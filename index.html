@@ -48,9 +48,9 @@
             <button onclick="toggleHint()" class="text-gray-400 hover:text-red-500 text-2xl font-bold">&times;</button>
         </div>
         <div class="text-xs text-gray-600 space-y-3 leading-relaxed">
-            <p>1. <b>Atur Saldo:</b> Masukkan uang tunai yang Anda pegang saat ini di menu Saldo Awal.</p>
-            <p>2. <b>Input Barang:</b> Gunakan format <br><code class="bg-gray-100 p-1 rounded text-indigo-600">Nama Produk : Modal > Jual</code></p>
-            <p>3. <b>Import Data:</b> Tempel teks laporan lama untuk memulihkan semua data sekaligus.</p>
+            <p>1. <b>Atur Saldo:</b> Masukkan saldo tunai awal Anda di menu Saldo Awal.</p>
+            <p>2. <b>Input Barang:</b> Gunakan format <br><code class="bg-gray-100 p-1 rounded text-indigo-600">Nama : Modal > Jual</code></p>
+            <p>3. <b>Import Report:</b> Salin seluruh teks laporan (termasuk unit laku & stok) lalu tempel melalui tombol Import.</p>
         </div>
     </div>
 
@@ -160,6 +160,12 @@
             label.innerText = panel.classList.contains('hidden-panel') ? "Buka Saldo Awal" : "Tutup Saldo Awal";
         }
 
+        // Helper untuk membersihkan angka dari teks
+        function parsePrice(str) {
+            if (!str) return 0;
+            return Number(str.replace(/[^0-9]/g, '')) || 0;
+        }
+
         function parseText(type) {
             const rawText = document.getElementById('bulkInput').value;
             const lines = rawText.split('\n');
@@ -168,8 +174,8 @@
                 if (line.includes(':') && line.includes('>')) {
                     const parts = line.split(/[:>]/);
                     const name = parts[0].trim().replace(/^-\s*/, '');
-                    const modal = Number(parts[1].replace(/[^0-9]/g, ''));
-                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
+                    const modal = parsePrice(parts[1]);
+                    const price = parsePrice(parts[2]);
                     
                     if (name && modal) {
                         items.unshift({
@@ -184,84 +190,76 @@
             calculateAll();
         }
 
-        // --- REVISI TOTAL FUNGSI IMPORT ---
+        // LOGIKA IMPORT REVISI TOTAL (ANTI ERROR FORMAT)
         function importReport() {
             const rawData = prompt("Tempel (Paste) laporan teks di sini:");
             if (!rawData) return;
 
             try {
-                // Bersihkan karakter aneh/invisible (zero-width joiners)
                 const cleanData = rawData.replace(/[\u200B-\u200D\uFEFF]/g, "");
                 const lines = cleanData.split('\n');
                 
                 let newItems = [];
                 let newStartBalance = 0;
-                let section = ""; 
+                let activeSection = ""; 
 
                 lines.forEach(line => {
                     const cleanLine = line.trim();
                     if (!cleanLine) return;
 
-                    // Deteksi Section Utama
-                    if (cleanLine.toLowerCase().includes("report bulanan")) { section = "sold"; return; }
-                    if (cleanLine.toLowerCase().includes("unit belum terjual")) { section = "stok"; return; }
+                    const lower = cleanLine.toLowerCase();
+                    if (lower.includes("report bulanan")) { activeSection = "sold"; return; }
+                    if (lower.includes("unit belum terjual")) { activeSection = "stok"; return; }
                     
-                    // Parsing Saldo Awal
-                    if (cleanLine.includes("Saldo Awal")) {
-                        const val = cleanLine.split(':')[1].replace(/[^0-9]/g, '');
-                        newStartBalance = Number(val);
+                    if (lower.includes("saldo awal")) {
+                        newStartBalance = parsePrice(cleanLine.split(':')[1]);
                         return;
                     }
 
-                    // Parsing Baris Barang
                     if (cleanLine.startsWith('-')) {
-                        if (section === "sold" && cleanLine.includes('>')) {
-                            // Format: - Nama : Modal > Jual (+Profit)
+                        // Jika baris mengandung tanda panah, otomatis masuk Terjual
+                        if (cleanLine.includes('>')) {
                             const parts = cleanLine.split(/[:>]/);
                             const name = parts[0].replace(/^-/, '').trim();
-                            const modal = Number(parts[1].replace(/[^0-9]/g, ''));
-                            const pricePart = parts[2].split('(')[0]; // Ambil sebelum (+Profit)
-                            const price = Number(pricePart.replace(/[^0-9]/g, ''));
+                            const modal = parsePrice(parts[1]);
+                            const price = parsePrice(parts[2].split('(')[0]);
                             
-                            if (name && !isNaN(modal) && !isNaN(price)) {
+                            if (name) {
                                 newItems.push({
                                     id: Date.now() + Math.random(),
                                     name, modal, price, status: 'sold', type: 'old'
                                 });
                             }
-                        } else if (section === "stok") {
-                            // Format: - Nama : Jual
+                        } 
+                        // Jika tidak ada tanda panah tapi ada titik dua, masuk Stok
+                        else if (cleanLine.includes(':')) {
                             const parts = cleanLine.split(':');
-                            if (parts.length > 1) {
-                                const name = parts[0].replace(/^-/, '').trim();
-                                const price = Number(parts[1].replace(/[^0-9]/g, ''));
-                                
-                                if (name && !isNaN(price)) {
-                                    // Gunakan modal = price (biar user ganti manual) atau 0
-                                    newItems.push({
-                                        id: Date.now() + Math.random(),
-                                        name, modal: price, price: price, status: 'stok', type: 'old'
-                                    });
-                                }
+                            const name = parts[0].replace(/^-/, '').trim();
+                            const price = parsePrice(parts[1]);
+                            
+                            if (name) {
+                                newItems.push({
+                                    id: Date.now() + Math.random(),
+                                    name, modal: price, price, status: 'stok', type: 'old'
+                                });
                             }
                         }
                     }
                 });
 
                 if (newItems.length > 0) {
-                    if (confirm(`Ditemukan ${newItems.length} unit.\nSaldo Awal: Rp ${newStartBalance.toLocaleString()}\n\nTimpa data saat ini?`)) {
+                    if (confirm(`Ditemukan ${newItems.length} unit. Timpa data saat ini?`)) {
                         items = newItems;
                         document.getElementById('startBalance').value = newStartBalance;
                         renderRows();
                         calculateAll();
-                        alert("Data Berhasil Diimport!");
+                        alert("Import Berhasil!");
                     }
                 } else {
-                    alert("Format tidak dikenali. Pastikan teks mengandung pemisah ':' dan '>'");
+                    alert("Gagal mengenali data. Pastikan baris barang diawali tanda '-'");
                 }
             } catch (e) {
-                console.error(e);
-                alert("Gagal membaca teks. Error: " + e.message);
+                alert("Kesalahan sistem: " + e.message);
             }
         }
 
@@ -360,8 +358,7 @@
             report += `Report Bulanan - ${currentMonthString}\n`;
             report += `————————————————\n`;
             
-            const terjual = items.filter(i => i.status === 'sold');
-            terjual.forEach(i => {
+            items.filter(i => i.status === 'sold').forEach(i => {
                 const profit = i.price - i.modal;
                 report += `- ${i.name} : ${i.modal.toLocaleString('id-ID')} > ${i.price.toLocaleString('id-ID')} (+${profit.toLocaleString('id-ID')})\n`;
             });
@@ -382,7 +379,7 @@
             report += `Saldo Akhir : ${document.getElementById('summaryCash').innerText}\n`;
             report += `UnRealize Balance : ${document.getElementById('summaryTotal').innerText}`;
 
-            navigator.clipboard.writeText(report).then(() => alert("Laporan disalin ke clipboard!"));
+            navigator.clipboard.writeText(report).then(() => alert("Laporan disalin!"));
         }
 
         function saveData() {
@@ -403,10 +400,7 @@
         }
 
         function clearData() {
-            if(confirm('Hapus semua data permanent?')) {
-                localStorage.clear();
-                location.reload();
-            }
+            if(confirm('Hapus semua data?')) { localStorage.clear(); location.reload(); }
         }
 
         window.onload = loadData;
