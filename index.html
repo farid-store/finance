@@ -22,7 +22,6 @@
         #overlay.open, #hintModalOverlay.open { display: block; }
         .hidden-panel { display: none; }
 
-        /* Modal Hint Style */
         #hintModal { 
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 90%; max-width: 400px; background: white; border-radius: 20px; padding: 24px;
@@ -51,17 +50,17 @@
         <div class="text-xs text-gray-600 space-y-3 leading-relaxed">
             <p>1. <b>Atur Saldo:</b> Masukkan uang tunai yang Anda pegang saat ini di menu Saldo Awal.</p>
             <p>2. <b>Input Barang:</b> Gunakan format <br><code class="bg-gray-100 p-1 rounded text-indigo-600">Nama Produk : Modal > Jual</code></p>
-            <p>3. <b>Stok Lalu:</b> Gunakan ini jika barang sudah ada sebelum pembukuan bulan ini dimulai (Tidak memotong saldo cash).</p>
-            <p>4. <b>Belanja Baru:</b> Gunakan ini jika barang baru dibeli (Otomatis memotong saldo cash).</p>
-            <p>5. <b>Laku:</b> Klik tombol "Laku?" jika unit terjual untuk menambah cash dan profit.</p>
-            <p>6. <b>Reset:</b> Klik menu "sidebar" pilih hapus data, untuk melakukan reset catatan.</p>
+            <p>3. <b>Import Data:</b> Gunakan tombol Import untuk memulihkan data dari teks laporan yang pernah di-copy.</p>
         </div>
     </div>
 
     <div class="max-w-2xl mx-auto">
         <div class="flex justify-between items-center mb-6">
             <button onclick="toggleSidebar()" class="p-2 bg-white rounded-xl shadow-sm text-indigo-600 font-bold">☰ Menu</button>
-            <button onclick="exportReport()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg">📤 Copy Report</button>
+            <div class="flex gap-2">
+                <button onclick="importReport()" class="px-4 py-2 bg-slate-600 text-white rounded-xl text-xs font-bold shadow-lg">📥 Import Report</button>
+                <button onclick="exportReport()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg">📤 Copy Report</button>
+            </div>
         </div>
 
         <header class="mb-8 flex justify-between items-center">
@@ -187,6 +186,75 @@
             document.getElementById('bulkInput').value = '';
             renderRows();
             calculateAll();
+        }
+
+        // --- FITUR IMPORT BARU ---
+        function importReport() {
+            const rawData = prompt("Tempel (Paste) laporan teks di sini:");
+            if (!rawData) return;
+
+            try {
+                const lines = rawData.split('\n');
+                let newItems = [];
+                let newStartBalance = 0;
+                let section = ""; // "terjual" atau "stok"
+
+                lines.forEach(line => {
+                    const cleanLine = line.trim();
+                    
+                    // Deteksi Section
+                    if (cleanLine.includes("Report Bulanan")) { section = "sold"; return; }
+                    if (cleanLine.includes("Unit Belum Terjual")) { section = "stok"; return; }
+                    
+                    // Ambil Saldo Awal
+                    if (cleanLine.includes("Saldo Awal")) {
+                        newStartBalance = Number(cleanLine.split(':')[1].replace(/[^0-9]/g, ''));
+                    }
+
+                    // Parsing Baris Barang
+                    if (cleanLine.startsWith('-')) {
+                        if (section === "sold" && cleanLine.includes('>')) {
+                            // Format: - Nama : Modal > Jual (+Profit)
+                            const parts = cleanLine.split(/[:>]/);
+                            const name = parts[0].replace(/^-/, '').trim();
+                            const modal = Number(parts[1].replace(/[^0-9]/g, ''));
+                            const price = Number(parts[2].split('(')[0].replace(/[^0-9]/g, ''));
+                            
+                            newItems.push({
+                                id: Date.now() + Math.random(),
+                                name, modal, price, status: 'sold', type: 'old'
+                            });
+                        } else if (section === "stok") {
+                            // Format: - Nama : Jual
+                            const parts = cleanLine.split(':');
+                            if (parts.length > 1) {
+                                const name = parts[0].replace(/^-/, '').trim();
+                                const price = Number(parts[1].replace(/[^0-9]/g, ''));
+                                // Karena modal tidak ada di teks "Unit Belum Terjual", kita set sama dengan harga (atau 0)
+                                // Namun agar data akurat, import ini paling baik untuk data 'sold'
+                                newItems.push({
+                                    id: Date.now() + Math.random(),
+                                    name, modal: price, price: price, status: 'stok', type: 'old'
+                                });
+                            }
+                        }
+                    }
+                });
+
+                if (newItems.length > 0) {
+                    if (confirm(`Ditemukan ${newItems.length} unit. Timpa data saat ini?`)) {
+                        items = newItems;
+                        document.getElementById('startBalance').value = newStartBalance;
+                        renderRows();
+                        calculateAll();
+                        alert("Import Berhasil!");
+                    }
+                } else {
+                    alert("Format tidak dikenali. Pastikan teks laporan sesuai.");
+                }
+            } catch (e) {
+                alert("Gagal mengurai data: " + e.message);
+            }
         }
 
         function toggleSold(id) {
