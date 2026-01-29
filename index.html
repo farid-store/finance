@@ -18,11 +18,10 @@
         
         #sidebar { transition: transform 0.3s ease; transform: translateX(-100%); z-index: 50; }
         #sidebar.open { transform: translateX(0); }
-        #overlay, #hintModalOverlay, #importModalOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
-        #overlay.open, #hintModalOverlay.open, #importModalOverlay.open { display: block; }
+        #overlay, #importModalOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
+        #overlay.open, #importModalOverlay.open { display: block; }
         .hidden-panel { display: none; }
 
-        /* Modal Style */
         .modal-custom { 
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 90%; max-width: 450px; background: white; border-radius: 20px; padding: 24px;
@@ -43,28 +42,15 @@
         </nav>
     </div>
 
-    <div id="hintModalOverlay" onclick="toggleHint()"></div>
-    <div id="hintModal" class="modal-custom">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="font-black text-indigo-900 uppercase">Cara Penggunaan</h3>
-            <button onclick="toggleHint()" class="text-gray-400 hover:text-red-500 text-2xl font-bold">&times;</button>
-        </div>
-        <div class="text-xs text-gray-600 space-y-3 leading-relaxed">
-            <p>1. <b>Atur Saldo:</b> Masukkan uang tunai awal di menu Saldo Awal.</p>
-            <p>2. <b>Input Barang:</b> Gunakan format <br><code class="bg-gray-100 p-1 rounded text-indigo-600">Nama Produk : Modal > Jual</code></p>
-            <p>3. <b>Laku:</b> Klik "Laku?" jika unit terjual untuk menambah cash dan profit.</p>
-            <p>4. <b>Import:</b> Kamu bisa memulihkan data dari teks laporan yang pernah kamu copy sebelumnya.</p>
-        </div>
-    </div>
-
     <div id="importModalOverlay" onclick="toggleImportModal()"></div>
     <div id="importModal" class="modal-custom">
         <div class="flex justify-between items-center mb-4">
             <h3 class="font-black text-indigo-900 uppercase italic">📥 Import Data</h3>
             <button onclick="toggleImportModal()" class="text-gray-400 hover:text-red-500 text-2xl font-bold">&times;</button>
         </div>
+        <p class="text-[10px] text-gray-400 mb-2 font-bold uppercase">Tempel laporan hasil export di sini:</p>
         <textarea id="importArea" class="input-field h-48 mb-4 text-[11px] font-mono" placeholder="Paste laporan di sini..."></textarea>
-        <button onclick="processImport()" class="btn-primary bg-indigo-600">PROSES IMPORT DATA</button>
+        <button onclick="processImport()" class="btn-primary bg-indigo-600">PROSES & SINKRONKAN DATA</button>
     </div>
 
     <div class="max-w-2xl mx-auto">
@@ -108,21 +94,16 @@
             </h3>
             <textarea id="bulkInput" class="input-field h-24 mb-3 text-sm border-dashed" placeholder="Format: Nama HP : Modal > Jual&#10;Contoh: Poco M3 : 450000 > 600000"></textarea>
             <div class="grid grid-cols-2 gap-3">
-                <button onclick="parseText('old')" class="btn-primary bg-slate-700 text-[10px] uppercase">Stok Bulan Lalu</button>
-                <button onclick="parseText('new')" class="btn-primary bg-emerald-600 text-[10px] uppercase">Belanja Stok Baru</button>
+                <button onclick="parseText('old')" class="btn-primary bg-slate-700 text-[10px] uppercase">Stok Bulan Lalu [L]</button>
+                <button onclick="parseText('new')" class="btn-primary bg-emerald-600 text-[10px] uppercase">Belanja Baru [B]</button>
             </div>
         </div>
 
         <div class="mb-6">
-            <div class="flex items-center gap-2 mb-2">
-                <button onclick="toggleConfig()" class="text-[10px] font-bold text-indigo-600 flex items-center gap-1 uppercase tracking-widest">
-                    <span id="configIcon">⚙️</span> <span id="configLabel">Buka Saldo Awal</span>
-                </button>
-                <button onclick="toggleHint()" class="w-5 h-5 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-full text-[10px] font-bold hover:bg-indigo-200">?</button>
-            </div>
+            <button onclick="toggleConfig()" id="configLabel" class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-2">⚙️ Buka Saldo Awal</button>
             <div id="configPanel" class="hidden-panel">
                 <div class="card p-5 bg-indigo-50 border-none">
-                    <h3 class="font-bold text-indigo-900 text-[10px] uppercase tracking-wider mb-2">Cash Awal (Saldo Tunai)</h3>
+                    <h3 class="font-bold text-indigo-900 text-[10px] uppercase tracking-wider mb-2">Modal Tunai di Tangan (Awal Bulan)</h3>
                     <input type="number" id="startBalance" class="input-field font-black text-lg text-indigo-700 bg-white border-none" value="0" onchange="calculateAll()">
                 </div>
             </div>
@@ -135,7 +116,7 @@
                     <h2 id="previewModalStock" class="text-xl font-black">Rp 0</h2>
                 </div>
                 <div class="text-right">
-                    <h3 class="font-bold text-emerald-400 text-[9px] uppercase tracking-widest">Potensi Untung (Unrealized)</h3>
+                    <h3 class="font-bold text-emerald-400 text-[9px] uppercase tracking-widest">Potensi Untung</h3>
                     <h2 id="previewUnrealizedProfit" class="text-xl font-black">Rp 0</h2>
                 </div>
             </div>
@@ -156,15 +137,9 @@
         const currentMonthString = monthNames[now.getMonth()] + " " + now.getFullYear();
         document.getElementById('currentMonth').innerText = currentMonthString;
 
-        // --- UI FUNCTIONS ---
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
             document.getElementById('overlay').classList.toggle('open');
-        }
-
-        function toggleHint() {
-            document.getElementById('hintModal').classList.toggle('open');
-            document.getElementById('hintModalOverlay').classList.toggle('open');
         }
 
         function toggleImportModal() {
@@ -177,28 +152,20 @@
             const panel = document.getElementById('configPanel');
             const label = document.getElementById('configLabel');
             panel.classList.toggle('hidden-panel');
-            label.innerText = panel.classList.contains('hidden-panel') ? "Buka Saldo Awal" : "Tutup Saldo Awal";
+            label.innerText = panel.classList.contains('hidden-panel') ? "⚙️ Buka Saldo Awal" : "⚙️ Tutup Saldo Awal";
         }
 
-        // --- CORE LOGIC ---
         function parseText(type) {
             const rawText = document.getElementById('bulkInput').value;
             const lines = rawText.split('\n');
-            
             lines.forEach(line => {
                 if (line.includes(':') && line.includes('>')) {
                     const parts = line.split(/[:>]/);
-                    const name = parts[0].trim().replace(/^-\s*/, '');
+                    const name = parts[0].trim().replace(/^-\s*/, '').replace(/\[[BL]\]\s*/, '');
                     const modal = Number(parts[1].replace(/[^0-9]/g, ''));
                     const price = Number(parts[2].replace(/[^0-9]/g, ''));
-                    
                     if (name && modal) {
-                        items.unshift({
-                            id: Date.now() + Math.random(),
-                            name, modal, price,
-                            status: 'stok',
-                            type: type 
-                        });
+                        items.unshift({ id: Date.now() + Math.random(), name, modal, price, status: 'stok', type: type });
                     }
                 }
             });
@@ -209,9 +176,8 @@
 
         function processImport() {
             const text = document.getElementById('importArea').value;
-            if (!text.trim()) return alert("Paste teks laporan dulu!");
-
-            if (!confirm("Import data akan menimpa data saat ini. Lanjutkan?")) return;
+            if (!text.trim()) return;
+            if (!confirm("Hapus data saat ini dan ganti dengan data import?")) return;
 
             const newItems = [];
             const lines = text.split('\n');
@@ -220,33 +186,30 @@
 
             lines.forEach(line => {
                 const cleanLine = line.trim();
-                
-                // Deteksi Section
-                if (cleanLine.includes("Report Bulanan")) { section = "sold"; return; }
-                if (cleanLine.includes("Unit Belum Terjual")) { section = "unsold"; return; }
+                if (cleanLine.includes("Report Bulanan")) section = "sold";
+                if (cleanLine.includes("Unit Belum Terjual")) section = "unsold";
                 if (cleanLine.includes("Saldo Awal")) {
-                    const match = cleanLine.match(/Saldo\s*Awal\s*:\s*Rp\s*([\d.]+)/i);
-                    if (match) saldoAwalImport = Number(match[1].replace(/\./g, ''));
-                    return;
+                    const m = cleanLine.match(/Rp\s*([\d.]+)/);
+                    if (m) saldoAwalImport = Number(m[1].replace(/\./g, ''));
                 }
 
-                // Parse Item Berdasarkan Section
                 if (cleanLine.startsWith("-")) {
-                    if (section === "sold" && cleanLine.includes(">")) {
-                        // Format: - Name : 800.000 > 900.000 (+100.000)
-                        const parts = cleanLine.split(/[:>]/);
-                        const name = parts[0].replace('-', '').trim();
+                    const isNew = cleanLine.includes("[B]");
+                    const type = isNew ? 'new' : 'old';
+                    
+                    const parts = cleanLine.split(/[:>]/);
+                    if (parts.length >= 3) {
+                        const name = parts[0].replace('-', '').replace(/\[[BL]\]/, '').trim();
                         const modal = Number(parts[1].replace(/[^0-9]/g, ''));
-                        const price = Number(parts[2].split('(')[0].replace(/[^0-9]/g, ''));
-                        newItems.push({ id: Math.random(), name, modal, price, status: 'sold', type: 'old' });
-                    } 
-                    else if (section === "unsold") {
-                        // Format: - Name : 1.300.000
-                        const parts = cleanLine.split(':');
-                        const name = parts[0].replace('-', '').trim();
-                        const price = Number(parts[1].replace(/[^0-9]/g, ''));
-                        // Karena di laporan unsold tidak ada modal, kita samakan modal = harga jual (0 profit sementara)
-                        newItems.push({ id: Math.random(), name, modal: price, price, status: 'stok', type: 'old' });
+                        const pricePart = parts[2].split('(')[0];
+                        const price = Number(pricePart.replace(/[^0-9]/g, ''));
+                        
+                        newItems.push({
+                            id: Math.random(),
+                            name, modal, price,
+                            status: section === "sold" ? "sold" : "stok",
+                            type: type
+                        });
                     }
                 }
             });
@@ -257,9 +220,9 @@
                 renderRows();
                 calculateAll();
                 toggleImportModal();
-                alert("Berhasil mengimpor " + newItems.length + " unit!");
+                alert("Import Berhasil! Data baru telah disinkronkan.");
             } else {
-                alert("Format teks tidak dikenali. Pastikan format sesuai laporan export.");
+                alert("Format tidak dikenali. Pastikan meng-copy seluruh isi laporan.");
             }
         }
 
@@ -273,7 +236,7 @@
         }
 
         function removeItem(id) {
-            if(confirm('Hapus item ini?')) {
+            if(confirm('Hapus item?')) {
                 items = items.filter(i => i.id !== id);
                 renderRows();
                 calculateAll();
@@ -284,21 +247,18 @@
             const container = document.getElementById('itemRows');
             document.getElementById('itemCount').innerText = `${items.length} UNIT`;
             container.innerHTML = '';
-            
             items.forEach(item => {
                 const isSold = item.status === 'sold';
                 const isOld = item.type === 'old';
                 const profit = item.price - item.modal;
-                
                 const card = document.createElement('div');
                 card.className = `p-4 rounded-2xl border-2 transition-all ${isSold ? 'bg-white border-emerald-500 opacity-75' : 'bg-white border-slate-100'}`;
-                
                 card.innerHTML = `
                     <div class="flex justify-between items-start">
                         <div class="flex-1">
                             <div class="flex items-center gap-2 mb-1">
-                                <span class="text-[8px] font-bold px-1.5 py-0.5 rounded uppercase ${isOld ? 'bg-orange-100 text-orange-600' : 'bg-blue-100 text-blue-600'}">
-                                    ${isOld ? 'Stok Lalu' : 'Baru'}
+                                <span class="text-[8px] font-bold px-1.5 py-0.5 rounded uppercase ${isOld ? 'bg-orange-100 text-orange-600' : 'bg-indigo-100 text-indigo-600'}">
+                                    ${isOld ? 'Stok Lalu' : 'Belanja Baru'}
                                 </span>
                                 <h4 class="font-bold text-gray-800 text-sm">${item.name}</h4>
                             </div>
@@ -309,10 +269,7 @@
                         </div>
                         <div class="flex flex-col items-end gap-2">
                             <button onclick="removeItem(${item.id})" class="text-gray-300 hover:text-red-400 text-xs">✕</button>
-                            ${!isSold ? 
-                                `<button onclick="toggleSold(${item.id})" class="btn-sell">Laku? ✓</button>` : 
-                                `<span class="badge-profit">+${profit.toLocaleString()}</span>`
-                            }
+                            ${!isSold ? `<button onclick="toggleSold(${item.id})" class="btn-sell">Laku? ✓</button>` : `<span class="badge-profit">+${profit.toLocaleString()}</span>`}
                         </div>
                     </div>
                 `;
@@ -329,7 +286,7 @@
             let totalFloatingModal = 0;
 
             items.forEach(item => {
-                if (item.type === 'new') { totalModalBelanjaBaru += item.modal; }
+                if (item.type === 'new') totalModalBelanjaBaru += item.modal;
                 if (item.status === 'sold') {
                     totalUangMasuk += item.price;
                     realizedProfit += (item.price - item.modal);
@@ -340,58 +297,38 @@
             });
 
             const currentCash = startBalance - totalModalBelanjaBaru + totalUangMasuk;
-            const totalAset = currentCash + totalFloatingPrice;
-            const unrealizedProfit = totalFloatingPrice - totalFloatingModal;
-
             document.getElementById('summaryCash').innerText = "Rp " + currentCash.toLocaleString('id-ID');
             document.getElementById('summaryFloating').innerText = "Rp " + totalFloatingPrice.toLocaleString('id-ID');
-            document.getElementById('summaryTotal').innerText = "Rp " + totalAset.toLocaleString('id-ID');
+            document.getElementById('summaryTotal').innerText = "Rp " + (currentCash + totalFloatingPrice).toLocaleString('id-ID');
             document.getElementById('summaryProfit').innerText = "Rp " + realizedProfit.toLocaleString('id-ID');
             document.getElementById('previewModalStock').innerText = "Rp " + totalFloatingModal.toLocaleString('id-ID');
-            document.getElementById('previewUnrealizedProfit').innerText = "Rp " + unrealizedProfit.toLocaleString('id-ID');
-            
+            document.getElementById('previewUnrealizedProfit').innerText = "Rp " + (totalFloatingPrice - totalFloatingModal).toLocaleString('id-ID');
             saveData();
         }
 
         function exportReport() {
-            let report = `————————————————\n`;
-            report += `Report Bulanan - ${currentMonthString}\n`;
-            report += `————————————————\n`;
-            
-            const terjual = items.filter(i => i.status === 'sold');
-            terjual.forEach(i => {
-                const profit = i.price - i.modal;
-                report += `- ${i.name} : ${i.modal.toLocaleString('id-ID')} > ${i.price.toLocaleString('id-ID')} (+${profit.toLocaleString('id-ID')})\n`;
+            let report = `————————————————\nReport Bulanan - ${currentMonthString}\n————————————————\n`;
+            items.filter(i => i.status === 'sold').forEach(i => {
+                const tag = i.type === 'new' ? '[B]' : '[L]';
+                report += `- ${tag} ${i.name} : ${i.modal.toLocaleString('id-ID')} > ${i.price.toLocaleString('id-ID')} (+${(i.price-i.modal).toLocaleString('id-ID')})\n`;
             });
-
-            report += `\n————————————————\n`;
-            report += `Unit Belum Terjual - ${currentMonthString}\n`;
-            report += `————————————————\n`;
+            report += `\n————————————————\nUnit Belum Terjual - ${currentMonthString}\n————————————————\n`;
             items.filter(i => i.status === 'stok').forEach(i => {
-                report += `- ${i.name} : ${i.price.toLocaleString('id-ID')}\n`;
+                const tag = i.type === 'new' ? '[B]' : '[L]';
+                report += `- ${tag} ${i.name} : ${i.modal.toLocaleString('id-ID')} > ${i.price.toLocaleString('id-ID')}\n`;
             });
-
-            report += `\n————————————————\n`;
-            report += `> Saldo Awal : Rp ${Number(document.getElementById('startBalance').value).toLocaleString('id-ID')}\n`;
+            report += `\n————————————————\n> Saldo Awal : Rp ${Number(document.getElementById('startBalance').value).toLocaleString('id-ID')}\n`;
             report += `> Total Profit Terjual : ${document.getElementById('summaryProfit').innerText}\n`;
             report += `> Total UnRealize Profit : ${document.getElementById('previewUnrealizedProfit').innerText}\n`;
-            report += `> Total Floating : ${document.getElementById('summaryFloating').innerText}\n`;
-            report += `————————————————\n`;
-            report += `Saldo Akhir : ${document.getElementById('summaryCash').innerText}\n`;
-            report += `UnRealize Balance : ${document.getElementById('summaryTotal').innerText}`;
-
-            navigator.clipboard.writeText(report).then(() => alert("Laporan disalin sesuai format!"));
+            report += `> Total Floating : ${document.getElementById('summaryFloating').innerText}\n————————————————\n`;
+            report += `Saldo Akhir : ${document.getElementById('summaryCash').innerText}\nUnRealize Balance : ${document.getElementById('summaryTotal').innerText}`;
+            
+            navigator.clipboard.writeText(report).then(() => alert("Laporan Berhasil Disalin!"));
         }
 
-        function saveData() {
-            localStorage.setItem('phone_ledger_v4', JSON.stringify({
-                startBalance: document.getElementById('startBalance').value,
-                items: items
-            }));
-        }
-
+        function saveData() { localStorage.setItem('phone_ledger_v6', JSON.stringify({ startBalance: document.getElementById('startBalance').value, items: items })); }
         function loadData() {
-            const data = JSON.parse(localStorage.getItem('phone_ledger_v4'));
+            const data = JSON.parse(localStorage.getItem('phone_ledger_v6'));
             if (data) {
                 document.getElementById('startBalance').value = data.startBalance || 0;
                 items = data.items || [];
@@ -399,14 +336,7 @@
                 calculateAll();
             }
         }
-
-        function clearData() {
-            if(confirm('Hapus semua data?')) {
-                localStorage.clear();
-                location.reload();
-            }
-        }
-
+        function clearData() { if(confirm('Reset semua data?')) { localStorage.clear(); location.reload(); } }
         window.onload = loadData;
     </script>
 </body>
