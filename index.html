@@ -21,6 +21,9 @@
         #sidebar.open { transform: translateX(0); }
         #overlay { display: none; z-index: 40; }
         #overlay.open { display: block; }
+        
+        /* Utility for Hiding */
+        .hidden-panel { display: none; }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -32,7 +35,6 @@
             <a href="#" class="block p-3 rounded-lg bg-indigo-800 font-medium">📊 Ringkasan Utama</a>
             <a href="#" class="block p-3 rounded-lg hover:bg-indigo-800 transition text-indigo-300 italic">📦 Stok Gudang (Demo)</a>
             <a href="#" class="block p-3 rounded-lg hover:bg-indigo-800 transition text-indigo-300 italic">📈 Laporan Tahunan (Demo)</a>
-            <a href="#" class="block p-3 rounded-lg hover:bg-indigo-800 transition text-indigo-300 italic">⚙️ Pengaturan (Demo)</a>
         </nav>
     </div>
 
@@ -59,7 +61,7 @@
                 <h2 id="summaryCash" class="text-lg font-bold text-gray-800">Rp 0</h2>
             </div>
             <div class="card p-5 border-b-4 border-emerald-500">
-                <p class="text-[10px] text-gray-500 uppercase font-bold">Floating (Stok)</p>
+                <p class="text-[10px] text-gray-500 uppercase font-bold">Floating (Stok Aktif)</p>
                 <h2 id="summaryFloating" class="text-lg font-bold text-gray-800">Rp 0</h2>
             </div>
             <div class="card p-6 col-span-2 text-center bg-indigo-900 text-white">
@@ -68,33 +70,46 @@
             </div>
         </div>
 
-        <div class="card p-6 mb-6">
-            <h3 class="font-bold text-gray-800 mb-2 flex items-center gap-2">
+        <div class="card p-6 mb-4">
+            <h3 class="font-bold text-gray-800 mb-2 flex items-center gap-2 text-sm uppercase tracking-wider">
                 <span>📝</span> Smart Input Teks
             </h3>
             <textarea id="bulkInput" class="input-field h-24 mb-3 text-sm border-dashed" placeholder="Format: Tipe : Modal > Jual&#10;Contoh:&#10;Oppo A54 : 500000 > 650000"></textarea>
             <div class="grid grid-cols-2 gap-3">
-                <button onclick="parseText('stok')" class="btn-primary bg-slate-700 text-xs text-white">Simpan Stok</button>
-                <button onclick="parseText('sold')" class="btn-primary bg-emerald-600 text-xs text-white">Simpan Terjual</button>
+                <button onclick="parseText('stok')" class="btn-primary bg-slate-700 text-xs text-white uppercase">Simpan Stok</button>
+                <button onclick="parseText('sold')" class="btn-primary bg-emerald-600 text-xs text-white uppercase">Simpan Terjual</button>
             </div>
         </div>
 
-        <div class="space-y-4 mb-6">
-            <div class="card p-6">
-                <h3 class="font-bold text-gray-800 text-sm mb-3">Saldo Awal (Per Awal Bulan)</h3>
-                <input type="number" id="startBalance" class="input-field font-black text-xl text-indigo-700 bg-indigo-50 border-none uppercase" value="0" onchange="calculateAll()">
-            </div>
+        <div class="mb-6">
+            <button onclick="toggleConfig()" class="text-[10px] font-bold text-indigo-600 flex items-center gap-1 mb-2 uppercase tracking-widest">
+                <span id="configIcon">⚙️</span> <span id="configLabel">Buka Pengaturan Saldo</span>
+            </button>
             
-            <div class="card p-5 bg-slate-800 border-l-8 border-indigo-500 text-white">
-                <p class="text-[10px] text-indigo-300 uppercase font-bold tracking-widest mb-1">Total Modal Take Unit (Stock)</p>
-                <h2 id="previewModalStock" class="text-2xl font-black text-white">Rp 0</h2>
-                <p class="text-[9px] text-slate-400 mt-1 italic">*Jumlah dana tertanam pada unit yang belum terjual</p>
+            <div id="configPanel" class="hidden-panel space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="card p-5 bg-indigo-50 border-none">
+                        <h3 class="font-bold text-indigo-900 text-[10px] uppercase tracking-wider mb-2">Saldo Awal (Cash)</h3>
+                        <input type="number" id="startBalance" class="input-field font-black text-lg text-indigo-700 bg-white border-none" value="0" onchange="calculateAll()">
+                    </div>
+                    <div class="card p-5 bg-emerald-50 border-none">
+                        <h3 class="font-bold text-emerald-900 text-[10px] uppercase tracking-wider mb-2">Floating Bulan Lalu (Stok)</h3>
+                        <input type="number" id="prevFloating" class="input-field font-black text-lg text-emerald-700 bg-white border-none" value="0" onchange="calculateAll()" placeholder="Total Jual Stok Lalu">
+                    </div>
+                </div>
             </div>
-
-            <div class="card p-5 bg-indigo-950 border-l-8 border-emerald-500 text-white">
-                <p class="text-[10px] text-emerald-400 uppercase font-bold tracking-widest mb-1">Unrealized Profit (Estimate)</p>
-                <h2 id="previewUnrealizedProfit" class="text-2xl font-black text-white">Rp 0</h2>
-                <p class="text-[9px] text-indigo-300 mt-1 italic">*Potensi keuntungan jika semua stok terjual sesuai target</p>
+        </div>
+        
+        <div class="space-y-3 mb-8">
+            <div class="card p-4 bg-slate-800 border-l-4 border-indigo-500 text-white flex justify-between items-center">
+                <div>
+                    <h3 class="font-bold text-indigo-300 text-[9px] uppercase tracking-widest">Modal Stok (Live)</h3>
+                    <h2 id="previewModalStock" class="text-xl font-black">Rp 0</h2>
+                </div>
+                <div class="text-right">
+                    <h3 class="font-bold text-emerald-400 text-[9px] uppercase tracking-widest">Unrealized Profit</h3>
+                    <h2 id="previewUnrealizedProfit" class="text-xl font-black">Rp 0</h2>
+                </div>
             </div>
         </div>
 
@@ -118,6 +133,19 @@
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
             document.getElementById('overlay').classList.toggle('open');
+        }
+
+        // Toggle Config Panel
+        function toggleConfig() {
+            const panel = document.getElementById('configPanel');
+            const label = document.getElementById('configLabel');
+            if (panel.style.display === "block") {
+                panel.style.display = "none";
+                label.innerText = "Buka Pengaturan Saldo";
+            } else {
+                panel.style.display = "block";
+                label.innerText = "Tutup Pengaturan Saldo";
+            }
         }
 
         function parseText(status) {
@@ -189,33 +217,36 @@
 
         function calculateAll() {
             const startBalance = Number(document.getElementById('startBalance').value) || 0;
-            let totalModalBelanja = 0;
+            const prevFloating = Number(document.getElementById('prevFloating').value) || 0;
+            
+            let totalModalInputBulanIni = 0;
             let totalUangMasuk = 0;
-            let totalFloating = 0;
+            let floatingInputBulanIni = 0;
             let realizedProfit = 0;
-            let modalStockOnly = 0;
+            let modalStockAktif = 0;
             let unrealizedProfitEst = 0;
 
             items.forEach(item => {
-                totalModalBelanja += item.modal;
+                totalModalInputBulanIni += item.modal;
                 if (item.status === 'sold') {
                     totalUangMasuk += item.price;
                     realizedProfit += (item.price - item.modal);
                 } else {
-                    totalFloating += item.price;
-                    modalStockOnly += item.modal;
+                    floatingInputBulanIni += item.price;
+                    modalStockAktif += item.modal;
                     unrealizedProfitEst += (item.price - item.modal);
                 }
             });
 
-            const currentCash = startBalance - totalModalBelanja + totalUangMasuk;
-            const unrealizedBalance = currentCash + totalFloating;
+            const combinedFloating = prevFloating + floatingInputBulanIni;
+            const currentCash = startBalance - totalModalInputBulanIni + totalUangMasuk;
+            const totalAset = currentCash + combinedFloating;
 
             document.getElementById('summaryCash').innerText = "Rp " + currentCash.toLocaleString('id-ID');
-            document.getElementById('summaryFloating').innerText = "Rp " + totalFloating.toLocaleString('id-ID');
-            document.getElementById('summaryTotal').innerText = "Rp " + unrealizedBalance.toLocaleString('id-ID');
+            document.getElementById('summaryFloating').innerText = "Rp " + combinedFloating.toLocaleString('id-ID');
+            document.getElementById('summaryTotal').innerText = "Rp " + totalAset.toLocaleString('id-ID');
             document.getElementById('summaryProfit').innerText = "Rp " + realizedProfit.toLocaleString('id-ID');
-            document.getElementById('previewModalStock').innerText = "Rp " + modalStockOnly.toLocaleString('id-ID');
+            document.getElementById('previewModalStock').innerText = "Rp " + modalStockAktif.toLocaleString('id-ID');
             document.getElementById('previewUnrealizedProfit').innerText = "Rp " + unrealizedProfitEst.toLocaleString('id-ID');
             
             saveData();
@@ -223,12 +254,13 @@
 
         function exportReport() {
             const startBal = Number(document.getElementById('startBalance').value) || 0;
+            const prevFloat = Number(document.getElementById('prevFloating').value) || 0;
             const soldItems = items.filter(i => i.status === 'sold');
             const stockItems = items.filter(i => i.status === 'stok');
             
             let totalProfitSold = 0;
             let totalUnrealizedProfit = 0;
-            let totalFloating = 0;
+            let floatingBulanIni = 0;
             let totalUangMasuk = 0;
             let totalModalBelanja = 0;
 
@@ -236,43 +268,36 @@
             report += `Report Bulanan - ${currentMonthString}\n`;
             report += `————————————————\n`;
 
-            if (soldItems.length === 0) {
-                report += `(Belum ada data terjual)\n`;
-            } else {
-                soldItems.forEach(item => {
-                    const profit = item.price - item.modal;
-                    totalProfitSold += profit;
-                    totalUangMasuk += item.price;
-                    report += `- ${item.name} : ${item.modal.toLocaleString('id-ID')} > ${item.price.toLocaleString('id-ID')} (+${profit.toLocaleString('id-ID')})\n`;
-                });
-            }
+            soldItems.forEach(item => {
+                const profit = item.price - item.modal;
+                totalProfitSold += profit;
+                totalUangMasuk += item.price;
+                report += `- ${item.name} : ${item.modal.toLocaleString('id-ID')} > ${item.price.toLocaleString('id-ID')} (+${profit.toLocaleString('id-ID')})\n`;
+            });
 
             report += `\n————————————————\n`;
-            report += `Unit Belum Terjual - ${currentMonthString}\n`;
+            report += `Unit Belum Terjual (New)\n`;
             report += `————————————————\n`;
 
-            if (stockItems.length === 0) {
-                report += `(Stok kosong)\n`;
-            } else {
-                stockItems.forEach(item => {
-                    totalFloating += item.price;
-                    totalUnrealizedProfit += (item.price - item.modal);
-                    report += `- ${item.name} : ${item.price.toLocaleString('id-ID')}\n`;
-                });
-            }
+            stockItems.forEach(item => {
+                floatingBulanIni += item.price;
+                totalUnrealizedProfit += (item.price - item.modal);
+                report += `- ${item.name} : ${item.price.toLocaleString('id-ID')}\n`;
+            });
 
             items.forEach(i => totalModalBelanja += i.modal);
             const cashAkhir = startBal - totalModalBelanja + totalUangMasuk;
-            const unRealBalance = cashAkhir + totalFloating;
+            const totalFloating = prevFloat + floatingBulanIni;
+            const totalAset = cashAkhir + totalFloating;
 
             report += `\n————————————————\n`;
-            report += `> Saldo Awal : Rp ${startBal.toLocaleString('id-ID')}\n`;
-            report += `> Total Profit Terjual : Rp ${totalProfitSold.toLocaleString('id-ID')}\n`;
-            report += `> Total Est. Profit Stok : Rp ${totalUnrealizedProfit.toLocaleString('id-ID')}\n`;
-            report += `> Total Floating : Rp ${totalFloating.toLocaleString('id-ID')}\n`;
+            report += `> Saldo Awal (Cash) : Rp ${startBal.toLocaleString('id-ID')}\n`;
+            report += `> Floating Lalu : Rp ${prevFloat.toLocaleString('id-ID')}\n`;
+            report += `> Profit Terjual : Rp ${totalProfitSold.toLocaleString('id-ID')}\n`;
             report += `————————————————\n`;
-            report += `Saldo Akhir : Rp ${cashAkhir.toLocaleString('id-ID')}\n`;
-            report += `UnRealize Balance : Rp ${unRealBalance.toLocaleString('id-ID')}`;
+            report += `Saldo Akhir (Cash) : Rp ${cashAkhir.toLocaleString('id-ID')}\n`;
+            report += `Total Floating Aktif : Rp ${totalFloating.toLocaleString('id-ID')}\n`;
+            report += `Unrealized Balance : Rp ${totalAset.toLocaleString('id-ID')}`;
 
             navigator.clipboard.writeText(report).then(() => {
                 alert("Laporan berhasil disalin!");
@@ -290,6 +315,7 @@
         function saveData() {
             localStorage.setItem('ledger_pro_v3', JSON.stringify({
                 startBalance: document.getElementById('startBalance').value,
+                prevFloating: document.getElementById('prevFloating').value,
                 items: items
             }));
         }
@@ -298,7 +324,14 @@
             const data = JSON.parse(localStorage.getItem('ledger_pro_v3'));
             if (data) {
                 document.getElementById('startBalance').value = data.startBalance || 0;
+                document.getElementById('prevFloating').value = data.prevFloating || 0;
                 items = data.items || [];
+                
+                // Auto-show panel if there's data
+                if (data.startBalance > 0 || data.prevFloating > 0) {
+                    toggleConfig();
+                }
+                
                 renderRows();
                 calculateAll();
             }
