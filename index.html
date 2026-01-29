@@ -17,7 +17,6 @@
         .btn-sell { background: #10b981; color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; transition: 0.2s; }
         .btn-sell:hover { background: #059669; }
 
-        /* Sidebar Styles */
         #sidebar { transition: transform 0.3s ease; transform: translateX(-100%); z-index: 50; }
         #sidebar.open { transform: translateX(0); }
         #overlay { display: none; z-index: 40; }
@@ -49,18 +48,18 @@
                 <p id="currentMonth" class="text-indigo-600 font-semibold uppercase tracking-wider text-[10px]"></p>
             </div>
             <div class="text-right">
-                <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Net Profit</p>
+                <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Realized Profit</p>
                 <h2 id="summaryProfit" class="text-xl font-black text-emerald-600">Rp 0</h2>
             </div>
         </header>
 
         <div class="grid grid-cols-2 gap-4 mb-6">
             <div class="card p-5 border-b-4 border-indigo-500">
-                <p class="text-[10px] text-gray-500 uppercase font-bold">Total Cash</p>
+                <p class="text-[10px] text-gray-500 uppercase font-bold">Total Cash (S. Akhir)</p>
                 <h2 id="summaryCash" class="text-lg font-bold text-gray-800">Rp 0</h2>
             </div>
             <div class="card p-5 border-b-4 border-emerald-500">
-                <p class="text-[10px] text-gray-500 uppercase font-bold">Floating</p>
+                <p class="text-[10px] text-gray-500 uppercase font-bold">Floating (Stok)</p>
                 <h2 id="summaryFloating" class="text-lg font-bold text-gray-800">Rp 0</h2>
             </div>
             <div class="card p-6 col-span-2 text-center bg-indigo-900 text-white">
@@ -176,62 +175,90 @@
 
         function calculateAll() {
             const startBalance = Number(document.getElementById('startBalance').value) || 0;
-            const currentMonth = now.getMonth();
-            
             let totalModalBelanja = 0;
             let totalUangMasuk = 0;
             let totalFloating = 0;
-            let netProfitBulanIni = 0;
+            let realizedProfit = 0;
+            let unrealizedProfit = 0;
 
             items.forEach(item => {
                 totalModalBelanja += item.modal;
                 if (item.status === 'sold') {
                     totalUangMasuk += item.price;
-                    if (item.month === currentMonth) {
-                        netProfitBulanIni += (item.price - item.modal);
-                    }
+                    realizedProfit += (item.price - item.modal);
                 } else {
                     totalFloating += item.price;
+                    unrealizedProfit += (item.price - item.modal);
                 }
             });
 
             const currentCash = startBalance - totalModalBelanja + totalUangMasuk;
-            const unrealized = currentCash + totalFloating;
+            const unrealizedBalance = currentCash + totalFloating;
 
             document.getElementById('summaryCash').innerText = "Rp " + currentCash.toLocaleString('id-ID');
             document.getElementById('summaryFloating').innerText = "Rp " + totalFloating.toLocaleString('id-ID');
-            document.getElementById('summaryTotal').innerText = "Rp " + unrealized.toLocaleString('id-ID');
-            document.getElementById('summaryProfit').innerText = "Rp " + netProfitBulanIni.toLocaleString('id-ID');
+            document.getElementById('summaryTotal').innerText = "Rp " + unrealizedBalance.toLocaleString('id-ID');
+            document.getElementById('summaryProfit').innerText = "Rp " + realizedProfit.toLocaleString('id-ID');
             
             saveData();
         }
 
         function exportReport() {
             const startBal = Number(document.getElementById('startBalance').value) || 0;
-            const cash = document.getElementById('summaryCash').innerText;
-            const floating = document.getElementById('summaryFloating').innerText;
-            const profitTotal = document.getElementById('summaryProfit').innerText;
-            const asset = document.getElementById('summaryTotal').innerText;
-
-            let report = `————————————————\nReport Bulanan - ${currentMonthString}\n————————————————\n`;
-            
             const soldItems = items.filter(i => i.status === 'sold');
-            if (soldItems.length === 0) report += `(Belum ada data terjual)\n`;
+            const stockItems = items.filter(i => i.status === 'stok');
             
-            soldItems.forEach(item => {
-                report += `- ${item.name} : ${item.modal.toLocaleString()} > ${item.price.toLocaleString()} (+${(item.price - item.modal).toLocaleString()})\n`;
-            });
+            let totalProfitSold = 0;
+            let totalUnrealizedProfit = 0;
+            let totalFloating = 0;
+            let totalUangMasuk = 0;
+            let totalModalBelanja = 0;
+
+            let report = `————————————————\n`;
+            report += `Report Bulanan - ${currentMonthString}\n`;
+            report += `————————————————\n`;
+
+            if (soldItems.length === 0) {
+                report += `(Belum ada data terjual)\n`;
+            } else {
+                soldItems.forEach(item => {
+                    const profit = item.price - item.modal;
+                    totalProfitSold += profit;
+                    totalUangMasuk += item.price;
+                    report += `- ${item.name} : ${item.modal.toLocaleString('id-ID')} > ${item.price.toLocaleString('id-ID')} (+${profit.toLocaleString('id-ID')})\n`;
+                });
+            }
+
+            report += `\n————————————————\n`;
+            report += `Unit Belum Terjual - ${currentMonthString}\n`;
+            report += `————————————————\n`;
+
+            if (stockItems.length === 0) {
+                report += `(Stok kosong)\n`;
+            } else {
+                stockItems.forEach(item => {
+                    totalFloating += item.price;
+                    totalUnrealizedProfit += (item.price - item.modal);
+                    report += `- ${item.name} : ${item.price.toLocaleString('id-ID')}\n`;
+                });
+            }
+
+            // Re-calculate for totals
+            items.forEach(i => totalModalBelanja += i.modal);
+            const cashAkhir = startBal - totalModalBelanja + totalUangMasuk;
+            const unRealBalance = cashAkhir + totalFloating;
 
             report += `\n————————————————\n`;
             report += `> Saldo Awal : Rp ${startBal.toLocaleString('id-ID')}\n`;
-            report += `> Saldo Akhir : ${cash}\n`;
-            report += `> Total Profit Terjual : ${profitTotal}\n`;
-            report += `> Total Floating : ${floating}\n`;
+            report += `> Total Profit Terjual : Rp ${totalProfitSold.toLocaleString('id-ID')}\n`;
+            report += `> Total UnRealize Profit : Rp ${totalUnrealizedProfit.toLocaleString('id-ID')}\n`;
+            report += `> Total Floating : Rp ${totalFloating.toLocaleString('id-ID')}\n`;
             report += `————————————————\n`;
-            report += `UnRealize Balance : ${asset}`;
+            report += `Saldo Akhir : Rp ${cashAkhir.toLocaleString('id-ID')}\n`;
+            report += `UnRealize Balance : Rp ${unRealBalance.toLocaleString('id-ID')}`;
 
             navigator.clipboard.writeText(report).then(() => {
-                alert("Laporan berhasil disalin!");
+                alert("Laporan sesuai format berhasil disalin!");
             });
         }
 
