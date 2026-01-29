@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Tracker - Phone Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .card { border-radius: 16px; background: white; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .input-field { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 8px; outline: none; transition: 0.3s; }
+        .input-field:focus { border-color: #6366f1; ring: 2px #6366f1; }
+        .btn-primary { background: #6366f1; color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; width: 100%; }
+        .btn-secondary { background: #10b981; color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; width: 100%; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-md mx-auto">
+        <header class="mb-6 text-center">
+            <h1 class="text-2xl font-bold text-gray-800">Phone Ledger</h1>
+            <p class="text-gray-500 text-sm">Dashboard Pembukuan Bulanan</p>
+        </header>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="card p-4">
+                <p class="text-xs text-gray-500 uppercase">Total Cash</p>
+                <h2 id="summaryCash" class="text-lg font-semibold text-indigo-600">Rp 0</h2>
+            </div>
+            <div class="card p-4">
+                <p class="text-xs text-gray-500 uppercase">Total Floating</p>
+                <h2 id="summaryFloating" class="text-lg font-semibold text-emerald-600">Rp 0</h2>
+            </div>
+            <div class="card p-4 col-span-2 text-center bg-indigo-50 border border-indigo-100">
+                <p class="text-xs text-gray-500 uppercase">Unrealized Balance</p>
+                <h2 id="summaryTotal" class="text-2xl font-bold text-indigo-900">Rp 0</h2>
+            </div>
+        </div>
+
+        <div class="card p-6 mb-6">
+            <h3 class="font-semibold mb-4 text-gray-700">Set Saldo Awal</h3>
+            <input type="number" id="startBalance" class="input-field" placeholder="Saldo Awal (Contoh: 22550000)" onchange="calculateAll()">
+        </div>
+
+        <div class="card p-6 mb-6">
+            <h3 class="font-semibold mb-4 text-gray-700">Belanja & Penjualan</h3>
+            <div id="itemRows">
+                </div>
+            <button onclick="addRow()" class="mt-2 text-sm text-indigo-600 font-medium">+ Tambah Item</button>
+        </div>
+
+        <button onclick="saveData()" class="btn-primary mb-4">Simpan Data</button>
+        <button onclick="exportNote()" class="btn-secondary">Salin Laporan Teks</button>
+        
+        <p class="text-center text-xs text-gray-400 mt-6">Data tersimpan otomatis di perangkat ini.</p>
+    </div>
+
+    <script>
+        let items = [];
+
+        function addRow(name = '', modal = 0, hargaJual = 0, status = 'stok') {
+            const id = Date.now() + Math.random();
+            const rowHtml = `
+                <div id="row-${id}" class="border-b pb-4 mb-4">
+                    <input type="text" placeholder="Nama Unit" class="input-field text-sm" value="${name}" onchange="updateItem(${id}, 'name', this.value)">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="number" placeholder="Modal" class="input-field text-sm" value="${modal}" onchange="updateItem(${id}, 'modal', this.value)">
+                        <input type="number" placeholder="Jual/Target" class="input-field text-sm" value="${hargaJual}" onchange="updateItem(${id}, 'price', this.value)">
+                    </div>
+                    <select class="input-field text-sm" onchange="updateItem(${id}, 'status', this.value)">
+                        <option value="stok" ${status === 'stok' ? 'selected' : ''}>Masih Stok (Floating)</option>
+                        <option value="sold" ${status === 'sold' ? 'selected' : ''}>Terjual (Sold)</option>
+                    </select>
+                    <button onclick="removeRow(${id})" class="text-red-400 text-xs">Hapus</button>
+                </div>
+            `;
+            document.getElementById('itemRows').insertAdjacentHTML('beforeend', rowHtml);
+            items.push({ id, name, modal: Number(modal), price: Number(hargaJual), status });
+            calculateAll();
+        }
+
+        function updateItem(id, field, value) {
+            const item = items.find(i => i.id === id);
+            if (item) {
+                item[field] = field === 'name' || field === 'status' ? value : Number(value);
+                calculateAll();
+            }
+        }
+
+        function removeRow(id) {
+            document.getElementById(`row-${id}`).remove();
+            items = items.filter(i => i.id !== id);
+            calculateAll();
+        }
+
+        function calculateAll() {
+            const startBalance = Number(document.getElementById('startBalance').value) || 0;
+            let totalModalBelanja = 0;
+            let totalUangMasuk = 0;
+            let totalFloating = 0;
+
+            items.forEach(item => {
+                totalModalBelanja += item.modal;
+                if (item.status === 'sold') {
+                    totalUangMasuk += item.price;
+                } else {
+                    totalFloating += item.price;
+                }
+            });
+
+            const currentCash = startBalance - totalModalBelanja + totalUangMasuk;
+            const unrealized = currentCash + totalFloating;
+
+            document.getElementById('summaryCash').innerText = "Rp " + currentCash.toLocaleString('id-ID');
+            document.getElementById('summaryFloating').innerText = "Rp " + totalFloating.toLocaleString('id-ID');
+            document.getElementById('summaryTotal').innerText = "Rp " + unrealized.toLocaleString('id-ID');
+        }
+
+        function saveData() {
+            const data = {
+                startBalance: document.getElementById('startBalance').value,
+                items: items
+            };
+            localStorage.setItem('phoneLedgerData', JSON.stringify(data));
+            alert('Data berhasil disimpan!');
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('phoneLedgerData');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                document.getElementById('startBalance').value = parsed.startBalance;
+                parsed.items.forEach(i => addRow(i.name, i.modal, i.price, i.status));
+            }
+        }
+
+        function exportNote() {
+            let text = `LAPORAN PEMBUKUAN\n`;
+            text += `Total Cash: ${document.getElementById('summaryCash').innerText}\n`;
+            text += `Total Floating: ${document.getElementById('summaryFloating').innerText}\n`;
+            text += `Unrealized Balance: ${document.getElementById('summaryTotal').innerText}\n`;
+            navigator.clipboard.writeText(text);
+            alert('Ringkasan teks berhasil disalin!');
+        }
+
+        window.onload = loadData;
+    </script>
+</body>
+</html>
