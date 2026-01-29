@@ -11,18 +11,15 @@
         .card { border-radius: 16px; background: white; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
         .input-field { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; transition: 0.3s; }
         .input-field:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
-        .btn-primary { background: #6366f1; color: white; padding: 12px; border-radius: 10px; font-weight: 600; width: 100%; transition: 0.2s; cursor: pointer; }
+        .btn-primary { color: white; padding: 12px; border-radius: 10px; font-weight: 600; width: 100%; transition: 0.2s; cursor: pointer; }
         .btn-primary:active { transform: scale(0.98); }
         .badge-profit { background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; border: 1px solid #bbf7d0; }
         .btn-sell { background: #10b981; color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; transition: 0.2s; }
-        .btn-sell:hover { background: #059669; }
-
+        
         #sidebar { transition: transform 0.3s ease; transform: translateX(-100%); z-index: 50; }
         #sidebar.open { transform: translateX(0); }
         #overlay { display: none; z-index: 40; }
         #overlay.open { display: block; }
-        
-        /* Utility for Hiding */
         .hidden-panel { display: none; }
     </style>
 </head>
@@ -30,18 +27,17 @@
 
     <div id="overlay" class="fixed inset-0 bg-black/50" onclick="toggleSidebar()"></div>
     <div id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-indigo-900 text-white p-6 shadow-2xl">
-        <h2 class="text-xl font-bold mb-8 flex items-center gap-2"><span>📱</span> Menu Dashboard</h2>
+        <h2 class="text-xl font-bold mb-8 flex items-center gap-2"><span>📱</span> Menu</h2>
         <nav class="space-y-4">
-            <a href="#" class="block p-3 rounded-lg bg-indigo-800 font-medium">📊 Ringkasan Utama</a>
-            <a href="#" class="block p-3 rounded-lg hover:bg-indigo-800 transition text-indigo-300 italic">📦 Stok Gudang (Demo)</a>
-            <a href="#" class="block p-3 rounded-lg hover:bg-indigo-800 transition text-indigo-300 italic">📈 Laporan Tahunan (Demo)</a>
+            <a href="#" class="block p-3 rounded-lg bg-indigo-800 font-medium">📊 Dashboard Utama</a>
+            <button onclick="clearData()" class="block w-full text-left p-3 rounded-lg hover:bg-red-800 transition text-red-300 italic">🗑️ Hapus Semua Data</button>
         </nav>
     </div>
 
     <div class="max-w-2xl mx-auto">
         <div class="flex justify-between items-center mb-6">
             <button onclick="toggleSidebar()" class="p-2 bg-white rounded-xl shadow-sm text-indigo-600 font-bold">☰ Menu</button>
-            <button onclick="exportReport()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg active:scale-95 transition-all">📤 Copy Report</button>
+            <button onclick="exportReport()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg">📤 Copy Report</button>
         </div>
 
         <header class="mb-8 flex justify-between items-center">
@@ -57,15 +53,15 @@
 
         <div class="grid grid-cols-2 gap-4 mb-6">
             <div class="card p-5 border-b-4 border-indigo-500">
-                <p class="text-[10px] text-gray-500 uppercase font-bold">Total Cash (S. Akhir)</p>
+                <p class="text-[10px] text-gray-500 uppercase font-bold">Uang Tunai (Cash)</p>
                 <h2 id="summaryCash" class="text-lg font-bold text-gray-800">Rp 0</h2>
             </div>
             <div class="card p-5 border-b-4 border-emerald-500">
-                <p class="text-[10px] text-gray-500 uppercase font-bold">Floating (Stok Aktif)</p>
+                <p class="text-[10px] text-gray-500 uppercase font-bold">Total Floating</p>
                 <h2 id="summaryFloating" class="text-lg font-bold text-gray-800">Rp 0</h2>
             </div>
             <div class="card p-6 col-span-2 text-center bg-indigo-900 text-white">
-                <p class="text-[10px] text-indigo-300 uppercase font-bold mb-1 tracking-widest">Unrealized Balance (Total Aset)</p>
+                <p class="text-[10px] text-indigo-300 uppercase font-bold mb-1 tracking-widest">Total Aset (Unrealized Balance)</p>
                 <h2 id="summaryTotal" class="text-3xl font-black">Rp 0</h2>
             </div>
         </div>
@@ -74,53 +70,44 @@
             <h3 class="font-bold text-gray-800 mb-2 flex items-center gap-2 text-sm uppercase tracking-wider">
                 <span>📝</span> Smart Input Teks
             </h3>
-            <textarea id="bulkInput" class="input-field h-24 mb-3 text-sm border-dashed" placeholder="Format: Tipe : Modal > Jual&#10;Contoh:&#10;Oppo A54 : 500000 > 650000"></textarea>
+            <textarea id="bulkInput" class="input-field h-24 mb-3 text-sm border-dashed" placeholder="Format: Nama HP : Modal > Jual&#10;Contoh: Poco M3 : 450000 > 600000"></textarea>
             <div class="grid grid-cols-2 gap-3">
-                <button onclick="parseText('stok')" class="btn-primary bg-slate-700 text-xs text-white uppercase">Simpan Stok</button>
-                <button onclick="parseText('sold')" class="btn-primary bg-emerald-600 text-xs text-white uppercase">Simpan Terjual</button>
+                <button onclick="parseText('old')" class="btn-primary bg-slate-700 text-[10px] uppercase">Stok Bulan Lalu</button>
+                <button onclick="parseText('new')" class="btn-primary bg-emerald-600 text-[10px] uppercase">Belanja Stok Baru</button>
             </div>
         </div>
 
         <div class="mb-6">
             <button onclick="toggleConfig()" class="text-[10px] font-bold text-indigo-600 flex items-center gap-1 mb-2 uppercase tracking-widest">
-                <span id="configIcon">⚙️</span> <span id="configLabel">Buka Pengaturan Saldo</span>
+                <span id="configIcon">⚙️</span> <span id="configLabel">Buka Saldo Awal</span>
             </button>
-            
-            <div id="configPanel" class="hidden-panel space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="card p-5 bg-indigo-50 border-none">
-                        <h3 class="font-bold text-indigo-900 text-[10px] uppercase tracking-wider mb-2">Saldo Awal (Cash)</h3>
-                        <input type="number" id="startBalance" class="input-field font-black text-lg text-indigo-700 bg-white border-none" value="0" onchange="calculateAll()">
-                    </div>
-                    <div class="card p-5 bg-emerald-50 border-none">
-                        <h3 class="font-bold text-emerald-900 text-[10px] uppercase tracking-wider mb-2">Floating Bulan Lalu (Stok)</h3>
-                        <input type="number" id="prevFloating" class="input-field font-black text-lg text-emerald-700 bg-white border-none" value="0" onchange="calculateAll()" placeholder="Total Jual Stok Lalu">
-                    </div>
+            <div id="configPanel" class="hidden-panel">
+                <div class="card p-5 bg-indigo-50 border-none">
+                    <h3 class="font-bold text-indigo-900 text-[10px] uppercase tracking-wider mb-2">Cash Awal (Saldo Tunai)</h3>
+                    <input type="number" id="startBalance" class="input-field font-black text-lg text-indigo-700 bg-white border-none" value="0" onchange="calculateAll()">
                 </div>
             </div>
         </div>
-        
+
         <div class="space-y-3 mb-8">
             <div class="card p-4 bg-slate-800 border-l-4 border-indigo-500 text-white flex justify-between items-center">
                 <div>
-                    <h3 class="font-bold text-indigo-300 text-[9px] uppercase tracking-widest">Modal Stok (Live)</h3>
+                    <h3 class="font-bold text-indigo-300 text-[9px] uppercase tracking-widest">Modal Stok Berjalan</h3>
                     <h2 id="previewModalStock" class="text-xl font-black">Rp 0</h2>
                 </div>
                 <div class="text-right">
-                    <h3 class="font-bold text-emerald-400 text-[9px] uppercase tracking-widest">Unrealized Profit</h3>
+                    <h3 class="font-bold text-emerald-400 text-[9px] uppercase tracking-widest">Potensi Untung (Unrealized)</h3>
                     <h2 id="previewUnrealizedProfit" class="text-xl font-black">Rp 0</h2>
                 </div>
             </div>
         </div>
 
         <div class="mb-4 flex justify-between items-center px-2">
-            <h3 class="font-black text-gray-800 text-sm uppercase tracking-widest">Daftar Transaksi</h3>
+            <h3 class="font-black text-gray-800 text-sm uppercase tracking-widest">Inventaris Unit</h3>
             <span id="itemCount" class="text-[10px] bg-gray-200 px-2 py-1 rounded-full font-bold text-gray-600">0 UNIT</span>
         </div>
         
         <div id="itemRows" class="space-y-3 mb-10"></div>
-
-        <button onclick="clearData()" class="text-[10px] text-red-400 font-bold block mx-auto uppercase tracking-[0.2em] mb-10">Hapus Semua Data Terarsip</button>
     </div>
 
     <script>
@@ -135,32 +122,33 @@
             document.getElementById('overlay').classList.toggle('open');
         }
 
-        // Toggle Config Panel
         function toggleConfig() {
             const panel = document.getElementById('configPanel');
             const label = document.getElementById('configLabel');
-            if (panel.style.display === "block") {
-                panel.style.display = "none";
-                label.innerText = "Buka Pengaturan Saldo";
-            } else {
-                panel.style.display = "block";
-                label.innerText = "Tutup Pengaturan Saldo";
-            }
+            panel.classList.toggle('hidden-panel');
+            label.innerText = panel.classList.contains('hidden-panel') ? "Buka Saldo Awal" : "Tutup Saldo Awal";
         }
 
-        function parseText(status) {
+        function parseText(type) {
             const rawText = document.getElementById('bulkInput').value;
             const lines = rawText.split('\n');
             
             lines.forEach(line => {
                 if (line.includes(':') && line.includes('>')) {
                     const parts = line.split(/[:>]/);
-                    const name = parts[0].trim();
+                    const name = parts[0].trim().replace(/^-\s*/, '');
                     const modal = Number(parts[1].replace(/[^0-9]/g, ''));
                     const price = Number(parts[2].replace(/[^0-9]/g, ''));
                     
                     if (name && modal) {
-                        items.unshift({ id: Date.now() + Math.random(), name, modal, price, status, month: now.getMonth() });
+                        items.unshift({
+                            id: Date.now() + Math.random(),
+                            name,
+                            modal,
+                            price,
+                            status: 'stok',
+                            type: type // 'old' atau 'new'
+                        });
                     }
                 }
             });
@@ -173,7 +161,14 @@
             const item = items.find(i => i.id === id);
             if (item) {
                 item.status = 'sold';
-                item.month = now.getMonth();
+                renderRows();
+                calculateAll();
+            }
+        }
+
+        function removeItem(id) {
+            if(confirm('Hapus item ini?')) {
+                items = items.filter(i => i.id !== id);
                 renderRows();
                 calculateAll();
             }
@@ -186,20 +181,24 @@
             
             items.forEach(item => {
                 const isSold = item.status === 'sold';
+                const isOld = item.type === 'old';
                 const profit = item.price - item.modal;
+                
                 const card = document.createElement('div');
-                card.className = `p-4 rounded-2xl border-2 transition-all ${isSold ? 'bg-white border-emerald-500 shadow-sm' : 'bg-white border-slate-100'}`;
+                card.className = `p-4 rounded-2xl border-2 transition-all ${isSold ? 'bg-white border-emerald-500 opacity-75' : 'bg-white border-slate-100'}`;
                 
                 card.innerHTML = `
                     <div class="flex justify-between items-start">
                         <div class="flex-1">
                             <div class="flex items-center gap-2 mb-1">
-                                <span class="w-2 h-2 rounded-full ${isSold ? 'bg-emerald-500' : 'bg-orange-400 animate-pulse'}"></span>
+                                <span class="text-[8px] font-bold px-1.5 py-0.5 rounded uppercase ${isOld ? 'bg-orange-100 text-orange-600' : 'bg-blue-100 text-blue-600'}">
+                                    ${isOld ? 'Stok Lalu' : 'Baru'}
+                                </span>
                                 <h4 class="font-bold text-gray-800 text-sm">${item.name}</h4>
                             </div>
                             <div class="flex gap-4 text-[11px] font-medium text-gray-500">
                                 <span>M: <b class="text-gray-700">${item.modal.toLocaleString()}</b></span>
-                                <span>${isSold ? 'J:' : 'T:'} <b class="text-gray-700">${item.price.toLocaleString()}</b></span>
+                                <span>J: <b class="text-gray-700">${item.price.toLocaleString()}</b></span>
                             </div>
                         </div>
                         <div class="flex flex-col items-end gap-2">
@@ -217,128 +216,89 @@
 
         function calculateAll() {
             const startBalance = Number(document.getElementById('startBalance').value) || 0;
-            const prevFloating = Number(document.getElementById('prevFloating').value) || 0;
             
-            let totalModalInputBulanIni = 0;
+            let totalModalBelanjaBaru = 0;
             let totalUangMasuk = 0;
-            let floatingInputBulanIni = 0;
             let realizedProfit = 0;
-            let modalStockAktif = 0;
-            let unrealizedProfitEst = 0;
+            
+            let totalFloatingPrice = 0;
+            let totalFloatingModal = 0;
 
             items.forEach(item => {
-                totalModalInputBulanIni += item.modal;
+                // Cash Flow: Hanya belanja stok BARU yang mengurangi cash awal
+                if (item.type === 'new') {
+                    totalModalBelanjaBaru += item.modal;
+                }
+
                 if (item.status === 'sold') {
+                    // Semua barang terjual (lama/baru) menambah cash
                     totalUangMasuk += item.price;
                     realizedProfit += (item.price - item.modal);
                 } else {
-                    floatingInputBulanIni += item.price;
-                    modalStockAktif += item.modal;
-                    unrealizedProfitEst += (item.price - item.modal);
+                    // Barang yang masih ada di tangan masuk ke Floating
+                    totalFloatingPrice += item.price;
+                    totalFloatingModal += item.modal;
                 }
             });
 
-            const combinedFloating = prevFloating + floatingInputBulanIni;
-            const currentCash = startBalance - totalModalInputBulanIni + totalUangMasuk;
-            const totalAset = currentCash + combinedFloating;
+            const currentCash = startBalance - totalModalBelanjaBaru + totalUangMasuk;
+            const totalAset = currentCash + totalFloatingPrice;
+            const unrealizedProfit = totalFloatingPrice - totalFloatingModal;
 
+            // UI Updates
             document.getElementById('summaryCash').innerText = "Rp " + currentCash.toLocaleString('id-ID');
-            document.getElementById('summaryFloating').innerText = "Rp " + combinedFloating.toLocaleString('id-ID');
+            document.getElementById('summaryFloating').innerText = "Rp " + totalFloatingPrice.toLocaleString('id-ID');
             document.getElementById('summaryTotal').innerText = "Rp " + totalAset.toLocaleString('id-ID');
             document.getElementById('summaryProfit').innerText = "Rp " + realizedProfit.toLocaleString('id-ID');
-            document.getElementById('previewModalStock').innerText = "Rp " + modalStockAktif.toLocaleString('id-ID');
-            document.getElementById('previewUnrealizedProfit').innerText = "Rp " + unrealizedProfitEst.toLocaleString('id-ID');
+            
+            document.getElementById('previewModalStock').innerText = "Rp " + totalFloatingModal.toLocaleString('id-ID');
+            document.getElementById('previewUnrealizedProfit').innerText = "Rp " + unrealizedProfit.toLocaleString('id-ID');
             
             saveData();
         }
 
         function exportReport() {
             const startBal = Number(document.getElementById('startBalance').value) || 0;
-            const prevFloat = Number(document.getElementById('prevFloating').value) || 0;
-            const soldItems = items.filter(i => i.status === 'sold');
-            const stockItems = items.filter(i => i.status === 'stok');
+            let report = `REKAP PEMBUKUAN - ${currentMonthString}\n`;
+            report += `------------------------------\n`;
             
-            let totalProfitSold = 0;
-            let totalUnrealizedProfit = 0;
-            let floatingBulanIni = 0;
-            let totalUangMasuk = 0;
-            let totalModalBelanja = 0;
-
-            let report = `————————————————\n`;
-            report += `Report Bulanan - ${currentMonthString}\n`;
-            report += `————————————————\n`;
-
-            soldItems.forEach(item => {
-                const profit = item.price - item.modal;
-                totalProfitSold += profit;
-                totalUangMasuk += item.price;
-                report += `- ${item.name} : ${item.modal.toLocaleString('id-ID')} > ${item.price.toLocaleString('id-ID')} (+${profit.toLocaleString('id-ID')})\n`;
+            const terjual = items.filter(i => i.status === 'sold');
+            report += `UNIT TERJUAL:\n`;
+            terjual.forEach(i => {
+                report += `- ${i.name} (+${(i.price - i.modal).toLocaleString('id-ID')})\n`;
             });
 
-            report += `\n————————————————\n`;
-            report += `Unit Belum Terjual (New)\n`;
-            report += `————————————————\n`;
-
-            stockItems.forEach(item => {
-                floatingBulanIni += item.price;
-                totalUnrealizedProfit += (item.price - item.modal);
-                report += `- ${item.name} : ${item.price.toLocaleString('id-ID')}\n`;
+            report += `\nSTOK AKTIF (FLOATING):\n`;
+            items.filter(i => i.status === 'stok').forEach(i => {
+                report += `- ${i.name} (Jual: ${i.price.toLocaleString('id-ID')})\n`;
             });
 
-            items.forEach(i => totalModalBelanja += i.modal);
-            const cashAkhir = startBal - totalModalBelanja + totalUangMasuk;
-            const totalFloating = prevFloat + floatingBulanIni;
-            const totalAset = cashAkhir + totalFloating;
+            report += `\n------------------------------\n`;
+            report += `CASH AKHIR: ${document.getElementById('summaryCash').innerText}\n`;
+            report += `TOTAL ASET: ${document.getElementById('summaryTotal').innerText}\n`;
 
-            report += `\n————————————————\n`;
-            report += `> Saldo Awal (Cash) : Rp ${startBal.toLocaleString('id-ID')}\n`;
-            report += `> Floating Lalu : Rp ${prevFloat.toLocaleString('id-ID')}\n`;
-            report += `> Profit Terjual : Rp ${totalProfitSold.toLocaleString('id-ID')}\n`;
-            report += `————————————————\n`;
-            report += `Saldo Akhir (Cash) : Rp ${cashAkhir.toLocaleString('id-ID')}\n`;
-            report += `Total Floating Aktif : Rp ${totalFloating.toLocaleString('id-ID')}\n`;
-            report += `Unrealized Balance : Rp ${totalAset.toLocaleString('id-ID')}`;
-
-            navigator.clipboard.writeText(report).then(() => {
-                alert("Laporan berhasil disalin!");
-            });
-        }
-
-        function removeItem(id) {
-            if(confirm('Hapus item ini?')) {
-                items = items.filter(i => i.id !== id);
-                renderRows();
-                calculateAll();
-            }
+            navigator.clipboard.writeText(report).then(() => alert("Laporan disalin!"));
         }
 
         function saveData() {
-            localStorage.setItem('ledger_pro_v3', JSON.stringify({
+            localStorage.setItem('phone_ledger_v4', JSON.stringify({
                 startBalance: document.getElementById('startBalance').value,
-                prevFloating: document.getElementById('prevFloating').value,
                 items: items
             }));
         }
 
         function loadData() {
-            const data = JSON.parse(localStorage.getItem('ledger_pro_v3'));
+            const data = JSON.parse(localStorage.getItem('phone_ledger_v4'));
             if (data) {
                 document.getElementById('startBalance').value = data.startBalance || 0;
-                document.getElementById('prevFloating').value = data.prevFloating || 0;
                 items = data.items || [];
-                
-                // Auto-show panel if there's data
-                if (data.startBalance > 0 || data.prevFloating > 0) {
-                    toggleConfig();
-                }
-                
                 renderRows();
                 calculateAll();
             }
         }
 
         function clearData() {
-            if(confirm('PERINGATAN: Semua data akan dihapus permanen!')) {
+            if(confirm('Hapus semua data?')) {
                 localStorage.clear();
                 location.reload();
             }
