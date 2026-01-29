@@ -18,8 +18,8 @@
         
         #sidebar { transition: transform 0.3s ease; transform: translateX(-100%); z-index: 50; }
         #sidebar.open { transform: translateX(0); }
-        #overlay, #importModalOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
-        #overlay.open, #importModalOverlay.open { display: block; }
+        #overlay, #importModalOverlay, #helpModalOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
+        #overlay.open, #importModalOverlay.open, #helpModalOverlay.open { display: block; }
         .hidden-panel { display: none; }
 
         .modal-custom { 
@@ -37,7 +37,7 @@
     <div id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-indigo-900 text-white p-6 shadow-2xl">
         <h2 class="text-xl font-bold mb-8 flex items-center gap-2"><span>📱</span> Menu</h2>
         <nav class="space-y-4">
-            <a href="#" class="block p-3 rounded-lg bg-indigo-800 font-medium">📊 Dashboard Utama</a>
+            <button onclick="toggleHelpModal()" class="block w-full text-left p-3 rounded-lg bg-indigo-800 font-medium">📖 Panduan Penggunaan</button>
             <button onclick="clearData()" class="block w-full text-left p-3 rounded-lg hover:bg-red-800 transition text-red-300 italic">🗑️ Hapus Semua Data</button>
         </nav>
     </div>
@@ -51,6 +51,25 @@
         <p class="text-[10px] text-gray-400 mb-2 font-bold uppercase">Tempel laporan hasil export di sini:</p>
         <textarea id="importArea" class="input-field h-48 mb-4 text-[11px] font-mono" placeholder="Paste laporan di sini..."></textarea>
         <button onclick="processImport()" class="btn-primary bg-indigo-600">PROSES & SINKRONKAN DATA</button>
+    </div>
+
+    <div id="helpModalOverlay" onclick="toggleHelpModal()"></div>
+    <div id="helpModal" class="modal-custom max-h-[80vh] overflow-y-auto text-sm">
+        <h3 class="font-black text-indigo-900 mb-4 uppercase tracking-wider text-lg">🚀 Cara Penggunaan</h3>
+        <ol class="space-y-4 text-gray-600">
+            <li><b class="text-indigo-600">1. Atur Saldo Awal:</b> Buka menu "Atur Saldo" dan masukkan uang tunai yang Anda pegang saat ini.</li>
+            <li><b class="text-indigo-600">2. Input Unit:</b> Gunakan format <code class="bg-gray-100 px-1">Nama : Modal > Jual</code>. Pilih <b>[L]</b> untuk stok lama bulan lalu, atau <b>[B]</b> untuk belanja baru.</li>
+            <li><b class="text-indigo-600">3. Penjualan:</b> Klik tombol <b>Laku? ✓</b> pada unit yang terjual. Sistem akan mencatat profit dan memindahkan unit ke History.</li>
+            <li><b class="text-indigo-600">4. Pantau Dashboard:</b> 
+                <ul class="ml-4 mt-1 list-disc text-xs">
+                    <li><b>Cash:</b> Sisa uang tunai yang ada.</li>
+                    <li><b>Floating:</b> Nilai barang yang belum laku.</li>
+                    <li><b>Realized Profit:</b> Keuntungan bersih dari barang yang sudah laku.</li>
+                </ul>
+            </li>
+            <li><b class="text-indigo-600">5. Report:</b> Gunakan <b>Copy Report</b> untuk membagikan laporan ke WhatsApp dengan format yang rapi.</li>
+        </ol>
+        <button onclick="toggleHelpModal()" class="mt-6 btn-primary bg-indigo-600">SAYA MENGERTI</button>
     </div>
 
     <div class="max-w-2xl mx-auto">
@@ -100,7 +119,11 @@
         </div>
 
         <div class="mb-6">
-            <button onclick="toggleConfig()" id="configLabel" class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-2">⚙️ Buka Saldo Awal</button>
+            <div class="flex items-center gap-2 mb-2">
+                <button onclick="toggleConfig()" id="configLabel" class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">⚙️ Buka Saldo Awal</button>
+                <span onclick="alert('Isi dengan uang tunai awal bulan. Sistem akan otomatis mengurangi saldo ini jika Anda klik [B] (Belanja Baru) dan menambahnya jika ada unit laku.')" 
+                      class="w-4 h-4 rounded-full bg-indigo-100 text-indigo-600 text-[10px] flex items-center justify-center font-bold cursor-help border border-indigo-200">?</span>
+            </div>
             <div id="configPanel" class="hidden-panel">
                 <div class="card p-5 bg-indigo-50 border-none">
                     <h3 class="font-bold text-indigo-900 text-[10px] uppercase tracking-wider mb-2">Modal Tunai di Tangan (Awal Bulan)</h3>
@@ -124,14 +147,13 @@
 
         <div class="mb-6 space-y-4">
             <div class="relative">
-                <input type="text" id="searchInput" onkeyup="renderRows()" placeholder="Cari nama unit atau tanggal..." class="input-field pl-10 text-sm">
+                <input type="text" id="searchInput" onkeyup="renderRows()" placeholder="Cari unit atau tanggal..." class="input-field pl-10 text-sm">
                 <span class="absolute left-3 top-3.5 opacity-40">🔍</span>
             </div>
             
             <div class="flex bg-slate-200 p-1 rounded-xl gap-1">
                 <button onclick="setFilter('stok')" id="tabStok" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all bg-white text-indigo-600 shadow-sm">Stok Terbaru</button>
                 <button onclick="setFilter('sold')" id="tabSold" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500">History Transaksi</button>
-                <button onclick="setFilter('soon')" id="tabSoon" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-400 cursor-not-allowed" disabled>Coming Soon</button>
             </div>
         </div>
 
@@ -145,7 +167,7 @@
 
     <script>
         let items = [];
-        let currentFilter = 'stok'; // Filter default
+        let currentFilter = 'stok';
         const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
         const now = new Date();
         const currentMonthString = monthNames[now.getMonth()] + " " + now.getFullYear();
@@ -159,7 +181,11 @@
         function toggleImportModal() {
             document.getElementById('importModal').classList.toggle('open');
             document.getElementById('importModalOverlay').classList.toggle('open');
-            document.getElementById('importArea').value = '';
+        }
+
+        function toggleHelpModal() {
+            document.getElementById('helpModal').classList.toggle('open');
+            document.getElementById('helpModalOverlay').classList.toggle('open');
         }
 
         function toggleConfig() {
@@ -169,12 +195,10 @@
             label.innerText = panel.classList.contains('hidden-panel') ? "⚙️ Buka Saldo Awal" : "⚙️ Tutup Saldo Awal";
         }
 
-        // Fungsi Tab Baru
         function setFilter(filter) {
             currentFilter = filter;
             const tabStok = document.getElementById('tabStok');
             const tabSold = document.getElementById('tabSold');
-            
             if(filter === 'stok') {
                 tabStok.className = "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all bg-white text-indigo-600 shadow-sm";
                 tabSold.className = "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500";
@@ -207,7 +231,7 @@
         function processImport() {
             const text = document.getElementById('importArea').value;
             if (!text.trim()) return;
-            if (!confirm("Hapus data saat ini dan ganti dengan data import?")) return;
+            if (!confirm("Ganti data saat ini dengan data import?")) return;
 
             const newItems = [];
             const lines = text.split('\n');
@@ -222,25 +246,14 @@
                     const m = cleanLine.match(/Rp\s*([\d.]+)/);
                     if (m) saldoAwalImport = Number(m[1].replace(/\./g, ''));
                 }
-
                 if (cleanLine.startsWith("-")) {
-                    const isNew = cleanLine.includes("[B]");
-                    const type = isNew ? 'new' : 'old';
-                    
+                    const type = cleanLine.includes("[B]") ? 'new' : 'old';
                     const parts = cleanLine.split(/[:>]/);
                     if (parts.length >= 3) {
                         const name = parts[0].replace('-', '').replace(/\[[BL]\]/, '').trim();
                         const modal = Number(parts[1].replace(/[^0-9]/g, ''));
-                        const pricePart = parts[2].split('(')[0];
-                        const price = Number(pricePart.replace(/[^0-9]/g, ''));
-                        
-                        newItems.push({
-                            id: Math.random(),
-                            name, modal, price,
-                            status: section === "sold" ? "sold" : "stok",
-                            type: type,
-                            soldAt: ''
-                        });
+                        const price = Number(parts[2].split('(')[0].replace(/[^0-9]/g, ''));
+                        newItems.push({ id: Math.random(), name, modal, price, status: section === "sold" ? "sold" : "stok", type: type, soldAt: '' });
                     }
                 }
             });
@@ -251,9 +264,7 @@
                 renderRows();
                 calculateAll();
                 toggleImportModal();
-                alert("Import Berhasil! Data baru telah disinkronkan.");
-            } else {
-                alert("Format tidak dikenali. Pastikan meng-copy seluruh isi laporan.");
+                alert("Import Berhasil!");
             }
         }
 
@@ -262,7 +273,7 @@
             if (item) {
                 const d = new Date();
                 item.status = 'sold';
-                item.soldAt = `${d.getDate()} ${monthNames[d.getMonth()]} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+                item.soldAt = `${d.getDate()}/${d.getMonth()+1} ${d.getHours()}:${d.getMinutes().toString().padStart(2,'0')}`;
                 renderRows();
                 calculateAll();
             }
@@ -279,8 +290,6 @@
         function renderRows() {
             const container = document.getElementById('itemRows');
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            
-            // Filter Berdasarkan Tab dan Search
             const displayItems = items.filter(i => {
                 const matchTab = i.status === currentFilter;
                 const matchSearch = i.name.toLowerCase().includes(searchTerm) || (i.soldAt && i.soldAt.toLowerCase().includes(searchTerm));
@@ -295,25 +304,25 @@
                 const isOld = item.type === 'old';
                 const profit = item.price - item.modal;
                 const card = document.createElement('div');
-                card.className = `p-4 rounded-2xl border-2 transition-all ${isSold ? 'bg-white border-emerald-500 opacity-75' : 'bg-white border-slate-100'}`;
+                card.className = `p-4 rounded-2xl border-2 transition-all ${isSold ? 'bg-white border-emerald-500 opacity-90' : 'bg-white border-slate-100'}`;
                 card.innerHTML = `
                     <div class="flex justify-between items-start">
                         <div class="flex-1">
                             <div class="flex items-center gap-2 mb-1">
-                                <span class="text-[8px] font-bold px-1.5 py-0.5 rounded uppercase ${isOld ? 'bg-orange-100 text-orange-600' : 'bg-indigo-100 text-indigo-600'}">
-                                    ${isOld ? 'Stok Lalu' : 'Belanja Baru'}
+                                <span class="text-[7px] font-black px-1.5 py-0.5 rounded uppercase ${isOld ? 'bg-orange-100 text-orange-600' : 'bg-indigo-100 text-indigo-600'}">
+                                    ${isOld ? 'STOK LALU' : 'BELANJA BARU'}
                                 </span>
                                 <h4 class="font-bold text-gray-800 text-sm">${item.name}</h4>
                             </div>
-                            <div class="flex gap-4 text-[11px] font-medium text-gray-500">
+                            <div class="flex items-center gap-3 text-[10px] font-medium text-gray-500">
                                 <span>M: <b class="text-gray-700">${item.modal.toLocaleString()}</b></span>
                                 <span>J: <b class="text-gray-700">${item.price.toLocaleString()}</b></span>
-                                ${isSold && item.soldAt ? `<span class="text-indigo-600 font-bold">📅 ${item.soldAt}</span>` : ''}
+                                ${isSold ? `<span class="text-[9px] text-indigo-500 bg-indigo-50 px-1 rounded font-bold">${item.soldAt}</span>` : ''}
                             </div>
                         </div>
                         <div class="flex flex-col items-end gap-2">
                             <button onclick="removeItem(${item.id})" class="text-gray-300 hover:text-red-400 text-xs">✕</button>
-                            ${!isSold ? `<button onclick="toggleSold(${item.id})" class="btn-sell">Laku? ✓</button>` : `<span class="badge-profit">+${profit.toLocaleString()}</span>`}
+                            ${!isSold ? `<button onclick="toggleSold(${item.id})" class="btn-sell">Laku? ✓</button>` : `<span class="badge-profit text-[10px]">+${profit.toLocaleString()}</span>`}
                         </div>
                     </div>
                 `;
@@ -353,26 +362,20 @@
         function exportReport() {
             let report = `————————————————\nReport Bulanan - ${currentMonthString}\n————————————————\n`;
             items.filter(i => i.status === 'sold').forEach(i => {
-                const tag = i.type === 'new' ? '[B]' : '[L]';
-                report += `- ${tag} ${i.name} : ${i.modal.toLocaleString('id-ID')} > ${i.price.toLocaleString('id-ID')} (+${(i.price-i.modal).toLocaleString('id-ID')})\n`;
+                report += `- ${i.type === 'new' ? '[B]' : '[L]'} ${i.name} : ${i.modal.toLocaleString('id-ID')} > ${i.price.toLocaleString('id-ID')} (+${(i.price-i.modal).toLocaleString('id-ID')})\n`;
             });
-            report += `\n————————————————\nUnit Belum Terjual - ${currentMonthString}\n————————————————\n`;
+            report += `\n————————————————\nUnit Belum Terjual\n————————————————\n`;
             items.filter(i => i.status === 'stok').forEach(i => {
-                const tag = i.type === 'new' ? '[B]' : '[L]';
-                report += `- ${tag} ${i.name} : ${i.modal.toLocaleString('id-ID')} > ${i.price.toLocaleString('id-ID')}\n`;
+                report += `- ${i.type === 'new' ? '[B]' : '[L]'} ${i.name} : ${i.modal.toLocaleString('id-ID')} > ${i.price.toLocaleString('id-ID')}\n`;
             });
-            report += `\n————————————————\n> Saldo Awal : Rp ${Number(document.getElementById('startBalance').value).toLocaleString('id-ID')}\n`;
-            report += `> Total Profit Terjual : ${document.getElementById('summaryProfit').innerText}\n`;
-            report += `> Total UnRealize Profit : ${document.getElementById('previewUnrealizedProfit').innerText}\n`;
-            report += `> Total Floating : ${document.getElementById('summaryFloating').innerText}\n————————————————\n`;
-            report += `Saldo Akhir : ${document.getElementById('summaryCash').innerText}\nUnRealize Balance : ${document.getElementById('summaryTotal').innerText}`;
-            
-            navigator.clipboard.writeText(report).then(() => alert("Laporan Berhasil Disalin!"));
+            report += `\n————————————————\nSaldo Awal : Rp ${Number(document.getElementById('startBalance').value).toLocaleString('id-ID')}\n`;
+            report += `Saldo Akhir : ${document.getElementById('summaryCash').innerText}\nProfit Terjual : ${document.getElementById('summaryProfit').innerText}\n————————————————`;
+            navigator.clipboard.writeText(report).then(() => alert("Laporan Disalin!"));
         }
 
-        function saveData() { localStorage.setItem('phone_ledger_v6_rev', JSON.stringify({ startBalance: document.getElementById('startBalance').value, items: items })); }
+        function saveData() { localStorage.setItem('phone_ledger_v7', JSON.stringify({ startBalance: document.getElementById('startBalance').value, items: items })); }
         function loadData() {
-            const data = JSON.parse(localStorage.getItem('phone_ledger_v6_rev'));
+            const data = JSON.parse(localStorage.getItem('phone_ledger_v7'));
             if (data) {
                 document.getElementById('startBalance').value = data.startBalance || 0;
                 items = data.items || [];
