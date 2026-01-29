@@ -11,9 +11,11 @@
         .card { border-radius: 16px; background: white; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
         .input-field { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; transition: 0.3s; }
         .input-field:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
-        .btn-primary { background: #6366f1; color: white; padding: 12px; border-radius: 10px; font-weight: 600; width: 100%; transition: 0.2s; }
+        .btn-primary { background: #6366f1; color: white; padding: 12px; border-radius: 10px; font-weight: 600; width: 100%; transition: 0.2s; cursor: pointer; }
         .btn-primary:active { transform: scale(0.98); }
-        .badge-profit { background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
+        .badge-profit { background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; border: 1px solid #bbf7d0; }
+        .btn-sell { background: #10b981; color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; transition: 0.2s; }
+        .btn-sell:hover { background: #059669; }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -21,51 +23,55 @@
     <div class="max-w-2xl mx-auto">
         <header class="mb-8 flex justify-between items-center">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900">Digital Ledger</h1>
-                <p id="currentMonth" class="text-indigo-600 font-medium uppercase tracking-wider text-xs"></p>
+                <h1 class="text-2xl font-bold text-gray-900 leading-tight">Digital Ledger</h1>
+                <p id="currentMonth" class="text-indigo-600 font-semibold uppercase tracking-wider text-[10px]"></p>
             </div>
             <div class="text-right">
-                <p class="text-xs text-gray-500">Net Profit Bulan Ini</p>
-                <h2 id="summaryProfit" class="text-xl font-bold text-emerald-600">Rp 0</h2>
+                <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Net Profit</p>
+                <h2 id="summaryProfit" class="text-xl font-black text-emerald-600">Rp 0</h2>
             </div>
         </header>
 
         <div class="grid grid-cols-2 gap-4 mb-6">
-            <div class="card p-5 border-t-4 border-indigo-500">
-                <p class="text-xs text-gray-500 uppercase font-semibold">Total Cash</p>
+            <div class="card p-5 border-b-4 border-indigo-500">
+                <p class="text-[10px] text-gray-500 uppercase font-bold">Total Cash</p>
                 <h2 id="summaryCash" class="text-lg font-bold text-gray-800">Rp 0</h2>
             </div>
-            <div class="card p-5 border-t-4 border-emerald-500">
-                <p class="text-xs text-gray-500 uppercase font-semibold">Floating</p>
+            <div class="card p-5 border-b-4 border-emerald-500">
+                <p class="text-[10px] text-gray-500 uppercase font-bold">Floating</p>
                 <h2 id="summaryFloating" class="text-lg font-bold text-gray-800">Rp 0</h2>
             </div>
-            <div class="card p-6 col-span-2 text-center bg-white border border-indigo-100">
-                <p class="text-xs text-gray-500 uppercase font-semibold mb-1">Unrealized Balance (Total Aset)</p>
-                <h2 id="summaryTotal" class="text-3xl font-black text-indigo-900">Rp 0</h2>
+            <div class="card p-6 col-span-2 text-center bg-indigo-900 text-white">
+                <p class="text-[10px] text-indigo-300 uppercase font-bold mb-1 tracking-widest">Unrealized Balance (Total Aset)</p>
+                <h2 id="summaryTotal" class="text-3xl font-black">Rp 0</h2>
             </div>
         </div>
 
         <div class="card p-6 mb-6">
-            <h3 class="font-bold text-gray-800 mb-2">Smart Input Teks</h3>
-            <p class="text-xs text-gray-500 mb-4">Tempel format: <b>Tipe : Modal > Jual</b> (Pisah baris)</p>
-            <textarea id="bulkInput" class="input-field h-24 mb-3 text-sm" placeholder="Contoh:&#10;Oppo A54 : 500.000 > 650.000&#10;iPhone XR : 1.100.000 > 1.500.000"></textarea>
-            <div class="flex gap-2">
-                <button onclick="parseText('stok')" class="btn-primary bg-gray-800 text-xs">Input Sebagai Stok</button>
-                <button onclick="parseText('sold')" class="btn-primary bg-emerald-600 text-xs">Input Sebagai Terjual</button>
+            <h3 class="font-bold text-gray-800 mb-2 flex items-center gap-2">
+                <span>📝</span> Smart Input Teks
+            </h3>
+            <textarea id="bulkInput" class="input-field h-24 mb-3 text-sm border-dashed" placeholder="Format: Tipe : Modal > Jual&#10;Contoh:&#10;Oppo A54 : 500000 > 650000"></textarea>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="parseText('stok')" class="btn-primary bg-slate-700 text-xs">Simpan Stok</button>
+                <button onclick="parseText('sold')" class="btn-primary bg-emerald-600 text-xs">Simpan Terjual</button>
             </div>
         </div>
 
         <div class="card p-6 mb-6">
-            <h3 class="font-bold text-gray-800 mb-4">Saldo Awal Bulan</h3>
-            <input type="number" id="startBalance" class="input-field font-bold text-lg text-indigo-700" placeholder="Saldo Awal Rp" onchange="calculateAll()">
+            <h3 class="font-bold text-gray-800 text-sm mb-3">Saldo Awal (Desember/Awal Bulan)</h3>
+            <input type="number" id="startBalance" class="input-field font-black text-xl text-indigo-700 bg-indigo-50 border-none" value="0" onchange="calculateAll()">
         </div>
 
-        <div class="card p-6">
-            <h3 class="font-bold text-gray-800 mb-4">Daftar Transaksi</h3>
-            <div id="itemRows" class="space-y-4">
-                </div>
-            <button onclick="clearData()" class="mt-8 text-xs text-red-500 font-medium block mx-auto uppercase tracking-widest">Reset Semua Data</button>
+        <div class="mb-4 flex justify-between items-center px-2">
+            <h3 class="font-black text-gray-800 text-sm uppercase tracking-widest">Daftar Transaksi</h3>
+            <span id="itemCount" class="text-[10px] bg-gray-200 px-2 py-1 rounded-full font-bold text-gray-600">0 UNIT</span>
         </div>
+        
+        <div id="itemRows" class="space-y-3 mb-10">
+            </div>
+
+        <button onclick="clearData()" class="text-[10px] text-red-400 font-bold block mx-auto uppercase tracking-[0.2em] mb-10">Hapus Semua Data Terarsip</button>
     </div>
 
     <script>
@@ -74,7 +80,6 @@
         const now = new Date();
         document.getElementById('currentMonth').innerText = monthNames[now.getMonth()] + " " + now.getFullYear();
 
-        // Fungsi Smart Parser
         function parseText(status) {
             const rawText = document.getElementById('bulkInput').value;
             const lines = rawText.split('\n');
@@ -87,44 +92,58 @@
                     const price = Number(parts[2].replace(/[^0-9]/g, ''));
                     
                     if (name && modal) {
-                        addItem(name, modal, price, status, now.getMonth());
+                        items.unshift({ id: Date.now() + Math.random(), name, modal, price, status, month: now.getMonth() });
                     }
                 }
             });
             document.getElementById('bulkInput').value = '';
-        }
-
-        function addItem(name, modal, price, status, month) {
-            const id = Date.now() + Math.random();
-            items.push({ id, name, modal, price, status, month });
             renderRows();
             calculateAll();
         }
 
+        function toggleSold(id) {
+            const item = items.find(i => i.id === id);
+            if (item) {
+                item.status = 'sold';
+                item.month = now.getMonth(); // Update ke bulan sekarang saat terjual
+                renderRows();
+                calculateAll();
+            }
+        }
+
         function renderRows() {
             const container = document.getElementById('itemRows');
+            document.getElementById('itemCount').innerText = `${items.length} UNIT`;
             container.innerHTML = '';
+            
             items.forEach(item => {
+                const isSold = item.status === 'sold';
                 const profit = item.price - item.modal;
-                const row = document.createElement('div');
-                row.className = `p-4 rounded-xl border ${item.status === 'sold' ? 'bg-emerald-50 border-emerald-100' : 'bg-gray-50 border-gray-100'}`;
-                row.innerHTML = `
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <span class="text-xs font-bold uppercase tracking-tighter ${item.status === 'sold' ? 'text-emerald-600' : 'text-orange-500'}">${item.status}</span>
-                            <h4 class="font-bold text-gray-800">${item.name}</h4>
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-2xl border-2 transition-all ${isSold ? 'bg-white border-emerald-500 shadow-sm' : 'bg-white border-slate-100'}`;
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="w-2 h-2 rounded-full ${isSold ? 'bg-emerald-500' : 'bg-orange-400 animate-pulse'}"></span>
+                                <h4 class="font-bold text-gray-800 text-sm">${item.name}</h4>
+                            </div>
+                            <div class="flex gap-4 text-[11px] font-medium text-gray-500">
+                                <span>M: <b class="text-gray-700">${item.modal.toLocaleString()}</b></span>
+                                <span>${isSold ? 'J:' : 'T:'} <b class="text-gray-700">${item.price.toLocaleString()}</b></span>
+                            </div>
                         </div>
-                        <button onclick="removeItem(${item.id})" class="text-gray-400">✕</button>
-                    </div>
-                    <div class="flex justify-between items-end">
-                        <div class="text-xs text-gray-500">
-                            M: ${item.modal.toLocaleString()} <br> 
-                            J: ${item.price.toLocaleString()}
+                        <div class="flex flex-col items-end gap-2">
+                            <button onclick="removeItem(${item.id})" class="text-gray-300 hover:text-red-400 text-xs">✕</button>
+                            ${!isSold ? 
+                                `<button onclick="toggleSold(${item.id})" class="btn-sell">Laku? ✓</button>` : 
+                                `<span class="badge-profit">+${profit.toLocaleString()}</span>`
+                            }
                         </div>
-                        ${item.status === 'sold' ? `<span class="badge-profit">+Rp ${profit.toLocaleString()}</span>` : ''}
                     </div>
                 `;
-                container.appendChild(row);
+                container.appendChild(card);
             });
         }
 
@@ -141,7 +160,6 @@
                 totalModalBelanja += item.modal;
                 if (item.status === 'sold') {
                     totalUangMasuk += item.price;
-                    // Hitung profit hanya jika bulan input sama dengan bulan sekarang
                     if (item.month === currentMonth) {
                         netProfitBulanIni += (item.price - item.modal);
                     }
@@ -162,30 +180,32 @@
         }
 
         function removeItem(id) {
-            items = items.filter(i => i.id !== id);
-            renderRows();
-            calculateAll();
+            if(confirm('Hapus item ini?')) {
+                items = items.filter(i => i.id !== id);
+                renderRows();
+                calculateAll();
+            }
         }
 
         function saveData() {
-            localStorage.setItem('ledger_v2', JSON.stringify({
+            localStorage.setItem('ledger_pro_v3', JSON.stringify({
                 startBalance: document.getElementById('startBalance').value,
                 items: items
             }));
         }
 
         function loadData() {
-            const data = JSON.parse(localStorage.getItem('ledger_v2'));
+            const data = JSON.parse(localStorage.getItem('ledger_pro_v3'));
             if (data) {
-                document.getElementById('startBalance').value = data.startBalance;
-                items = data.items;
+                document.getElementById('startBalance').value = data.startBalance || 0;
+                items = data.items || [];
                 renderRows();
                 calculateAll();
             }
         }
 
         function clearData() {
-            if(confirm('Hapus semua data?')) {
+            if(confirm('PERINGATAN: Semua data akan dihapus permanen!')) {
                 localStorage.clear();
                 location.reload();
             }
