@@ -15,293 +15,177 @@
         .btn-primary:active { transform: scale(0.98); }
         .badge-profit { background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; border: 1px solid #bbf7d0; }
         .btn-sell { background: #10b981; color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; transition: 0.2s; }
-        
         #sidebar { transition: transform 0.3s ease; transform: translateX(-100%); z-index: 50; }
         #sidebar.open { transform: translateX(0); }
         #overlay, #hintModalOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
         #overlay.open, #hintModalOverlay.open { display: block; }
         .hidden-panel { display: none; }
-
-        #hintModal { 
-            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 90%; max-width: 400px; background: white; border-radius: 20px; padding: 24px;
-            z-index: 100; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-        }
-        #hintModal.open { display: block; }
     </style>
 </head>
+
 <body class="p-4 md:p-8">
 
-    <div id="overlay" onclick="toggleSidebar()"></div>
-    <div id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-indigo-900 text-white p-6 shadow-2xl">
-        <h2 class="text-xl font-bold mb-8 flex items-center gap-2"><span>📱</span> Menu</h2>
-        <nav class="space-y-4">
-            <button onclick="clearData()" class="block w-full text-left p-3 rounded-lg hover:bg-red-800 transition text-red-300 italic">🗑️ Hapus Semua Data</button>
-        </nav>
+<div class="max-w-2xl mx-auto">
+
+    <!-- IMPORT -->
+    <div class="card p-6 mb-4 border-dashed border-2 border-indigo-300">
+        <h3 class="font-bold text-gray-800 mb-2 text-sm uppercase tracking-wider">📥 Import Laporan</h3>
+        <textarea id="importInput" class="input-field h-32 mb-3 text-sm"
+            placeholder="Paste laporan hasil export di sini..."></textarea>
+        <button onclick="importReport()" class="btn-primary bg-indigo-600 text-[10px] uppercase">
+            Import Laporan
+        </button>
     </div>
 
-    <div id="hintModalOverlay" onclick="toggleHint()"></div>
-    <div id="hintModal">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="font-black text-indigo-900 uppercase">Petunjuk</h3>
-            <button onclick="toggleHint()" class="text-gray-400 hover:text-red-500 text-2xl font-bold">&times;</button>
-        </div>
-        <div class="text-xs text-gray-600 space-y-3 leading-relaxed">
-            <p>1. <b>Import:</b> Klik tombol "Import Report" lalu tempel laporan lengkap Anda.</p>
-            <p>2. <b>Input Manual:</b> Gunakan format <code>Nama : Modal > Jual</code></p>
+    <!-- SMART INPUT -->
+    <div class="card p-6 mb-4">
+        <h3 class="font-bold text-gray-800 mb-2 text-sm uppercase tracking-wider">📝 Smart Input</h3>
+        <textarea id="bulkInput" class="input-field h-24 mb-3 text-sm"
+            placeholder="Nama : Modal > Jual"></textarea>
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="parseText('old')" class="btn-primary bg-slate-700 text-[10px] uppercase">Stok Lama</button>
+            <button onclick="parseText('new')" class="btn-primary bg-emerald-600 text-[10px] uppercase">Stok Baru</button>
         </div>
     </div>
 
-    <div class="max-w-2xl mx-auto">
-        <div class="flex justify-between items-center mb-6">
-            <button onclick="toggleSidebar()" class="p-2 bg-white rounded-xl shadow-sm text-indigo-600 font-bold">☰ Menu</button>
-            <div class="flex gap-2">
-                <button onclick="importReport()" class="px-4 py-2 bg-slate-600 text-white rounded-xl text-xs font-bold shadow-lg">📥 Import Report</button>
-                <button onclick="exportReport()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg">📤 Copy Report</button>
-            </div>
-        </div>
-
-        <header class="mb-8 flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900 leading-tight">Digital Ledger</h1>
-                <p id="currentMonth" class="text-indigo-600 font-semibold uppercase tracking-wider text-[10px]"></p>
-            </div>
-            <div class="text-right">
-                <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Realized Profit</p>
-                <h2 id="summaryProfit" class="text-xl font-black text-emerald-600">Rp 0</h2>
-            </div>
-        </header>
-
-        <div class="grid grid-cols-2 gap-4 mb-6">
-            <div class="card p-5 border-b-4 border-indigo-500">
-                <p class="text-[10px] text-gray-500 uppercase font-bold">Uang Tunai (Cash)</p>
-                <h2 id="summaryCash" class="text-lg font-bold text-gray-800">Rp 0</h2>
-            </div>
-            <div class="card p-5 border-b-4 border-emerald-500">
-                <p class="text-[10px] text-gray-500 uppercase font-bold">Total Floating</p>
-                <h2 id="summaryFloating" class="text-lg font-bold text-gray-800">Rp 0</h2>
-            </div>
-            <div class="card p-6 col-span-2 text-center bg-indigo-900 text-white">
-                <p class="text-[10px] text-indigo-300 uppercase font-bold mb-1 tracking-widest">Total Aset (Unrealized Balance)</p>
-                <h2 id="summaryTotal" class="text-3xl font-black">Rp 0</h2>
-            </div>
-        </div>
-
-        <div class="card p-6 mb-4">
-            <h3 class="font-bold text-gray-800 mb-2 flex items-center gap-2 text-sm uppercase">📝 Smart Input</h3>
-            <textarea id="bulkInput" class="input-field h-24 mb-3 text-sm border-dashed" placeholder="Contoh: Poco M3 : 450000 > 600000"></textarea>
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="parseText('old')" class="btn-primary bg-slate-700 text-[10px] uppercase">Stok Lalu</button>
-                <button onclick="parseText('new')" class="btn-primary bg-emerald-600 text-[10px] uppercase">Belanja Baru</button>
-            </div>
-        </div>
-
-        <div class="mb-6">
-            <button onclick="toggleConfig()" id="configLabel" class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-2">⚙️ Buka Saldo Awal</button>
-            <div id="configPanel" class="hidden-panel">
-                <div class="card p-5 bg-indigo-50 border-none">
-                    <input type="number" id="startBalance" class="input-field font-black text-lg text-indigo-700" value="0" onchange="calculateAll()">
-                </div>
-            </div>
-        </div>
-
-        <div id="itemRows" class="space-y-3 mb-10"></div>
+    <!-- SALDO -->
+    <div class="card p-5 mb-4">
+        <p class="text-[10px] text-gray-500 uppercase font-bold">Saldo Awal</p>
+        <input type="number" id="startBalance" class="input-field font-black text-lg" value="0" onchange="calculateAll()">
     </div>
 
-    <script>
-        let items = [];
-        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-        const now = new Date();
-        const currentMonthString = monthNames[now.getMonth()] + " " + now.getFullYear();
-        document.getElementById('currentMonth').innerText = currentMonthString;
+    <!-- SUMMARY -->
+    <div class="grid grid-cols-2 gap-4 mb-6">
+        <div class="card p-4">
+            <p class="text-xs">Cash</p>
+            <h2 id="summaryCash" class="font-black">Rp 0</h2>
+        </div>
+        <div class="card p-4">
+            <p class="text-xs">Floating</p>
+            <h2 id="summaryFloating" class="font-black">Rp 0</h2>
+        </div>
+        <div class="card p-4 col-span-2 bg-indigo-900 text-white text-center">
+            <p class="text-xs">Total Aset</p>
+            <h2 id="summaryTotal" class="text-2xl font-black">Rp 0</h2>
+        </div>
+    </div>
 
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.getElementById('overlay').classList.toggle('open');
-        }
+    <div id="itemRows" class="space-y-3"></div>
+</div>
 
-        function toggleHint() { document.getElementById('hintModal').classList.toggle('open'); }
-        function toggleConfig() { 
-            const p = document.getElementById('configPanel');
-            p.classList.toggle('hidden-panel');
-            document.getElementById('configLabel').innerText = p.classList.contains('hidden-panel') ? "⚙️ Buka Saldo Awal" : "⚙️ Tutup Saldo Awal";
-        }
+<script>
+let items = [];
 
-        function parsePrice(str) {
-            if (!str) return 0;
-            // Menghapus semua karakter non-angka agar titik/koma ribuan tidak merusak Number()
-            return Number(str.replace(/[^0-9]/g, '')) || 0;
-        }
-
-        function importReport() {
-            const rawData = prompt("Tempel laporan di sini:");
-            if (!rawData) return;
-
-            // MEMBERSIHKAN KARAKTER UNICODE / INVISIBLE (PENYEBAB UTAMA ERROR)
-            const cleanData = rawData.replace(/[\u200B-\u200D\uFEFF]/g, "").replace(/\u00A0/g, " ");
-            const lines = cleanData.split('\n');
-            
-            let newItems = [];
-            let newStartBalance = 0;
-            let currentSection = ""; 
-
-            lines.forEach(line => {
-                const row = line.trim();
-                if (!row) return;
-
-                // Deteksi Section Judul
-                if (row.toLowerCase().includes("report bulanan")) {
-                    currentSection = "SOLD";
-                    return;
-                } else if (row.toLowerCase().includes("belum terjual")) {
-                    currentSection = "STOK";
-                    return;
-                }
-
-                // Ambil Saldo Awal
-                if (row.toLowerCase().includes("saldo awal")) {
-                    const balancePart = row.split(':')[1];
-                    if(balancePart) newStartBalance = parsePrice(balancePart);
-                    return;
-                }
-
-                // Deteksi Baris Barang (menggunakan Regex untuk simbol list - atau • atau *)
-                if (/^[-•*]/.test(row)) {
-                    const content = row.replace(/^[-•*]\s*/, ''); 
-                    
-                    if (currentSection === "SOLD" && content.includes('>')) {
-                        // Pola Terjual (Nama : Modal > Jual)
-                        const parts = content.split(/[:>]/);
-                        const name = parts[0].trim();
-                        const modal = parsePrice(parts[1]);
-                        const price = parsePrice(parts[2].split('(')[0]);
-                        if (name) newItems.push({ id: Math.random(), name, modal, price, status: 'sold', type: 'old' });
-                    } 
-                    else if (content.includes(':')) {
-                        // Pola Stok (Nama : Jual)
-                        const parts = content.split(':');
-                        const name = parts[0].trim();
-                        const price = parsePrice(parts[1]);
-                        // Jika di section STOK, maka modal = price (sebagai placeholder)
-                        // Jika di section SOLD tapi formatnya Nama:Harga, maka tetap masuk stok
-                        const status = (currentSection === "SOLD") ? 'sold' : 'stok';
-                        if (name) newItems.push({ id: Math.random(), name, modal: price, price, status: status, type: 'old' });
-                    }
-                }
+function parseText(type) {
+    const raw = document.getElementById('bulkInput').value.split('\n');
+    raw.forEach(line => {
+        if (line.includes(':') && line.includes('>')) {
+            const p = line.split(/[:>]/);
+            items.push({
+                id: Date.now() + Math.random(),
+                name: p[0].trim(),
+                modal: Number(p[1].replace(/\D/g,'')),
+                price: Number(p[2].replace(/\D/g,'')),
+                status: 'stok',
+                type
             });
-
-            if (newItems.length > 0) {
-                if (confirm(`Berhasil memproses ${newItems.length} unit. Timpa data sekarang?`)) {
-                    items = newItems;
-                    document.getElementById('startBalance').value = newStartBalance;
-                    renderRows();
-                    calculateAll();
-                }
-            } else {
-                alert("Gagal membaca data. Pastikan laporan memiliki judul section dan baris barang diawali tanda '-'");
-            }
         }
+    });
+    document.getElementById('bulkInput').value = '';
+    renderRows(); calculateAll();
+}
 
-        function parseText(type) {
-            const lines = document.getElementById('bulkInput').value.split('\n');
-            lines.forEach(line => {
-                const cleanLine = line.replace(/[\u200B-\u200D\uFEFF]/g, "").trim();
-                if (cleanLine.includes(':')) {
-                    const parts = cleanLine.split(/[:>]/);
-                    const name = parts[0].trim().replace(/^[-•*]\s*/, '');
-                    const modal = parsePrice(parts[1]);
-                    const price = parts[2] ? parsePrice(parts[2]) : modal;
-                    if (name) items.unshift({ id: Math.random(), name, modal, price, status: 'stok', type });
-                }
-            });
-            document.getElementById('bulkInput').value = '';
-            renderRows(); 
-            calculateAll();
-        }
+function toggleSold(id){
+    const i = items.find(x=>x.id===id);
+    if(i){ i.status='sold'; renderRows(); calculateAll(); }
+}
 
-        function renderRows() {
-            const container = document.getElementById('itemRows');
-            container.innerHTML = '';
-            items.forEach(item => {
-                const isSold = item.status === 'sold';
-                const card = document.createElement('div');
-                card.className = `p-4 rounded-2xl border-2 bg-white ${isSold ? 'border-emerald-500 opacity-75' : 'border-slate-100'}`;
-                card.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-[8px] font-bold px-1.5 py-0.5 rounded ${item.type==='old'?'bg-orange-100 text-orange-600':'bg-blue-100 text-blue-600'}">${item.type==='old'?'STOK LALU':'BARU'}</span>
-                                <h4 class="font-bold text-gray-800 text-sm">${item.name}</h4>
-                            </div>
-                            <p class="text-[10px] text-gray-500 font-medium">M: ${item.modal.toLocaleString()} | J: ${item.price.toLocaleString()}</p>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            ${isSold ? `<span class="badge-profit">+${(item.price-item.modal).toLocaleString()}</span>` : `<button onclick="toggleSold(${item.id})" class="btn-sell">Laku?</button>`}
-                            <button onclick="removeItem(${item.id})" class="text-gray-300">✕</button>
-                        </div>
-                    </div>`;
-                container.appendChild(card);
+function renderRows(){
+    const c = document.getElementById('itemRows');
+    c.innerHTML='';
+    items.forEach(i=>{
+        const d=document.createElement('div');
+        d.className='card p-4 flex justify-between';
+        d.innerHTML=`
+        <div>
+            <b>${i.name}</b><br>
+            <small>${i.modal.toLocaleString()} → ${i.price.toLocaleString()}</small>
+        </div>
+        <div>
+            ${i.status==='stok'
+            ? `<button onclick="toggleSold(${i.id})" class="btn-sell">Laku?</button>`
+            : `<span class="badge-profit">+${(i.price-i.modal).toLocaleString()}</span>`}
+        </div>`;
+        c.appendChild(d);
+    });
+}
+
+function calculateAll(){
+    const start = Number(startBalance.value)||0;
+    let beli=0, masuk=0, floating=0;
+
+    items.forEach(i=>{
+        if(i.type==='new') beli+=i.modal;
+        if(i.status==='sold') masuk+=i.price;
+        else floating+=i.price;
+    });
+
+    summaryCash.innerText='Rp '+(start-beli+masuk).toLocaleString();
+    summaryFloating.innerText='Rp '+floating.toLocaleString();
+    summaryTotal.innerText='Rp '+(start-beli+masuk+floating).toLocaleString();
+    saveData();
+}
+
+function importReport(){
+    const t=document.getElementById('importInput').value;
+    if(!t.trim()) return alert('Paste laporan dulu');
+    if(!confirm('Data lama akan diganti. Lanjutkan?')) return;
+
+    items=[];
+    let mode='';
+    t.split('\n').forEach(l=>{
+        l=l.trim();
+        if(l.includes('Report Bulanan')) mode='sold';
+        if(l.includes('Unit Belum Terjual')) mode='stok';
+
+        if(l.startsWith('-') && mode==='sold'){
+            const m=l.match(/- (.+?) : ([\d.]+) > ([\d.]+)/);
+            if(m) items.push({
+                id:Date.now()+Math.random(),
+                name:m[1], modal:+m[2].replace(/\./g,''), price:+m[3].replace(/\./g,''),
+                status:'sold', type:'old'
             });
         }
 
-        function toggleSold(id) {
-            const i = items.find(x => x.id === id);
-            if (i) { i.status = 'sold'; renderRows(); calculateAll(); }
-        }
-
-        function removeItem(id) {
-            items = items.filter(x => x.id !== id);
-            renderRows(); calculateAll();
-        }
-
-        function calculateAll() {
-            const start = Number(document.getElementById('startBalance').value) || 0;
-            let belanjaBaru = 0, uangMasuk = 0, profit = 0, floating = 0;
-            items.forEach(i => {
-                if (i.type === 'new') belanjaBaru += i.modal;
-                if (i.status === 'sold') { 
-                    uangMasuk += i.price; 
-                    profit += (i.price - i.modal); 
-                }
-                else { 
-                    floating += i.price; 
-                }
+        if(l.startsWith('-') && mode==='stok'){
+            const m=l.match(/- (.+?) : ([\d.]+)/);
+            if(m) items.push({
+                id:Date.now()+Math.random(),
+                name:m[1], modal:+m[2].replace(/\./g,''), price:+m[2].replace(/\./g,''),
+                status:'stok', type:'old'
             });
-            const cash = start - belanjaBaru + uangMasuk;
-            document.getElementById('summaryCash').innerText = "Rp " + cash.toLocaleString('id-ID');
-            document.getElementById('summaryFloating').innerText = "Rp " + floating.toLocaleString('id-ID');
-            document.getElementById('summaryTotal').innerText = "Rp " + (cash + floating).toLocaleString('id-ID');
-            document.getElementById('summaryProfit').innerText = "Rp " + profit.toLocaleString('id-ID');
-            saveData();
         }
 
-        function exportReport() {
-            let res = `————————————————\nReport Bulanan - ${currentMonthString}\n————————————————\n`;
-            items.filter(i => i.status === 'sold').forEach(i => {
-                res += `- ${i.name} : ${i.modal.toLocaleString()} > ${i.price.toLocaleString()} (+${(i.price-i.modal).toLocaleString()})\n`;
-            });
-            res += `\n————————————————\nUnit Belum Terjual - ${currentMonthString}\n————————————————\n`;
-            items.filter(i => i.status === 'stok').forEach(i => {
-                res += `- ${i.name} : ${i.price.toLocaleString()}\n`;
-            });
-            res += `\n————————————————\n> Saldo Awal : Rp ${Number(document.getElementById('startBalance').value).toLocaleString()}\n`;
-            res += `> Total Profit : ${document.getElementById('summaryProfit').innerText}\n`;
-            res += `————————————————\nSaldo Akhir : ${document.getElementById('summaryCash').innerText}`;
-            
-            navigator.clipboard.writeText(res).then(() => alert("Laporan disalin!"));
+        if(l.includes('Saldo Awal')){
+            startBalance.value=l.replace(/\D/g,'');
         }
+    });
 
-        function saveData() { localStorage.setItem('phone_ledger_final', JSON.stringify({ startBalance: document.getElementById('startBalance').value, items })); }
-        function loadData() {
-            const data = JSON.parse(localStorage.getItem('phone_ledger_final'));
-            if (data) {
-                document.getElementById('startBalance').value = data.startBalance || 0;
-                items = data.items || [];
-                renderRows(); calculateAll();
-            }
-        }
-        function clearData() { if(confirm('Hapus semua data? Tindakan ini tidak bisa dibatalkan.')) { localStorage.clear(); location.reload(); } }
-        window.onload = loadData;
-    </script>
+    document.getElementById('importInput').value='';
+    renderRows(); calculateAll();
+    alert('Import berhasil');
+}
+
+function saveData(){
+    localStorage.setItem('ledger_import',JSON.stringify({items, start:startBalance.value}));
+}
+
+function loadData(){
+    const d=JSON.parse(localStorage.getItem('ledger_import'));
+    if(d){ items=d.items||[]; startBalance.value=d.start||0; renderRows(); calculateAll(); }
+}
+window.onload=loadData;
+</script>
+
 </body>
 </html>
