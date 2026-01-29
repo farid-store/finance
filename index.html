@@ -79,9 +79,17 @@
             </div>
         </div>
 
-        <div class="card p-6 mb-6">
-            <h3 class="font-bold text-gray-800 text-sm mb-3">Saldo Awal (Per Awal Bulan)</h3>
-            <input type="number" id="startBalance" class="input-field font-black text-xl text-indigo-700 bg-indigo-50 border-none uppercase" value="0" onchange="calculateAll()">
+        <div class="space-y-4 mb-6">
+            <div class="card p-6">
+                <h3 class="font-bold text-gray-800 text-sm mb-3">Saldo Awal (Per Awal Bulan)</h3>
+                <input type="number" id="startBalance" class="input-field font-black text-xl text-indigo-700 bg-indigo-50 border-none uppercase" value="0" onchange="calculateAll()">
+            </div>
+            
+            <div class="card p-5 bg-slate-800 border-l-8 border-indigo-500 text-white">
+                <p class="text-[10px] text-indigo-300 uppercase font-bold tracking-widest mb-1">Total Modal Take Unit (Stock)</p>
+                <h2 id="previewModalStock" class="text-2xl font-black text-white">Rp 0</h2>
+                <p class="text-[9px] text-slate-400 mt-1 italic">*Jumlah dana tertanam pada unit yang belum terjual</p>
+            </div>
         </div>
 
         <div class="mb-4 flex justify-between items-center px-2">
@@ -179,7 +187,7 @@
             let totalUangMasuk = 0;
             let totalFloating = 0;
             let realizedProfit = 0;
-            let unrealizedProfit = 0;
+            let modalStockOnly = 0;
 
             items.forEach(item => {
                 totalModalBelanja += item.modal;
@@ -188,7 +196,7 @@
                     realizedProfit += (item.price - item.modal);
                 } else {
                     totalFloating += item.price;
-                    unrealizedProfit += (item.price - item.modal);
+                    modalStockOnly += item.modal;
                 }
             });
 
@@ -199,6 +207,7 @@
             document.getElementById('summaryFloating').innerText = "Rp " + totalFloating.toLocaleString('id-ID');
             document.getElementById('summaryTotal').innerText = "Rp " + unrealizedBalance.toLocaleString('id-ID');
             document.getElementById('summaryProfit').innerText = "Rp " + realizedProfit.toLocaleString('id-ID');
+            document.getElementById('previewModalStock').innerText = "Rp " + modalStockOnly.toLocaleString('id-ID');
             
             saveData();
         }
@@ -243,7 +252,6 @@
                 });
             }
 
-            // Re-calculate for totals
             items.forEach(i => totalModalBelanja += i.modal);
             const cashAkhir = startBal - totalModalBelanja + totalUangMasuk;
             const unRealBalance = cashAkhir + totalFloating;
@@ -258,7 +266,7 @@
             report += `UnRealize Balance : Rp ${unRealBalance.toLocaleString('id-ID')}`;
 
             navigator.clipboard.writeText(report).then(() => {
-                alert("Laporan sesuai format berhasil disalin!");
+                alert("Laporan berhasil disalin!");
             });
         }
 
