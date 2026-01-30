@@ -34,7 +34,6 @@
         .check-label { font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 5px; display: block; }
         .mode-desktop { max-width: 1000px !important; border-left: 1px solid #ddd; border-right: 1px solid #ddd; }
         
-        /* Tombol Link List */
         .btn-check-list { 
             display: flex; align-items: center; justify-content: space-between;
             width: 100%; padding: 14px; background: #1e293b; color: white; 
@@ -43,6 +42,11 @@
         }
         .btn-check-list:hover { background: #334155; }
         .btn-check-list span { opacity: 0.6; font-size: 10px; font-weight: 400; }
+
+        /* Dial Code Styles */
+        .dial-item { border-bottom: 1px solid #f1f5f9; padding: 10px 0; }
+        .dial-code { font-family: monospace; color: #6366f1; font-weight: 800; font-size: 14px; }
+        .dial-desc { font-size: 11px; color: #64748b; margin-top: 2px; }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -53,6 +57,7 @@
         <nav class="space-y-4 flex-1">
             <button onclick="switchPage('main')" class="block w-full text-left p-3 rounded-lg hover:bg-indigo-800 transition font-bold">📊 Dashboard Utama</button>
             <button onclick="switchPage('hp')" class="block w-full text-left p-3 rounded-lg hover:bg-indigo-800 transition font-bold">🔍 Handphone Check</button>
+            <button onclick="switchPage('dial')" class="block w-full text-left p-3 rounded-lg hover:bg-indigo-800 transition font-bold">📞 Dial Check (Kode)</button>
             <button onclick="switchPage('laptop')" class="block w-full text-left p-3 rounded-lg hover:bg-indigo-800 transition font-bold">🔍 Laptop Check</button>
             <div class="border-t border-indigo-800 my-4"></div>
             <button onclick="toggleHelpModal()" class="block w-full text-left p-3 rounded-lg bg-indigo-800 font-medium">📖 Panduan</button>
@@ -166,7 +171,7 @@
                     Cek IMEI Beacukai <span>🌐 Portal Bea Cukai</span>
                 </button>
                 <button onclick="window.open('https://sickw.com/')" class="btn-check-list">
-                    SICKSW <span>🌐 Cek Serial Number / IMEI</span>
+                    SICKSW <span>🌐 Cek SN / IMEI</span>
                 </button>
                 <button onclick="window.open('https://www.touchscreentest.com/')" class="btn-check-list">
                     Touchscreen Test <span>🌐 Online Test</span>
@@ -177,9 +182,51 @@
                 <button onclick="window.open('https://webcammictest.com/mic/')" class="btn-check-list">
                     Microphone Test <span>🌐 Online Test</span>
                 </button>
-                <button onclick="window.open('https://www.youtube.com/results?search_query=stereo+speaker+test')" class="btn-check-list">
-                    Stereo Speaker Test <span>🌐 YouTube</span>
-                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-dial" class="max-w-2xl mx-auto hidden">
+        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase tracking-widest">← Kembali ke Dashboard</button>
+        <h1 class="text-2xl font-black text-gray-900 uppercase italic mb-2">📞 Dial Check Codes</h1>
+        <p class="text-[10px] text-red-500 font-bold mb-6 italic tracking-tight">⚠️ Hati-hati di Engineer Mode, jangan ubah setingan sembarangan!</p>
+        
+        <div class="space-y-4">
+            <div class="card p-5">
+                <h3 class="font-black text-xs text-indigo-600 uppercase mb-3 border-b pb-2">1. Kode Universal Android</h3>
+                <div class="dial-item"><span class="dial-code">*#06#</span><div class="dial-desc">Cek nomor IMEI (Wajib)</div></div>
+                <div class="dial-item"><span class="dial-code">*#*#4636#*#*</span><div class="dial-desc">Informasi Jaringan, Baterai, & Statistik</div></div>
+            </div>
+
+            <div class="card p-5">
+                <h3 class="font-black text-xs text-blue-600 uppercase mb-3 border-b pb-2">2. Samsung</h3>
+                <div class="dial-item"><span class="dial-code">*#0*#</span><div class="dial-desc">Menu Uji Hardware Utama (LCD, Touch, Speaker)</div></div>
+                <div class="dial-item"><span class="dial-code">*#7353#</span><div class="dial-desc">Menu Uji Cepat (Quick Test)</div></div>
+                <div class="dial-item"><span class="dial-code">*#0228#</span><div class="dial-desc">Cek Status Baterai</div></div>
+                <div class="dial-item"><span class="dial-code">*#12580*369#</span><div class="dial-desc">Informasi Versi Software & Hardware</div></div>
+                <div class="dial-item"><span class="dial-code">*#9900#</span><div class="dial-desc">System Dump (Hapus Log / Hemat Baterai)</div></div>
+            </div>
+
+            <div class="card p-5">
+                <h3 class="font-black text-xs text-orange-600 uppercase mb-3 border-b pb-2">3. Xiaomi / Redmi / Poco</h3>
+                <div class="dial-item"><span class="dial-code">*#*#64663#*#*</span><div class="dial-desc">Menu QC Test / Hardware Diagnostic (Utama)</div></div>
+                <div class="dial-item"><span class="dial-code">*#*#6485#*#*</span><div class="dial-desc">Cek Kesehatan & Info Baterai Detail</div></div>
+                <div class="dial-item"><span class="dial-code">*#*#0000#*#*</span><div class="dial-desc">Informasi Versi Software / Tentang Telepon</div></div>
+                <div class="dial-item"><span class="dial-code">*#*#2664#*#*</span><div class="dial-desc">Uji Layar Sentuh (Touchscreen)</div></div>
+            </div>
+
+            <div class="card p-5">
+                <h3 class="font-black text-xs text-emerald-600 uppercase mb-3 border-b pb-2">4. OPPO, Vivo, dan Realme</h3>
+                <div class="dial-item"><span class="dial-code">*#899#</span><div class="dial-desc">Engineer Mode / Manual Test (Oppo/Realme)</div></div>
+                <div class="dial-item"><span class="dial-code">*#808#</span><div class="dial-desc">Hardware Test (Oppo/Realme)</div></div>
+                <div class="dial-item"><span class="dial-code">*#6776#</span><div class="dial-desc">Informasi Perangkat Lunak Lengkap</div></div>
+                <div class="dial-item"><span class="dial-code">*#558#</span><div class="dial-desc">Cek Sensor & Layar (Khusus Vivo)</div></div>
+            </div>
+
+            <div class="card p-5 mb-10">
+                <h3 class="font-black text-xs text-blue-800 uppercase mb-3 border-b pb-2">5. Asus</h3>
+                <div class="dial-item"><span class="dial-code">.12345+=</span><div class="dial-desc">Ketik di Kalkulator untuk Masuk Diagnosa</div></div>
+                <div class="dial-item"><span class="dial-code">*#*#3646633#*#*</span><div class="dial-desc">Engineer Mode (Chipset MediaTek)</div></div>
             </div>
         </div>
     </div>
@@ -192,9 +239,6 @@
             <div class="space-y-2">
                 <button onclick="window.open('https://webcammictest.com/')" class="btn-check-list">
                     Webcam Test <span>🌐 Online Test</span>
-                </button>
-                <button onclick="window.open('https://webcammictest.com/mic/')" class="btn-check-list">
-                    Microphone Test <span>🌐 Online Test</span>
                 </button>
                 <button onclick="window.open('https://en.key-test.ru/')" class="btn-check-list">
                     Keyboard Test <span>🌐 Online</span>
@@ -225,6 +269,7 @@
         <ul class="space-y-4 text-gray-600">
             <li><b class="text-indigo-600">1. Atur Saldo:</b> Klik "Atur Saldo" untuk modal awal tunai.</li>
             <li><b class="text-indigo-600">2. Input Cepat:</b> Ketik <code class="bg-gray-100 px-1">Nama : Modal > Jual</code>. Klik [L] untuk stok lama atau [B] belanja baru.</li>
+            <li><b class="text-indigo-600">3. Dial Check:</b> Buka aplikasi Telepon, ketik kode yang tertera tanpa menekan panggil.</li>
         </ul>
         <button onclick="toggleHelpModal()" class="mt-6 btn-primary bg-indigo-600">SAYA MENGERTI</button>
     </div>
@@ -232,18 +277,18 @@
     <script>
         // --- LOGIKA HALAMAN ---
         function switchPage(page) {
-            document.getElementById('page-main').classList.add('hidden');
-            document.getElementById('page-hp').classList.add('hidden');
-            document.getElementById('page-laptop').classList.add('hidden');
+            const pages = ['page-main', 'page-hp', 'page-laptop', 'page-dial'];
+            pages.forEach(p => document.getElementById(p).classList.add('hidden'));
             
             if(page === 'main') document.getElementById('page-main').classList.remove('hidden');
             if(page === 'hp') document.getElementById('page-hp').classList.remove('hidden');
             if(page === 'laptop') document.getElementById('page-laptop').classList.remove('hidden');
+            if(page === 'dial') document.getElementById('page-dial').classList.remove('hidden');
             
             toggleSidebar();
+            window.scrollTo(0,0);
         }
 
-        // --- UPDATE: FUNGSI DIRECT IMEI ---
         function directImei() {
             const imei = document.getElementById('imeiInput').value;
             if(!imei) return alert("Isi IMEI dulu!");
@@ -270,7 +315,7 @@
             }
         }
 
-        // --- LOGIKA ASLI ANDA (UTUH) ---
+        // --- LOGIKA ASLI (TIDAK BERUBAH) ---
         let items = [];
         let currentFilter = 'stok';
         const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
