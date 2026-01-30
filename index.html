@@ -29,10 +29,20 @@
         .modal-custom.open { display: block; }
         .hidden-panel { display: none; }
 
-        /* Style Baru untuk Fitur Cek */
+        /* Style Fitur Cek */
         .check-card { padding: 15px; border-radius: 12px; background: #f8fafc; border: 1px solid #e2e8f0; margin-bottom: 10px; }
         .check-label { font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 5px; display: block; }
         .mode-desktop { max-width: 1000px !important; border-left: 1px solid #ddd; border-right: 1px solid #ddd; }
+        
+        /* Tombol Link List */
+        .btn-check-list { 
+            display: flex; align-items: center; justify-content: space-between;
+            width: 100%; padding: 14px; background: #1e293b; color: white; 
+            border-radius: 12px; font-size: 12px; font-weight: 600; margin-bottom: 8px;
+            transition: 0.2s;
+        }
+        .btn-check-list:hover { background: #334155; }
+        .btn-check-list span { opacity: 0.6; font-size: 10px; font-weight: 400; }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -144,22 +154,31 @@
         
         <div class="card p-6 space-y-4">
             <div class="check-card">
-                <label class="check-label italic">Cek Status IMEI (imei.info)</label>
+                <label class="check-label italic">Cek IMEI (imei.info)</label>
                 <div class="flex gap-2">
                     <input type="number" id="imeiInput" class="input-field text-sm" placeholder="Masukkan 15 digit IMEI...">
                     <button onclick="directImei()" class="btn-primary bg-indigo-600 w-24 text-[10px]">CEK</button>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 gap-3">
-                <button onclick="window.open('https://screen-test.online/')" class="btn-primary bg-slate-800 text-xs text-left px-5 flex justify-between items-center">
-                    Cek LCD & Touchscreen <span>🌐 Online Test</span>
+            <div class="space-y-2">
+                <button onclick="window.open('https://old.beacukai.go.id/websitenewV2/cek-imei.html')" class="btn-check-list">
+                    Cek IMEI Beacukai <span>🌐 Portal Bea Cukai</span>
                 </button>
-                <button onclick="window.open('https://www.onlinemictest.com/')" class="btn-primary bg-slate-800 text-xs text-left px-5 flex justify-between items-center">
-                    Cek Mic & Recording <span>🌐 Online Test</span>
+                <button onclick="window.open('https://sickw.com/')" class="btn-check-list">
+                    SICKSW <span>🌐 Cek Serial Number / IMEI</span>
                 </button>
-                <button onclick="window.open('https://www.youtube.com/results?search_query=stereo+speaker+test')" class="btn-primary bg-slate-800 text-xs text-left px-5 flex justify-between items-center">
-                    Cek Suara (Stereo Test) <span>🌐 YouTube</span>
+                <button onclick="window.open('https://www.touchscreentest.com/')" class="btn-check-list">
+                    Touchscreen Test <span>🌐 Online Test</span>
+                </button>
+                <button onclick="window.open('https://lcdtech.info/en/tests/dead.pixel.html')" class="btn-check-list">
+                    LCD Dead Pixel Test <span>🌐 Online Test</span>
+                </button>
+                <button onclick="window.open('https://webcammictest.com/mic/')" class="btn-check-list">
+                    Microphone Test <span>🌐 Online Test</span>
+                </button>
+                <button onclick="window.open('https://www.youtube.com/results?search_query=stereo+speaker+test')" class="btn-check-list">
+                    Stereo Speaker Test <span>🌐 YouTube</span>
                 </button>
             </div>
         </div>
@@ -170,15 +189,21 @@
         <h1 class="text-2xl font-black text-gray-900 uppercase italic mb-6">💻 Laptop Check</h1>
         
         <div class="card p-6 space-y-4">
-            <div class="grid grid-cols-1 gap-3">
-                <button onclick="window.open('https://en.key-test.ru/')" class="btn-primary bg-slate-800 text-xs text-left px-5 flex justify-between items-center">
+            <div class="space-y-2">
+                <button onclick="window.open('https://webcammictest.com/')" class="btn-check-list">
+                    Webcam Test <span>🌐 Online Test</span>
+                </button>
+                <button onclick="window.open('https://webcammictest.com/mic/')" class="btn-check-list">
+                    Microphone Test <span>🌐 Online Test</span>
+                </button>
+                <button onclick="window.open('https://en.key-test.ru/')" class="btn-check-list">
                     Keyboard Test <span>🌐 Online</span>
                 </button>
-                <button onclick="window.open('https://webcamtests.com/')" class="btn-primary bg-slate-800 text-xs text-left px-5 flex justify-between items-center">
-                    Webcam Test <span>🌐 Online</span>
+                <button onclick="window.open('https://lcdtech.info/en/tests/dead.pixel.html')" class="btn-check-list">
+                    LCD Dead Pixel Test <span>🌐 Online</span>
                 </button>
-                <button onclick="window.open('https://www.batterymon.com/')" class="btn-primary bg-slate-800 text-xs text-left px-5 flex justify-between items-center">
-                    Download BatteryMon (PC) <span>📥 External</span>
+                <button onclick="window.open('https://www.batterymon.com/')" class="btn-check-list">
+                    Download BatteryMon <span>📥 PC Software</span>
                 </button>
             </div>
         </div>
@@ -205,7 +230,7 @@
     </div>
 
     <script>
-        // --- LOGIKA HALAMAN BARU ---
+        // --- LOGIKA HALAMAN ---
         function switchPage(page) {
             document.getElementById('page-main').classList.add('hidden');
             document.getElementById('page-hp').classList.add('hidden');
@@ -218,6 +243,7 @@
             toggleSidebar();
         }
 
+        // --- UPDATE: FUNGSI DIRECT IMEI ---
         function directImei() {
             const imei = document.getElementById('imeiInput').value;
             if(!imei) return alert("Isi IMEI dulu!");
@@ -244,7 +270,7 @@
             }
         }
 
-        // --- LOGIKA ASLI ANDA (TIDAK DIUBAH) ---
+        // --- LOGIKA ASLI ANDA (UTUH) ---
         let items = [];
         let currentFilter = 'stok';
         const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
