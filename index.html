@@ -29,7 +29,6 @@
         .modal-custom.open { display: block; }
         .hidden-panel { display: none; }
 
-        /* Style Fitur Cek */
         .check-card { padding: 15px; border-radius: 12px; background: #f8fafc; border: 1px solid #e2e8f0; margin-bottom: 10px; }
         .check-label { font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 5px; display: block; }
         .mode-desktop { max-width: 1000px !important; border-left: 1px solid #ddd; border-right: 1px solid #ddd; }
@@ -43,10 +42,10 @@
         .btn-check-list:hover { background: #334155; }
         .btn-check-list span { opacity: 0.6; font-size: 10px; font-weight: 400; }
 
-        /* Dial Code Styles */
         .dial-item { border-bottom: 1px solid #f1f5f9; padding: 10px 0; }
         .dial-code { font-family: monospace; color: #6366f1; font-weight: 800; font-size: 14px; }
         .dial-desc { font-size: 11px; color: #64748b; margin-top: 2px; }
+        .timestamp-text { font-size: 8px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -154,150 +153,62 @@
         <div id="itemRows" class="space-y-3 mb-20"></div>
     </div>
 
-    <div id="page-hp" class="max-w-2xl mx-auto hidden">
-        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase tracking-widest">← Kembali ke Dashboard</button>
-        <h1 class="text-2xl font-black text-gray-900 uppercase italic mb-6">🔍 Handphone Check</h1>
-        <div class="card p-6 space-y-4">
-            <div class="check-card">
-                <label class="check-label italic">Cek IMEI (imei.info)</label>
-                <div class="flex gap-2">
-                    <input type="number" id="imeiInput" class="input-field text-sm" placeholder="Masukkan 15 digit IMEI...">
-                    <button onclick="directImei()" class="btn-primary bg-indigo-600 w-24 text-[10px]">CEK</button>
-                </div>
-            </div>
-            <div class="space-y-2">
-                <button onclick="window.open('https://old.beacukai.go.id/websitenewV2/cek-imei.html')" class="btn-check-list">Cek IMEI Beacukai <span>🌐 Portal Bea Cukai</span></button>
-                <button onclick="window.open('https://sickw.com/')" class="btn-check-list">SICKSW <span>🌐 Cek SN / IMEI</span></button>
-                <button onclick="window.open('https://www.touchscreentest.com/')" class="btn-check-list">Touchscreen Test <span>🌐 Online Test</span></button>
-                <button onclick="window.open('https://lcdtech.info/en/tests/dead.pixel.html')" class="btn-check-list">LCD Dead Pixel Test <span>🌐 Online Test</span></button>
-                <button onclick="window.open('https://webcammictest.com/mic/')" class="btn-check-list">Microphone Test <span>🌐 Online Test</span></button>
-            </div>
-        </div>
-    </div>
-
-    <div id="page-warranty" class="max-w-2xl mx-auto hidden">
-        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase tracking-widest">← Kembali ke Dashboard</button>
-        <h1 class="text-2xl font-black text-gray-900 uppercase italic mb-6">🛡️ Warranty Check</h1>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-10">
-            <button onclick="window.open('https://www.mi.com/global/verify/#/en/tab/imei')" class="btn-check-list bg-orange-600">Xiaomi <span>🌐 Official</span></button>
-            <button onclick="window.open('https://www.realme.com/sa-en/support/phonecheck')" class="btn-check-list bg-yellow-500 text-black">Realme <span>🌐 Official</span></button>
-            <button onclick="window.open('https://www.vivo.com/en/support/IMEI')" class="btn-check-list bg-blue-600">Vivo <span>🌐 Official</span></button>
-            <button onclick="window.open('https://support.oppo.com/en/warranty-check/')" class="btn-check-list bg-emerald-600">OPPO <span>🌐 Official</span></button>
-            <button onclick="window.open('https://wap.id.infinixmobility.com/care/imei-authentication')" class="btn-check-list bg-green-500">Infinix <span>🌐 Official</span></button>
-            <button onclick="window.open('https://www.tecno-mobile.com/warranty/')" class="btn-check-list bg-blue-400">Tecno <span>🌐 Official</span></button>
-            <button onclick="window.open('https://www.iqoo.com/in/support/IMEI')" class="btn-check-list bg-black">iQOO <span>🌐 Official</span></button>
-            <button onclick="window.open('https://checkcoverage.apple.com/coverage?locale=en_ID')" class="btn-check-list bg-slate-500">Apple <span>🌐 Official</span></button>
-            <button class="btn-check-list bg-slate-200 text-slate-400 cursor-not-allowed" disabled>Samsung <span>⌛ Coming Soon</span></button>
-        </div>
-    </div>
-
-    <div id="page-dial" class="max-w-2xl mx-auto hidden">
-        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase tracking-widest">← Kembali ke Dashboard</button>
-        <h1 class="text-2xl font-black text-gray-900 uppercase italic mb-2">📞 Dial Check Codes</h1>
-        <p class="text-[10px] text-red-500 font-bold mb-6 italic tracking-tight">⚠️ Hati-hati di Engineer Mode, jangan ubah setingan sembarangan!</p>
-        <div class="space-y-4">
-            <div class="card p-5">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-3 border-b pb-2">1. Kode Universal Android</h3>
-                <div class="dial-item"><span class="dial-code">*#06#</span><div class="dial-desc">Cek nomor IMEI (Wajib)</div></div>
-                <div class="dial-item"><span class="dial-code">*#*#4636#*#*</span><div class="dial-desc">Informasi Jaringan, Baterai, & Statistik</div></div>
-            </div>
-            <div class="card p-5">
-                <h3 class="font-black text-xs text-blue-600 uppercase mb-3 border-b pb-2">2. Samsung</h3>
-                <div class="dial-item"><span class="dial-code">*#0*#</span><div class="dial-desc">Menu Uji Hardware Utama (LCD, Touch, Speaker)</div></div>
-                <div class="dial-item"><span class="dial-code">*#7353#</span><div class="dial-desc">Menu Uji Cepat (Quick Test)</div></div>
-                <div class="dial-item"><span class="dial-code">*#0228#</span><div class="dial-desc">Cek Status Baterai</div></div>
-            </div>
-            <div class="card p-5">
-                <h3 class="font-black text-xs text-orange-600 uppercase mb-3 border-b pb-2">3. Xiaomi / Redmi / Poco</h3>
-                <div class="dial-item"><span class="dial-code">*#*#64663#*#*</span><div class="dial-desc">Menu QC Test / Hardware Diagnostic (Utama)</div></div>
-                <div class="dial-item"><span class="dial-code">*#*#6485#*#*</span><div class="dial-desc">Cek Kesehatan & Info Baterai Detail</div></div>
-            </div>
-            <div class="card p-5">
-                <h3 class="font-black text-xs text-emerald-600 uppercase mb-3 border-b pb-2">4. OPPO, Vivo, dan Realme</h3>
-                <div class="dial-item"><span class="dial-code">*#899#</span><div class="dial-desc">Engineer Mode / Manual Test (Oppo/Realme)</div></div>
-                <div class="dial-item"><span class="dial-code">*#558#</span><div class="dial-desc">Cek Sensor & Layar (Khusus Vivo)</div></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="page-laptop" class="max-w-2xl mx-auto hidden">
-        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase tracking-widest">← Kembali ke Dashboard</button>
-        <h1 class="text-2xl font-black text-gray-900 uppercase italic mb-6">💻 Laptop Check</h1>
-        <div class="card p-6 space-y-4">
-            <button onclick="window.open('https://webcammictest.com/')" class="btn-check-list">Webcam Test <span>🌐 Online Test</span></button>
-            <button onclick="window.open('https://en.key-test.ru/')" class="btn-check-list">Keyboard Test <span>🌐 Online</span></button>
-            <button onclick="window.open('https://lcdtech.info/en/tests/dead.pixel.html')" class="btn-check-list">LCD Dead Pixel Test <span>🌐 Online</span></button>
-        </div>
-    </div>
+    <div id="page-hp" class="max-w-2xl mx-auto hidden"><button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase tracking-widest">← Kembali</button><div class="card p-6"><h1 class="text-2xl font-black mb-6 italic">🔍 Handphone Check</h1><div class="check-card"><label class="check-label italic">Cek IMEI</label><div class="flex gap-2"><input type="number" id="imeiInput" class="input-field text-sm" placeholder="15 digit..."><button onclick="directImei()" class="btn-primary bg-indigo-600 w-24 text-[10px]">CEK</button></div></div><div class="space-y-2"><button onclick="window.open('https://old.beacukai.go.id/websitenewV2/cek-imei.html')" class="btn-check-list">Cek IMEI Beacukai <span>🌐 Portal</span></button><button onclick="window.open('https://sickw.com/')" class="btn-check-list">SICKSW <span>🌐 IMEI</span></button></div></div></div>
+    <div id="page-warranty" class="max-w-2xl mx-auto hidden"><button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase tracking-widest">← Kembali</button><h1 class="text-2xl font-black mb-6 italic uppercase">🛡️ Warranty Check</h1><div class="grid grid-cols-1 md:grid-cols-2 gap-3"><button onclick="window.open('https://www.mi.com/global/verify/#/en/tab/imei')" class="btn-check-list bg-orange-600">Xiaomi</button><button onclick="window.open('https://checkcoverage.apple.com/')" class="btn-check-list bg-slate-500">Apple</button></div></div>
+    <div id="page-dial" class="max-w-2xl mx-auto hidden"><button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase tracking-widest">← Kembali</button><h1 class="text-2xl font-black mb-6 italic uppercase">📞 Dial Codes</h1><div class="card p-5"><div class="dial-item"><span class="dial-code">*#0*#</span> Samsung Test</div><div class="dial-item"><span class="dial-code">*#*#64663#*#*</span> Xiaomi Test</div></div></div>
+    <div id="page-laptop" class="max-w-2xl mx-auto hidden"><button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase tracking-widest">← Kembali</button><h1 class="text-2xl font-black mb-6 italic uppercase">💻 Laptop Check</h1><div class="card p-6"><button onclick="window.open('https://en.key-test.ru/')" class="btn-check-list">Keyboard Test</button></div></div>
 
     <div id="importModalOverlay" onclick="toggleImportModal()"></div>
     <div id="importModal" class="modal-custom">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="font-black text-indigo-900 uppercase italic">📥 Import Laporan</h3>
-            <button onclick="toggleImportModal()" class="text-gray-400 hover:text-red-500 text-2xl font-bold">&times;</button>
-        </div>
-        <textarea id="importArea" class="input-field h-48 mb-4 text-[11px] font-mono" placeholder="Paste report WhatsApp di sini..."></textarea>
+        <div class="flex justify-between items-center mb-4"><h3 class="font-black text-indigo-900 uppercase italic">📥 Import Laporan</h3><button onclick="toggleImportModal()" class="text-gray-400 hover:text-red-500 text-2xl font-bold">&times;</button></div>
+        <textarea id="importArea" class="input-field h-48 mb-4 text-[11px] font-mono" placeholder="Paste report di sini..."></textarea>
         <button onclick="processImport()" class="btn-primary bg-indigo-600">SINKRONKAN DATA SEKARANG</button>
     </div>
 
     <div id="helpModalOverlay" onclick="toggleHelpModal()"></div>
     <div id="helpModal" class="modal-custom max-h-[80vh] overflow-y-auto text-sm">
-        <h3 class="font-black text-indigo-900 mb-4 uppercase text-lg">🚀 Cara Penggunaan</h3>
-        <ul class="space-y-4 text-gray-600">
-            <li><b class="text-indigo-600">1. Atur Saldo:</b> Klik "Atur Saldo" untuk modal awal tunai.</li>
-            <li><b class="text-indigo-600">2. Warranty Check:</b> Gunakan menu baru untuk langsung menuju portal garansi resmi brand.</li>
-        </ul>
-        <button onclick="toggleHelpModal()" class="mt-6 btn-primary bg-indigo-600">SAYA MENGERTI</button>
+        <h3 class="font-black text-indigo-900 mb-4 uppercase text-lg">🚀 Info Baru</h3>
+        <p class="text-gray-600">Sekarang data mencatat <b>Tanggal Masuk</b> & <b>Keluar</b> secara otomatis. Export akan memisahkan barang berdasarkan bulan.</p>
+        <button onclick="toggleHelpModal()" class="mt-6 btn-primary bg-indigo-600">MENGERTI</button>
     </div>
 
     <script>
-        // --- LOGIKA HALAMAN ---
+        let items = [];
+        let currentFilter = 'stok';
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        
+        function getSimpleDate() {
+            const d = new Date();
+            return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+        }
+
+        function getMonthYear() {
+            const d = new Date();
+            return `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+        }
+
         function switchPage(page) {
-            const pages = ['page-main', 'page-hp', 'page-warranty', 'page-laptop', 'page-dial'];
-            pages.forEach(p => {
+            ['page-main', 'page-hp', 'page-warranty', 'page-laptop', 'page-dial'].forEach(p => {
                 const el = document.getElementById(p);
                 if(el) el.classList.add('hidden');
             });
-            
             const target = document.getElementById('page-' + page);
             if(target) target.classList.remove('hidden');
-            
-            toggleSidebar();
+            if(document.getElementById('sidebar').classList.contains('open')) toggleSidebar();
             window.scrollTo(0,0);
         }
 
         function directImei() {
             const imei = document.getElementById('imeiInput').value;
-            if(!imei) return alert("Isi IMEI dulu!");
+            if(!imei) return alert("Isi IMEI!");
             window.open(`https://www.imei.info/?imei=${imei}`, '_blank');
         }
 
         function setView(mode) {
-            const body = document.body;
-            const btnMob = document.getElementById('btnMob');
-            const btnDesk = document.getElementById('btnDesk');
-            if(mode === 'desktop') {
-                body.classList.add('mode-desktop');
-                btnDesk.classList.add('bg-indigo-600');
-                btnDesk.classList.remove('text-indigo-400');
-                btnMob.classList.remove('bg-indigo-600');
-                btnMob.classList.add('text-indigo-400');
-            } else {
-                body.classList.remove('mode-desktop');
-                btnMob.classList.add('bg-indigo-600');
-                btnMob.classList.remove('text-indigo-400');
-                btnDesk.classList.remove('bg-indigo-600');
-                btnDesk.classList.add('text-indigo-400');
-            }
+            document.body.classList.toggle('mode-desktop', mode === 'desktop');
+            document.getElementById('btnDesk').className = mode === 'desktop' ? "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600" : "flex-1 py-2 rounded-lg text-[10px] font-black text-indigo-400";
+            document.getElementById('btnMob').className = mode === 'mobile' ? "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600" : "flex-1 py-2 rounded-lg text-[10px] font-black text-indigo-400";
         }
-
-        // --- LOGIKA DATA ---
-        let items = [];
-        let currentFilter = 'stok';
-        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-        const now = new Date();
-        const currentMonthString = monthNames[now.getMonth()] + " " + now.getFullYear();
-        document.getElementById('currentMonth').innerText = currentMonthString;
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
         function toggleImportModal() { document.getElementById('importModal').classList.toggle('open'); document.getElementById('importModalOverlay').classList.toggle('open'); }
@@ -318,6 +229,8 @@
         function parseText(type) {
             const rawText = document.getElementById('bulkInput').value;
             if (!rawText.trim()) return;
+            const dateStr = getSimpleDate();
+            const monthStr = getMonthYear();
             rawText.split('\n').forEach(line => {
                 if (line.includes(':') && line.includes('>')) {
                     const parts = line.split(/[:>]/);
@@ -325,7 +238,11 @@
                     const modal = Number(parts[1].replace(/[^0-9]/g, ''));
                     const price = Number(parts[2].replace(/[^0-9]/g, ''));
                     if (name && modal) {
-                        items.unshift({ id: Date.now() + Math.random(), name, modal, price, status: 'stok', type, soldAt: '' });
+                        items.unshift({ 
+                            id: Date.now() + Math.random(), 
+                            name, modal, price, status: 'stok', type, 
+                            dateIn: dateStr, dateOut: '', month: monthStr 
+                        });
                     }
                 }
             });
@@ -337,8 +254,7 @@
             const item = items.find(i => i.id === id);
             if (item) {
                 item.status = 'sold';
-                const d = new Date();
-                item.soldAt = `${d.getDate()}/${d.getMonth()+1}`;
+                item.dateOut = getSimpleDate();
                 calculateAll();
             }
         }
@@ -371,6 +287,7 @@
             document.getElementById('summaryProfit').innerText = "Rp " + profit.toLocaleString('id-ID');
             document.getElementById('previewModalStock').innerText = "Rp " + floatModal.toLocaleString('id-ID');
             document.getElementById('previewUnrealizedProfit').innerText = "Rp " + (floatPrice - floatModal).toLocaleString('id-ID');
+            document.getElementById('currentMonth').innerText = getMonthYear();
             renderRows();
             saveData();
         }
@@ -391,6 +308,9 @@
                                 <span class="text-[7px] font-black px-1.5 py-0.5 rounded uppercase ${item.type === 'old' ? 'bg-orange-100 text-orange-600' : 'bg-indigo-100 text-indigo-600'}">${item.type === 'old' ? 'STOK LALU [L]' : 'BELANJA BARU [B]'}</span>
                                 <h4 class="font-bold text-gray-800 text-sm">${item.name}</h4>
                             </div>
+                            <div class="timestamp-text mb-1">
+                                IN: ${item.dateIn} ${item.dateOut ? ' | OUT: ' + item.dateOut : ''}
+                            </div>
                             <div class="flex items-center gap-3 text-[10px] font-medium text-gray-500">
                                 <span>M: <b class="text-gray-700">${item.modal.toLocaleString()}</b></span>
                                 <span>J: <b class="text-gray-700">${item.price.toLocaleString()}</b></span>
@@ -406,59 +326,89 @@
         }
 
         function exportReport() {
-            let report = `————————————————\nReport Bulanan - ${currentMonthString}\n————————————————\n`;
-            items.filter(i => i.status === 'sold').forEach(i => {
-                const profit = i.price - i.modal;
-                report += `- ${i.type === 'new' ? '[B]' : '[L]'} ${i.name} : ${i.modal.toLocaleString('id-ID')} > ${i.price.toLocaleString('id-ID')} (+${profit.toLocaleString('id-ID')})\n`;
+            let report = `===== DIGITAL LEDGER REPORT =====\n\n`;
+            const months = [...new Set(items.map(i => i.month))];
+            
+            months.forEach(m => {
+                report += `[[ BULAN: ${m.toUpperCase()} ]]\n`;
+                const monthlySold = items.filter(i => i.month === m && i.status === 'sold');
+                const monthlyStock = items.filter(i => i.month === m && i.status === 'stok');
+
+                if(monthlySold.length > 0) {
+                    report += `--- Terjual ---\n`;
+                    monthlySold.forEach(i => {
+                        report += `- ${i.type === 'new' ? '[B]' : '[L]'} ${i.name} : ${i.modal.toLocaleString('id-ID')} > ${i.price.toLocaleString('id-ID')} (+${(i.price-i.modal).toLocaleString('id-ID')})\n`;
+                    });
+                }
+                if(monthlyStock.length > 0) {
+                    report += `--- Stok ---\n`;
+                    monthlyStock.forEach(i => {
+                        report += `- ${i.type === 'new' ? '[B]' : '[L]'} ${i.name} : ${i.modal.toLocaleString('id-ID')} > ${i.price.toLocaleString('id-ID')}\n`;
+                    });
+                }
+                report += `\n`;
             });
-            report += `\n————————————————\nUnit Belum Terjual - ${currentMonthString}\n————————————————\n`;
-            items.filter(i => i.status === 'stok').forEach(i => {
-                report += `- ${i.type === 'new' ? '[B]' : '[L]'} ${i.name} : ${i.modal.toLocaleString('id-ID')} > ${i.price.toLocaleString('id-ID')}\n`;
-            });
+
             const startBal = Number(document.getElementById('startBalance').value);
-            report += `\n————————————————\n> Saldo Awal : Rp ${startBal.toLocaleString('id-ID')}\n> Total Profit Terjual : ${document.getElementById('summaryProfit').innerText}\n> Total Floating : ${document.getElementById('summaryFloating').innerText}\n————————————————\nSaldo Akhir : ${document.getElementById('summaryCash').innerText}\nUnRealize Balance : ${document.getElementById('summaryTotal').innerText}`;
-            navigator.clipboard.writeText(report).then(() => alert("Laporan Disalin!"));
+            report += `————————————————\n`;
+            report += `> Saldo Awal : Rp ${startBal.toLocaleString('id-ID')}\n`;
+            report += `> Total Profit : ${document.getElementById('summaryProfit').innerText}\n`;
+            report += `> Saldo Akhir : ${document.getElementById('summaryCash').innerText}\n`;
+            report += `————————————————`;
+            
+            navigator.clipboard.writeText(report).then(() => alert("Laporan Per Bulan Berhasil Disalin!"));
         }
 
         function processImport() {
             const text = document.getElementById('importArea').value;
-            if (!text.trim() || !confirm("Sinkronkan data?")) return;
+            if (!text.trim() || !confirm("Import data ini?")) return;
             const newItems = [];
-            let section = "";
+            let currentM = getMonthYear();
+            let section = "stok";
             let saldoAwalImport = 0;
+
             text.split('\n').forEach(line => {
                 const clean = line.trim();
-                if (clean.includes("Report Bulanan")) section = "sold";
-                else if (clean.includes("Unit Belum Terjual")) section = "stok";
-                else if (clean.includes("Saldo Awal")) {
+                if (clean.includes("[[ BULAN:")) {
+                    currentM = clean.replace(/\[\[ BULAN:|\]\]/g, '').trim();
+                } else if (clean.includes("--- Terjual ---")) {
+                    section = "sold";
+                } else if (clean.includes("--- Stok ---")) {
+                    section = "stok";
+                } else if (clean.includes("Saldo Awal")) {
                     const m = clean.match(/Rp\s*([\d.]+)/);
                     if (m) saldoAwalImport = Number(m[1].replace(/\./g, ''));
-                }
-                else if (clean.startsWith("-")) {
+                } else if (clean.startsWith("-")) {
                     const isNew = clean.includes("[B]");
                     const parts = clean.split(/[:>]/);
                     if (parts.length >= 3) {
                         const name = parts[0].replace(/-|\[B\]|\[L\]/g, '').trim();
                         const modal = Number(parts[1].replace(/[^0-9]/g, ''));
                         const price = Number(parts[2].split('(')[0].replace(/[^0-9]/g, ''));
-                        if (name && modal) {
-                            newItems.push({ id: Date.now() + Math.random(), name, modal, price, status: section, type: isNew ? 'new' : 'old', soldAt: section === 'sold' ? 'Imported' : '' });
-                        }
+                        newItems.push({
+                            id: Date.now() + Math.random(),
+                            name, modal, price, status: section,
+                            type: isNew ? 'new' : 'old',
+                            dateIn: 'Imported',
+                            dateOut: section === 'sold' ? 'Imported' : '',
+                            month: currentM
+                        });
                     }
                 }
             });
+
             if (newItems.length > 0) {
                 items = newItems;
                 document.getElementById('startBalance').value = saldoAwalImport;
                 calculateAll();
                 toggleImportModal();
-                alert("Data Berhasil Diimpor!");
+                alert("Data Berhasil Disinkronkan!");
             }
         }
 
-        function saveData() { localStorage.setItem('ledger_v2_data', JSON.stringify({ startBalance: document.getElementById('startBalance').value, items })); }
+        function saveData() { localStorage.setItem('ledger_v3_stamps', JSON.stringify({ startBalance: document.getElementById('startBalance').value, items })); }
         function loadData() {
-            const data = JSON.parse(localStorage.getItem('ledger_v2_data'));
+            const data = JSON.parse(localStorage.getItem('ledger_v3_stamps'));
             if (data) {
                 document.getElementById('startBalance').value = data.startBalance || 0;
                 items = data.items || [];
