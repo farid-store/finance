@@ -16,6 +16,7 @@
         .badge-profit { background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; border: 1px solid #bbf7d0; }
         .btn-sell { background: #10b981; color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; transition: 0.2s; }
         
+        /* Sidebar Styles */
         #sidebar { transition: transform 0.3s ease; transform: translateX(-100%); z-index: 50; }
         #sidebar.open { transform: translateX(0); }
         #overlay, #importModalOverlay, #helpModalOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
@@ -37,20 +38,26 @@
             display: flex; align-items: center; justify-content: space-between;
             width: 100%; padding: 14px; background: #1e293b; color: white; 
             border-radius: 12px; font-size: 12px; font-weight: 600; margin-bottom: 8px;
-            transition: 0.2s;
+            transition: 0.2s; text-align: left;
         }
         .btn-check-list:hover { background: #334155; }
         .btn-check-list span { opacity: 0.6; font-size: 10px; font-weight: 400; }
 
-        .dial-item { border-bottom: 1px solid #f1f5f9; padding: 10px 0; }
-        .dial-code { font-family: monospace; color: #6366f1; font-weight: 800; font-size: 14px; }
-        .dial-desc { font-size: 11px; color: #64748b; margin-top: 2px; }
+        .dial-item { border-bottom: 1px solid #f1f5f9; padding: 12px 0; display: flex; flex-direction: column; }
+        .dial-code { font-family: monospace; color: #6366f1; font-weight: 800; font-size: 15px; }
+        .dial-desc { font-size: 11px; color: #64748b; font-weight: 600; margin-top: 2px; text-transform: uppercase; }
         .timestamp-text { font-size: 8px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
+        
+        .page-container { display: none; }
+        .page-container.active { display: block; }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <div id="overlay" class="fixed inset-0" onclick="toggleSidebar()"></div>
+    <div id="overlay" onclick="toggleSidebar()"></div>
+    <div id="importModalOverlay" onclick="toggleImportModal()"></div>
+    <div id="helpModalOverlay" onclick="toggleHelpModal()"></div>
+
     <div id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-indigo-900 text-white p-6 shadow-2xl flex flex-col">
         <h2 class="text-xl font-bold mb-8 flex items-center gap-2"><span>📱</span> Menu</h2>
         <nav class="space-y-4 flex-1 overflow-y-auto">
@@ -58,7 +65,7 @@
             <button onclick="switchPage('hp')" class="block w-full text-left p-3 rounded-lg hover:bg-indigo-800 transition font-bold">🔍 Handphone Check</button>
             <button onclick="switchPage('warranty')" class="block w-full text-left p-3 rounded-lg hover:bg-indigo-800 transition font-bold text-emerald-400">🛡️ Warranty Check</button>
             <button onclick="switchPage('dial')" class="block w-full text-left p-3 rounded-lg hover:bg-indigo-800 transition font-bold">📞 Dial Check (Kode)</button>
-            <button onclick="switchPage('laptop')" class="block w-full text-left p-3 rounded-lg hover:bg-indigo-800 transition font-bold">🔍 Laptop Check</button>
+            <button onclick="switchPage('laptop')" class="block w-full text-left p-3 rounded-lg hover:bg-indigo-800 transition font-bold">💻 Laptop Check</button>
             <div class="border-t border-indigo-800 my-4"></div>
             <button onclick="toggleHelpModal()" class="block w-full text-left p-3 rounded-lg bg-indigo-800 font-medium">📖 Panduan</button>
             <button onclick="clearData()" class="block w-full text-left p-3 rounded-lg hover:bg-red-800 transition text-red-300 italic font-bold">🗑️ Hapus Semua Data</button>
@@ -73,7 +80,7 @@
         </div>
     </div>
 
-    <div id="page-main" class="max-w-2xl mx-auto">
+    <div id="page-main" class="page-container active max-w-2xl mx-auto">
         <div class="flex justify-between items-center mb-6">
             <button onclick="toggleSidebar()" class="p-2 bg-white rounded-xl shadow-sm text-indigo-600 font-bold px-4">☰ Menu</button>
             <div class="flex gap-2">
@@ -153,22 +160,96 @@
         <div id="itemRows" class="space-y-3 mb-20"></div>
     </div>
 
-    <div id="page-hp" class="max-w-2xl mx-auto hidden"><button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase tracking-widest">← Kembali</button><div class="card p-6"><h1 class="text-2xl font-black mb-6 italic">🔍 Handphone Check</h1><div class="check-card"><label class="check-label italic">Cek IMEI</label><div class="flex gap-2"><input type="number" id="imeiInput" class="input-field text-sm" placeholder="15 digit..."><button onclick="directImei()" class="btn-primary bg-indigo-600 w-24 text-[10px]">CEK</button></div></div><div class="space-y-2"><button onclick="window.open('https://old.beacukai.go.id/websitenewV2/cek-imei.html')" class="btn-check-list">Cek IMEI Beacukai <span>🌐 Portal</span></button><button onclick="window.open('https://sickw.com/')" class="btn-check-list">SICKSW <span>🌐 IMEI</span></button></div></div></div>
-    <div id="page-warranty" class="max-w-2xl mx-auto hidden"><button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase tracking-widest">← Kembali</button><h1 class="text-2xl font-black mb-6 italic uppercase">🛡️ Warranty Check</h1><div class="grid grid-cols-1 md:grid-cols-2 gap-3"><button onclick="window.open('https://www.mi.com/global/verify/#/en/tab/imei')" class="btn-check-list bg-orange-600">Xiaomi</button><button onclick="window.open('https://checkcoverage.apple.com/')" class="btn-check-list bg-slate-500">Apple</button></div></div>
-    <div id="page-dial" class="max-w-2xl mx-auto hidden"><button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase tracking-widest">← Kembali</button><h1 class="text-2xl font-black mb-6 italic uppercase">📞 Dial Codes</h1><div class="card p-5"><div class="dial-item"><span class="dial-code">*#0*#</span> Samsung Test</div><div class="dial-item"><span class="dial-code">*#*#64663#*#*</span> Xiaomi Test</div></div></div>
-    <div id="page-laptop" class="max-w-2xl mx-auto hidden"><button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase tracking-widest">← Kembali</button><h1 class="text-2xl font-black mb-6 italic uppercase">💻 Laptop Check</h1><div class="card p-6"><button onclick="window.open('https://en.key-test.ru/')" class="btn-check-list">Keyboard Test</button></div></div>
+    <div id="page-hp" class="page-container max-w-2xl mx-auto">
+        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase tracking-widest">← Kembali</button>
+        <div class="card p-6">
+            <h1 class="text-2xl font-black mb-6 italic">🔍 Handphone Check</h1>
+            <div class="check-card">
+                <label class="check-label italic">Cek IMEI info</label>
+                <div class="flex gap-2">
+                    <input type="number" id="imeiInput" class="input-field text-sm" placeholder="Masukkan 15 digit IMEI...">
+                    <button onclick="directImei()" class="btn-primary bg-indigo-600 w-24 text-[10px]">CEK</button>
+                </div>
+            </div>
+            <div class="space-y-3 mt-4">
+                <button onclick="window.open('https://old.beacukai.go.id/websitenewV2/cek-imei.html')" class="btn-check-list">Cek IMEI Beacukai <span>🌐 Portal</span></button>
+                <button onclick="window.open('https://sickw.com/')" class="btn-check-list">SICKSW <span>🌐 IMEI</span></button>
+                <button onclick="window.open('https://imeicheck.com/')" class="btn-check-list">IMEI Check Professional <span>🌐 Info</span></button>
+            </div>
+        </div>
+    </div>
 
-    <div id="importModalOverlay" onclick="toggleImportModal()"></div>
+    <div id="page-warranty" class="page-container max-w-2xl mx-auto">
+        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase tracking-widest">← Kembali</button>
+        <h1 class="text-2xl font-black mb-6 italic uppercase">🛡️ Warranty Check</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <button onclick="window.open('https://www.mi.com/global/verify/#/en/tab/imei')" class="btn-check-list bg-orange-600">Xiaomi Official <span>🌐 Link</span></button>
+            <button onclick="window.open('https://checkcoverage.apple.com/')" class="btn-check-list bg-slate-800">Apple Coverage <span>🌐 Link</span></button>
+            <button onclick="window.open('https://www.samsung.com/id/support/your-service/main')" class="btn-check-list bg-blue-700">Samsung Service <span>🌐 Link</span></button>
+            <button onclick="window.open('https://support.oppo.com/id/warranty-check/')" class="btn-check-list bg-emerald-600">OPPO Warranty <span>🌐 Link</span></button>
+            <button onclick="window.open('https://www.vivo.com/id/support/IMEI')" class="btn-check-list bg-blue-500">Vivo Warranty <span>🌐 Link</span></button>
+            <button onclick="window.open('https://www.realme.com/id/support/phonecheck')" class="btn-check-list bg-yellow-500 text-black">Realme Check <span>🌐 Link</span></button>
+        </div>
+    </div>
+
+    <div id="page-dial" class="page-container max-w-2xl mx-auto">
+        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase tracking-widest">← Kembali</button>
+        <h1 class="text-2xl font-black mb-6 italic uppercase">📞 Dial Codes</h1>
+        <div class="card p-5">
+            <div class="dial-item">
+                <span class="dial-code">*#0*#</span> 
+                <span class="dial-desc">Samsung General Test</span>
+            </div>
+            <div class="dial-item">
+                <span class="dial-code">*#*#64663#*#*</span> 
+                <span class="dial-desc">Xiaomi / Poco Hardware Test (CIT)</span>
+            </div>
+            <div class="dial-item">
+                <span class="dial-code">*#808#</span> 
+                <span class="dial-desc">Oppo Engineer Mode</span>
+            </div>
+            <div class="dial-item">
+                <span class="dial-code">*#*#4636#*#*</span> 
+                <span class="dial-desc">Info Sinyal & Baterai (All Android)</span>
+            </div>
+            <div class="dial-item">
+                <span class="dial-code">*#06#</span> 
+                <span class="dial-desc">Cek IMEI Semua HP</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-laptop" class="page-container max-w-2xl mx-auto">
+        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase tracking-widest">← Kembali</button>
+        <h1 class="text-2xl font-black mb-6 italic uppercase">💻 Laptop Check</h1>
+        <div class="card p-6">
+            <p class="text-xs text-gray-500 mb-4 font-bold uppercase">Tools Pengecekan Laptop:</p>
+            <div class="space-y-3">
+                <button onclick="window.open('https://en.key-test.ru/')" class="btn-check-list">Keyboard Test <span>🌐 Web</span></button>
+                <button onclick="window.open('https://www.passmark.com/products/monitortest/')" class="btn-check-list">Monitor/LCD Test <span>🌐 Web</span></button>
+                <button onclick="window.open('https://webcamtests.com/')" class="btn-check-list">Webcam Test <span>🌐 Web</span></button>
+                <button onclick="window.open('https://www.pchardwareertest.com/battery-test/')" class="btn-check-list">Battery Health Info <span>🌐 Web</span></button>
+            </div>
+        </div>
+    </div>
+
     <div id="importModal" class="modal-custom">
-        <div class="flex justify-between items-center mb-4"><h3 class="font-black text-indigo-900 uppercase italic">📥 Import Laporan</h3><button onclick="toggleImportModal()" class="text-gray-400 hover:text-red-500 text-2xl font-bold">&times;</button></div>
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="font-black text-indigo-900 uppercase italic">📥 Import Laporan</h3>
+            <button onclick="toggleImportModal()" class="text-gray-400 hover:text-red-500 text-2xl font-bold">&times;</button>
+        </div>
         <textarea id="importArea" class="input-field h-48 mb-4 text-[11px] font-mono" placeholder="Paste report di sini..."></textarea>
         <button onclick="processImport()" class="btn-primary bg-indigo-600">SINKRONKAN DATA SEKARANG</button>
     </div>
 
-    <div id="helpModalOverlay" onclick="toggleHelpModal()"></div>
     <div id="helpModal" class="modal-custom max-h-[80vh] overflow-y-auto text-sm">
-        <h3 class="font-black text-indigo-900 mb-4 uppercase text-lg">🚀 Info Baru</h3>
-        <p class="text-gray-600">Sekarang data mencatat <b>Tanggal Masuk</b> & <b>Keluar</b> secara otomatis. Export akan memisahkan barang berdasarkan bulan.</p>
+        <h3 class="font-black text-indigo-900 mb-4 uppercase text-lg">🚀 Info Fitur</h3>
+        <p class="text-gray-600 mb-3">Sistem ini mencatat <b>Tanggal Masuk & Keluar</b> otomatis. Data disimpan secara lokal di browser Anda.</p>
+        <ul class="list-disc pl-5 text-gray-500 space-y-2 text-xs">
+            <li><b>Format Input:</b> Nama HP : Modal > Jual</li>
+            <li><b>Tombol [L]:</b> Untuk stok lama yang sudah ada.</li>
+            <li><b>Tombol [B]:</b> Untuk barang belanjaan baru bulan ini.</li>
+        </ul>
         <button onclick="toggleHelpModal()" class="mt-6 btn-primary bg-indigo-600">MENGERTI</button>
     </div>
 
@@ -187,20 +268,16 @@
             return `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
         }
 
-        function switchPage(page) {
-            ['page-main', 'page-hp', 'page-warranty', 'page-laptop', 'page-dial'].forEach(p => {
-                const el = document.getElementById(p);
-                if(el) el.classList.add('hidden');
-            });
-            const target = document.getElementById('page-' + page);
-            if(target) target.classList.remove('hidden');
+        function switchPage(pageId) {
+            document.querySelectorAll('.page-container').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + pageId).classList.add('active');
             if(document.getElementById('sidebar').classList.contains('open')) toggleSidebar();
             window.scrollTo(0,0);
         }
 
         function directImei() {
             const imei = document.getElementById('imeiInput').value;
-            if(!imei) return alert("Isi IMEI!");
+            if(!imei || imei.length < 14) return alert("Isi IMEI dengan benar (15 digit)!");
             window.open(`https://www.imei.info/?imei=${imei}`, '_blank');
         }
 
@@ -328,12 +405,10 @@
         function exportReport() {
             let report = `===== DIGITAL LEDGER REPORT =====\n\n`;
             const months = [...new Set(items.map(i => i.month))];
-            
             months.forEach(m => {
                 report += `[[ BULAN: ${m.toUpperCase()} ]]\n`;
                 const monthlySold = items.filter(i => i.month === m && i.status === 'sold');
                 const monthlyStock = items.filter(i => i.month === m && i.status === 'stok');
-
                 if(monthlySold.length > 0) {
                     report += `--- Terjual ---\n`;
                     monthlySold.forEach(i => {
@@ -348,14 +423,12 @@
                 }
                 report += `\n`;
             });
-
             const startBal = Number(document.getElementById('startBalance').value);
             report += `————————————————\n`;
             report += `> Saldo Awal : Rp ${startBal.toLocaleString('id-ID')}\n`;
             report += `> Total Profit : ${document.getElementById('summaryProfit').innerText}\n`;
             report += `> Saldo Akhir : ${document.getElementById('summaryCash').innerText}\n`;
             report += `————————————————`;
-            
             navigator.clipboard.writeText(report).then(() => alert("Laporan Per Bulan Berhasil Disalin!"));
         }
 
@@ -396,7 +469,6 @@
                     }
                 }
             });
-
             if (newItems.length > 0) {
                 items = newItems;
                 document.getElementById('startBalance').value = saldoAwalImport;
@@ -415,7 +487,8 @@
                 calculateAll();
             }
         }
-        function clearData() { if(confirm('Hapus permanen?')) { localStorage.clear(); location.reload(); } }
+        function clearData() { if(confirm('Hapus permanen semua data?')) { localStorage.clear(); location.reload(); } }
+        
         window.onload = loadData;
     </script>
 </body>
