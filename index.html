@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Tracker Pro - Phone Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; overflow-x: hidden; transition: max-width 0.3s ease; margin: auto; }
+        .card { border-radius: 16px; background: white; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .input-field { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; transition: 0.3s; }
+        .input-field:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
+        .btn-primary { color: white; padding: 12px; border-radius: 10px; font-weight: 600; width: 100%; transition: 0.2s; cursor: pointer; border: none; }
+        .btn-primary:active { transform: scale(0.98); }
+        .badge-profit { background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; border: 1px solid #bbf7d0; }
+        .btn-sell { background: #10b981; color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; transition: 0.2s; }
+        
+        #sidebar { transition: transform 0.3s ease; transform: translateX(-100%); z-index: 50; }
+        #sidebar.open { transform: translateX(0); }
+        #overlay, #importModalOverlay, #helpModalOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
+        #overlay.open, #importModalOverlay.open, #helpModalOverlay.open { display: block; }
+
+        .modal-custom { 
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 90%; max-width: 450px; background: white; border-radius: 20px; padding: 24px;
+            z-index: 100; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+        .modal-custom.open { display: block; }
+        .hidden-panel { display: none; }
+
+        /* Style Fitur Cek */
+        .check-card { padding: 15px; border-radius: 12px; background: #f8fafc; border: 1px solid #e2e8f0; margin-bottom: 10px; }
+        .check-label { font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .mode-desktop { max-width: 1000px !important; border-left: 1px solid #ddd; border-right: 1px solid #ddd; }
+        
+        .btn-check-list { 
+            display: flex; align-items: center; justify-content: space-between;
+            width: 100%; padding: 14px; background: #1e293b; color: white; 
+            border-radius: 12px; font-size: 12px; font-weight: 600; margin-bottom: 8px;
+            transition: 0.2s;
+        }
+        .btn-check-list:hover { background: #334155; }
+        .btn-check-list span { opacity: 0.6; font-size: 10px; font-weight: 400; }
+
+        /* Dial Code Styles */
+        .dial-item { border-bottom: 1px solid #f1f5f9; padding: 10px 0; }
+        .dial-code { font-family: monospace; color: #6366f1; font-weight: 800; font-size: 14px; }
+        .dial-desc { font-size: 11px; color: #64748b; margin-top: 2px; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div id="overlay" class="fixed inset-0" onclick="toggleSidebar()"></div>
+    <div id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-indigo-900 text-white p-6 shadow-2xl flex flex-col">
+        <h2 class="text-xl font-bold mb-8 flex items-center gap-2"><span>📱</span> Menu</h2>
+        <nav class="space-y-4 flex-1 overflow-y-auto">
+            <button onclick="switchPage('main')" class="block w-full text-left p-3 rounded-lg hover:bg-indigo-800 transition font-bold">📊 Dashboard Utama</button>
+            <button onclick="switchPage('hp')" class="block w-full text-left p-3 rounded-lg hover:bg-indigo-800 transition font-bold">🔍 Handphone Check</button>
+            <button onclick="switchPage('warranty')" class="block w-full text-left p-3 rounded-lg hover:bg-indigo-800 transition font-bold text-emerald-400">🛡️ Warranty Check</button>
+            <button onclick="switchPage('dial')" class="block w-full text-left p-3 rounded-lg hover:bg-indigo-800 transition font-bold">📞 Dial Check (Kode)</button>
+            <button onclick="switchPage('laptop')" class="block w-full text-left p-3 rounded-lg hover:bg-indigo-800 transition font-bold">🔍 Laptop Check</button>
+            <div class="border-t border-indigo-800 my-4"></div>
+            <button onclick="toggleHelpModal()" class="block w-full text-left p-3 rounded-lg bg-indigo-800 font-medium">📖 Panduan</button>
+            <button onclick="clearData()" class="block w-full text-left p-3 rounded-lg hover:bg-red-800 transition text-red-300 italic font-bold">🗑️ Hapus Semua Data</button>
+        </nav>
+
+        <div class="mt-auto">
+            <p class="text-[10px] text-indigo-300 mb-2 font-bold uppercase">View Mode</p>
+            <div class="flex bg-indigo-950 p-1 rounded-xl gap-1">
+                <button onclick="setView('mobile')" id="btnMob" class="flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600">MOBILE</button>
+                <button onclick="setView('desktop')" id="btnDesk" class="flex-1 py-2 rounded-lg text-[10px] font-black text-indigo-400">DESKTOP</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-main" class="max-w-2xl mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <button onclick="toggleSidebar()" class="p-2 bg-white rounded-xl shadow-sm text-indigo-600 font-bold px-4">☰ Menu</button>
+            <div class="flex gap-2">
+                <button onclick="toggleImportModal()" class="px-4 py-2 bg-white border border-indigo-200 text-indigo-600 rounded-xl text-xs font-bold shadow-sm">📥 Import</button>
+                <button onclick="exportReport()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg">📤 Copy Report</button>
+            </div>
+        </div>
+
+        <header class="mb-8 flex justify-between items-end">
+            <div>
+                <h1 class="text-lg font-black text-gray-900 uppercase tracking-[0.2em] italic">Digital Ledger</h1>
+                <p id="currentMonth" class="text-indigo-600 font-bold uppercase tracking-widest text-[10px]"></p>
+            </div>
+            <div class="text-right">
+                <p class="text-[9px] text-gray-500 uppercase font-black tracking-widest">Realized Profit</p>
+                <h2 id="summaryProfit" class="text-2xl font-black text-emerald-600">Rp 0</h2>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="card p-5 border-b-4 border-indigo-500">
+                <p class="text-[10px] text-gray-500 uppercase font-bold">Uang Tunai (Cash)</p>
+                <h2 id="summaryCash" class="text-lg font-bold text-gray-800">Rp 0</h2>
+            </div>
+            <div class="card p-5 border-b-4 border-emerald-500">
+                <p class="text-[10px] text-gray-500 uppercase font-bold">Total Floating</p>
+                <h2 id="summaryFloating" class="text-lg font-bold text-gray-800">Rp 0</h2>
+            </div>
+            <div class="card p-6 col-span-2 text-center bg-indigo-900 text-white">
+                <p class="text-[10px] text-indigo-300 uppercase font-bold mb-1 tracking-widest">Unrealized Balance (Total Aset)</p>
+                <h2 id="summaryTotal" class="text-3xl font-black">Rp 0</h2>
+            </div>
+        </div>
+
+        <div class="card p-6 mb-4">
+            <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2 text-xs uppercase tracking-wider">
+                <span>📝</span> Smart Input Teks
+            </h3>
+            <textarea id="bulkInput" class="input-field h-24 mb-3 text-sm border-dashed" placeholder="Contoh: Poco M3 : 500.000 > 600.000"></textarea>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="parseText('old')" class="btn-primary bg-slate-700 text-[10px]">STOK LALU [L]</button>
+                <button onclick="parseText('new')" class="btn-primary bg-emerald-600 text-[10px]">BELANJA BARU [B]</button>
+            </div>
+        </div>
+
+        <div class="mb-6">
+            <button onclick="toggleConfig()" id="configLabel" class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-2 inline-block">⚙️ Atur Saldo Awal</button>
+            <div id="configPanel" class="hidden-panel">
+                <div class="card p-5 bg-indigo-50 border-none mb-4">
+                    <h3 class="font-bold text-indigo-900 text-[10px] uppercase mb-2">Modal Tunai di Tangan (Awal Bulan)</h3>
+                    <input type="number" id="startBalance" class="input-field font-black text-lg text-indigo-700" value="0" onchange="calculateAll()">
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 bg-slate-800 border-l-4 border-indigo-500 text-white flex justify-between items-center mb-8">
+            <div>
+                <h3 class="font-bold text-indigo-300 text-[9px] uppercase tracking-widest">Modal Stok Berjalan</h3>
+                <h2 id="previewModalStock" class="text-xl font-black">Rp 0</h2>
+            </div>
+            <div class="text-right">
+                <h3 class="font-bold text-emerald-400 text-[9px] uppercase tracking-widest">Potensi Untung</h3>
+                <h2 id="previewUnrealizedProfit" class="text-xl font-black">Rp 0</h2>
+            </div>
+        </div>
+
+        <div class="mb-6 space-y-4">
+            <div class="relative">
+                <input type="text" id="searchInput" onkeyup="renderRows()" placeholder="Cari unit..." class="input-field pl-10 text-sm">
+                <span class="absolute left-3 top-3.5 opacity-40">🔍</span>
+            </div>
+            <div class="flex bg-slate-200 p-1 rounded-xl gap-1">
+                <button onclick="setFilter('stok')" id="tabStok" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all bg-white text-indigo-600 shadow-sm">Unit Stok</button>
+                <button onclick="setFilter('sold')" id="tabSold" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500">History Terjual</button>
+            </div>
+        </div>
+        <div id="itemRows" class="space-y-3 mb-20"></div>
+    </div>
+
+    <div id="page-hp" class="max-w-2xl mx-auto hidden">
+        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase tracking-widest">← Kembali ke Dashboard</button>
+        <h1 class="text-2xl font-black text-gray-900 uppercase italic mb-6">🔍 Handphone Check</h1>
+        <div class="card p-6 space-y-4">
+            <div class="check-card">
+                <label class="check-label italic">Cek IMEI (imei.info)</label>
+                <div class="flex gap-2">
+                    <input type="number" id="imeiInput" class="input-field text-sm" placeholder="Masukkan 15 digit IMEI...">
+                    <button onclick="directImei()" class="btn-primary bg-indigo-600 w-24 text-[10px]">CEK</button>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <button onclick="window.open('https://old.beacukai.go.id/websitenewV2/cek-imei.html')" class="btn-check-list">Cek IMEI Beacukai <span>🌐 Portal Bea Cukai</span></button>
+                <button onclick="window.open('https://sickw.com/')" class="btn-check-list">SICKSW <span>🌐 Cek SN / IMEI</span></button>
+                <button onclick="window.open('https://www.touchscreentest.com/')" class="btn-check-list">Touchscreen Test <span>🌐 Online Test</span></button>
+                <button onclick="window.open('https://lcdtech.info/en/tests/dead.pixel.html')" class="btn-check-list">LCD Dead Pixel Test <span>🌐 Online Test</span></button>
+                <button onclick="window.open('https://webcammictest.com/mic/')" class="btn-check-list">Microphone Test <span>🌐 Online Test</span></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-warranty" class="max-w-2xl mx-auto hidden">
+        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase tracking-widest">← Kembali ke Dashboard</button>
+        <h1 class="text-2xl font-black text-gray-900 uppercase italic mb-6">🛡️ Warranty Check</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-10">
+            <button onclick="window.open('https://www.mi.com/global/verify/#/en/tab/imei')" class="btn-check-list bg-orange-600">Xiaomi <span>🌐 Official</span></button>
+            <button onclick="window.open('https://www.realme.com/sa-en/support/phonecheck')" class="btn-check-list bg-yellow-500 text-black">Realme <span>🌐 Official</span></button>
+            <button onclick="window.open('https://www.vivo.com/en/support/IMEI')" class="btn-check-list bg-blue-600">Vivo <span>🌐 Official</span></button>
+            <button onclick="window.open('https://support.oppo.com/en/warranty-check/')" class="btn-check-list bg-emerald-600">OPPO <span>🌐 Official</span></button>
+            <button onclick="window.open('https://wap.id.infinixmobility.com/care/imei-authentication')" class="btn-check-list bg-green-500">Infinix <span>🌐 Official</span></button>
+            <button onclick="window.open('https://www.tecno-mobile.com/warranty/')" class="btn-check-list bg-blue-400">Tecno <span>🌐 Official</span></button>
+            <button onclick="window.open('https://www.iqoo.com/in/support/IMEI')" class="btn-check-list bg-black">iQOO <span>🌐 Official</span></button>
+            <button onclick="window.open('https://checkcoverage.apple.com/coverage?locale=en_ID')" class="btn-check-list bg-slate-500">Apple <span>🌐 Official</span></button>
+            <button class="btn-check-list bg-slate-200 text-slate-400 cursor-not-allowed" disabled>Samsung <span>⌛ Coming Soon</span></button>
+        </div>
+    </div>
+
+    <div id="page-dial" class="max-w-2xl mx-auto hidden">
+        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase tracking-widest">← Kembali ke Dashboard</button>
+        <h1 class="text-2xl font-black text-gray-900 uppercase italic mb-2">📞 Dial Check Codes</h1>
+        <p class="text-[10px] text-red-500 font-bold mb-6 italic tracking-tight">⚠️ Hati-hati di Engineer Mode, jangan ubah setingan sembarangan!</p>
+        <div class="space-y-4">
+            <div class="card p-5">
+                <h3 class="font-black text-xs text-indigo-600 uppercase mb-3 border-b pb-2">1. Kode Universal Android</h3>
+                <div class="dial-item"><span class="dial-code">*#06#</span><div class="dial-desc">Cek nomor IMEI (Wajib)</div></div>
+                <div class="dial-item"><span class="dial-code">*#*#4636#*#*</span><div class="dial-desc">Informasi Jaringan, Baterai, & Statistik</div></div>
+            </div>
+            <div class="card p-5">
+                <h3 class="font-black text-xs text-blue-600 uppercase mb-3 border-b pb-2">2. Samsung</h3>
+                <div class="dial-item"><span class="dial-code">*#0*#</span><div class="dial-desc">Menu Uji Hardware Utama (LCD, Touch, Speaker)</div></div>
+                <div class="dial-item"><span class="dial-code">*#7353#</span><div class="dial-desc">Menu Uji Cepat (Quick Test)</div></div>
+                <div class="dial-item"><span class="dial-code">*#0228#</span><div class="dial-desc">Cek Status Baterai</div></div>
+            </div>
+            <div class="card p-5">
+                <h3 class="font-black text-xs text-orange-600 uppercase mb-3 border-b pb-2">3. Xiaomi / Redmi / Poco</h3>
+                <div class="dial-item"><span class="dial-code">*#*#64663#*#*</span><div class="dial-desc">Menu QC Test / Hardware Diagnostic (Utama)</div></div>
+                <div class="dial-item"><span class="dial-code">*#*#6485#*#*</span><div class="dial-desc">Cek Kesehatan & Info Baterai Detail</div></div>
+            </div>
+            <div class="card p-5">
+                <h3 class="font-black text-xs text-emerald-600 uppercase mb-3 border-b pb-2">4. OPPO, Vivo, dan Realme</h3>
+                <div class="dial-item"><span class="dial-code">*#899#</span><div class="dial-desc">Engineer Mode / Manual Test (Oppo/Realme)</div></div>
+                <div class="dial-item"><span class="dial-code">*#558#</span><div class="dial-desc">Cek Sensor & Layar (Khusus Vivo)</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-laptop" class="max-w-2xl mx-auto hidden">
+        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase tracking-widest">← Kembali ke Dashboard</button>
+        <h1 class="text-2xl font-black text-gray-900 uppercase italic mb-6">💻 Laptop Check</h1>
+        <div class="card p-6 space-y-4">
+            <button onclick="window.open('https://webcammictest.com/')" class="btn-check-list">Webcam Test <span>🌐 Online Test</span></button>
+            <button onclick="window.open('https://en.key-test.ru/')" class="btn-check-list">Keyboard Test <span>🌐 Online</span></button>
+            <button onclick="window.open('https://lcdtech.info/en/tests/dead.pixel.html')" class="btn-check-list">LCD Dead Pixel Test <span>🌐 Online</span></button>
+        </div>
+    </div>
+
+    <div id="importModalOverlay" onclick="toggleImportModal()"></div>
+    <div id="importModal" class="modal-custom">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="font-black text-indigo-900 uppercase italic">📥 Import Laporan</h3>
+            <button onclick="toggleImportModal()" class="text-gray-400 hover:text-red-500 text-2xl font-bold">&times;</button>
+        </div>
+        <textarea id="importArea" class="input-field h-48 mb-4 text-[11px] font-mono" placeholder="Paste report WhatsApp di sini..."></textarea>
+        <button onclick="processImport()" class="btn-primary bg-indigo-600">SINKRONKAN DATA SEKARANG</button>
+    </div>
+
+    <div id="helpModalOverlay" onclick="toggleHelpModal()"></div>
+    <div id="helpModal" class="modal-custom max-h-[80vh] overflow-y-auto text-sm">
+        <h3 class="font-black text-indigo-900 mb-4 uppercase text-lg">🚀 Cara Penggunaan</h3>
+        <ul class="space-y-4 text-gray-600">
+            <li><b class="text-indigo-600">1. Atur Saldo:</b> Klik "Atur Saldo" untuk modal awal tunai.</li>
+            <li><b class="text-indigo-600">2. Warranty Check:</b> Gunakan menu baru untuk langsung menuju portal garansi resmi brand.</li>
+        </ul>
+        <button onclick="toggleHelpModal()" class="mt-6 btn-primary bg-indigo-600">SAYA MENGERTI</button>
+    </div>
+
+    <script>
+        // --- LOGIKA HALAMAN ---
+        function switchPage(page) {
+            const pages = ['page-main', 'page-hp', 'page-warranty', 'page-laptop', 'page-dial'];
+            pages.forEach(p => {
+                const el = document.getElementById(p);
+                if(el) el.classList.add('hidden');
+            });
+            
+            const target = document.getElementById('page-' + page);
+            if(target) target.classList.remove('hidden');
+            
+            toggleSidebar();
+            window.scrollTo(0,0);
+        }
+
+        function directImei() {
+            const imei = document.getElementById('imeiInput').value;
+            if(!imei) return alert("Isi IMEI dulu!");
+            window.open(`https://www.imei.info/?imei=${imei}`, '_blank');
+        }
+
+        function setView(mode) {
+            const body = document.body;
+            const btnMob = document.getElementById('btnMob');
+            const btnDesk = document.getElementById('btnDesk');
+            if(mode === 'desktop') {
+                body.classList.add('mode-desktop');
+                btnDesk.classList.add('bg-indigo-600');
+                btnDesk.classList.remove('text-indigo-400');
+                btnMob.classList.remove('bg-indigo-600');
+                btnMob.classList.add('text-indigo-400');
+            } else {
+                body.classList.remove('mode-desktop');
+                btnMob.classList.add('bg-indigo-600');
+                btnMob.classList.remove('text-indigo-400');
+                btnDesk.classList.remove('bg-indigo-600');
+                btnDesk.classList.add('text-indigo-400');
+            }
+        }
+
+        // --- LOGIKA DATA ---
+        let items = [];
+        let currentFilter = 'stok';
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        const now = new Date();
+        const currentMonthString = monthNames[now.getMonth()] + " " + now.getFullYear();
+        document.getElementById('currentMonth').innerText = currentMonthString;
+
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
+        function toggleImportModal() { document.getElementById('importModal').classList.toggle('open'); document.getElementById('importModalOverlay').classList.toggle('open'); }
+        function toggleHelpModal() { document.getElementById('helpModal').classList.toggle('open'); document.getElementById('helpModalOverlay').classList.toggle('open'); }
+        function toggleConfig() {
+            const panel = document.getElementById('configPanel');
+            panel.classList.toggle('hidden-panel');
+            document.getElementById('configLabel').innerText = panel.classList.contains('hidden-panel') ? "⚙️ Atur Saldo Awal" : "⚙️ Tutup Pengaturan";
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.getElementById('tabStok').className = filter === 'stok' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
+            document.getElementById('tabSold').className = filter === 'sold' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
+            renderRows();
+        }
+
+        function parseText(type) {
+            const rawText = document.getElementById('bulkInput').value;
+            if (!rawText.trim()) return;
+            rawText.split('\n').forEach(line => {
+                if (line.includes(':') && line.includes('>')) {
+                    const parts = line.split(/[:>]/);
+                    const name = parts[0].trim().replace(/^-\s*/, '').replace(/\[[BL]\]\s*/, '');
+                    const modal = Number(parts[1].replace(/[^0-9]/g, ''));
+                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
+                    if (name && modal) {
+                        items.unshift({ id: Date.now() + Math.random(), name, modal, price, status: 'stok', type, soldAt: '' });
+                    }
+                }
+            });
+            document.getElementById('bulkInput').value = '';
+            calculateAll();
+        }
+
+        function toggleSold(id) {
+            const item = items.find(i => i.id === id);
+            if (item) {
+                item.status = 'sold';
+                const d = new Date();
+                item.soldAt = `${d.getDate()}/${d.getMonth()+1}`;
+                calculateAll();
+            }
+        }
+
+        function removeItem(id) {
+            if(confirm('Hapus unit ini?')) {
+                items = items.filter(i => i.id !== id);
+                calculateAll();
+            }
+        }
+
+        function calculateAll() {
+            const start = Number(document.getElementById('startBalance').value) || 0;
+            let belanjaBaru = 0, uangMasuk = 0, profit = 0, floatPrice = 0, floatModal = 0;
+            items.forEach(i => {
+                if (i.status === 'sold') {
+                    if (i.type === 'new') belanjaBaru += i.modal;
+                    uangMasuk += i.price;
+                    profit += (i.price - i.modal);
+                } else {
+                    if (i.type === 'new') belanjaBaru += i.modal;
+                    floatPrice += i.price;
+                    floatModal += i.modal;
+                }
+            });
+            const cash = start - belanjaBaru + uangMasuk;
+            document.getElementById('summaryCash').innerText = "Rp " + cash.toLocaleString('id-ID');
+            document.getElementById('summaryFloating').innerText = "Rp " + floatPrice.toLocaleString('id-ID');
+            document.getElementById('summaryTotal').innerText = "Rp " + (cash + floatPrice).toLocaleString('id-ID');
+            document.getElementById('summaryProfit').innerText = "Rp " + profit.toLocaleString('id-ID');
+            document.getElementById('previewModalStock').innerText = "Rp " + floatModal.toLocaleString('id-ID');
+            document.getElementById('previewUnrealizedProfit').innerText = "Rp " + (floatPrice - floatModal).toLocaleString('id-ID');
+            renderRows();
+            saveData();
+        }
+
+        function renderRows() {
+            const container = document.getElementById('itemRows');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const display = items.filter(i => i.status === currentFilter && i.name.toLowerCase().includes(search));
+            container.innerHTML = '';
+            display.forEach(item => {
+                const profit = item.price - item.modal;
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-2xl border-2 transition-all bg-white ${item.status === 'sold' ? 'border-emerald-500' : 'border-slate-100'}`;
+                card.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-[7px] font-black px-1.5 py-0.5 rounded uppercase ${item.type === 'old' ? 'bg-orange-100 text-orange-600' : 'bg-indigo-100 text-indigo-600'}">${item.type === 'old' ? 'STOK LALU [L]' : 'BELANJA BARU [B]'}</span>
+                                <h4 class="font-bold text-gray-800 text-sm">${item.name}</h4>
+                            </div>
+                            <div class="flex items-center gap-3 text-[10px] font-medium text-gray-500">
+                                <span>M: <b class="text-gray-700">${item.modal.toLocaleString()}</b></span>
+                                <span>J: <b class="text-gray-700">${item.price.toLocaleString()}</b></span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end gap-2">
+                            <button onclick="removeItem(${item.id})" class="text-gray-300 hover:text-red-400 text-xs">✕</button>
+                            ${item.status !== 'sold' ? `<button onclick="toggleSold(${item.id})" class="btn-sell">Laku? ✓</button>` : `<span class="badge-profit text-[9px]">+${profit.toLocaleString()}</span>`}
+                        </div>
+                    </div>`;
+                container.appendChild(card);
+            });
+        }
+
+        function exportReport() {
+            let report = `————————————————\nReport Bulanan - ${currentMonthString}\n————————————————\n`;
+            items.filter(i => i.status === 'sold').forEach(i => {
+                const profit = i.price - i.modal;
+                report += `- ${i.type === 'new' ? '[B]' : '[L]'} ${i.name} : ${i.modal.toLocaleString('id-ID')} > ${i.price.toLocaleString('id-ID')} (+${profit.toLocaleString('id-ID')})\n`;
+            });
+            report += `\n————————————————\nUnit Belum Terjual - ${currentMonthString}\n————————————————\n`;
+            items.filter(i => i.status === 'stok').forEach(i => {
+                report += `- ${i.type === 'new' ? '[B]' : '[L]'} ${i.name} : ${i.modal.toLocaleString('id-ID')} > ${i.price.toLocaleString('id-ID')}\n`;
+            });
+            const startBal = Number(document.getElementById('startBalance').value);
+            report += `\n————————————————\n> Saldo Awal : Rp ${startBal.toLocaleString('id-ID')}\n> Total Profit Terjual : ${document.getElementById('summaryProfit').innerText}\n> Total Floating : ${document.getElementById('summaryFloating').innerText}\n————————————————\nSaldo Akhir : ${document.getElementById('summaryCash').innerText}\nUnRealize Balance : ${document.getElementById('summaryTotal').innerText}`;
+            navigator.clipboard.writeText(report).then(() => alert("Laporan Disalin!"));
+        }
+
+        function processImport() {
+            const text = document.getElementById('importArea').value;
+            if (!text.trim() || !confirm("Sinkronkan data?")) return;
+            const newItems = [];
+            let section = "";
+            let saldoAwalImport = 0;
+            text.split('\n').forEach(line => {
+                const clean = line.trim();
+                if (clean.includes("Report Bulanan")) section = "sold";
+                else if (clean.includes("Unit Belum Terjual")) section = "stok";
+                else if (clean.includes("Saldo Awal")) {
+                    const m = clean.match(/Rp\s*([\d.]+)/);
+                    if (m) saldoAwalImport = Number(m[1].replace(/\./g, ''));
+                }
+                else if (clean.startsWith("-")) {
+                    const isNew = clean.includes("[B]");
+                    const parts = clean.split(/[:>]/);
+                    if (parts.length >= 3) {
+                        const name = parts[0].replace(/-|\[B\]|\[L\]/g, '').trim();
+                        const modal = Number(parts[1].replace(/[^0-9]/g, ''));
+                        const price = Number(parts[2].split('(')[0].replace(/[^0-9]/g, ''));
+                        if (name && modal) {
+                            newItems.push({ id: Date.now() + Math.random(), name, modal, price, status: section, type: isNew ? 'new' : 'old', soldAt: section === 'sold' ? 'Imported' : '' });
+                        }
+                    }
+                }
+            });
+            if (newItems.length > 0) {
+                items = newItems;
+                document.getElementById('startBalance').value = saldoAwalImport;
+                calculateAll();
+                toggleImportModal();
+                alert("Data Berhasil Diimpor!");
+            }
+        }
+
+        function saveData() { localStorage.setItem('ledger_v2_data', JSON.stringify({ startBalance: document.getElementById('startBalance').value, items })); }
+        function loadData() {
+            const data = JSON.parse(localStorage.getItem('ledger_v2_data'));
+            if (data) {
+                document.getElementById('startBalance').value = data.startBalance || 0;
+                items = data.items || [];
+                calculateAll();
+            }
+        }
+        function clearData() { if(confirm('Hapus permanen?')) { localStorage.clear(); location.reload(); } }
+        window.onload = loadData;
+    </script>
+</body>
+</html>
