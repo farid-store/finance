@@ -3,30 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Ledger Pro - Mobile Store</title>
+    <title>Digital Ledger - Finance Tracker Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg-main: #f1f5f9; --sidebar-bg: #1e293b; --accent: #6366f1; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: #1e293b; margin: auto; transition: max-width 0.3s ease; }
-        
+        :root {
+            --bg-main: #f8fafc;
+            --sidebar-bg: #1e293b;
+            --accent: #6366f1;
+        }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-main); 
+            color: #1e293b;
+            margin: auto;
+            transition: max-width 0.3s ease;
+        }
         /* UI Components */
-        .card { background: white; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-        .input-field { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; transition: 0.3s; background: #fdfdfd; }
+        .card { 
+            background: white; 
+            border-radius: 16px; 
+            border: 1px solid #e2e8f0; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .input-field { 
+            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; 
+            outline: none; transition: 0.3s; background: #fdfdfd;
+        }
         .input-field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
         
-        /* Sidebar Styling */
-        #sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 50; }
-        .sidebar-item { display: flex; align-items: center; padding: 12px 16px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; color: #94a3b8; transition: 0.2s; cursor: pointer; }
-        .sidebar-item:hover, .sidebar-item.active { background: #334155; color: white; }
-        .dropdown-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; background: #0f172a; border-radius: 8px; margin: 0 8px; }
-        .dropdown-content.show { max-height: 800px; margin-bottom: 8px; padding: 4px 0; }
+        /* Sidebar Dropdown */
+        #sidebar { 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            z-index: 50; 
+        }
+        .sidebar-item {
+            display: flex; align-items: center; padding: 12px 16px;
+            border-radius: 10px; font-size: 0.875rem; font-weight: 500;
+            color: #94a3b8; transition: 0.2s; cursor: pointer;
+        }
+        .sidebar-item:hover { background: #334155; color: white; }
+        .dropdown-content {
+            max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out;
+            background: #0f172a; border-radius: 8px; margin: 0 8px;
+        }
+        .dropdown-content.show { max-height: 500px; margin-bottom: 8px; }
 
         /* Helpers */
         .mode-desktop { max-width: 1000px !important; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; background: white; min-height: 100vh; }
         .hidden-panel { display: none; }
         .badge-profit { background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; }
-        .dial-card { border-left: 4px solid var(--accent); padding: 10px; background: #f8fafc; border-radius: 8px; margin-bottom: 8px; }
     </style>
 </head>
 <body class="p-4 md:p-8 antialiased">
@@ -34,20 +60,20 @@
     <div id="overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-40" onclick="toggleSidebar()"></div>
 
     <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#1e293b] text-white shadow-2xl flex flex-col -translate-x-full lg:translate-x-0">
-        <div class="p-6 overflow-y-auto flex-1">
+        <div class="p-6 overflow-y-auto">
             <h2 class="text-xl font-extrabold mb-8 flex items-center gap-3 italic tracking-tight">
-                <span class="bg-indigo-600 p-2 rounded-lg not-italic shadow-lg shadow-indigo-500/20">📱</span> MENU
+                <span class="bg-indigo-600 p-2 rounded-lg not-italic">📱</span> MENU
             </h2>
             
-            <nav class="space-y-1">
-                <div onclick="switchPage('main')" class="sidebar-item active">
+            <nav class="space-y-2">
+                <div onclick="switchPage('main')" class="sidebar-item hover:bg-indigo-600 hover:text-white transition">
                     <span class="mr-3 text-lg">📊</span> Dashboard Utama
                 </div>
 
                 <div>
                     <div onclick="toggleDropdown('dropCheck')" class="sidebar-item justify-between">
-                        <span class="flex items-center"><span class="mr-3 text-lg">🔍</span> Pengecekan</span>
-                        <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                        <span class="flex items-center"><span class="mr-3 text-lg">🔍</span> Pengecekan Gadget</span>
+                        <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
                     <div id="dropCheck" class="dropdown-content">
                         <div onclick="switchPage('hp')" class="sidebar-item text-xs pl-12">Handphone Check</div>
@@ -58,30 +84,36 @@
 
                 <div>
                     <div onclick="toggleDropdown('dropWarranty')" class="sidebar-item justify-between">
-                        <span class="flex items-center"><span class="mr-3 text-lg">🛡️</span> Garansi Resmi</span>
-                        <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                        <span class="flex items-center"><span class="mr-3 text-lg">🛡️</span> Cek Garansi Resmi</span>
+                        <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
                     <div id="dropWarranty" class="dropdown-content">
-                        <a href="https://www.samsung.com/id/support/your-service/main" target="_blank" class="sidebar-item text-xs pl-12">Samsung Official</a>
-                        <a href="https://www.mi.com/global/verify/#/en/tab/imei" target="_blank" class="sidebar-item text-xs pl-12">Xiaomi / POCO</a>
-                        <a href="https://www.realme.com/id/support/phonecheck" target="_blank" class="sidebar-item text-xs pl-12">Realme Official</a>
-                        <a href="https://www.vivo.com/id/support/IMEI" target="_blank" class="sidebar-item text-xs pl-12">Vivo / iQOO</a>
-                        <a href="https://support.oppo.com/id/warranty-check/" target="_blank" class="sidebar-item text-xs pl-12">OPPO Official</a>
-                        <a href="https://wap.id.infinixmobility.com/care/imei-authentication" target="_blank" class="sidebar-item text-xs pl-12">Infinix / Tecno</a>
-                        <a href="https://checkcoverage.apple.com/" target="_blank" class="sidebar-item text-xs pl-12 text-indigo-400 font-bold">Apple Official</a>
+                        <a href="https://www.mi.com/global/verify/#/en/tab/imei" target="_blank" class="sidebar-item text-xs pl-12">Xiaomi Official</a>
+                        <a href="https://www.realme.com/sa-en/support/phonecheck" target="_blank" class="sidebar-item text-xs pl-12">Realme Official</a>
+                        <a href="https://www.vivo.com/en/support/IMEI" target="_blank" class="sidebar-item text-xs pl-12">Vivo Official</a>
+                        <a href="https://support.oppo.com/en/warranty-check/" target="_blank" class="sidebar-item text-xs pl-12">OPPO Official</a>
+                        <a href="https://wap.id.infinixmobility.com/care/imei-authentication" target="_blank" class="sidebar-item text-xs pl-12">Infinix Official</a>
+                        <a href="https://checkcoverage.apple.com/" target="_blank" class="sidebar-item text-xs pl-12 font-bold text-indigo-400">Apple Official</a>
+                        <a href="https://www.iqoo.com/in/support/IMEI" target="_blank" class="sidebar-item text-xs pl-12">Iqoo Official</a>
+                        <a href="https://www.tecno-mobile.com/warranty/" target="_blank" class="sidebar-item text-xs pl-12">Techno Official</a>
+                        <a href="https://www.samsung.com/us/support/warranty/" target="_blank" class="sidebar-item text-xs pl-12">Samsung Official</a>
+                        
+                    
+                    
                     </div>
                 </div>
 
-                <div class="border-t border-slate-700 my-4 opacity-50"></div>
+                <div class="border-t border-slate-700 my-4"></div>
                 
-                <button onclick="clearData()" class="sidebar-item w-full text-red-400 hover:bg-red-500/10 transition italic">🗑️ Hapus Data Permanen</button>
+                <button onclick="toggleHelpModal()" class="sidebar-item w-full bg-slate-800/50 mb-2">📖 Panduan</button>
+                <button onclick="clearData()" class="sidebar-item w-full text-red-400 hover:text-red-300 italic">🗑️ Hapus Semua Data</button>
             </nav>
 
-            <div class="mt-10">
-                <p class="text-[10px] text-slate-500 font-bold uppercase mb-3 tracking-widest">Layout View</p>
+            <div class="mt-8">
+                <p class="text-[10px] text-slate-500 font-bold uppercase mb-3 tracking-widest">View Mode</p>
                 <div class="flex bg-slate-900 p-1 rounded-xl gap-1">
-                    <button onclick="setView('mobile')" id="btnMob" class="flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white transition">MOBILE</button>
-                    <button onclick="setView('desktop')" id="btnDesk" class="flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500 transition">DESKTOP</button>
+                    <button onclick="setView('mobile')" id="btnMob" class="flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white">MOBILE</button>
+                    <button onclick="setView('desktop')" id="btnDesk" class="flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500">DESKTOP</button>
                 </div>
             </div>
         </div>
@@ -92,7 +124,7 @@
             <button onclick="toggleSidebar()" class="lg:hidden p-2 bg-white rounded-xl shadow-sm border text-indigo-600 font-bold px-4 transition active:scale-95">☰ Menu</button>
             <div class="flex gap-2">
                 <button onclick="toggleImportModal()" class="px-4 py-2 bg-white border border-indigo-100 text-indigo-600 rounded-xl text-xs font-bold shadow-sm hover:bg-indigo-50 transition">📥 Import</button>
-                <button onclick="exportReport()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg hover:bg-indigo-700 transition">📤 Export Report</button>
+                <button onclick="exportReport()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg hover:bg-indigo-700 transition">📤 Copy Report</button>
             </div>
         </div>
 
@@ -102,7 +134,7 @@
                 <p id="currentMonth" class="text-indigo-600 font-bold uppercase tracking-widest text-[10px]"></p>
             </div>
             <div class="text-right">
-                <p class="text-[9px] text-slate-400 uppercase font-black tracking-widest">Keuntungan Bersih</p>
+                <p class="text-[9px] text-slate-400 uppercase font-black tracking-widest">Realized Profit</p>
                 <h2 id="summaryProfit" class="text-2xl font-black text-emerald-600">Rp 0</h2>
             </div>
         </header>
@@ -117,17 +149,19 @@
                 <h2 id="summaryFloating" class="text-lg font-bold text-slate-800">Rp 0</h2>
             </div>
             <div class="card p-6 col-span-2 text-center bg-slate-900 text-white border-none shadow-xl">
-                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-widest opacity-70">Total Aset Keseluruhan</p>
+                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-widest opacity-80">Unrealized Balance (Total Aset)</p>
                 <h2 id="summaryTotal" class="text-3xl font-black">Rp 0</h2>
             </div>
         </div>
 
         <div class="card p-6 mb-4">
-            <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2 text-xs uppercase tracking-wider">📝 Input Data Cepat</h3>
-            <textarea id="bulkInput" class="input-field h-24 mb-4 text-sm font-medium" placeholder="Contoh: Samsung S23 : 5.000.000 > 6.000.000"></textarea>
+            <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2 text-xs uppercase tracking-wider">
+                <span>📝</span> Smart Input Teks
+            </h3>
+            <textarea id="bulkInput" class="input-field h-24 mb-4 text-sm border-dashed" placeholder="Contoh: Poco M3 : 500.000 > 600.000"></textarea>
             <div class="grid grid-cols-2 gap-3">
-                <button onclick="parseText('old')" class="py-3 bg-slate-700 text-white rounded-xl font-bold text-[10px] uppercase hover:bg-slate-800 transition shadow-lg shadow-slate-200">Stok Lalu [L]</button>
-                <button onclick="parseText('new')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-[10px] uppercase hover:bg-indigo-700 transition shadow-lg shadow-indigo-200">Belanja Baru [B]</button>
+                <button onclick="parseText('old')" class="py-3 bg-slate-700 text-white rounded-xl font-bold text-[10px] uppercase hover:bg-slate-800 transition">Stok Lalu [L]</button>
+                <button onclick="parseText('new')" class="py-3 bg-emerald-600 text-white rounded-xl font-bold text-[10px] uppercase hover:bg-emerald-700 transition">Belanja Baru [B]</button>
             </div>
         </div>
 
@@ -135,29 +169,29 @@
             <button onclick="toggleConfig()" id="configLabel" class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-2 inline-block">⚙️ Atur Saldo Awal</button>
             <div id="configPanel" class="hidden-panel">
                 <div class="card p-5 bg-indigo-50/50 border-indigo-100 mb-4">
-                    <h3 class="font-bold text-indigo-900 text-[10px] uppercase mb-2 italic">Modal Tunai Awal Bulan</h3>
-                    <input type="number" id="startBalance" class="input-field font-black text-xl text-indigo-700" value="0" oninput="calculateAll()">
+                    <h3 class="font-bold text-indigo-900 text-[10px] uppercase mb-2">Modal Tunai di Tangan (Awal Bulan)</h3>
+                    <input type="number" id="startBalance" class="input-field font-black text-lg text-indigo-700" value="0" onchange="calculateAll()">
                 </div>
             </div>
         </div>
 
-        <div class="card p-5 bg-slate-800 border-l-4 border-indigo-500 text-white flex justify-between items-center mb-8 shadow-xl">
+        <div class="card p-5 bg-slate-800 border-l-4 border-indigo-500 text-white flex justify-between items-center mb-8 shadow-lg">
             <div>
-                <h3 class="font-bold text-indigo-300 text-[9px] uppercase tracking-widest opacity-80 italic">Modal Stok Jalan</h3>
+                <h3 class="font-bold text-indigo-300 text-[9px] uppercase tracking-widest opacity-80">Modal Stok Berjalan</h3>
                 <h2 id="previewModalStock" class="text-xl font-black">Rp 0</h2>
             </div>
             <div class="text-right">
-                <h3 class="font-bold text-emerald-400 text-[9px] uppercase tracking-widest opacity-80 italic">Potensi Untung</h3>
+                <h3 class="font-bold text-emerald-400 text-[9px] uppercase tracking-widest opacity-80">Potensi Untung</h3>
                 <h2 id="previewUnrealizedProfit" class="text-xl font-black">Rp 0</h2>
             </div>
         </div>
 
         <div class="mb-6 space-y-4">
             <div class="relative">
-                <input type="text" id="searchInput" onkeyup="renderRows()" placeholder="Cari unit..." class="input-field pl-10 text-sm shadow-sm">
+                <input type="text" id="searchInput" onkeyup="renderRows()" placeholder="Cari unit..." class="input-field pl-10 text-sm">
                 <span class="absolute left-3 top-3.5 opacity-30 text-lg">🔍</span>
             </div>
-            <div class="flex bg-slate-200/50 p-1 rounded-xl gap-1 border border-slate-200">
+            <div class="flex bg-slate-200 p-1 rounded-xl gap-1">
                 <button onclick="setFilter('stok')" id="tabStok" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all bg-white text-indigo-600 shadow-sm">Unit Stok</button>
                 <button onclick="setFilter('sold')" id="tabSold" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500">History Terjual</button>
             </div>
@@ -166,105 +200,109 @@
         <div id="itemRows" class="space-y-3 mb-20"></div>
     </main>
 
-    <div id="page-dial" class="max-w-2xl mx-auto hidden">
-        <button onclick="switchPage('main')" class="mb-6 text-indigo-600 font-bold text-xs uppercase flex items-center gap-2">← Dashboard</button>
-        <h1 class="text-2xl font-black italic mb-2 tracking-tighter">📞 Kode Dial Hardware</h1>
-        <p class="text-[10px] text-slate-400 font-bold uppercase mb-8">Data Lengkap Hardware Test Per Merk</p>
-        
-        <div class="card p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="dial-card border-slate-900 col-span-full">
-                <h3 class="font-black text-xs text-slate-900">SEMUA MERK (IMEI)</h3>
-                <p class="text-[12px] font-bold text-indigo-600 mt-1">*#06#</p>
-            </div>
-            <div class="dial-card border-blue-600">
-                <h3 class="font-black text-xs text-blue-600">SAMSUNG</h3>
-                <p class="text-[11px] mt-1 italic"><b>*#0*#</b> (Menu Tes Lengkap)</p>
-                <p class="text-[11px] italic"><b>*#7353#</b> (Quick Menu)</p>
-            </div>
-            <div class="dial-card border-orange-500">
-                <h3 class="font-black text-xs text-orange-600">XIAOMI / POCO</h3>
-                <p class="text-[11px] mt-1 italic"><b>*#*#64663#*#*</b> (CIT Mode)</p>
-            </div>
-            <div class="dial-card border-emerald-500">
-                <h3 class="font-black text-xs text-emerald-600">OPPO / REALME</h3>
-                <p class="text-[11px] mt-1 italic"><b>*#899#</b> (Engineer Mode)</p>
-            </div>
-            <div class="dial-card border-blue-400">
-                <h3 class="font-black text-xs text-blue-500">VIVO / iQOO</h3>
-                <p class="text-[11px] mt-1 italic"><b>*#558#</b> (Factory Test)</p>
-                <p class="text-[11px] italic"><b>*#*#001#*#*</b> (iQOO Mode)</p>
-            </div>
-            <div class="dial-card border-emerald-400">
-                <h3 class="font-black text-xs text-emerald-600">INFINIX / TECNO</h3>
-                <p class="text-[11px] mt-1 italic"><b>*#90#</b> (Hardware Master)</p>
-            </div>
-            <div class="dial-card border-slate-400">
-                <h3 class="font-black text-xs text-slate-600">IPHONE</h3>
-                <p class="text-[10px] mt-1">Cek di <b>Settings > General > About</b> (Parts History)</p>
-            </div>
-        </div>
-    </div>
-
     <div id="page-hp" class="max-w-2xl mx-auto hidden">
         <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali</button>
-        <div class="card p-8 text-center"><p class="font-bold text-slate-400 uppercase tracking-widest text-xs">Menu Handphone Check Siap Diisi Link</p></div>
-    </div>
-    <div id="page-laptop" class="max-w-2xl mx-auto hidden">
-        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali</button>
-        <div class="card p-8 text-center"><p class="font-bold text-slate-400 uppercase tracking-widest text-xs">Menu Laptop Check Siap Diisi Link</p></div>
+        <h1 class="text-2xl font-black italic mb-6">📱 Handphone Check</h1>
+        <div class="card p-6 space-y-4">
+            <div class="bg-slate-50 p-4 rounded-xl border">
+                <label class="text-[10px] font-bold text-slate-400 uppercase block mb-2 italic">Cek IMEI (imei.info)</label>
+                <div class="flex gap-2">
+                    <input type="number" id="imeiInput" class="input-field text-sm" placeholder="Masukkan 15 digit IMEI...">
+                    <button onclick="directImei()" class="bg-indigo-600 text-white px-6 rounded-xl font-bold text-[10px]">CEK</button>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-2">
+                <button onclick="window.open('https://old.beacukai.go.id/websitenewV2/cek-imei.html')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">Cek IMEI Beacukai <span>🌐</span></button>
+                <button onclick="window.open('https://sickw.com/')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">SICKSW (SN/IMEI) <span>🌐</span></button>
+                <button onclick="window.open('https://www.touchscreentest.com/')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">Touchscreen Test <span>🌐</span></button>
+            </div>
+        </div>
     </div>
 
     <div id="importModal" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="toggleImportModal()"></div>
         <div class="relative bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl">
-            <h3 class="text-xl font-black text-indigo-900 uppercase italic mb-4">📥 Import Report</h3>
-            <textarea id="importArea" class="input-field h-48 mb-4 text-[10px] font-mono" placeholder="Tempel report WhatsApp di sini..."></textarea>
-            <button onclick="processImport()" class="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-200">SINKRONKAN DATA SEKARANG</button>
+            <h3 class="text-xl font-black text-indigo-900 uppercase italic mb-4">📥 Import Laporan</h3>
+            <textarea id="importArea" class="input-field h-48 mb-4 text-[11px] font-mono" placeholder="Paste report WhatsApp di sini..."></textarea>
+            <button onclick="processImport()" class="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold shadow-lg">SINKRONKAN DATA SEKARANG</button>
         </div>
     </div>
 
     <script>
-        // --- LOGIKA UTAMA (TIDAK ADA YANG DIKURANGI) ---
         let items = [];
         let currentFilter = 'stok';
-        const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        
+        // --- UI Logic ---
+        function toggleSidebar() { 
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('overlay');
+            sb.classList.toggle('-translate-x-full');
+            ov.classList.toggle('hidden');
+        }
 
-        // UI Handlers
-        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('overlay').classList.toggle('hidden'); }
-        function toggleDropdown(id) { document.getElementById(id).classList.toggle('show'); }
+        function toggleDropdown(id) {
+            document.getElementById(id).classList.toggle('show');
+        }
+
         function switchPage(page) {
-            ['page-main', 'page-hp', 'page-laptop', 'page-dial'].forEach(p => document.getElementById(p).classList.add('hidden'));
-            document.getElementById('page-' + page).classList.remove('hidden');
+            const pages = ['page-main', 'page-hp', 'page-laptop', 'page-dial'];
+            pages.forEach(p => {
+                const el = document.getElementById(p);
+                if(el) el.classList.add('hidden');
+            });
+            const target = document.getElementById('page-' + page);
+            if(target) target.classList.remove('hidden');
             if(window.innerWidth < 1024) toggleSidebar();
             window.scrollTo(0,0);
         }
-        function toggleConfig() { document.getElementById('configPanel').classList.toggle('hidden-panel'); }
-        function toggleImportModal() { document.getElementById('importModal').classList.toggle('hidden'); }
+
         function setView(mode) {
             const body = document.body;
+            const btnMob = document.getElementById('btnMob');
+            const btnDesk = document.getElementById('btnDesk');
             if(mode === 'desktop') {
                 body.classList.add('mode-desktop');
-                document.getElementById('btnDesk').className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white";
-                document.getElementById('btnMob').className = "flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500";
+                btnDesk.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white";
+                btnMob.className = "flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500";
             } else {
                 body.classList.remove('mode-desktop');
-                document.getElementById('btnMob').className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white";
-                document.getElementById('btnDesk').className = "flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500";
+                btnMob.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white";
+                btnDesk.className = "flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500";
             }
         }
 
-        // Core Algorithm (Plek dari File Asli)
+        function toggleConfig() {
+            const panel = document.getElementById('configPanel');
+            panel.classList.toggle('hidden-panel');
+            document.getElementById('configLabel').innerText = panel.classList.contains('hidden-panel') ? "⚙️ Atur Saldo Awal" : "⚙️ Tutup Pengaturan";
+        }
+
+        function toggleImportModal() { document.getElementById('importModal').classList.toggle('hidden'); }
+
+        // --- Core Algorithm (Plek sesuai file asli) ---
+        function getNow() {
+            const d = new Date();
+            return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+        }
+
         function parseText(type) {
-            const val = document.getElementById('bulkInput').value;
-            if (!val.trim()) return;
-            val.split('\n').forEach(line => {
+            const rawText = document.getElementById('bulkInput').value;
+            if (!rawText.trim()) return;
+            rawText.split('\n').forEach(line => {
                 if (line.includes(':') && line.includes('>')) {
                     const parts = line.split(/[:>]/);
                     const name = parts[0].trim().replace(/^-\s*/, '').replace(/\[[BL]\]\s*/, '');
                     const modal = Number(parts[1].replace(/[^0-9]/g, ''));
-                    const price = Number(parts[2].split('(')[0].replace(/[^0-9]/g, ''));
+                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
                     if (name && modal) {
-                        items.unshift({ id: Date.now() + Math.random(), name, modal, price, status: 'stok', type, date: new Date().toLocaleDateString('id-ID') });
+                        items.unshift({ 
+                            id: Date.now() + Math.random(), 
+                            name, modal, price, status: 'stok', 
+                            type, 
+                            entryDate: getNow(), 
+                            soldAt: '' 
+                        });
                     }
                 }
             });
@@ -274,7 +312,7 @@
 
         function calculateAll() {
             const start = Number(document.getElementById('startBalance').value) || 0;
-            let belanjaBaru = 0, uangMasuk = 0, profit = 0, fPrice = 0, fModal = 0;
+            let belanjaBaru = 0, uangMasuk = 0, profit = 0, floatPrice = 0, floatModal = 0;
             
             items.forEach(i => {
                 if (i.status === 'sold') {
@@ -283,126 +321,140 @@
                     profit += (i.price - i.modal);
                 } else {
                     if (i.type === 'new') belanjaBaru += i.modal;
-                    fPrice += i.price;
-                    fModal += i.modal;
+                    floatPrice += i.price;
+                    floatModal += i.modal;
                 }
             });
 
             const cash = start - belanjaBaru + uangMasuk;
             document.getElementById('summaryCash').innerText = "Rp " + cash.toLocaleString('id-ID');
-            document.getElementById('summaryFloating').innerText = "Rp " + fPrice.toLocaleString('id-ID');
-            document.getElementById('summaryTotal').innerText = "Rp " + (cash + fPrice).toLocaleString('id-ID');
+            document.getElementById('summaryFloating').innerText = "Rp " + floatPrice.toLocaleString('id-ID');
+            document.getElementById('summaryTotal').innerText = "Rp " + (cash + floatPrice).toLocaleString('id-ID');
             document.getElementById('summaryProfit').innerText = "Rp " + profit.toLocaleString('id-ID');
-            document.getElementById('previewModalStock').innerText = "Rp " + fModal.toLocaleString('id-ID');
-            document.getElementById('previewUnrealizedProfit').innerText = "Rp " + (fPrice - fModal).toLocaleString('id-ID');
+            document.getElementById('previewModalStock').innerText = "Rp " + floatModal.toLocaleString('id-ID');
+            document.getElementById('previewUnrealizedProfit').innerText = "Rp " + (floatPrice - floatModal).toLocaleString('id-ID');
             
             renderRows();
             saveData();
         }
 
-        function setFilter(f) {
-            currentFilter = f;
-            document.getElementById('tabStok').className = f === 'stok' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
-            document.getElementById('tabSold').className = f === 'sold' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.getElementById('tabStok').className = filter === 'stok' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
+            document.getElementById('tabSold').className = filter === 'sold' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
             renderRows();
         }
 
         function renderRows() {
             const container = document.getElementById('itemRows');
             const search = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = items.filter(i => i.status === currentFilter && i.name.toLowerCase().includes(search));
+            const display = items.filter(i => i.status === currentFilter && i.name.toLowerCase().includes(search));
             container.innerHTML = '';
             
-            filtered.forEach(item => {
+            display.forEach(item => {
+                const profit = item.price - item.modal;
                 const card = document.createElement('div');
-                card.className = `p-4 rounded-2xl border-2 bg-white transition-all ${item.status === 'sold' ? 'border-emerald-400' : 'border-slate-100 shadow-sm'}`;
+                card.className = `p-4 rounded-2xl border-2 bg-white transition-all ${item.status === 'sold' ? 'border-emerald-500' : 'border-slate-100'}`;
                 card.innerHTML = `
                     <div class="flex justify-between items-center">
                         <div class="flex-1">
                             <div class="flex items-center gap-2 mb-1">
-                                <span class="text-[7px] font-black px-1.5 py-0.5 rounded uppercase ${item.type === 'old' ? 'bg-orange-100 text-orange-600' : 'bg-indigo-100 text-indigo-600'}">${item.type === 'old' ? '[L]' : '[B]'}</span>
+                                <span class="text-[7px] font-black px-1.5 py-0.5 rounded uppercase ${item.type === 'old' ? 'bg-orange-100 text-orange-600' : 'bg-indigo-100 text-indigo-600'}">${item.type === 'old' ? 'STOK LALU [L]' : 'BELANJA BARU [B]'}</span>
                                 <h4 class="font-bold text-slate-800 text-sm">${item.name}</h4>
                             </div>
-                            <p class="text-[10px] text-slate-500 font-bold uppercase">M: ${item.modal.toLocaleString()} • J: ${item.price.toLocaleString()}</p>
+                            <div class="flex items-center gap-3 text-[10px] font-medium text-slate-500">
+                                <span>M: <b class="text-slate-700">${item.modal.toLocaleString()}</b></span>
+                                <span>J: <b class="text-slate-700">${item.price.toLocaleString()}</b></span>
+                            </div>
+                            <div class="mt-1 text-[8px] text-slate-400 font-bold uppercase italic">
+                                📥 Masuk: ${item.entryDate || '-'} 
+                                ${item.soldAt ? `<br><span class="text-emerald-500">📤 Terjual: ${item.soldAt}</span>` : ''}
+                            </div>
                         </div>
                         <div class="flex flex-col items-end gap-2">
-                            <button onclick="removeItem(${item.id})" class="text-slate-300 hover:text-red-500 text-xs">✕</button>
-                            ${item.status === 'stok' ? `<button onclick="markSold(${item.id})" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg font-bold text-[9px] shadow-lg shadow-emerald-100">LAKU ✓</button>` : `<span class="badge-profit">+${(item.price - item.modal).toLocaleString()}</span>`}
+                            <button onclick="removeItem(${item.id})" class="text-slate-300 hover:text-red-400 text-xs transition">✕</button>
+                            ${item.status !== 'sold' ? `<button onclick="toggleSold(${item.id})" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg font-bold text-[10px] hover:bg-emerald-700 transition">Laku? ✓</button>` : `<span class="badge-profit">+${profit.toLocaleString()}</span>`}
                         </div>
                     </div>`;
                 container.appendChild(card);
             });
         }
 
-        function markSold(id) { const i = items.find(x => x.id === id); if(i) { i.status = 'sold'; calculateAll(); } }
-        function removeItem(id) { if(confirm('Hapus unit ini?')) { items = items.filter(x => x.id !== id); calculateAll(); } }
-
-        // EXPORT FUNCTION (PERBAIKAN TOTAL)
-        function exportReport() {
-            let report = `Report Bulanan - ${document.getElementById('currentMonth').innerText}\n\n`;
-            report += `UNIT TERJUAL:\n`;
-            items.filter(i => i.status === 'sold').forEach(i => {
-                report += `- ${i.type === 'new' ? '[B]' : '[L]'} ${i.name} : ${i.modal.toLocaleString()} > ${i.price.toLocaleString()} (+${(i.price-i.modal).toLocaleString()})\n`;
-            });
-            report += `\nUNIT BELUM TERJUAL:\n`;
-            items.filter(i => i.status === 'stok').forEach(i => {
-                report += `- ${i.type === 'new' ? '[B]' : '[L]'} ${i.name} : ${i.modal.toLocaleString()} > ${i.price.toLocaleString()}\n`;
-            });
-            report += `\nSaldo Awal : Rp ${Number(document.getElementById('startBalance').value).toLocaleString()}\n`;
-            report += `Total Profit : ${document.getElementById('summaryProfit').innerText}\n`;
-            report += `Saldo Akhir : ${document.getElementById('summaryCash').innerText}`;
-            
-            navigator.clipboard.writeText(report).then(() => alert("Report Berhasil Dicopy!"));
+        function toggleSold(id) {
+            const item = items.find(i => i.id === id);
+            if (item) { item.status = 'sold'; item.soldAt = getNow(); calculateAll(); }
         }
 
-        // IMPORT FUNCTION (PERBAIKAN TOTAL)
-        function processImport() {
-            const raw = document.getElementById('importArea').value;
-            if(!raw.trim()) return;
-            const newItems = [];
-            let currentMode = 'sold';
-            let importedBalance = 0;
+        function removeItem(id) { if(confirm('Hapus unit ini?')) { items = items.filter(i => i.id !== id); calculateAll(); } }
 
-            raw.split('\n').forEach(line => {
+        function exportReport() {
+            let report = `————————————————\nReport Bulanan - ${currentMonthString}\n————————————————\n`;
+            items.filter(i => i.status === 'sold').forEach(i => {
+                const profit = i.price - i.modal;
+                report += `- ${i.type === 'new' ? '[B]' : '[L]'} ${i.name} : ${i.modal.toLocaleString('id-ID')} > ${i.price.toLocaleString('id-ID')} (+${profit.toLocaleString('id-ID')})\n  (Masuk: ${i.entryDate} | Terjual: ${i.soldAt})\n`;
+            });
+            report += `\n————————————————\nUnit Belum Terjual\n————————————————\n`;
+            items.filter(i => i.status === 'stok').forEach(i => {
+                report += `- ${i.type === 'new' ? '[B]' : '[L]'} ${i.name} : ${i.modal.toLocaleString('id-ID')} > ${i.price.toLocaleString('id-ID')}\n  (Masuk: ${i.entryDate})\n`;
+            });
+            const startBal = Number(document.getElementById('startBalance').value);
+            report += `\n————————————————\n> Saldo Awal : Rp ${startBal.toLocaleString('id-ID')}\n> Total Profit : ${document.getElementById('summaryProfit').innerText}\n————————————————\nSaldo Akhir : ${document.getElementById('summaryCash').innerText}`;
+            navigator.clipboard.writeText(report).then(() => alert("Laporan Disalin!"));
+        }
+
+        function processImport() {
+            const text = document.getElementById('importArea').value;
+            if (!text.trim() || !confirm("Sinkronkan data?")) return;
+            const newItems = [];
+            let section = "";
+            let saldoAwalImport = 0;
+            text.split('\n').forEach(line => {
                 const clean = line.trim();
-                if(clean.includes('BELUM TERJUAL')) currentMode = 'stok';
-                else if(clean.includes('Saldo Awal')) {
+                if (clean.includes("Report Bulanan")) section = "sold";
+                else if (clean.includes("Unit Belum Terjual")) section = "stok";
+                else if (clean.includes("Saldo Awal")) {
                     const m = clean.match(/Rp\s*([\d.]+)/);
-                    if(m) importedBalance = Number(m[1].replace(/\./g, ''));
+                    if (m) saldoAwalImport = Number(m[1].replace(/\./g, ''));
                 }
-                else if(clean.startsWith('-')) {
-                    const isNew = clean.includes('[B]');
-                    const p = clean.split(/[:>]/);
-                    if(p.length >= 3) {
-                        const name = p[0].replace(/-|\[B\]|\[L\]/g, '').trim();
-                        const modal = Number(p[1].replace(/[^0-9]/g, ''));
-                        const price = Number(p[2].split('(')[0].replace(/[^0-9]/g, ''));
-                        newItems.push({ id: Date.now()+Math.random(), name, modal, price, status: currentMode, type: isNew?'new':'old' });
+                else if (clean.startsWith("-")) {
+                    const isNew = clean.includes("[B]");
+                    const parts = clean.split(/[:>]/);
+                    if (parts.length >= 3) {
+                        const name = parts[0].replace(/-|\[B\]|\[L\]/g, '').trim();
+                        const modal = Number(parts[1].replace(/[^0-9]/g, ''));
+                        const price = Number(parts[2].split('(')[0].replace(/[^0-9]/g, ''));
+                        if (name && modal) {
+                            newItems.push({ id: Date.now() + Math.random(), name, modal, price, status: section, type: isNew ? 'new' : 'old', entryDate: 'Imported', soldAt: section === 'sold' ? 'Imported' : '' });
+                        }
                     }
                 }
             });
+            if (newItems.length > 0) { items = newItems; document.getElementById('startBalance').value = saldoAwalImport; calculateAll(); toggleImportModal(); alert("Data Berhasil Diimpor!"); }
+        }
 
-            if(newItems.length > 0) {
-                items = newItems;
-                document.getElementById('startBalance').value = importedBalance;
+        function saveData() { localStorage.setItem('ledger_v2_final', JSON.stringify({ startBalance: document.getElementById('startBalance').value, items })); }
+        function loadData() {
+            const data = JSON.parse(localStorage.getItem('ledger_v2_final'));
+            if (data) {
+                document.getElementById('startBalance').value = data.startBalance || 0;
+                items = data.items || [];
                 calculateAll();
-                toggleImportModal();
-                alert("Import Berhasil!");
             }
         }
-
-        function saveData() { localStorage.setItem('ledger_final_v1', JSON.stringify({ bal: document.getElementById('startBalance').value, items })); }
-        function loadData() {
-            const data = JSON.parse(localStorage.getItem('ledger_final_v1'));
-            if(data) { document.getElementById('startBalance').value = data.bal; items = data.items; calculateAll(); }
-        }
-        function clearData() { if(confirm('Hapus semua data selamanya?')) { localStorage.clear(); location.reload(); } }
+        function clearData() { if(confirm('Hapus permanen?')) { localStorage.clear(); location.reload(); } }
 
         window.onload = () => {
-            const d = new Date();
-            document.getElementById('currentMonth').innerText = months[d.getMonth()] + " " + d.getFullYear();
+            const now = new Date();
+            const currentMonthString = monthNames[now.getMonth()] + " " + now.getFullYear();
+            document.getElementById('currentMonth').innerText = currentMonthString;
             loadData();
         };
+
+        function directImei() {
+            const imei = document.getElementById('imeiInput').value;
+            if(!imei) return alert("Isi IMEI dulu!");
+            window.open(`https://www.imei.info/?imei=${imei}`, '_blank');
+        }
     </script>
 </body>
 </html>
