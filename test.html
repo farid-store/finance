@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Ledger - Finance Tracker Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/tesseract.js@v5.0.0/dist/tesseract.min.js"></script>
+    <style>
+        :root { --bg-main: #f8fafc; --sidebar-bg: #1e293b; --accent: #6366f1; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: #1e293b; margin: auto; transition: max-width 0.3s ease; }
+        .card { background: white; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .input-field { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; transition: 0.3s; background: #fdfdfd; }
+        .input-field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+        #sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 50; }
+        .sidebar-item { display: flex; align-items: center; padding: 12px 16px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; color: #94a3b8; transition: 0.2s; cursor: pointer; }
+        .sidebar-item:hover { background: #334155; color: white; }
+        .dropdown-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; background: #0f172a; border-radius: 8px; margin: 0 8px; }
+        .dropdown-content.show { max-height: 800px; margin-bottom: 8px; }
+        .mode-desktop { max-width: 1000px !important; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; background: white; min-height: 100vh; }
+        #ocr-loading { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); z-index: 100; align-items: center; justify-content: center; color: white; flex-direction: column; text-align: center; }
+        .loader-ring { width: 50px; height: 50px; border: 5px solid #334155; border-top: 5px solid #6366f1; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        canvas#previewCanvas { display: none; } /* Hidden canvas for processing */
+    </style>
+</head>
+<body class="p-4 md:p-8 antialiased">
+
+    <div id="ocr-loading">
+        <div class="loader-ring mb-4"></div>
+        <p class="text-lg font-black italic">OPTIMIZING & SCANNING...</p>
+        <p id="ocr-status" class="text-[10px] text-slate-400 mt-2 uppercase font-bold tracking-widest">Enhancing Image Quality</p>
+    </div>
+
+    <canvas id="previewCanvas"></canvas>
+    <div id="overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-40" onclick="toggleSidebar()"></div>
+
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#1e293b] text-white shadow-2xl flex flex-col -translate-x-full lg:translate-x-0">
+        <div class="p-6 overflow-y-auto">
+            <h2 class="text-xl font-extrabold mb-8 flex items-center gap-3 italic tracking-tight">
+                <span class="bg-indigo-600 p-2 rounded-lg not-italic">📱</span> LEDGER PRO
+            </h2>
+            <nav class="space-y-2">
+                <div onclick="switchPage('main')" class="sidebar-item hover:bg-indigo-600 hover:text-white transition">📊 Dashboard</div>
+                <div onclick="switchPage('cashflow')" class="sidebar-item hover:bg-emerald-600 hover:text-white transition">💸 Cash Flow</div>
+                <div onclick="toggleDropdown('dropCheck')" class="sidebar-item justify-between">
+                    <span>🔍 Gadget Check</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+                <div id="dropCheck" class="dropdown-content">
+                    <div onclick="switchPage('hp')" class="sidebar-item text-xs pl-12">IMEI Check</div>
+                    <div onclick="switchPage('dial')" class="sidebar-item text-xs pl-12">Kode Dial</div>
+                    <div onclick="switchPage('laptop')" class="sidebar-item text-xs pl-12">Laptop Check</div>
+                </div>
+                <div class="border-t border-slate-700 my-4"></div>
+                <button onclick="clearData()" class="sidebar-item w-full text-red-400">🗑️ Reset Data</button>
+            </nav>
+        </div>
+    </aside>
+
+    <main id="page-main" class="max-w-2xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <button onclick="toggleSidebar()" class="lg:hidden p-2 bg-white rounded-xl shadow-sm border font-bold px-4">☰</button>
+            <div class="flex gap-2">
+                <button onclick="exportReport()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg">📤 Copy Report</button>
+            </div>
+        </div>
+
+        <header class="mb-8">
+            <h1 class="text-2xl font-black text-slate-900 uppercase italic tracking-tighter">Inventory Stock</h1>
+            <p id="currentMonth" class="text-indigo-600 font-bold uppercase tracking-widest text-[10px]"></p>
+        </header>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="card p-5 border-b-4 border-indigo-500">
+                <p class="text-[10px] text-slate-400 font-bold uppercase">Cash</p>
+                <h2 id="summaryCash" class="text-lg font-bold">Rp 0</h2>
+            </div>
+            <div class="card p-5 border-b-4 border-emerald-500">
+                <p class="text-[10px] text-slate-400 font-bold uppercase">Profit</p>
+                <h2 id="summaryProfit" class="text-lg font-bold text-emerald-600">Rp 0</h2>
+            </div>
+        </div>
+
+        <div class="card p-6 mb-6">
+            <textarea id="bulkInput" class="input-field h-20 mb-4 text-sm" placeholder="Contoh: Unit : Modal > Jual"></textarea>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="parseText('old')" class="py-3 bg-slate-700 text-white rounded-xl font-bold text-[10px] uppercase">Stok Lalu</button>
+                <button onclick="parseText('new')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-[10px] uppercase">Belanja Baru</button>
+            </div>
+        </div>
+
+        <div class="card p-5 bg-indigo-50 border-indigo-100 mb-6">
+            <p class="text-[10px] font-bold text-indigo-900 uppercase mb-2">💰 Modal Awal Tunai</p>
+            <input type="number" id="startBalance" class="input-field font-black" value="0" onchange="calculateAll()">
+        </div>
+
+        <div id="itemRows" class="space-y-3 pb-24"></div>
+    </main>
+
+    <div id="page-cashflow" class="max-w-2xl mx-auto hidden">
+        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs">← BACK</button>
+        <h1 class="text-2xl font-black italic mb-6 uppercase">Cash Flow</h1>
+        
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="card p-5 border-l-4 border-emerald-500"><h2 id="cf-total-in" class="text-lg font-bold text-emerald-600">Rp 0</h2></div>
+            <div class="card p-5 border-l-4 border-red-500"><h2 id="cf-total-out" class="text-lg font-bold text-red-600">Rp 0</h2></div>
+        </div>
+
+        <div class="card p-6 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-xs uppercase tracking-widest">Catat Pengeluaran/Pemasukan</h3>
+                <label class="bg-indigo-600 text-white px-3 py-2 rounded-lg font-black text-[9px] cursor-pointer">
+                    📷 SCAN STRUK
+                    <input type="file" id="ocr-upload" accept="image/*" class="hidden" onchange="processOcr(this)">
+                </label>
+            </div>
+            <div class="space-y-3">
+                <div class="flex gap-2">
+                    <select id="cf-type" class="p-3 bg-slate-50 border rounded-xl text-[10px] font-bold">
+                        <option value="in">MASUK</option>
+                        <option value="out">KELUAR</option>
+                    </select>
+                    <input type="text" id="cf-desc" class="input-field text-sm" placeholder="Keterangan...">
+                </div>
+                <input type="number" id="cf-amount" class="input-field text-sm font-bold" placeholder="Nominal Rp">
+                <button onclick="addCashFlow()" class="w-full py-3 bg-slate-900 text-white rounded-xl font-bold text-xs">SIMPAN</button>
+            </div>
+        </div>
+        <div id="cf-list" class="space-y-3 pb-24"></div>
+    </div>
+
+    <div id="page-hp" class="max-w-2xl mx-auto hidden">
+        <button onclick="switchPage('main')" class="mb-4 font-bold text-xs">← BACK</button>
+        <div class="card p-6">
+            <h1 class="font-black mb-4 uppercase">IMEI Checker</h1>
+            <input type="number" id="imeiInput" class="input-field mb-4" placeholder="Masukkan 15 Digit IMEI">
+            <button onclick="directImei()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold">CEK IMEI.INFO</button>
+        </div>
+    </div>
+
+    <div id="page-dial" class="max-w-2xl mx-auto hidden">
+        <button onclick="switchPage('main')" class="mb-4 font-bold text-xs">← BACK</button>
+        <div class="grid grid-cols-1 gap-3">
+            <div class="card p-4"><b>SAMSUNG:</b> *#0*#</div>
+            <div class="card p-4"><b>XIAOMI:</b> *#*#64663#*#*</div>
+            <div class="card p-4"><b>OPPO/REALME:</b> *#899#</div>
+            <div class="card p-4"><b>VIVO:</b> *#558#</div>
+            <div class="card p-4"><b>IPHONE:</b> *3001#12345#*</div>
+        </div>
+    </div>
+
+    <div id="page-laptop" class="max-w-2xl mx-auto hidden">
+        <button onclick="switchPage('main')" class="mb-4 font-bold text-xs">← BACK</button>
+        <div class="card p-5 space-y-2">
+            <h1 class="font-black uppercase mb-3">Laptop Check</h1>
+            <p>• <b>Battery:</b> powercfg /batteryreport</p>
+            <p>• <b>SSD:</b> CrystalDiskInfo</p>
+            <p>• <b>Layar:</b> deadpixeltest.org</p>
+            <p>• <b>Keyboard:</b> keyboardtester.com</p>
+        </div>
+    </div>
+
+    <script>
+        let items = [], cashflows = [], currentFilter = 'stok';
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+        function switchPage(p) {
+            ['page-main', 'page-cashflow', 'page-hp', 'page-dial', 'page-laptop'].forEach(pg => document.getElementById(pg).classList.add('hidden'));
+            document.getElementById('page-' + p).classList.remove('hidden');
+            if(p === 'cashflow') renderCashFlow();
+            if(window.innerWidth < 1024) toggleSidebar();
+        }
+
+        function toggleSidebar() { 
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            document.getElementById('overlay').classList.toggle('hidden');
+        }
+
+        function toggleDropdown(id) { document.getElementById(id).classList.toggle('show'); }
+
+        // --- NEW & IMPROVED OCR LOGIC ---
+        async function processOcr(input) {
+            if (!input.files || !input.files[0]) return;
+            const loader = document.getElementById('ocr-loading');
+            const statusText = document.getElementById('ocr-status');
+            loader.style.display = 'flex';
+
+            try {
+                statusText.innerText = "Enhancing Image Quality...";
+                const processedImage = await prepareImageForOcr(input.files[0]);
+                
+                statusText.innerText = "Scanning Text (Indonesian)...";
+                const result = await Tesseract.recognize(processedImage, 'ind', {
+                    logger: m => { if(m.status === 'recognizing text') statusText.innerText = `Reading: ${Math.round(m.progress * 100)}%`; }
+                });
+
+                const text = result.data.text;
+                console.log("OCR Raw Text:", text); // Untuk debug di console
+
+                // Logika Filter Angka Harga (Mencari angka > 1000 yang bukan tahun/telp)
+                const priceRegex = /(?:total|bayar|harga|amount|net|rp|idr)?[ \t]*[:.]?[ \t]*(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?)/gi;
+                let matches = [];
+                let match;
+                while ((match = priceRegex.exec(text)) !== null) {
+                    let val = match[1].replace(/[,.]/g, '');
+                    if (val.length >= 4 && val.length <= 8) matches.push(parseInt(val));
+                }
+
+                // Ambil angka terbesar yang masuk akal sebagai total belanja
+                const detectedAmount = matches.length > 0 ? Math.max(...matches) : 0;
+                
+                document.getElementById('cf-desc').value = "Struk: " + text.substring(0, 20).replace(/\n/g, ' ') + "...";
+                document.getElementById('cf-amount').value = detectedAmount;
+
+                alert("Scan Selesai! Mohon verifikasi nominal Rp " + detectedAmount.toLocaleString());
+            } catch (e) {
+                alert("Gagal membaca struk. Pastikan foto tegak lurus dan terang.");
+            } finally {
+                loader.style.display = 'none';
+                input.value = "";
+            }
+        }
+
+        // Image Pre-processing: Convert to high-contrast B&W
+        function prepareImageForOcr(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.getElementById('previewCanvas');
+                        const ctx = canvas.getContext('2d');
+                        const MAX_WIDTH = 1200;
+                        const scale = MAX_WIDTH / img.width;
+                        canvas.width = MAX_WIDTH;
+                        canvas.height = img.height * scale;
+                        
+                        // Step 1: Draw Image
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        
+                        // Step 2: Grayscale & Contrast Enhancement
+                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        const data = imageData.data;
+                        for (let i = 0; i < data.length; i += 4) {
+                            const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                            // Thresholding (Hitam Putih Tajam)
+                            const val = avg > 128 ? 255 : 0; 
+                            data[i] = data[i+1] = data[i+2] = val;
+                        }
+                        ctx.putImageData(imageData, 0, 0);
+                        resolve(canvas.toDataURL('image/jpeg', 0.9));
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // --- CORE FINANCE LOGIC ---
+        function calculateAll() {
+            const start = Number(document.getElementById('startBalance').value) || 0;
+            let bNew = 0, uIn = 0, pft = 0, fPrc = 0;
+            items.forEach(i => {
+                if(i.status === 'sold') {
+                    if(i.type === 'new') bNew += i.modal;
+                    uIn += i.price;
+                    pft += (i.price - i.modal);
+                } else {
+                    if(i.type === 'new') bNew += i.modal;
+                    fPrc += i.price;
+                }
+            });
+            const cash = start - bNew + uIn;
+            document.getElementById('summaryCash').innerText = "Rp " + cash.toLocaleString();
+            document.getElementById('summaryProfit').innerText = "Rp " + pft.toLocaleString();
+            renderRows();
+            saveData();
+        }
+
+        function parseText(type) {
+            const raw = document.getElementById('bulkInput').value;
+            raw.split('\n').forEach(line => {
+                if(line.includes(':') && line.includes('>')) {
+                    const pts = line.split(/[:>]/);
+                    const name = pts[0].trim();
+                    const modal = Number(pts[1].replace(/[^0-9]/g, ''));
+                    const price = Number(pts[2].replace(/[^0-9]/g, ''));
+                    if(name && modal) items.unshift({ id: Date.now()+Math.random(), name, modal, price, status: 'stok', type, date: new Date().toLocaleDateString() });
+                }
+            });
+            document.getElementById('bulkInput').value = "";
+            calculateAll();
+        }
+
+        function renderRows() {
+            const container = document.getElementById('itemRows');
+            container.innerHTML = "";
+            items.filter(i => i.status === currentFilter).forEach(i => {
+                const div = document.createElement('div');
+                div.className = "card p-4 flex justify-between items-center";
+                div.innerHTML = `<div><h4 class="font-bold">${i.name}</h4><p class="text-[10px] text-slate-400">M: ${i.modal.toLocaleString()} | J: ${i.price.toLocaleString()}</p></div>
+                <div class="flex gap-2">
+                    ${i.status === 'stok' ? `<button onclick="toggleSold(${i.id})" class="bg-emerald-500 text-white px-3 py-1 rounded-lg text-[10px] font-bold">LAKU</button>` : ''}
+                    <button onclick="removeItem(${i.id})" class="text-red-300 text-xs">✕</button>
+                </div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function toggleSold(id) { const i = items.find(x => x.id === id); if(i) i.status = 'sold'; calculateAll(); }
+        function removeItem(id) { items = items.filter(x => x.id !== id); calculateAll(); }
+
+        // --- CASH FLOW LOGIC ---
+        function addCashFlow() {
+            const t = document.getElementById('cf-type').value, d = document.getElementById('cf-desc').value, a = Number(document.getElementById('cf-amount').value);
+            if(!d || !a) return;
+            cashflows.unshift({ id: Date.now(), type: t, desc: d, amount: a, date: new Date().toLocaleTimeString() });
+            document.getElementById('cf-desc').value = ""; document.getElementById('cf-amount').value = "";
+            renderCashFlow(); saveData();
+        }
+
+        function renderCashFlow() {
+            const list = document.getElementById('cf-list');
+            let tin = 0, tout = 0;
+            list.innerHTML = "";
+            cashflows.forEach(cf => {
+                if(cf.type === 'in') tin += cf.amount; else tout += cf.amount;
+                const div = document.createElement('div');
+                div.className = `card p-4 border-l-4 ${cf.type === 'in' ? 'border-emerald-500' : 'border-red-500'} flex justify-between`;
+                div.innerHTML = `<div><p class="text-[8px] text-slate-400">${cf.date}</p><h4 class="font-bold text-xs">${cf.desc}</h4></div>
+                <h3 class="font-black text-xs ${cf.type === 'in' ? 'text-emerald-600' : 'text-red-600'}">${cf.type === 'in' ? '+' : '-'} Rp ${cf.amount.toLocaleString()}</h3>`;
+                list.appendChild(div);
+            });
+            document.getElementById('cf-total-in').innerText = "Rp " + tin.toLocaleString();
+            document.getElementById('cf-total-out').innerText = "Rp " + tout.toLocaleString();
+        }
+
+        function saveData() { localStorage.setItem('ledger_v4_ocr', JSON.stringify({ startBalance: document.getElementById('startBalance').value, items, cashflows })); }
+        function loadData() {
+            const data = JSON.parse(localStorage.getItem('ledger_v4_ocr'));
+            if(data) {
+                document.getElementById('startBalance').value = data.startBalance || 0;
+                items = data.items || []; cashflows = data.cashflows || [];
+                calculateAll(); renderCashFlow();
+            }
+        }
+
+        function directImei() { const i = document.getElementById('imeiInput').value; if(i) window.open(`https://www.imei.info/?imei=${i}`); }
+        function clearData() { if(confirm('Hapus semua?')) { localStorage.clear(); location.reload(); } }
+        function exportReport() { alert("Report copied to clipboard (Simulasi)"); }
+
+        window.onload = () => {
+            document.getElementById('currentMonth').innerText = monthNames[new Date().getMonth()] + " " + new Date().getFullYear();
+            loadData();
+        };
+    </script>
+</body>
+</html>
