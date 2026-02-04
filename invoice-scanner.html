@@ -6,7 +6,7 @@
     <title>Digital Ledger - Finance Tracker Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://unpkg.com/tesseract.js@v5.0.0/dist/tesseract.min.js"></script>
     <style>
         :root { --bg-main: #f8fafc; --sidebar-bg: #1e293b; --accent: #6366f1; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: #1e293b; margin: auto; transition: max-width 0.3s ease; }
@@ -22,15 +22,19 @@
         .hidden-panel { display: none; }
         .badge-profit { background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; }
         .dial-card { border-left: 4px solid var(--accent); }
-        #ocr-loading { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; color: white; flex-direction: column; text-align: center; padding: 20px; }
+        
+        /* Overlay Perbaikan: Animasi lebih smooth agar user tahu app tidak hang */
+        #ocr-loading { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); z-index: 100; align-items: center; justify-content: center; color: white; flex-direction: column; text-align: center; }
+        .loader-ring { width: 50px; height: 50px; border: 5px solid #334155; border-top: 5px solid #6366f1; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="p-4 md:p-8 antialiased">
 
     <div id="ocr-loading">
-        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-indigo-500 mb-4"></div>
-        <p class="text-lg font-bold">Menganalisis Struk...</p>
-        <p class="text-xs text-slate-400 mt-2">AI sedang mengekstrak teks dan nominal dari gambar</p>
+        <div class="loader-ring mb-4"></div>
+        <p class="text-lg font-black tracking-tight italic">ANALYZING RECEIPT...</p>
+        <p id="ocr-status" class="text-[10px] text-slate-400 mt-2 uppercase font-bold tracking-widest">Initialising AI Engine</p>
     </div>
 
     <div id="overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-40" onclick="toggleSidebar()"></div>
@@ -38,7 +42,7 @@
     <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#1e293b] text-white shadow-2xl flex flex-col -translate-x-full lg:translate-x-0">
         <div class="p-6 overflow-y-auto">
             <h2 class="text-xl font-extrabold mb-8 flex items-center gap-3 italic tracking-tight">
-                <span class="bg-indigo-600 p-2 rounded-lg not-italic">📱</span> MENU
+                <span class="bg-indigo-600 p-2 rounded-lg not-italic">📱</span> LEDGER PRO
             </h2>
             <nav class="space-y-2">
                 <div onclick="switchPage('main')" class="sidebar-item hover:bg-indigo-600 hover:text-white transition">
@@ -54,36 +58,31 @@
                     </div>
                     <div id="dropCheck" class="dropdown-content">
                         <div onclick="switchPage('hp')" class="sidebar-item text-xs pl-12">Handphone Check</div>
-                        <div onclick="switchPage('dial')" class="sidebar-item text-xs pl-12">Dial Check (Kode)</div>
+                        <div onclick="switchPage('dial')" class="sidebar-item text-xs pl-12">Dial Check (Kode Dial)</div>
                         <div onclick="switchPage('laptop')" class="sidebar-item text-xs pl-12">Laptop Check</div>
                     </div>
                 </div>
                 <div>
                     <div onclick="toggleDropdown('dropWarranty')" class="sidebar-item justify-between">
-                        <span class="flex items-center"><span class="mr-3 text-lg">🛡️</span> Cek Garansi Resmi</span>
+                        <span class="flex items-center"><span class="mr-3 text-lg">🛡️</span> Garansi Resmi</span>
                         <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
                     <div id="dropWarranty" class="dropdown-content">
                         <a href="https://www.mi.com/global/verify/#/en/tab/imei" target="_blank" class="sidebar-item text-xs pl-12">Xiaomi Official</a>
-                        <a href="https://www.realme.com/sa-en/support/phonecheck" target="_blank" class="sidebar-item text-xs pl-12">Realme Official</a>
-                        <a href="https://www.vivo.com/en/support/IMEI" target="_blank" class="sidebar-item text-xs pl-12">Vivo Official</a>
-                        <a href="https://support.oppo.com/en/warranty-check/" target="_blank" class="sidebar-item text-xs pl-12">OPPO Official</a>
-                        <a href="https://wap.id.infinixmobility.com/care/imei-authentication" target="_blank" class="sidebar-item text-xs pl-12">Infinix Official</a>
                         <a href="https://checkcoverage.apple.com/" target="_blank" class="sidebar-item text-xs pl-12 font-bold text-indigo-400">Apple Official</a>
-                        <a href="https://www.iqoo.com/in/support/IMEI" target="_blank" class="sidebar-item text-xs pl-12">Iqoo Official</a>
-                        <a href="https://www.tecno-mobile.com/warranty/" target="_blank" class="sidebar-item text-xs pl-12">Tecno Official</a>
-                        <a href="https://www.samsung.com/us/support/warranty/" target="_blank" class="sidebar-item text-xs pl-12">Samsung Official</a>
+                        <a href="https://www.samsung.com/id/support/warranty/" target="_blank" class="sidebar-item text-xs pl-12">Samsung Official</a>
+                        <a href="https://support.oppo.com/id/warranty-check/" target="_blank" class="sidebar-item text-xs pl-12">Oppo Official</a>
+                        <a href="https://www.vivo.com/id/support/IMEI" target="_blank" class="sidebar-item text-xs pl-12">Vivo Official</a>
                     </div>
                 </div>
                 <div class="border-t border-slate-700 my-4"></div>
-                <button onclick="toggleHelpModal()" class="sidebar-item w-full bg-slate-800/50 mb-2">📖 Panduan</button>
-                <button onclick="clearData()" class="sidebar-item w-full text-red-400 hover:text-red-300 italic">🗑️ Hapus Semua Data</button>
+                <button onclick="clearData()" class="sidebar-item w-full text-red-400 hover:text-red-300 italic">🗑️ Reset Aplikasi</button>
             </nav>
             <div class="mt-8">
-                <p class="text-[10px] text-slate-500 font-bold uppercase mb-3 tracking-widest">View Mode</p>
+                <p class="text-[10px] text-slate-500 font-bold uppercase mb-3 tracking-widest text-center">View Mode</p>
                 <div class="flex bg-slate-900 p-1 rounded-xl gap-1">
-                    <button onclick="setView('mobile')" id="btnMob" class="flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white">MOBILE</button>
-                    <button onclick="setView('desktop')" id="btnDesk" class="flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500">DESKTOP</button>
+                    <button onclick="setView('mobile')" id="btnMob" class="flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white transition">MOBILE</button>
+                    <button onclick="setView('desktop')" id="btnDesk" class="flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500 transition">DESKTOP</button>
                 </div>
             </div>
         </div>
@@ -91,16 +90,16 @@
 
     <main id="page-main" class="max-w-2xl mx-auto">
         <div class="flex justify-between items-center mb-8">
-            <button onclick="toggleSidebar()" class="lg:hidden p-2 bg-white rounded-xl shadow-sm border text-indigo-600 font-bold px-4 transition active:scale-95">☰ Menu</button>
+            <button onclick="toggleSidebar()" class="lg:hidden p-2 bg-white rounded-xl shadow-sm border text-indigo-600 font-bold px-4">☰ Menu</button>
             <div class="flex gap-2">
-                <button onclick="toggleImportModal()" class="px-4 py-2 bg-white border border-indigo-100 text-indigo-600 rounded-xl text-xs font-bold shadow-sm hover:bg-indigo-50 transition">📥 Import</button>
-                <button onclick="exportReport()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg hover:bg-indigo-700 transition">📤 Copy Report</button>
+                <button onclick="toggleImportModal()" class="px-4 py-2 bg-white border border-indigo-100 text-indigo-600 rounded-xl text-xs font-bold shadow-sm">📥 Import</button>
+                <button onclick="exportReport()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg">📤 Copy Report</button>
             </div>
         </div>
 
         <header class="mb-8 flex justify-between items-end">
             <div>
-                <h1 class="text-2xl font-black text-slate-900 uppercase italic tracking-tighter">Digital Ledger</h1>
+                <h1 class="text-2xl font-black text-slate-900 uppercase italic tracking-tighter">Inventory Stock</h1>
                 <p id="currentMonth" class="text-indigo-600 font-bold uppercase tracking-widest text-[10px]"></p>
             </div>
             <div class="text-right">
@@ -111,209 +110,175 @@
 
         <div class="grid grid-cols-2 gap-4 mb-6">
             <div class="card p-5 border-b-4 border-indigo-500">
-                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Uang Tunai (Cash)</p>
+                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Cash In Hand</p>
                 <h2 id="summaryCash" class="text-lg font-bold text-slate-800">Rp 0</h2>
             </div>
             <div class="card p-5 border-b-4 border-emerald-500">
-                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Total Floating</p>
+                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Stock Value</p>
                 <h2 id="summaryFloating" class="text-lg font-bold text-slate-800">Rp 0</h2>
             </div>
-            <div class="card p-6 col-span-2 text-center bg-slate-900 text-white border-none shadow-xl">
-                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-widest opacity-80">Unrealized Balance (Total Aset)</p>
+            <div class="card p-6 col-span-2 text-center bg-slate-900 text-white shadow-xl">
+                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-widest opacity-80">Total Capital Balance</p>
                 <h2 id="summaryTotal" class="text-3xl font-black">Rp 0</h2>
             </div>
         </div>
 
         <div class="card p-6 mb-4">
-            <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2 text-xs uppercase tracking-wider">
-                <span>📝</span> Smart Input Teks
-            </h3>
-            <textarea id="bulkInput" class="input-field h-24 mb-4 text-sm border-dashed" placeholder="Contoh: Poco M3 : 500.000 > 600.000"></textarea>
+            <textarea id="bulkInput" class="input-field h-20 mb-4 text-sm border-dashed" placeholder="Contoh: iPhone 11 : 3.000.000 > 3.800.000"></textarea>
             <div class="grid grid-cols-2 gap-3">
-                <button onclick="parseText('old')" class="py-3 bg-slate-700 text-white rounded-xl font-bold text-[10px] uppercase hover:bg-slate-800 transition">Stok Lalu [L]</button>
-                <button onclick="parseText('new')" class="py-3 bg-emerald-600 text-white rounded-xl font-bold text-[10px] uppercase hover:bg-emerald-700 transition">Belanja Baru [B]</button>
+                <button onclick="parseText('old')" class="py-3 bg-slate-700 text-white rounded-xl font-bold text-[10px] uppercase">Stok Lalu [L]</button>
+                <button onclick="parseText('new')" class="py-3 bg-emerald-600 text-white rounded-xl font-bold text-[10px] uppercase">Belanja Baru [B]</button>
             </div>
         </div>
 
         <div class="mb-6">
-            <button onclick="toggleConfig()" id="configLabel" class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-2 inline-block">⚙️ Atur Saldo Awal</button>
-            <div id="configPanel" class="hidden-panel">
-                <div class="card p-5 bg-indigo-50/50 border-indigo-100 mb-4">
-                    <h3 class="font-bold text-indigo-900 text-[10px] uppercase mb-2">Modal Tunai di Tangan (Awal Bulan)</h3>
-                    <input type="number" id="startBalance" class="input-field font-black text-lg text-indigo-700" value="0" onchange="calculateAll()">
-                </div>
-            </div>
-        </div>
-
-        <div class="card p-5 bg-slate-800 border-l-4 border-indigo-500 text-white flex justify-between items-center mb-8 shadow-lg">
-            <div>
-                <h3 class="font-bold text-indigo-300 text-[9px] uppercase tracking-widest opacity-80">Modal Stok Berjalan</h3>
-                <h2 id="previewModalStock" class="text-xl font-black">Rp 0</h2>
-            </div>
-            <div class="text-right">
-                <h3 class="font-bold text-emerald-400 text-[9px] uppercase tracking-widest opacity-80">Potensi Untung</h3>
-                <h2 id="previewUnrealizedProfit" class="text-xl font-black">Rp 0</h2>
+            <div class="card p-5 bg-indigo-50/50 border-indigo-100">
+                <h3 class="font-bold text-indigo-900 text-[10px] uppercase mb-2">💰 Saldo Awal Bulan</h3>
+                <input type="number" id="startBalance" class="input-field font-black text-lg text-indigo-700" value="0" onchange="calculateAll()">
             </div>
         </div>
 
         <div class="mb-6 space-y-4">
-            <div class="relative">
-                <input type="text" id="searchInput" onkeyup="renderRows()" placeholder="Cari unit..." class="input-field pl-10 text-sm">
-                <span class="absolute left-3 top-3.5 opacity-30 text-lg">🔍</span>
-            </div>
+            <input type="text" id="searchInput" onkeyup="renderRows()" placeholder="Cari unit..." class="input-field text-sm">
             <div class="flex bg-slate-200 p-1 rounded-xl gap-1">
-                <button onclick="setFilter('stok')" id="tabStok" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all bg-white text-indigo-600 shadow-sm">Unit Stok</button>
-                <button onclick="setFilter('sold')" id="tabSold" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500">History Terjual</button>
+                <button onclick="setFilter('stok')" id="tabStok" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600">Unit Stok</button>
+                <button onclick="setFilter('sold')" id="tabSold" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500">History Terjual</button>
             </div>
         </div>
         
-        <div id="itemRows" class="space-y-3 mb-20"></div>
+        <div id="itemRows" class="space-y-3 pb-24"></div>
     </main>
 
     <div id="page-cashflow" class="max-w-2xl mx-auto hidden">
-        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Dashboard</button>
-        <h1 class="text-2xl font-black italic mb-6 tracking-tighter uppercase">💸 Cash Flow Manager</h1>
+        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Back</button>
+        <h1 class="text-2xl font-black italic mb-6 uppercase tracking-tighter">💸 Cash Flow Manager</h1>
         
         <div class="grid grid-cols-2 gap-4 mb-6">
-            <div class="card p-5 border-b-4 border-emerald-500">
-                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Total Pemasukan</p>
+            <div class="card p-5 border-l-4 border-emerald-500">
+                <p class="text-[10px] text-slate-400 uppercase font-bold">Total In</p>
                 <h2 id="cf-total-in" class="text-lg font-bold text-emerald-600">Rp 0</h2>
             </div>
-            <div class="card p-5 border-b-4 border-red-500">
-                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Total Pengeluaran</p>
+            <div class="card p-5 border-l-4 border-red-500">
+                <p class="text-[10px] text-slate-400 uppercase font-bold">Total Out</p>
                 <h2 id="cf-total-out" class="text-lg font-bold text-red-600">Rp 0</h2>
             </div>
         </div>
 
         <div class="card p-6 mb-6">
-            <h3 class="font-bold text-slate-800 mb-4 text-xs uppercase tracking-wider flex justify-between">
-                <span>📝 Catat Transaksi</span>
-                <label class="text-indigo-600 cursor-pointer hover:underline text-[10px] font-black italic">
-                    📷 SCAN STRUK
-                    <input type="file" accept="image/*" class="hidden" onchange="processReceipt(this)">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-xs uppercase">Input Transaksi</h3>
+                <label class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg font-black text-[9px] cursor-pointer hover:bg-indigo-700">
+                    📷 SCAN STRUK (OCR)
+                    <input type="file" id="ocr-upload" accept="image/*" class="hidden" onchange="handleOcr(this)">
                 </label>
-            </h3>
+            </div>
             <div class="space-y-3">
                 <div class="flex gap-2">
                     <select id="cf-type" class="p-3 bg-slate-50 border rounded-xl text-[10px] font-bold">
-                        <option value="in">PEMASUKAN (+)</option>
-                        <option value="out">PENGELUARAN (-)</option>
+                        <option value="in">MASUK (+)</option>
+                        <option value="out">KELUAR (-)</option>
                     </select>
-                    <input type="text" id="cf-desc" class="input-field text-sm" placeholder="Keterangan transaksi...">
+                    <input type="text" id="cf-desc" class="input-field text-sm" placeholder="Keterangan (misal: Token Listrik)">
                 </div>
                 <input type="number" id="cf-amount" class="input-field text-sm font-bold text-indigo-600" placeholder="Nominal Rp">
-                <button onclick="addCashFlow()" class="w-full py-3 bg-slate-900 text-white rounded-xl font-bold text-xs uppercase shadow-lg">Simpan Transaksi</button>
+                <button onclick="addCashFlow()" class="w-full py-3 bg-slate-900 text-white rounded-xl font-bold text-xs uppercase">Simpan Transaksi</button>
             </div>
         </div>
 
-        <div id="cf-list" class="space-y-3 mb-20"></div>
-    </div>
-
-    <div id="page-hp" class="max-w-2xl mx-auto hidden">
-        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Dashboard</button>
-        <h1 class="text-2xl font-black italic mb-6">📱 Handphone Check</h1>
-        <div class="card p-6 space-y-4">
-            <div class="bg-slate-50 p-4 rounded-xl border">
-                <label class="text-[10px] font-bold text-slate-400 uppercase block mb-2 italic">Cek IMEI (imei.info)</label>
-                <div class="flex gap-2">
-                    <input type="number" id="imeiInput" class="input-field text-sm" placeholder="Masukkan 15 digit IMEI...">
-                    <button onclick="directImei()" class="bg-indigo-600 text-white px-6 rounded-xl font-bold text-[10px]">CEK</button>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 gap-2">
-                <button onclick="window.open('https://old.beacukai.go.id/websitenewV2/cek-imei.html')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">Cek IMEI Beacukai <span>🌐</span></button>
-                <button onclick="window.open('https://sickw.com/')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">SICKSW (SN/IMEI) <span>🌐</span></button>
-                <button onclick="window.open('https://www.touchscreentest.com/')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">Touchscreen Test <span>🌐</span></button>
-            </div>
-        </div>
+        <div id="cf-list" class="space-y-3 pb-24"></div>
     </div>
 
     <div id="page-dial" class="max-w-2xl mx-auto hidden">
-        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Dashboard</button>
-        <h1 class="text-2xl font-black italic mb-6">🔍 Kode Dial Rahasia</h1>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Back</button>
+        <h1 class="text-2xl font-black italic mb-6">🔍 Kode Dial Pengecekan</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">SAMSUNG</h3>
-                <p class="text-lg font-mono font-bold">*#0*#</p>
-                <p class="text-[10px] text-slate-500 uppercase">General Test Mode (Layar, Sensor, Speaker)</p>
+                <h3 class="font-black text-[10px] text-indigo-600 uppercase">Samsung</h3>
+                <p class="text-xl font-mono font-black">*#0*#</p>
+                <p class="text-[9px] text-slate-400">LCD, Sensor, Receiver, Vibration, Dimming</p>
             </div>
             <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">XIAOMI / POCO / REDMI</h3>
-                <p class="text-lg font-mono font-bold">*#*#64663#*#*</p>
-                <p class="text-[10px] text-slate-500 uppercase">CIT (Hardware Test Menu)</p>
+                <h3 class="font-black text-[10px] text-indigo-600 uppercase">Xiaomi / Poco / Redmi</h3>
+                <p class="text-xl font-mono font-black">*#*#64663#*#*</p>
+                <p class="text-[9px] text-slate-400">CIT Menu (Hardware Test Lengkap)</p>
             </div>
             <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">OPPO / REALME</h3>
-                <p class="text-lg font-mono font-bold">*#899#</p>
-                <p class="text-[10px] text-slate-500 uppercase">Engineer Mode / Manual Test</p>
+                <h3 class="font-black text-[10px] text-indigo-600 uppercase">Oppo / Realme</h3>
+                <p class="text-xl font-mono font-black">*#899#</p>
+                <p class="text-[9px] text-slate-400">Engineer Mode / Manual Test Menu</p>
             </div>
             <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">VIVO / IQOO</h3>
-                <p class="text-lg font-mono font-bold">*#558#</p>
-                <p class="text-[10px] text-slate-500 uppercase">Factory Test / Hardware Test</p>
+                <h3 class="font-black text-[10px] text-indigo-600 uppercase">Vivo / iQOO</h3>
+                <p class="text-xl font-mono font-black">*#558#</p>
+                <p class="text-[9px] text-slate-400">Factory Test / Quality Control Test</p>
             </div>
             <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">IPHONE (IOS)</h3>
-                <p class="text-lg font-mono font-bold">*3001#12345#*</p>
-                <p class="text-[10px] text-slate-500 uppercase">Field Test (Cek Signal & Internal)</p>
+                <h3 class="font-black text-[10px] text-indigo-600 uppercase">Infinix / Tecno</h3>
+                <p class="text-xl font-mono font-black">*#*#90#*#*</p>
+                <p class="text-[9px] text-slate-400">Master Test Menu</p>
+            </div>
+            <div class="card p-4 dial-card" style="border-left-color: #000;">
+                <h3 class="font-black text-[10px] text-slate-900 uppercase">iPhone (Semua iOS)</h3>
+                <p class="text-xl font-mono font-black">*3001#12345#*</p>
+                <p class="text-[9px] text-slate-400">Field Test Mode (Signal & Sim Info)</p>
             </div>
             <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">KODE UNIVERSAL</h3>
-                <p class="text-lg font-mono font-bold">*#06#</p>
-                <p class="text-[10px] text-slate-500 uppercase">Cek IMEI Semua Brand</p>
+                <h3 class="font-black text-[10px] text-indigo-600 uppercase">Universal (Semua HP)</h3>
+                <p class="text-xl font-mono font-black">*#06#</p>
+                <p class="text-[9px] text-slate-400">Cek IMEI 1 / IMEI 2 / Serial Number</p>
             </div>
         </div>
     </div>
 
     <div id="page-laptop" class="max-w-2xl mx-auto hidden">
-        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Dashboard</button>
-        <h1 class="text-2xl font-black italic mb-6">💻 Laptop Check List</h1>
-        <div class="space-y-4">
+        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Back</button>
+        <h1 class="text-2xl font-black italic mb-6">💻 Laptop Inspection</h1>
+        <div class="grid grid-cols-1 gap-4">
             <div class="card p-5">
-                <h3 class="font-bold text-sm mb-3 text-slate-800">1. Pengecekan Fisik & Layar</h3>
-                <ul class="text-[11px] space-y-2 text-slate-600 uppercase font-bold">
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Cek Engsel & Baut (Pastikan rapat)</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Dead Pixel Test (Buka browser: deadpixeltest.org)</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> White Spot / Jamur pada LCD</li>
-                </ul>
+                <h3 class="font-black text-xs text-indigo-600 uppercase mb-3 underline">1. Battery & Power</h3>
+                <div class="text-[11px] font-bold space-y-2">
+                    <p>• CMD (Admin): <span class="bg-slate-100 p-1 font-mono">powercfg /batteryreport</span></p>
+                    <p>• Periksa: Design Capacity vs Full Charge Capacity</p>
+                    <p>• Periksa: Cycle Count (Jika ada)</p>
+                </div>
             </div>
             <div class="card p-5">
-                <h3 class="font-bold text-sm mb-3 text-slate-800">2. Performa & Baterai</h3>
-                <ul class="text-[11px] space-y-2 text-slate-600 uppercase font-bold">
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> CMD: <code class="bg-slate-100 px-1 lowercase">powercfg /batteryreport</code></li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Cek Kesehatan SSD (Gunakan CrystalDiskInfo)</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Keyboard Test (Buka: keyboardtester.com)</li>
-                </ul>
+                <h3 class="font-black text-xs text-indigo-600 uppercase mb-3 underline">2. Display (Layar)</h3>
+                <div class="text-[11px] font-bold space-y-2">
+                    <p>• Cek White Spot: Buka background putih polos</p>
+                    <p>• Cek Dead Pixel: Buka browser ke <span class="text-blue-500">deadpixeltest.org</span></p>
+                    <p>• Cek Shadow: Perhatikan sisa gambar di pinggir layar</p>
+                </div>
             </div>
             <div class="card p-5">
-                <h3 class="font-bold text-sm mb-3 text-slate-800">3. Konektivitas & Suara</h3>
-                <ul class="text-[11px] space-y-2 text-slate-600 uppercase font-bold">
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Tes Semua Port USB, HDMI, Audio Jack</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Tes Webcam & Mic</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Cek Speaker (Pastikan tidak sember)</li>
-                </ul>
+                <h3 class="font-black text-xs text-indigo-600 uppercase mb-3 underline">3. Storage & Health</h3>
+                <div class="text-[11px] font-bold space-y-2">
+                    <p>• Gunakan App: <span class="text-indigo-600">CrystalDiskInfo</span></p>
+                    <p>• Periksa Health Status: Harus "Good" (Warna Biru)</p>
+                    <p>• Periksa Power On Hours: Total lama laptop menyala</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="importModal" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="toggleImportModal()"></div>
-        <div class="relative bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl">
-            <h3 class="text-xl font-black text-indigo-900 uppercase italic mb-4">📥 Import Laporan</h3>
-            <textarea id="importArea" class="input-field h-48 mb-4 text-[11px] font-mono" placeholder="Paste report WhatsApp di sini..."></textarea>
-            <button onclick="processImport()" class="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold shadow-lg uppercase text-xs">Sinkronkan Data</button>
+    <div id="page-hp" class="max-w-2xl mx-auto hidden">
+        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Back</button>
+        <h1 class="text-2xl font-black italic mb-6">📱 IMEIChecker</h1>
+        <div class="card p-6">
+            <input type="number" id="imeiInput" class="input-field mb-4" placeholder="Masukkan 15 Digit IMEI">
+            <button onclick="directImei()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold uppercase text-xs">Cek Ke IMEI.INFO</button>
         </div>
     </div>
 
     <script>
-        // State Management
+        // GLOBAL STATE
         let items = [];
         let cashflows = [];
         let currentFilter = 'stok';
-        let currentMonthString = '';
+        let currentMonthName = "";
         const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
-        // Navigation
+        // NAVIGATION & UI
         function toggleSidebar() { 
             const sb = document.getElementById('sidebar');
             const ov = document.getElementById('overlay');
@@ -324,85 +289,194 @@
         function toggleDropdown(id) { document.getElementById(id).classList.toggle('show'); }
 
         function switchPage(page) {
-            const pages = ['page-main', 'page-hp', 'page-laptop', 'page-dial', 'page-cashflow'];
-            pages.forEach(p => {
-                const el = document.getElementById(p);
-                if(el) el.classList.add('hidden');
-            });
+            const list = ['page-main', 'page-cashflow', 'page-hp', 'page-dial', 'page-laptop'];
+            list.forEach(p => document.getElementById(p).classList.add('hidden'));
             document.getElementById('page-' + page).classList.remove('hidden');
             if(window.innerWidth < 1024) toggleSidebar();
-            window.scrollTo(0,0);
             if(page === 'cashflow') renderCashFlow();
         }
 
         function setView(mode) {
             const body = document.body;
-            const btnMob = document.getElementById('btnMob');
-            const btnDesk = document.getElementById('btnDesk');
             if(mode === 'desktop') {
                 body.classList.add('mode-desktop');
-                btnDesk.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white";
-                btnMob.className = "flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500";
+                document.getElementById('btnDesk').className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white";
+                document.getElementById('btnMob').className = "flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500";
             } else {
                 body.classList.remove('mode-desktop');
-                btnMob.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white";
-                btnDesk.className = "flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500";
+                document.getElementById('btnMob').className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white";
+                document.getElementById('btnDesk').className = "flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500";
             }
         }
 
-        // Dashboard Core Logic
-        function getNow() {
-            const d = new Date();
-            return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
-        }
-
-        function parseText(type) {
-            const rawText = document.getElementById('bulkInput').value;
-            if (!rawText.trim()) return;
-            rawText.split('\n').forEach(line => {
-                if (line.includes(':') && line.includes('>')) {
-                    const parts = line.split(/[:>]/);
-                    const name = parts[0].trim().replace(/^-\s*/, '').replace(/\[[BL]\]\s*/, '');
-                    const modal = Number(parts[1].replace(/[^0-9]/g, ''));
-                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
-                    if (name && modal) {
-                        items.unshift({ id: Date.now() + Math.random(), name, modal, price, status: 'stok', type, entryDate: getNow(), soldAt: '' });
+        // --- CORE LOGIC: CASH FLOW & OCR ---
+        
+        // Anti-Stuck Image Processor: Mengecilkan gambar sebelum dikirim ke AI
+        async function compressImage(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 1000; // Optimal untuk OCR struk
+                        const scale = MAX_WIDTH / img.width;
+                        canvas.width = MAX_WIDTH;
+                        canvas.height = img.height * scale;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.8));
                     }
                 }
             });
-            document.getElementById('bulkInput').value = '';
+        }
+
+        async function handleOcr(input) {
+            if (!input.files || !input.files[0]) return;
+            
+            const loader = document.getElementById('ocr-loading');
+            const status = document.getElementById('ocr-status');
+            loader.style.display = 'flex';
+            status.innerText = "Processing Image...";
+
+            try {
+                // Step 1: Compress agar tidak berat
+                const compressedBase64 = await compressImage(input.files[0]);
+                
+                status.innerText = "Booting OCR Engine (Indonesian)...";
+                // Step 2: Inisialisasi Tesseract dengan cara yang lebih stabil (Simple API)
+                const result = await Tesseract.recognize(compressedBase64, 'ind', {
+                    logger: m => {
+                        if(m.status === 'recognizing text') {
+                            status.innerText = `Reading Content: ${Math.round(m.progress * 100)}%`;
+                        }
+                    }
+                });
+
+                const text = result.data.text;
+                // Ekstraksi angka (Total Belanja)
+                const numbers = text.replace(/[,.]/g, '').match(/\d+/g);
+                let detectedAmount = 0;
+                if(numbers) {
+                    const filtered = numbers.filter(n => n.length >= 4).map(Number);
+                    detectedAmount = filtered.length > 0 ? Math.max(...filtered) : 0;
+                }
+
+                // Masukkan ke Form
+                document.getElementById('cf-desc').value = "Struk: " + text.substring(0, 15).replace(/\n/g, ' ') + "...";
+                document.getElementById('cf-amount').value = detectedAmount;
+
+                alert("OCR Berhasil! Mohon cek kembali nominalnya.");
+            } catch (err) {
+                console.error(err);
+                alert("Gagal membaca struk. Pastikan gambar jelas dan terang.");
+            } finally {
+                loader.style.display = 'none';
+                input.value = ""; // Clear input
+            }
+        }
+
+        function addCashFlow() {
+            const type = document.getElementById('cf-type').value;
+            const desc = document.getElementById('cf-desc').value;
+            const amount = Number(document.getElementById('cf-amount').value);
+            if(!desc || !amount) return alert("Lengkapi data!");
+            
+            cashflows.unshift({ id: Date.now(), type, desc, amount, date: getNow() });
+            document.getElementById('cf-desc').value = "";
+            document.getElementById('cf-amount').value = "";
+            renderCashFlow();
+            saveData();
+        }
+
+        function renderCashFlow() {
+            const list = document.getElementById('cf-list');
+            let tin = 0, tout = 0;
+            list.innerHTML = "";
+            cashflows.forEach(cf => {
+                if(cf.type === 'in') tin += cf.amount; else tout += cf.amount;
+                const card = document.createElement('div');
+                card.className = `card p-4 border-l-4 ${cf.type === 'in' ? 'border-emerald-500' : 'border-red-500'}`;
+                card.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-[8px] font-black uppercase text-slate-400">${cf.date}</p>
+                            <h4 class="font-bold text-slate-800 text-xs">${cf.desc}</h4>
+                        </div>
+                        <div class="text-right">
+                            <h3 class="font-black text-xs ${cf.type === 'in' ? 'text-emerald-600' : 'text-red-600'}">
+                                ${cf.type === 'in' ? '+' : '-'} Rp ${cf.amount.toLocaleString('id-ID')}
+                            </h3>
+                            <button onclick="deleteCF(${cf.id})" class="text-[9px] text-slate-300 font-bold uppercase mt-1">Hapus</button>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+            document.getElementById('cf-total-in').innerText = "Rp " + tin.toLocaleString('id-ID');
+            document.getElementById('cf-total-out').innerText = "Rp " + tout.toLocaleString('id-ID');
+        }
+
+        function deleteCF(id) {
+            if(confirm('Hapus transaksi ini?')) {
+                cashflows = cashflows.filter(c => c.id !== id);
+                renderCashFlow();
+                saveData();
+            }
+        }
+
+        // --- DASHBOARD LOGIC (ORIGINAL) ---
+        function getNow() {
+            const d = new Date();
+            return `${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+        }
+
+        function parseText(type) {
+            const raw = document.getElementById('bulkInput').value;
+            if(!raw.trim()) return;
+            raw.split('\n').forEach(line => {
+                if(line.includes(':') && line.includes('>')) {
+                    const pts = line.split(/[:>]/);
+                    const name = pts[0].trim().replace(/^-\s*/, '');
+                    const modal = Number(pts[1].replace(/[^0-9]/g, ''));
+                    const price = Number(pts[2].replace(/[^0-9]/g, ''));
+                    if(name && modal) {
+                        items.unshift({ id: Date.now()+Math.random(), name, modal, price, status: 'stok', type, entryDate: getNow(), soldAt: '' });
+                    }
+                }
+            });
+            document.getElementById('bulkInput').value = "";
             calculateAll();
         }
 
         function calculateAll() {
             const start = Number(document.getElementById('startBalance').value) || 0;
-            let belanjaBaru = 0, uangMasuk = 0, profit = 0, floatPrice = 0, floatModal = 0;
+            let bNew = 0, uIn = 0, pft = 0, fPrc = 0;
             items.forEach(i => {
-                if (i.status === 'sold') {
-                    if (i.type === 'new') belanjaBaru += i.modal;
-                    uangMasuk += i.price;
-                    profit += (i.price - i.modal);
+                if(i.status === 'sold') {
+                    if(i.type === 'new') bNew += i.modal;
+                    uIn += i.price;
+                    pft += (i.price - i.modal);
                 } else {
-                    if (i.type === 'new') belanjaBaru += i.modal;
-                    floatPrice += i.price;
-                    floatModal += i.modal;
+                    if(i.type === 'new') bNew += i.modal;
+                    fPrc += i.price;
                 }
             });
-            const cash = start - belanjaBaru + uangMasuk;
+            const cash = start - bNew + uIn;
             document.getElementById('summaryCash').innerText = "Rp " + cash.toLocaleString('id-ID');
-            document.getElementById('summaryFloating').innerText = "Rp " + floatPrice.toLocaleString('id-ID');
-            document.getElementById('summaryTotal').innerText = "Rp " + (cash + floatPrice).toLocaleString('id-ID');
-            document.getElementById('summaryProfit').innerText = "Rp " + profit.toLocaleString('id-ID');
-            document.getElementById('previewModalStock').innerText = "Rp " + floatModal.toLocaleString('id-ID');
-            document.getElementById('previewUnrealizedProfit').innerText = "Rp " + (floatPrice - floatModal).toLocaleString('id-ID');
+            document.getElementById('summaryFloating').innerText = "Rp " + fPrc.toLocaleString('id-ID');
+            document.getElementById('summaryTotal').innerText = "Rp " + (cash + fPrc).toLocaleString('id-ID');
+            document.getElementById('summaryProfit').innerText = "Rp " + pft.toLocaleString('id-ID');
             renderRows();
             saveData();
         }
 
-        function setFilter(filter) {
-            currentFilter = filter;
-            document.getElementById('tabStok').className = filter === 'stok' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
-            document.getElementById('tabSold').className = filter === 'sold' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
+        function setFilter(f) {
+            currentFilter = f;
+            document.getElementById('tabStok').className = f === 'stok' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
+            document.getElementById('tabSold').className = f === 'sold' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
             renderRows();
         }
 
@@ -410,119 +484,47 @@
             const container = document.getElementById('itemRows');
             const search = document.getElementById('searchInput').value.toLowerCase();
             const display = items.filter(i => i.status === currentFilter && i.name.toLowerCase().includes(search));
-            container.innerHTML = '';
-            display.forEach(item => {
-                const profit = item.price - item.modal;
+            container.innerHTML = "";
+            display.forEach(i => {
                 const card = document.createElement('div');
-                card.className = `p-4 rounded-2xl border-2 bg-white transition-all ${item.status === 'sold' ? 'border-emerald-500' : 'border-slate-100'}`;
+                card.className = `p-4 rounded-2xl border-2 bg-white transition-all ${i.status === 'sold' ? 'border-emerald-500' : 'border-slate-100'}`;
                 card.innerHTML = `
                     <div class="flex justify-between items-center">
                         <div class="flex-1">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="text-[7px] font-black px-1.5 py-0.5 rounded uppercase ${item.type === 'old' ? 'bg-orange-100 text-orange-600' : 'bg-indigo-100 text-indigo-600'}">${item.type === 'old' ? 'STOK LALU [L]' : 'BELANJA BARU [B]'}</span>
-                                <h4 class="font-bold text-slate-800 text-sm">${item.name}</h4>
-                            </div>
-                            <div class="flex items-center gap-3 text-[10px] font-medium text-slate-500">
-                                <span>M: <b class="text-slate-700">${item.modal.toLocaleString()}</b></span>
-                                <span>J: <b class="text-slate-700">${item.price.toLocaleString()}</b></span>
-                            </div>
-                            <div class="mt-1 text-[8px] text-slate-400 font-bold uppercase italic">
-                                📥 Masuk: ${item.entryDate || '-'} 
-                                ${item.soldAt ? `<br><span class="text-emerald-500">📤 Terjual: ${item.soldAt}</span>` : ''}
-                            </div>
+                            <h4 class="font-bold text-slate-800 text-sm">${i.name}</h4>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">
+                                M: ${i.modal.toLocaleString()} | J: ${i.price.toLocaleString()}
+                            </p>
                         </div>
                         <div class="flex flex-col items-end gap-2">
-                            <button onclick="removeItem(${item.id})" class="text-slate-300 hover:text-red-400 text-xs transition">✕</button>
-                            ${item.status !== 'sold' ? `<button onclick="toggleSold(${item.id})" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg font-bold text-[10px] hover:bg-emerald-700 transition">Laku? ✓</button>` : `<span class="badge-profit">+${profit.toLocaleString()}</span>`}
+                            <button onclick="removeItem(${i.id})" class="text-slate-300 text-[10px]">✕</button>
+                            ${i.status === 'stok' ? 
+                                `<button onclick="toggleSold(${i.id})" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg font-bold text-[9px] uppercase">Sold ✓</button>` : 
+                                `<span class="badge-profit">+${(i.price-i.modal).toLocaleString()}</span>`}
                         </div>
-                    </div>`;
+                    </div>
+                `;
                 container.appendChild(card);
             });
         }
 
-        function toggleSold(id) {
-            const item = items.find(i => i.id === id);
-            if (item) { item.status = 'sold'; item.soldAt = getNow(); calculateAll(); }
+        function toggleSold(id) { 
+            const i = items.find(x => x.id === id); 
+            if(i) { i.status = 'sold'; i.soldAt = getNow(); calculateAll(); } 
         }
 
-        function removeItem(id) { if(confirm('Hapus unit ini?')) { items = items.filter(i => i.id !== id); calculateAll(); } }
-
-        // Cash Flow Logic
-        function addCashFlow() {
-            const type = document.getElementById('cf-type').value;
-            const desc = document.getElementById('cf-desc').value;
-            const amount = Number(document.getElementById('cf-amount').value);
-            if (!desc || !amount) return alert("Isi keterangan dan nominal!");
-            cashflows.unshift({ id: Date.now(), type, desc, amount, date: getNow() });
-            document.getElementById('cf-desc').value = '';
-            document.getElementById('cf-amount').value = '';
-            renderCashFlow();
-            saveData();
+        function removeItem(id) { 
+            if(confirm('Hapus?')) { items = items.filter(x => x.id !== id); calculateAll(); } 
         }
 
-        function renderCashFlow() {
-            const list = document.getElementById('cf-list');
-            let totalIn = 0, totalOut = 0;
-            list.innerHTML = '';
-            cashflows.forEach(cf => {
-                if (cf.type === 'in') totalIn += cf.amount; else totalOut += cf.amount;
-                const card = document.createElement('div');
-                card.className = `card p-4 border-l-4 ${cf.type === 'in' ? 'border-emerald-500' : 'border-red-500'}`;
-                card.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="text-[9px] font-black uppercase text-slate-400">${cf.date}</p>
-                            <h4 class="font-bold text-slate-800 text-sm">${cf.desc}</h4>
-                        </div>
-                        <div class="text-right">
-                            <h3 class="font-black text-sm ${cf.type === 'in' ? 'text-emerald-600' : 'text-red-600'}">
-                                ${cf.type === 'in' ? '+' : '-'} Rp ${cf.amount.toLocaleString('id-ID')}
-                            </h3>
-                            <button onclick="removeCF(${cf.id})" class="text-[10px] text-slate-300 hover:text-red-500 uppercase font-bold">Hapus</button>
-                        </div>
-                    </div>`;
-                list.appendChild(card);
-            });
-            document.getElementById('cf-total-in').innerText = "Rp " + totalIn.toLocaleString('id-ID');
-            document.getElementById('cf-total-out').innerText = "Rp " + totalOut.toLocaleString('id-ID');
-        }
-
-        function removeCF(id) { if(confirm('Hapus transaksi?')) { cashflows = cashflows.filter(c => c.id !== id); renderCashFlow(); saveData(); } }
-
-        // OCR Scan Logic
-        async function processReceipt(input) {
-            if (!input.files || !input.files[0]) return;
-            const loader = document.getElementById('ocr-loading');
-            loader.style.display = 'flex';
-            try {
-                const worker = await Tesseract.createWorker('ind');
-                const { data: { text } } = await worker.recognize(input.files[0]);
-                await worker.terminate();
-                const numbers = text.match(/\d+(\.\d+)?/g);
-                let detectedAmount = 0;
-                if (numbers) {
-                    const cleanNumbers = numbers.map(n => parseInt(n.replace(/\./g, ''))).filter(n => n > 1000);
-                    detectedAmount = Math.max(...cleanNumbers);
-                }
-                document.getElementById('cf-desc').value = "Scan: " + text.substring(0, 15).replace(/\n/g, ' ') + "...";
-                document.getElementById('cf-amount').value = detectedAmount || 0;
-                alert("Selesai! Periksa kembali nominal yang terdeteksi.");
-            } catch (e) { alert("Gagal memproses gambar."); } finally { loader.style.display = 'none'; }
-        }
-
-        // Data Storage
-        function saveData() { 
-            const payload = { 
-                startBalance: document.getElementById('startBalance').value, 
-                items: items, 
-                cashflows: cashflows 
-            };
-            localStorage.setItem('ledger_v3_master', JSON.stringify(payload)); 
+        function saveData() {
+            const db = { startBalance: document.getElementById('startBalance').value, items, cashflows };
+            localStorage.setItem('ledger_v3_master', JSON.stringify(db));
         }
 
         function loadData() {
             const data = JSON.parse(localStorage.getItem('ledger_v3_master'));
-            if (data) {
+            if(data) {
                 document.getElementById('startBalance').value = data.startBalance || 0;
                 items = data.items || [];
                 cashflows = data.cashflows || [];
@@ -532,31 +534,24 @@
         }
 
         function exportReport() {
-            let report = `————————————————\nReport - ${currentMonthString}\n————————————————\n`;
+            let r = `LAPORAN - ${currentMonthName}\n`;
             items.filter(i => i.status === 'sold').forEach(i => {
-                report += `- ${i.name} : ${i.modal.toLocaleString()} > ${i.price.toLocaleString()} (+${(i.price-i.modal).toLocaleString()})\n`;
+                r += `- ${i.name}: +${(i.price-i.modal).toLocaleString()}\n`;
             });
-            navigator.clipboard.writeText(report).then(() => alert("Laporan disalin!"));
+            navigator.clipboard.writeText(r).then(() => alert("Disalin!"));
         }
 
-        function processImport() {
-            const text = document.getElementById('importArea').value;
-            if (!text.trim()) return;
-            // (Logika import tetap sama dengan versi sebelumnya)
-            alert("Fitur import diproses...");
-            toggleImportModal();
+        function directImei() {
+            const i = document.getElementById('imeiInput').value;
+            if(i) window.open(`https://www.imei.info/?imei=${i}`, '_blank');
         }
 
-        function toggleConfig() { document.getElementById('configPanel').classList.toggle('hidden-panel'); }
-        function toggleImportModal() { document.getElementById('importModal').classList.toggle('hidden'); }
-        function clearData() { if(confirm('Hapus SEMUA data permanen?')) { localStorage.clear(); location.reload(); } }
-        function directImei() { const imei = document.getElementById('imeiInput').value; if(imei) window.open(`https://www.imei.info/?imei=${imei}`); }
-        function toggleHelpModal() { alert("Panduan: \n- Gunakan Dashboard untuk stok HP.\n- Gunakan Cash Flow untuk operasional harian.\n- Gunakan Scan Struk untuk input otomatis."); }
+        function clearData() { if(confirm('RESET SEMUA DATA?')) { localStorage.clear(); location.reload(); } }
 
         window.onload = () => {
             const now = new Date();
-            currentMonthString = monthNames[now.getMonth()] + " " + now.getFullYear();
-            document.getElementById('currentMonth').innerText = currentMonthString;
+            currentMonthName = monthNames[now.getMonth()] + " " + now.getFullYear();
+            document.getElementById('currentMonth').innerText = currentMonthName;
             loadData();
         };
     </script>
