@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Ledger - Finance Tracker Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <style>
+        :root { --bg-main: #f8fafc; --sidebar-bg: #1e293b; --accent: #6366f1; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: #1e293b; margin: auto; transition: max-width 0.3s ease; }
+        .card { background: white; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .input-field { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; transition: 0.3s; background: #fdfdfd; }
+        .input-field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+        #sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 50; }
+        .sidebar-item { display: flex; align-items: center; padding: 12px 16px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; color: #94a3b8; transition: 0.2s; cursor: pointer; }
+        .sidebar-item:hover { background: #334155; color: white; }
+        .dropdown-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; background: #0f172a; border-radius: 8px; margin: 0 8px; }
+        .dropdown-content.show { max-height: 800px; margin-bottom: 8px; }
+        .mode-desktop { max-width: 1000px !important; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; background: white; min-height: 100vh; }
+        .hidden-panel { display: none; }
+        .badge-profit { background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; }
+        .dial-card { border-left: 4px solid var(--accent); }
+        /* Loading Overlay for OCR */
+        #ocr-loading { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; color: white; flex-direction: column; }
+    </style>
+</head>
+<body class="p-4 md:p-8 antialiased">
+
+    <div id="ocr-loading">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mb-4"></div>
+        <p class="font-bold animate-pulse">Membaca Struk... Mohon Tunggu</p>
+    </div>
+
+    <div id="overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-40" onclick="toggleSidebar()"></div>
+
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#1e293b] text-white shadow-2xl flex flex-col -translate-x-full lg:translate-x-0">
+        <div class="p-6 overflow-y-auto">
+            <h2 class="text-xl font-extrabold mb-8 flex items-center gap-3 italic tracking-tight">
+                <span class="bg-indigo-600 p-2 rounded-lg not-italic">📱</span> MENU
+            </h2>
+            <nav class="space-y-2">
+                <div onclick="switchPage('main')" class="sidebar-item hover:bg-indigo-600 hover:text-white transition">
+                    <span class="mr-3 text-lg">📊</span> Dashboard Utama
+                </div>
+                <div onclick="switchPage('cashflow')" class="sidebar-item hover:bg-emerald-600 hover:text-white transition">
+                    <span class="mr-3 text-lg">💸</span> Cash Flow
+                </div>
+                <div>
+                    <div onclick="toggleDropdown('dropCheck')" class="sidebar-item justify-between">
+                        <span class="flex items-center"><span class="mr-3 text-lg">🔍</span> Gadget Check</span>
+                        <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                    <div id="dropCheck" class="dropdown-content">
+                        <div onclick="switchPage('hp')" class="sidebar-item text-xs pl-12">Handphone Check</div>
+                        <div onclick="switchPage('dial')" class="sidebar-item text-xs pl-12">Dial Check (Kode)</div>
+                        <div onclick="switchPage('laptop')" class="sidebar-item text-xs pl-12">Laptop Check</div>
+                    </div>
+                </div>
+                <div class="border-t border-slate-700 my-4"></div>
+                <button onclick="toggleHelpModal()" class="sidebar-item w-full bg-slate-800/50 mb-2">📖 Panduan</button>
+                <button onclick="clearData()" class="sidebar-item w-full text-red-400 hover:text-red-300 italic">🗑️ Hapus Semua Data</button>
+            </nav>
+        </div>
+    </aside>
+
+    <main id="page-main" class="max-w-2xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <button onclick="toggleSidebar()" class="lg:hidden p-2 bg-white rounded-xl shadow-sm border text-indigo-600 font-bold px-4 transition active:scale-95">☰ Menu</button>
+            <div class="flex gap-2">
+                <button onclick="toggleImportModal()" class="px-4 py-2 bg-white border border-indigo-100 text-indigo-600 rounded-xl text-xs font-bold shadow-sm hover:bg-indigo-50 transition">📥 Import</button>
+                <button onclick="exportReport()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg hover:bg-indigo-700 transition">📤 Copy Report</button>
+            </div>
+        </div>
+
+        <header class="mb-8 flex justify-between items-end">
+            <div>
+                <h1 class="text-2xl font-black text-slate-900 uppercase italic tracking-tighter">Digital Ledger</h1>
+                <p id="currentMonth" class="text-indigo-600 font-bold uppercase tracking-widest text-[10px]"></p>
+            </div>
+            <div class="text-right">
+                <p class="text-[9px] text-slate-400 uppercase font-black tracking-widest">Realized Profit</p>
+                <h2 id="summaryProfit" class="text-2xl font-black text-emerald-600">Rp 0</h2>
+            </div>
+        </header>
+        </main>
+
+    <div id="page-cashflow" class="max-w-2xl mx-auto hidden">
+        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Dashboard</button>
+        <h1 class="text-2xl font-black italic mb-6 tracking-tighter uppercase">💸 Cash Flow Manager</h1>
+        
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="card p-5 border-b-4 border-emerald-500">
+                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Total Pemasukan</p>
+                <h2 id="cf-total-in" class="text-lg font-bold text-emerald-600">Rp 0</h2>
+            </div>
+            <div class="card p-5 border-b-4 border-red-500">
+                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Total Pengeluaran</p>
+                <h2 id="cf-total-out" class="text-lg font-bold text-red-600">Rp 0</h2>
+            </div>
+        </div>
+
+        <div class="card p-6 mb-6">
+            <h3 class="font-bold text-slate-800 mb-4 text-xs uppercase tracking-wider flex justify-between">
+                <span>📝 Catat Transaksi</span>
+                <label class="text-indigo-600 cursor-pointer hover:underline">
+                    📷 Scan Struk
+                    <input type="file" accept="image/*" class="hidden" onchange="processReceipt(this)">
+                </label>
+            </h3>
+            <div class="space-y-3">
+                <div class="flex gap-2">
+                    <select id="cf-type" class="p-3 bg-slate-50 border rounded-xl text-xs font-bold">
+                        <option value="in">PEMASUKAN</option>
+                        <option value="out">PENGELUARAN</option>
+                    </select>
+                    <input type="text" id="cf-desc" class="input-field text-sm" placeholder="Keterangan (misal: Jual Aksesoris)">
+                </div>
+                <input type="number" id="cf-amount" class="input-field text-sm font-bold text-indigo-600" placeholder="Nominal Rp">
+                <button onclick="addCashFlow()" class="w-full py-3 bg-slate-900 text-white rounded-xl font-bold text-xs uppercase">Simpan Transaksi</button>
+            </div>
+        </div>
+
+        <div id="cf-list" class="space-y-3"></div>
+    </div>
+
+    <script>
+        let items = []; // Stok HP (Logika Asli)
+        let cashflows = []; // Cash Flow Baru
+        let currentFilter = 'stok';
+        let currentMonthString = '';
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+        // --- NEW: CASH FLOW LOGIC ---
+        function addCashFlow() {
+            const type = document.getElementById('cf-type').value;
+            const desc = document.getElementById('cf-desc').value;
+            const amount = Number(document.getElementById('cf-amount').value);
+            
+            if (!desc || !amount) return alert("Mohon isi keterangan dan nominal!");
+
+            cashflows.unshift({
+                id: Date.now(),
+                type,
+                desc,
+                amount,
+                date: getNow()
+            });
+
+            document.getElementById('cf-desc').value = '';
+            document.getElementById('cf-amount').value = '';
+            renderCashFlow();
+            saveData();
+        }
+
+        function renderCashFlow() {
+            const list = document.getElementById('cf-list');
+            let totalIn = 0;
+            let totalOut = 0;
+            list.innerHTML = '';
+
+            cashflows.forEach(cf => {
+                if (cf.type === 'in') totalIn += cf.amount;
+                else totalOut += cf.amount;
+
+                const card = document.createElement('div');
+                card.className = `card p-4 border-l-4 ${cf.type === 'in' ? 'border-emerald-500' : 'border-red-500'}`;
+                card.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-[9px] font-black uppercase text-slate-400">${cf.date}</p>
+                            <h4 class="font-bold text-slate-800 text-sm">${cf.desc}</h4>
+                        </div>
+                        <div class="text-right">
+                            <h3 class="font-black text-sm ${cf.type === 'in' ? 'text-emerald-600' : 'text-red-600'}">
+                                ${cf.type === 'in' ? '+' : '-'} Rp ${cf.amount.toLocaleString('id-ID')}
+                            </h3>
+                            <button onclick="removeCF(${cf.id})" class="text-[10px] text-slate-300 hover:text-red-500 uppercase font-bold">Hapus</button>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+
+            document.getElementById('cf-total-in').innerText = "Rp " + totalIn.toLocaleString('id-ID');
+            document.getElementById('cf-total-out').innerText = "Rp " + totalOut.toLocaleString('id-ID');
+        }
+
+        function removeCF(id) {
+            if(confirm('Hapus transaksi ini?')) {
+                cashflows = cashflows.filter(c => c.id !== id);
+                renderCashFlow();
+                saveData();
+            }
+        }
+
+        // --- NEW: OCR RECEIPT PROCESSING ---
+        async function processReceipt(input) {
+            if (!input.files || !input.files[0]) return;
+            
+            const loader = document.getElementById('ocr-loading');
+            loader.style.display = 'flex';
+
+            try {
+                const worker = await Tesseract.createWorker('ind');
+                const { data: { text } } = await worker.recognize(input.files[0]);
+                await worker.terminate();
+
+                // Logika ekstraksi angka dari teks struk (mencari angka terbesar sebagai total)
+                const numbers = text.match(/\d+(\.\d+)?/g);
+                let detectedAmount = 0;
+                if (numbers) {
+                    const cleanNumbers = numbers.map(n => parseInt(n.replace(/\./g, ''))).filter(n => n > 1000);
+                    detectedAmount = Math.max(...cleanNumbers);
+                }
+
+                document.getElementById('cf-desc').value = "Scan Struk: " + text.substring(0, 20).replace(/\n/g, ' ') + "...";
+                document.getElementById('cf-amount').value = detectedAmount || 0;
+                
+                alert("Scan Selesai! Silakan cek kembali nominal dan keterangannya.");
+            } catch (e) {
+                alert("Gagal membaca gambar. Pastikan gambar jelas.");
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+
+        // --- UPDATED CORE FUNCTIONS ---
+        function switchPage(page) {
+            const pages = ['page-main', 'page-hp', 'page-laptop', 'page-dial', 'page-cashflow'];
+            pages.forEach(p => {
+                const el = document.getElementById(p);
+                if(el) el.classList.add('hidden');
+            });
+            document.getElementById('page-' + page).classList.remove('hidden');
+            if(window.innerWidth < 1024) toggleSidebar();
+            if(page === 'cashflow') renderCashFlow();
+        }
+
+        function saveData() {
+            const data = {
+                startBalance: document.getElementById('startBalance').value,
+                items: items,
+                cashflows: cashflows // Save new data
+            };
+            localStorage.setItem('ledger_v2_final', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const data = JSON.parse(localStorage.getItem('ledger_v2_final'));
+            if (data) {
+                document.getElementById('startBalance').value = data.startBalance || 0;
+                items = data.items || [];
+                cashflows = data.cashflows || []; // Load new data
+                calculateAll();
+                renderCashFlow();
+            }
+        }
+
+        // ... (Keep all your existing original functions like calculateAll, renderRows, etc.) ...
+
+        window.onload = () => {
+            const now = new Date();
+            currentMonthString = monthNames[now.getMonth()] + " " + now.getFullYear();
+            const elMonth = document.getElementById('currentMonth');
+            if(elMonth) elMonth.innerText = currentMonthString;
+            loadData();
+        };
+
+        function getNow() {
+            const d = new Date();
+            return `${d.getDate()}/${d.getMonth()+1} ${d.getHours()}:${d.getMinutes().toString().padStart(2, '0')}`;
+        }
+    </script>
+</body>
+</html>
