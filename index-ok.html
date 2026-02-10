@@ -390,34 +390,67 @@
             renderRows();
         }
 
-        // --- FITUR BARU: LOGIKA KALKULATOR ---
-        let cInput = '0', cPrev = '', cOp = null;
-        function calcNum(n) {
-            if (n === '.' && cInput.includes('.')) return;
-            cInput = (cInput === '0' && n !== '.') ? n : cInput + n;
-            calcUpd();
-        }
-        function calcOp(op) {
-            if (cInput === '') return;
-            if (cPrev !== '') calcResult();
-            cOp = op; cPrev = cInput; cInput = ''; calcUpd();
-        }
-        function calcClear() { cInput = '0'; cPrev = ''; cOp = null; calcUpd(); }
-        function calcDel() { cInput = cInput.toString().slice(0, -1) || '0'; calcUpd(); }
-        function calcUpd() {
-            document.getElementById('calc-curr').innerText = cInput;
-            document.getElementById('calc-prev').innerText = cPrev + (cOp || '');
-        }
-        function calcResult() {
-            let res; const p = parseFloat(cPrev), c = parseFloat(cInput);
-            if (isNaN(p) || isNaN(c)) return;
-            switch (cOp) {
-                case '+': res = p + c; break; case '-': res = p - c; break;
-                case '*': res = p * c; break; case '/': res = p / c; break;
-                default: return;
-            }
-            cInput = res.toString(); cOp = null; cPrev = ''; calcUpd();
-        }
+// --- FITUR BARU: LOGIKA KALKULATOR (REVISI) ---
+let cInput = '0', cPrev = '', cOp = null;
+
+// Fungsi tambahan untuk memformat tampilan (1.000.000)
+function formatDisplay(numStr) {
+    if (!numStr || numStr === '-') return numStr;
+    const parts = numStr.split('.');
+    // Menggunakan format Indonesia (id-ID) untuk pemisah titik
+    parts[0] = parseFloat(parts[0]).toLocaleString('id-ID');
+    return parts.length > 1 ? parts[0] + ',' + parts[1] : parts[0];
+}
+
+function calcNum(n) {
+    if (n === '.' && cInput.includes('.')) return;
+    cInput = (cInput === '0' && n !== '.') ? n : cInput + n;
+    calcUpd();
+}
+
+function calcOp(op) {
+    if (cInput === '') return;
+    if (cPrev !== '') calcResult();
+    cOp = op; cPrev = cInput; cInput = ''; 
+    calcUpd();
+}
+
+// Tambahan fitur Persen
+function calcPerc() {
+    if (cInput === '0' || cInput === '') return;
+    cInput = (parseFloat(cInput) / 100).toString();
+    calcUpd();
+}
+
+function calcClear() { cInput = '0'; cPrev = ''; cOp = null; calcUpd(); }
+
+function calcDel() { 
+    cInput = cInput.toString().slice(0, -1) || '0'; 
+    calcUpd(); 
+}
+
+function calcUpd() {
+    // Memasukkan fungsi formatDisplay ke elemen HTML
+    document.getElementById('calc-curr').innerText = formatDisplay(cInput);
+    document.getElementById('calc-prev').innerText = cPrev ? formatDisplay(cPrev) + (cOp || '') : '';
+}
+
+function calcResult() {
+    let res; 
+    const p = parseFloat(cPrev), c = parseFloat(cInput);
+    if (isNaN(p) || isNaN(c)) return;
+    switch (cOp) {
+        case '+': res = p + c; break; 
+        case '-': res = p - c; break;
+        case '*': res = p * c; break; 
+        case '/': res = p / c; break;
+        default: return;
+    }
+    // Dibulatkan sedikit agar tidak muncul error angka desimal panjang (0.300000004)
+    cInput = parseFloat(res.toFixed(10)).toString(); 
+    cOp = null; cPrev = ''; 
+    calcUpd();
+}
 
         function toggleConfig() {
             const panel = document.getElementById('configPanel');
