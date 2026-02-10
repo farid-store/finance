@@ -86,31 +86,36 @@
                 <div class="border-t border-slate-700 my-4"></div>
                 
                 <div class="sidebar-calc">
-                    <div class="calc-display">
-                        <div id="calc-prev"></div>
-                        <div id="calc-curr">0</div>
-                    </div>
-                    <div class="calc-grid">
-                        <button class="btn-ac" onclick="calcClear()">AC</button>
-                        <button onclick="calcDel()">DEL</button>
-                        <button class="btn-op" onclick="calcOp('/')">÷</button>
-                        <button class="btn-op" onclick="calcOp('*')">×</button>
-                        <button onclick="calcNum('7')">7</button>
-                        <button onclick="calcNum('8')">8</button>
-                        <button onclick="calcNum('9')">9</button>
-                        <button class="btn-op" onclick="calcOp('-')">-</button>
-                        <button onclick="calcNum('4')">4</button>
-                        <button onclick="calcNum('5')">5</button>
-                        <button onclick="calcNum('6')">6</button>
-                        <button class="btn-op" onclick="calcOp('+')">+</button>
-                        <button onclick="calcNum('1')">1</button>
-                        <button onclick="calcNum('2')">2</button>
-                        <button onclick="calcNum('3')">3</button>
-                        <button onclick="calcNum('.')">.</button>
-                        <button onclick="calcNum('0')">0</button>
-                        <button class="btn-eq" onclick="calcResult()">=</button>
-                    </div>
-                </div>
+    <div class="calc-display">
+        <div id="calc-prev"></div>
+        <div id="calc-curr">0</div>
+    </div>
+    <div class="calc-grid">
+        <button class="btn-ac" onclick="calcClear()">AC</button>
+        <button onclick="calcDel()">DEL</button>
+        <button onclick="calcPerc()">%</button> 
+        <button class="btn-op" onclick="calcOp('/')">÷</button>
+        
+        <button onclick="calcNum('7')">7</button>
+        <button onclick="calcNum('8')">8</button>
+        <button onclick="calcNum('9')">9</button>
+        <button class="btn-op" onclick="calcOp('*')">×</button>
+        
+        <button onclick="calcNum('4')">4</button>
+        <button onclick="calcNum('5')">5</button>
+        <button onclick="calcNum('6')">6</button>
+        <button class="btn-op" onclick="calcOp('-')">-</button>
+        
+        <button onclick="calcNum('1')">1</button>
+        <button onclick="calcNum('2')">2</button>
+        <button onclick="calcNum('3')">3</button>
+        <button class="btn-op" onclick="calcOp('+')">+</button>
+        
+        <button onclick="calcNum('0')">0</button>
+        <button onclick="calcNum('.')">.</button>
+        <button class="btn-eq" onclick="calcResult()" style="grid-column: span 2;">=</button>
+    </div>
+</div>
 
                 <div id="admin-sidebar-tools">
                     <button onclick="toggleHelpModal()" class="sidebar-item w-full bg-slate-800/50 mb-2">📖 Panduan</button>
