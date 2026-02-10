@@ -21,6 +21,21 @@
         .hidden-panel { display: none; }
         .badge-profit { background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; }
         .dial-card { border-left: 4px solid var(--accent); }
+
+        /* FITUR TAMBAHAN: STYLING KALKULATOR SIDEBAR */
+        .sidebar-calc { background: #0f172a; border-radius: 20px; padding: 15px; margin: 15px 10px; border: 1px solid #334155; }
+        .calc-display { text-align: right; margin-bottom: 10px; padding: 8px; background: #1e293b; border-radius: 10px; }
+        #calc-prev { color: #64748b; font-size: 10px; min-height: 14px; }
+        #calc-curr { color: white; font-size: 18px; font-weight: 700; }
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .calc-grid button { height: 35px; border-radius: 8px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; background: #334155; color: white; }
+        .calc-grid button:hover { background: #475569; }
+        .calc-grid .btn-op { color: #818cf8; }
+        .calc-grid .btn-eq { background: #6366f1 !important; grid-column: span 2; }
+        .calc-grid .btn-ac { color: #f87171; }
+
+        /* MODERN CLIENT CARD UI */
+        .client-item-card { border: none !important; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.04) !important; padding: 20px !important; }
     </style>
 </head>
 <body class="p-4 md:p-8 antialiased">
@@ -49,12 +64,12 @@
                         <div onclick="switchPage('laptop')" class="sidebar-item text-xs pl-12">Laptop Check</div>
                     </div>
                 </div>
+
                 <div>
                     <div onclick="toggleDropdown('dropWarranty')" class="sidebar-item justify-between">
                         <span class="flex items-center"><span class="mr-3 text-lg">🛡️</span> Cek Garansi Resmi</span>
                         <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
-            
                     <div id="dropWarranty" class="dropdown-content">
                         <a href="https://www.mi.com/global/verify/#/en/tab/imei" target="_blank" class="sidebar-item text-xs pl-12">Xiaomi Official</a>
                         <a href="https://www.realme.com/sa-en/support/phonecheck" target="_blank" class="sidebar-item text-xs pl-12">Realme Official</a>
@@ -67,8 +82,37 @@
                         <a href="https://www.samsung.com/us/support/warranty/" target="_blank" class="sidebar-item text-xs pl-12">Samsung Official</a>
                     </div>
                 </div>
+
                 <div class="border-t border-slate-700 my-4"></div>
-                <div id="admin-only-nav">
+                
+                <div class="sidebar-calc">
+                    <div class="calc-display">
+                        <div id="calc-prev"></div>
+                        <div id="calc-curr">0</div>
+                    </div>
+                    <div class="calc-grid">
+                        <button class="btn-ac" onclick="calcClear()">AC</button>
+                        <button onclick="calcDel()">DEL</button>
+                        <button class="btn-op" onclick="calcOp('/')">÷</button>
+                        <button class="btn-op" onclick="calcOp('*')">×</button>
+                        <button onclick="calcNum('7')">7</button>
+                        <button onclick="calcNum('8')">8</button>
+                        <button onclick="calcNum('9')">9</button>
+                        <button class="btn-op" onclick="calcOp('-')">-</button>
+                        <button onclick="calcNum('4')">4</button>
+                        <button onclick="calcNum('5')">5</button>
+                        <button onclick="calcNum('6')">6</button>
+                        <button class="btn-op" onclick="calcOp('+')">+</button>
+                        <button onclick="calcNum('1')">1</button>
+                        <button onclick="calcNum('2')">2</button>
+                        <button onclick="calcNum('3')">3</button>
+                        <button onclick="calcNum('.')">.</button>
+                        <button onclick="calcNum('0')">0</button>
+                        <button class="btn-eq" onclick="calcResult()">=</button>
+                    </div>
+                </div>
+
+                <div id="admin-sidebar-tools">
                     <button onclick="toggleHelpModal()" class="sidebar-item w-full bg-slate-800/50 mb-2">📖 Panduan</button>
                     <button onclick="clearData()" class="sidebar-item w-full text-red-400 hover:text-red-300 italic">🗑️ Hapus Semua Data</button>
                 </div>
@@ -77,8 +121,8 @@
             <div class="mt-8">
                 <p class="text-[10px] text-slate-500 font-bold uppercase mb-3 tracking-widest">Access Mode</p>
                 <div class="flex bg-slate-900 p-1 rounded-xl gap-1">
-                    <button onclick="setAccess('admin')" id="btnAdmin" class="flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white">ADMIN</button>
-                    <button onclick="setAccess('client')" id="btnClient" class="flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500">CLIENT</button>
+                    <button onclick="setAccessMode('admin')" id="btnAccessAdmin" class="flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white">ADMIN</button>
+                    <button onclick="setAccessMode('client')" id="btnAccessClient" class="flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500">CLIENT</button>
                 </div>
             </div>
 
@@ -96,7 +140,7 @@
         <div class="flex justify-between items-center mb-8">
             <button onclick="toggleSidebar()" class="lg:hidden p-2 bg-white rounded-xl shadow-sm border text-indigo-600 font-bold px-4 transition active:scale-95">☰ Menu</button>
       
-            <div class="flex gap-2" id="admin-actions">
+            <div class="flex gap-2" id="admin-top-actions">
                 <button onclick="toggleImportModal()" class="px-4 py-2 bg-white border border-indigo-100 text-indigo-600 rounded-xl text-xs font-bold shadow-sm hover:bg-indigo-50 transition">📥 Import</button>
                 <button onclick="exportReport()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg hover:bg-indigo-700 transition">📤 Copy Report</button>
             </div>
@@ -110,13 +154,13 @@
                 <p id="currentMonth" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"></p>
             </div>
             
-            <div class="text-right admin-view">
+            <div class="text-right admin-only-view">
                 <p class="text-[9px] text-slate-400 uppercase font-black tracking-widest">Realized Profit</p>
                 <h2 id="summaryProfit" class="text-2xl font-black text-emerald-600">Rp 0</h2>
             </div>
         </header>
 
-        <div id="admin-summary" class="admin-view">
+        <div id="admin-dashboard-section" class="admin-only-view">
             <div class="grid grid-cols-2 gap-4 mb-6">
                 <div class="card p-5 border-b-4 border-indigo-500">
                     <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Uang Tunai (Cash)</p>
@@ -205,32 +249,32 @@
             <div class="card p-4 dial-card">
                 <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">SAMSUNG</h3>
                 <p class="text-lg font-mono font-bold">*#0*#</p>
-                <p class="text-[10px] text-slate-500 uppercase">General Test Mode (Layar, Sensor, Speaker)</p>
+                <p class="text-[10px] text-slate-500 uppercase">General Test Mode</p>
             </div>
             <div class="card p-4 dial-card">
                 <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">XIAOMI / POCO</h3>
                 <p class="text-lg font-mono font-bold">*#*#64663#*#*</p>
-                <p class="text-[10px] text-slate-500 uppercase">CIT (Hardware Test Menu)</p>
+                <p class="text-[10px] text-slate-500 uppercase">CIT (Hardware Test)</p>
             </div>
             <div class="card p-4 dial-card">
                 <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">OPPO / REALME</h3>
                 <p class="text-lg font-mono font-bold">*#899#</p>
-                <p class="text-[10px] text-slate-500 uppercase">Engineer Mode / Manual Test</p>
+                <p class="text-[10px] text-slate-500 uppercase">Engineer Mode</p>
             </div>
             <div class="card p-4 dial-card">
                 <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">VIVO / IQOO</h3>
                 <p class="text-lg font-mono font-bold">*#558#</p>
-                <p class="text-[10px] text-slate-500 uppercase">Factory Test / Hardware Test</p>
+                <p class="text-[10px] text-slate-500 uppercase">Factory Test</p>
             </div>
             <div class="card p-4 dial-card">
                 <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">IPHONE</h3>
                 <p class="text-lg font-mono font-bold">*3001#12345#*</p>
-                <p class="text-[10px] text-slate-500 uppercase">Field Test (Cek Signal & Internal)</p>
+                <p class="text-[10px] text-slate-500 uppercase">Field Test</p>
             </div>
             <div class="card p-4 dial-card">
                 <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">UNIVERSAL</h3>
                 <p class="text-lg font-mono font-bold">*#06#</p>
-                <p class="text-[10px] text-slate-500 uppercase">Cek IMEI Semua Brand</p>
+                <p class="text-[10px] text-slate-500 uppercase">Cek IMEI</p>
             </div>
         </div>
     </div>
@@ -242,25 +286,17 @@
             <div class="card p-5">
                 <h3 class="font-bold text-sm mb-3 text-slate-800">1. Pengecekan Fisik & Layar</h3>
                 <ul class="text-[11px] space-y-2 text-slate-600 uppercase font-bold">
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Cek Engsel & Baut (Pastikan rapat)</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Dead Pixel Test (Buka browser: deadpixeltest.org)</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> White Spot / Jamur pada LCD</li>
+                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Cek Engsel & Baut</li>
+                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Dead Pixel Test</li>
+                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> White Spot / Jamur</li>
                 </ul>
             </div>
             <div class="card p-5">
                 <h3 class="font-bold text-sm mb-3 text-slate-800">2. Performa & Baterai</h3>
                 <ul class="text-[11px] space-y-2 text-slate-600 uppercase font-bold">
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> CMD: <code class="bg-slate-100 px-1 lowercase">powercfg /batteryreport</code></li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Cek Kesehatan SSD (Gunakan CrystalDiskInfo)</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Keyboard Test (Buka: keyboardtester.com)</li>
-                </ul>
-            </div>
-            <div class="card p-5">
-                <h3 class="font-bold text-sm mb-3 text-slate-800">3. Konektivitas & Suara</h3>
-                <ul class="text-[11px] space-y-2 text-slate-600 uppercase font-bold">
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Tes Semua Port USB, HDMI, Audio Jack</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Tes Webcam & Mic</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Cek Speaker (Pastikan tidak sember)</li>
+                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> CMD: powercfg /batteryreport</li>
+                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Cek Kesehatan SSD</li>
+                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Keyboard Test</li>
                 </ul>
             </div>
         </div>
@@ -276,11 +312,14 @@
     </div>
 
     <script>
+        // --- VARIABEL & LOGIKA ASLI (TETAP SAMA) ---
         let items = [];
         let currentFilter = 'stok';
-        let accessMode = 'admin'; // Variabel baru untuk Access Mode
         let currentMonthString = '';
         const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+        // --- TAMBAHAN VARIABEL BARU ---
+        let accessMode = 'admin';
 
         function toggleSidebar() { 
             const sb = document.getElementById('sidebar');
@@ -318,32 +357,61 @@
             }
         }
 
-        // FUNGSI BARU: Set Access Mode
-        function setAccess(mode) {
+        // --- FITUR BARU: SET ACCESS MODE ---
+        function setAccessMode(mode) {
             accessMode = mode;
-            const btnAdmin = document.getElementById('btnAdmin');
-            const btnClient = document.getElementById('btnClient');
-            const adminViews = document.querySelectorAll('.admin-view');
-            const adminSummary = document.getElementById('admin-summary');
-            const adminActions = document.getElementById('admin-actions');
-            const adminNav = document.getElementById('admin-only-nav');
+            const adminTop = document.getElementById('admin-top-actions');
+            const adminDash = document.getElementById('admin-dashboard-section');
+            const adminSidebar = document.getElementById('admin-sidebar-tools');
+            const adminViews = document.querySelectorAll('.admin-only-view');
+            const btnA = document.getElementById('btnAccessAdmin');
+            const btnC = document.getElementById('btnAccessClient');
 
             if(mode === 'admin') {
-                btnAdmin.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white";
-                btnClient.className = "flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500";
-                adminViews.forEach(el => el.classList.remove('hidden'));
-                adminSummary.classList.remove('hidden');
-                adminActions.classList.remove('hidden');
-                adminNav.classList.remove('hidden');
+                btnA.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white";
+                btnC.className = "flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500";
+                adminTop.style.display = 'flex';
+                adminDash.style.display = 'block';
+                adminSidebar.style.display = 'block';
+                adminViews.forEach(v => v.style.display = 'block');
             } else {
-                btnClient.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white";
-                btnAdmin.className = "flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500";
-                adminViews.forEach(el => el.classList.add('hidden'));
-                adminSummary.classList.add('hidden');
-                adminActions.classList.add('hidden');
-                adminNav.classList.add('hidden');
+                btnC.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white";
+                btnA.className = "flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500";
+                adminTop.style.display = 'none';
+                adminDash.style.display = 'none';
+                adminSidebar.style.display = 'none';
+                adminViews.forEach(v => v.style.display = 'none');
             }
             renderRows();
+        }
+
+        // --- FITUR BARU: LOGIKA KALKULATOR ---
+        let cInput = '0', cPrev = '', cOp = null;
+        function calcNum(n) {
+            if (n === '.' && cInput.includes('.')) return;
+            cInput = (cInput === '0' && n !== '.') ? n : cInput + n;
+            calcUpd();
+        }
+        function calcOp(op) {
+            if (cInput === '') return;
+            if (cPrev !== '') calcResult();
+            cOp = op; cPrev = cInput; cInput = ''; calcUpd();
+        }
+        function calcClear() { cInput = '0'; cPrev = ''; cOp = null; calcUpd(); }
+        function calcDel() { cInput = cInput.toString().slice(0, -1) || '0'; calcUpd(); }
+        function calcUpd() {
+            document.getElementById('calc-curr').innerText = cInput;
+            document.getElementById('calc-prev').innerText = cPrev + (cOp || '');
+        }
+        function calcResult() {
+            let res; const p = parseFloat(cPrev), c = parseFloat(cInput);
+            if (isNaN(p) || isNaN(c)) return;
+            switch (cOp) {
+                case '+': res = p + c; break; case '-': res = p - c; break;
+                case '*': res = p * c; break; case '/': res = p / c; break;
+                default: return;
+            }
+            cInput = res.toString(); cOp = null; cPrev = ''; calcUpd();
         }
 
         function toggleConfig() {
@@ -409,19 +477,20 @@
             renderRows();
         }
 
-        // UPDATE renderRows: Menyesuaikan tampilan berdasarkan Access Mode
+        // --- UPDATE FUNGSI RENDER (DENGAN TAMPILAN CLIENT MODERN) ---
         function renderRows() {
             const container = document.getElementById('itemRows');
             const search = document.getElementById('searchInput').value.toLowerCase();
             const display = items.filter(i => i.status === currentFilter && i.name.toLowerCase().includes(search));
             container.innerHTML = '';
+
             display.forEach(item => {
                 const profit = item.price - item.modal;
                 const card = document.createElement('div');
-                card.className = `p-4 rounded-2xl border-2 bg-white transition-all ${item.status === 'sold' ? 'border-emerald-500' : 'border-slate-100'}`;
                 
-                if (accessMode === 'admin') {
-                    // Tampilan Lengkap Admin [cite: 89-98]
+                if(accessMode === 'admin') {
+                    // UI ASLI ADMIN
+                    card.className = `p-4 rounded-2xl border-2 bg-white transition-all ${item.status === 'sold' ? 'border-emerald-500' : 'border-slate-100'}`;
                     card.innerHTML = `
                         <div class="flex justify-between items-center">
                             <div class="flex-1">
@@ -444,16 +513,19 @@
                             </div>
                         </div>`;
                 } else {
-                    // Tampilan Ringkas Client (Hanya Nama & Harga Jual)
+                    // UI MODERN CLIENT (MINIMALIS)
+                    card.className = "client-item-card card flex justify-between items-center transition-all active:scale-[0.98]";
                     card.innerHTML = `
-                        <div class="flex justify-between items-center">
-                            <div class="flex-1">
-                                <h4 class="font-bold text-slate-800 text-base mb-1">${item.name}</h4>
-                                <div class="text-indigo-600 font-black text-lg">Rp ${item.price.toLocaleString('id-ID')}</div>
+                        <div class="flex-1">
+                            <h4 class="font-extrabold text-slate-800 text-lg mb-1 tracking-tight">${item.name}</h4>
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full ${item.status === 'sold' ? 'bg-red-400' : 'bg-emerald-400'} animate-pulse"></span>
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${item.status === 'sold' ? 'Out of Stock' : 'Ready Stock'}</span>
                             </div>
-                            <div>
-                                ${item.status === 'sold' ? '<span class="text-[10px] font-bold text-emerald-500 uppercase italic">Terjual</span>' : '<span class="text-[10px] font-bold text-indigo-400 uppercase italic">Ready Stok</span>'}
-                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] font-black text-indigo-400 uppercase tracking-tighter mb-0.5">Price</p>
+                            <div class="text-indigo-600 font-black text-xl tracking-tighter">Rp ${item.price.toLocaleString('id-ID')}</div>
                         </div>`;
                 }
                 container.appendChild(card);
