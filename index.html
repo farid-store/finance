@@ -9,384 +9,523 @@
     <script>
         tailwind.config = {
             darkMode: 'class',
-            theme: { extend: { colors: { slate: { 850: '#151e2e' } } } }
+            theme: { 
+                extend: { 
+                    colors: { 
+                        slate: { 850: '#151e2e', 900: '#0f172a', 950: '#020617' } 
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                } 
+            }
         }
     </script>
     <style>
-        /* --- STYLE ASLI (DIPERTAHANKAN) --- */
+        /* --- CORE VARIABLES --- */
         :root { 
-            --bg-main: #f8fafc; 
-            --sidebar-bg: #1e293b; 
-            --accent: #6366f1; 
-            --card-bg: white;
-            --text-main: #1e293b;
+            --bg-main: #f1f5f9; 
+            --sidebar-bg: #ffffff; 
+            --accent: #4f46e5; 
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --text-muted: #64748b;
             --border-color: #e2e8f0;
+            --input-bg: #f8fafc;
         }
 
-        /* Dark Mode Variables */
+        /* --- DARK MODE PREMIUM (REVISI) --- */
         .dark-mode {
-            --bg-main: #0f172a;
-            --sidebar-bg: #020617; /* Lebih gelap untuk sidebar di dark mode */
+            --bg-main: #020617; /* Lebih gelap, deep blue black */
+            --sidebar-bg: #0f172a; 
             --card-bg: #1e293b;
-            --text-main: #f1f5f9;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
             --border-color: #334155;
+            --input-bg: #0f172a;
+            --accent: #818cf8;
         }
 
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-main); margin: auto; transition: 0.3s ease; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-main); 
+            color: var(--text-main); 
+            margin: 0; 
+            transition: background-color 0.3s ease, color 0.3s ease; 
+            overflow-x: hidden;
+        }
         
-        .card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-        .input-field { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; transition: 0.3s; background: var(--card-bg); color: var(--text-main); }
-        .dark-mode .input-field { border-color: #475569; background: #0f172a; }
-        .input-field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+        /* Scrollbar Halus */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 20px; }
+
+        /* Card Styling */
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 16px; 
+            border: 1px solid var(--border-color); 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); 
+        }
         
-        #sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 50; background: var(--sidebar-bg); }
-        .sidebar-item { display: flex; align-items: center; padding: 12px 16px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; color: #94a3b8; transition: 0.2s; cursor: pointer; }
-        .sidebar-item:hover { background: rgba(255,255,255,0.1); color: white; }
+        /* Input Field Styling */
+        .input-field { 
+            width: 100%; 
+            padding: 12px 16px; 
+            border-radius: 12px; 
+            border: 1px solid var(--border-color); 
+            outline: none; 
+            transition: 0.3s; 
+            background: var(--input-bg); 
+            color: var(--text-main); 
+            font-size: 0.9rem;
+        }
+        .input-field:focus { 
+            border-color: var(--accent); 
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); 
+        }
         
-        .dropdown-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; background: rgba(0,0,0,0.2); border-radius: 8px; margin: 0 8px; }
+        /* Sidebar Styling */
+        #sidebar { 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            z-index: 50; 
+            background: var(--sidebar-bg); 
+            border-right: 1px solid var(--border-color);
+        }
+        .sidebar-item { 
+            display: flex; 
+            align-items: center; 
+            padding: 10px 14px; 
+            border-radius: 10px; 
+            font-size: 0.85rem; 
+            font-weight: 600; 
+            color: var(--text-muted); 
+            transition: 0.2s; 
+            cursor: pointer; 
+            margin-bottom: 4px;
+        }
+        .sidebar-item:hover { 
+            background: rgba(99, 102, 241, 0.1); 
+            color: var(--accent); 
+        }
+        .dark-mode .sidebar-item:hover { 
+            background: rgba(255,255,255,0.05); 
+            color: #fff; 
+        }
+        
+        /* Dropdown Animation */
+        .dropdown-content { 
+            max-height: 0; 
+            overflow: hidden; 
+            transition: max-height 0.3s ease-out; 
+            background: rgba(0,0,0,0.03); 
+            border-radius: 8px; 
+            margin: 0 8px; 
+        }
+        .dark-mode .dropdown-content { background: rgba(0,0,0,0.2); }
         .dropdown-content.show { max-height: 800px; margin-bottom: 8px; }
         
-        .mode-desktop { max-width: 1000px !important; border-left: 1px solid var(--border-color); border-right: 1px solid var(--border-color); background: var(--card-bg); min-height: 100vh; }
+        /* --- DESKTOP VIEW REVISION --- */
+        .mode-desktop { 
+            max-width: 1200px !important; 
+            margin: 0 auto; 
+            min-height: 100vh;
+            border-left: 1px solid var(--border-color); 
+            border-right: 1px solid var(--border-color); 
+            background: var(--bg-main);
+            position: relative;
+            display: flex;
+        }
         
+        /* Layout Handling */
+        .layout-wrapper { display: flex; width: 100%; min-height: 100vh; }
+        .main-content { flex: 1; padding: 20px; max-width: 800px; margin: 0 auto; width: 100%; }
+        
+        /* Mobile Default */
+        @media (max-width: 1024px) {
+            .mode-desktop { display: block; border: none; }
+            .layout-wrapper { display: block; }
+            .sidebar-desktop-visible { transform: translateX(-100%); position: fixed; height: 100%; }
+        }
+
+        /* Desktop State */
+        @media (min-width: 1024px) {
+            #sidebar { transform: translateX(0); position: sticky; top: 0; height: 100vh; }
+            /* Jika mode mobile dipaksa di layar besar */
+            body:not(.mode-desktop) #sidebar { position: fixed; }
+        }
+
         .hidden-panel { display: none; }
-        .badge-profit { background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; }
+        .badge-profit { background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.2); }
         .dial-card { border-left: 4px solid var(--accent); }
         
-        /* Calculator Style (Original) */
-        .sidebar-calc { background: rgba(0,0,0,0.3); border-radius: 20px; padding: 15px; margin: 15px 10px; border: 1px solid rgba(255,255,255,0.1); }
-        .calc-display { text-align: right; margin-bottom: 10px; padding: 8px; background: rgba(0,0,0,0.4); border-radius: 10px; }
-        #calc-prev { color: #64748b; font-size: 10px; min-height: 14px; }
-        #calc-curr { color: white; font-size: 18px; font-weight: 700; }
-        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-        .calc-grid button { height: 35px; border-radius: 8px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; background: rgba(255,255,255,0.1); color: white; }
-        .calc-grid button:hover { background: rgba(255,255,255,0.2); }
-        .calc-grid .btn-op { color: #818cf8; }
-        .calc-grid .btn-eq { background: #6366f1 !important; grid-column: span 2; }
-        .calc-grid .btn-ac { color: #f87171; }
-        
-        .client-item-card { border: none !important; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.04) !important; padding: 20px !important; }
+        /* Calculator Style Refined */
+        .sidebar-calc { 
+            background: var(--card-bg); 
+            border-radius: 16px; 
+            padding: 15px; 
+            margin: 15px 0; 
+            border: 1px solid var(--border-color); 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .dark-mode .sidebar-calc { background: #0f172a; }
+        .calc-display { text-align: right; margin-bottom: 10px; padding: 10px; background: var(--bg-main); border-radius: 10px; border: 1px solid var(--border-color); }
+        #calc-prev { color: var(--text-muted); font-size: 11px; min-height: 16px; }
+        #calc-curr { color: var(--text-main); font-size: 20px; font-weight: 700; }
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .calc-grid button { 
+            height: 36px; border-radius: 8px; border: 1px solid var(--border-color); 
+            font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+            background: var(--card-bg); color: var(--text-main); 
+        }
+        .calc-grid button:hover { background: var(--bg-main); border-color: var(--accent); }
+        .calc-grid .btn-op { color: var(--accent); background: rgba(99, 102, 241, 0.1); border: none; }
+        .calc-grid .btn-eq { background: var(--accent) !important; color: white !important; grid-column: span 2; border: none; }
+        .calc-grid .btn-ac { color: #ef4444; background: rgba(239, 68, 68, 0.1); border: none; }
 
-        /* --- FITUR SNOWBALL (INJECTED) --- */
-        .level-container { background: var(--bg-main); height: 10px; border-radius: 5px; overflow: hidden; margin-top: 5px; border: 1px solid var(--border-color); }
-        .level-fill { height: 100%; background: linear-gradient(90deg, #6366f1, #a855f7); transition: width 1s ease; }
-        
-        /* Aging Indicators */
-        .aging-warning { border-left: 4px solid #facc15 !important; background: #fefce8 !important; }
-        .dark-mode .aging-warning { background: #422006 !important; border-left-color: #eab308 !important; }
-        
-        .aging-danger { border-left: 4px solid #f87171 !important; background: #fef2f2 !important; }
-        .dark-mode .aging-danger { background: #450a0a !important; border-left-color: #ef4444 !important; }
+        /* Level Bar */
+        .level-container { background: var(--border-color); height: 8px; border-radius: 10px; overflow: hidden; margin-top: 8px; }
+        .level-fill { height: 100%; background: linear-gradient(90deg, #6366f1, #ec4899); transition: width 1s ease; border-radius: 10px; }
+
+        /* Aging Indicators (Softer) */
+        .aging-warning { border-left: 4px solid #facc15 !important; background: linear-gradient(to right, rgba(250, 204, 21, 0.1), transparent) !important; }
+        .aging-danger { border-left: 4px solid #f87171 !important; background: linear-gradient(to right, rgba(248, 113, 113, 0.1), transparent) !important; }
     </style>
 </head>
-<body class="p-4 md:p-8 antialiased pb-24">
+<body class="antialiased pb-24">
 
-    <div id="overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-40" onclick="toggleSidebar()"></div>
+    <div id="overlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden z-40 lg:hidden" onclick="toggleSidebar()"></div>
 
-    <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 text-white shadow-2xl flex flex-col -translate-x-full lg:translate-x-0 overflow-y-auto">
-        <div class="p-6">
-            <h2 class="text-xl font-extrabold mb-8 flex items-center gap-3 italic tracking-tight">
-                <span class="bg-indigo-600 p-2 rounded-lg not-italic">❄️</span> MENU
-            </h2>
-            <nav class="space-y-2">
-                <div onclick="switchPage('main')" class="sidebar-item hover:bg-indigo-600 hover:text-white transition">
-                    <span class="mr-3 text-lg">📊</span> Dashboard
+    <div class="layout-wrapper">
+        
+        <aside id="sidebar" class="w-72 h-screen flex flex-col justify-between overflow-y-auto fixed lg:sticky top-0 -translate-x-full lg:translate-x-0 bg-white dark:bg-slate-900 shadow-xl lg:shadow-none border-r border-slate-200 dark:border-slate-800">
+            <div class="p-5">
+                <div class="mb-8 flex items-center gap-3 px-2">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white text-lg">❄️</div>
+                    <div>
+                        <h2 class="text-sm font-extrabold tracking-tight text-slate-900 dark:text-white">SNOWBALL</h2>
+                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Digital Ledger</p>
+                    </div>
+                </div>
+
+                <nav class="space-y-1">
+                    <div onclick="switchPage('main')" class="sidebar-item hover:bg-slate-100 dark:hover:bg-slate-800">
+                        <span class="mr-3 text-lg">📊</span> Dashboard
+                    </div>
+                    
+                    <div>
+                        <div onclick="toggleDropdown('dropCheck')" class="sidebar-item justify-between hover:bg-slate-100 dark:hover:bg-slate-800">
+                            <span class="flex items-center"><span class="mr-3 text-lg">🔍</span> Tools & Cek</span>
+                            <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div id="dropCheck" class="dropdown-content">
+                            <div onclick="switchPage('hp')" class="sidebar-item text-xs pl-11">Handphone Check</div>
+                            <div onclick="switchPage('dial')" class="sidebar-item text-xs pl-11">Dial Check (Kode)</div>
+                            <div onclick="switchPage('laptop')" class="sidebar-item text-xs pl-11">Laptop Check</div>
+                            <div onclick="toggleCutLossModal()" class="sidebar-item text-xs pl-11 text-rose-500">✂️ Hitung Cut Loss</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div onclick="toggleDropdown('dropWarranty')" class="sidebar-item justify-between hover:bg-slate-100 dark:hover:bg-slate-800">
+                            <span class="flex items-center"><span class="mr-3 text-lg">🛡️</span> Cek Garansi</span>
+                            <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div id="dropWarranty" class="dropdown-content">
+                            <a href="https://www.mi.com/global/verify/#/en/tab/imei" target="_blank" class="sidebar-item text-xs pl-11">Xiaomi Official</a>
+                            <a href="https://checkcoverage.apple.com/" target="_blank" class="sidebar-item text-xs pl-11 font-bold text-indigo-500">Apple Official</a>
+                            <a href="https://www.samsung.com/us/support/warranty/" target="_blank" class="sidebar-item text-xs pl-11">Samsung Official</a>
+                            <a href="https://www.vivo.com/en/support/IMEI" target="_blank" class="sidebar-item text-xs pl-11">Vivo Official</a>
+                            <a href="https://support.oppo.com/en/warranty-check/" target="_blank" class="sidebar-item text-xs pl-11">OPPO Official</a>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-calc mt-4">
+                        <div class="calc-display">
+                            <div id="calc-prev"></div>
+                            <div id="calc-curr">0</div>
+                        </div>
+                        <div class="calc-grid">
+                            <button class="btn-ac" onclick="calcClear()">AC</button>
+                            <button onclick="calcDel()">DEL</button>
+                            <button onclick="calcPerc()">%</button> 
+                            <button class="btn-op" onclick="calcOp('/')">÷</button>
+                            <button onclick="calcNum('7')">7</button>
+                            <button onclick="calcNum('8')">8</button>
+                            <button onclick="calcNum('9')">9</button>
+                            <button class="btn-op" onclick="calcOp('*')">×</button>
+                            <button onclick="calcNum('4')">4</button>
+                            <button onclick="calcNum('5')">5</button>
+                            <button onclick="calcNum('6')">6</button>
+                            <button class="btn-op" onclick="calcOp('-')">-</button>
+                            <button onclick="calcNum('1')">1</button>
+                            <button onclick="calcNum('2')">2</button>
+                            <button onclick="calcNum('3')">3</button>
+                            <button class="btn-op" onclick="calcOp('+')">+</button>
+                            <button onclick="calcNum('0')">0</button>
+                            <button onclick="calcNum('.')">.</button>
+                            <button class="btn-eq" onclick="calcResult()" style="grid-column: span 2;">=</button>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+
+            <div class="p-5 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+                <div id="admin-sidebar-tools">
+                    <button onclick="toggleDarkMode()" class="sidebar-item w-full justify-center mb-3 border border-slate-300 dark:border-slate-700 rounded-lg text-xs hover:bg-slate-200 dark:hover:bg-slate-800">
+                        🌙 Toggle Dark Mode
+                    </button>
+                    
+                    <div class="grid grid-cols-3 gap-2 mb-4">
+                        <button onclick="exportJSON()" class="flex flex-col items-center justify-center p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-emerald-500 hover:text-emerald-500 transition group" title="Backup Data">
+                            <span class="text-lg mb-1">💾</span>
+                            <span class="text-[8px] font-bold uppercase text-slate-400 group-hover:text-emerald-500">Save</span>
+                        </button>
+                        <label class="flex flex-col items-center justify-center p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-blue-500 hover:text-blue-500 transition cursor-pointer group" title="Restore Data">
+                            <span class="text-lg mb-1">📂</span>
+                            <span class="text-[8px] font-bold uppercase text-slate-400 group-hover:text-blue-500">Load</span>
+                            <input type="file" hidden onchange="importJSON(this)">
+                        </label>
+                        <button onclick="clearData()" class="flex flex-col items-center justify-center p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-rose-500 hover:text-rose-500 transition group" title="Reset Pabrik">
+                            <span class="text-lg mb-1">🗑️</span>
+                            <span class="text-[8px] font-bold uppercase text-slate-400 group-hover:text-rose-500">Reset</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="flex bg-slate-200 dark:bg-slate-800 p-1 rounded-lg gap-1">
+                        <button onclick="setAccessMode('admin')" id="btnAccessAdmin" class="flex-1 py-1.5 rounded text-[9px] font-black bg-white dark:bg-slate-600 shadow-sm text-slate-900 dark:text-white">ADMIN</button>
+                        <button onclick="setAccessMode('client')" id="btnAccessClient" class="flex-1 py-1.5 rounded text-[9px] font-black text-slate-400 hover:text-slate-600">CLIENT</button>
+                    </div>
+                    <div class="flex bg-slate-200 dark:bg-slate-800 p-1 rounded-lg gap-1">
+                        <button onclick="setView('mobile')" id="btnMob" class="flex-1 py-1.5 rounded text-[9px] font-black bg-indigo-600 text-white shadow-sm">MOBILE</button>
+                        <button onclick="setView('desktop')" id="btnDesk" class="flex-1 py-1.5 rounded text-[9px] font-black text-slate-500 hover:text-slate-700">DESKTOP</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="flex justify-between items-center mb-6 lg:hidden">
+                <button onclick="toggleSidebar()" class="p-2.5 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold active:scale-95">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+                </button>
+                <div class="flex gap-2">
+                    <button onclick="exportReport()" class="p-2.5 bg-indigo-600 text-white rounded-xl shadow-lg active:scale-95">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div id="page-main">
+                <header class="mb-8">
+                    <div class="flex flex-col md:flex-row justify-between items-end md:items-center gap-4">
+                        <div>
+                            <h1 class="text-3xl font-extrabold tracking-tighter text-slate-900 dark:text-white uppercase leading-none">DIGITAL <span class="text-indigo-500">LEDGER</span></h1>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider">Snowball Level <span id="currentLevel">1</span></span>
+                            </div>
+                        </div>
+                        <div class="text-right admin-only-view bg-white dark:bg-slate-800 p-3 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm w-full md:w-auto">
+                            <p class="text-[9px] text-slate-400 uppercase font-bold tracking-widest mb-1">Total Aset</p>
+                            <h2 id="totalAssetDisplay" class="text-2xl font-black text-indigo-600 dark:text-indigo-400">Rp 0</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="level-container admin-only-view mt-4">
+                        <div id="levelBar" class="level-fill" style="width: 0%"></div>
+                    </div>
+                    <p id="motivationText" class="text-[10px] text-right mt-1 text-slate-400 italic admin-only-view">Semangat! Sedikit lagi naik level.</p>
+                </header>
+
+                <div id="admin-dashboard-section" class="admin-only-view space-y-6">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="card p-5 border-t-4 border-indigo-500">
+                            <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Uang Tunai (Cash)</p>
+                            <h2 id="summaryCash" class="text-lg md:text-xl font-bold text-slate-800 dark:text-white">Rp 0</h2>
+                        </div>
+                        <div class="card p-5 border-t-4 border-emerald-500">
+                            <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Total Stok</p>
+                            <h2 id="summaryStock" class="text-lg md:text-xl font-bold text-slate-800 dark:text-white">Rp 0</h2>
+                        </div>
+                        <div class="card p-6 col-span-2 relative overflow-hidden bg-slate-900 dark:bg-black text-white border-none shadow-xl group">
+                            <div class="absolute right-0 top-0 w-32 h-32 bg-indigo-600 rounded-full blur-3xl opacity-20 group-hover:opacity-30 transition"></div>
+                            <div class="relative z-10 flex justify-between items-center">
+                                <div>
+                                    <p class="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-widest">Realized Profit (Cair)</p>
+                                    <h2 id="summaryProfit" class="text-3xl md:text-4xl font-black tracking-tight text-white">Rp 0</h2>
+                                </div>
+                                <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-xl">💰</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card p-5">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2 text-xs uppercase tracking-wider">
+                                <span class="bg-indigo-100 text-indigo-600 p-1 rounded">📝</span> Smart Input
+                            </h3>
+                            <input type="date" id="backdateInput" class="bg-transparent text-[10px] font-bold text-slate-500 dark:text-slate-400 border-b border-slate-300 dark:border-slate-600 outline-none">
+                        </div>
+                        <textarea id="bulkInput" class="input-field h-24 mb-4 font-mono text-sm border-dashed bg-slate-50 dark:bg-slate-900/50" placeholder="Contoh: Poco M3 : 500.000 > 600.000"></textarea>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="parseText('old')" class="py-3 bg-slate-700 dark:bg-slate-700 text-white rounded-xl font-bold text-[10px] uppercase hover:bg-slate-600 transition shadow-lg shadow-slate-500/20">Stok Lalu [L]</button>
+                            <button onclick="parseText('new')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-[10px] uppercase hover:bg-indigo-500 transition shadow-lg shadow-indigo-500/20">Belanja Baru [B]</button>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4 overflow-x-auto pb-2">
+                        <button onclick="toggleConfig('configPanel', 'configLabel', '⚙️ Atur Saldo Awal')" id="configLabel" class="flex-shrink-0 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest shadow-sm">⚙️ Atur Saldo Awal</button>
+                        <button onclick="toggleConfig('extraProfitPanel', 'extraProfitLabel', '📈 Tambah Profit Manual')" id="extraProfitLabel" class="flex-shrink-0 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest shadow-sm">📈 Tambah Profit Manual</button>
+                    </div>
+
+                    <div id="configPanel" class="hidden-panel">
+                        <div class="card p-5 bg-indigo-50 dark:bg-slate-800 border-indigo-100 dark:border-indigo-900/50">
+                            <h3 class="font-bold text-indigo-900 dark:text-indigo-300 text-[10px] uppercase mb-2">Modal Tunai di Tangan (Awal Bulan)</h3>
+                            <input type="number" id="startBalance" class="input-field font-black text-lg text-indigo-700 dark:text-indigo-300 bg-white dark:bg-slate-900" value="0" onchange="calculateAll()">
+                        </div>
+                    </div>
+
+                    <div id="extraProfitPanel" class="hidden-panel">
+                        <div class="card p-5 bg-emerald-50 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-900/50">
+                            <h3 class="font-bold text-emerald-900 dark:text-emerald-400 text-[10px] uppercase mb-3">Input Profit Manual (Ex: Service / Barang Lalu)</h3>
+                            <textarea id="exBulkInput" class="input-field h-20 mb-3 text-xs border-dashed bg-white dark:bg-slate-900" placeholder="Nama : Modal > Jual"></textarea>
+                            <button onclick="parseExtraProfitText()" class="w-full py-2 bg-indigo-600 text-white rounded-lg font-bold text-[10px] uppercase mb-4 shadow">Simpan Profit</button>
+                            <div id="extraProfitList" class="mt-4 space-y-2 pt-3"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 space-y-4">
+                    <div class="relative group">
+                        <input type="text" id="searchInput" onkeyup="renderRows()" placeholder="Cari unit..." class="input-field pl-10 text-sm bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-indigo-500/20">
+                        <span class="absolute left-3 top-3.5 text-slate-400 group-focus-within:text-indigo-500 transition">🔍</span>
+                    </div>
+                    
+                    <div class="flex bg-slate-200 dark:bg-slate-800 p-1.5 rounded-xl gap-1">
+                        <button onclick="setFilter('stok')" id="tabStok" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm">Stok</button>
+                        <button onclick="setFilter('sold')" id="tabSold" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">Terjual</button>
+                        <button onclick="setFilter('extra')" id="tabExtra" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">History</button>
+                    </div>
+                    
+                    <div class="flex justify-end lg:hidden" id="admin-top-actions">
+                        <button onclick="toggleImportModal()" class="text-xs text-indigo-500 font-bold underline">Import Laporan WA</button>
+                    </div>
                 </div>
                 
-                <div>
-                    <div onclick="toggleDropdown('dropCheck')" class="sidebar-item justify-between">
-                        <span class="flex items-center"><span class="mr-3 text-lg">🔍</span> Tools & Cek</span>
-                        <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </div>
-                    <div id="dropCheck" class="dropdown-content">
-                        <div onclick="switchPage('hp')" class="sidebar-item text-xs pl-12">Handphone Check</div>
-                        <div onclick="switchPage('dial')" class="sidebar-item text-xs pl-12">Dial Check (Kode)</div>
-                        <div onclick="switchPage('laptop')" class="sidebar-item text-xs pl-12">Laptop Check</div>
-                        <div onclick="toggleCutLossModal()" class="sidebar-item text-xs pl-12 text-rose-400">✂️ Hitung Cut Loss</div>
-                    </div>
-                </div>
-
-                <div>
-                    <div onclick="toggleDropdown('dropWarranty')" class="sidebar-item justify-between">
-                        <span class="flex items-center"><span class="mr-3 text-lg">🛡️</span> Cek Garansi</span>
-                        <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </div>
-                    <div id="dropWarranty" class="dropdown-content">
-                        <a href="https://www.mi.com/global/verify/#/en/tab/imei" target="_blank" class="sidebar-item text-xs pl-12">Xiaomi Official</a>
-                        <a href="https://www.realme.com/sa-en/support/phonecheck" target="_blank" class="sidebar-item text-xs pl-12">Realme Official</a>
-                        <a href="https://www.vivo.com/en/support/IMEI" target="_blank" class="sidebar-item text-xs pl-12">Vivo Official</a>
-                        <a href="https://support.oppo.com/en/warranty-check/" target="_blank" class="sidebar-item text-xs pl-12">OPPO Official</a>
-                        <a href="https://wap.id.infinixmobility.com/care/imei-authentication" target="_blank" class="sidebar-item text-xs pl-12">Infinix Official</a>
-                        <a href="https://checkcoverage.apple.com/" target="_blank" class="sidebar-item text-xs pl-12 font-bold text-indigo-400">Apple Official</a>
-                        <a href="https://www.iqoo.com/in/support/IMEI" target="_blank" class="sidebar-item text-xs pl-12">Iqoo Official</a>
-                        <a href="https://www.tecno-mobile.com/warranty/" target="_blank" class="sidebar-item text-xs pl-12">Tecno Official</a>
-                        <a href="https://www.samsung.com/us/support/warranty/" target="_blank" class="sidebar-item text-xs pl-12">Samsung Official</a>
-                    </div>
-                </div>
-
-                <div class="border-t border-slate-700 my-4"></div>
-                <div class="sidebar-calc">
-                    <div class="calc-display">
-                        <div id="calc-prev"></div>
-                        <div id="calc-curr">0</div>
-                    </div>
-                    <div class="calc-grid">
-                        <button class="btn-ac" onclick="calcClear()">AC</button>
-                        <button onclick="calcDel()">DEL</button>
-                        <button onclick="calcPerc()">%</button> 
-                        <button class="btn-op" onclick="calcOp('/')">÷</button>
-                        <button onclick="calcNum('7')">7</button>
-                        <button onclick="calcNum('8')">8</button>
-                        <button onclick="calcNum('9')">9</button>
-                        <button class="btn-op" onclick="calcOp('*')">×</button>
-                        <button onclick="calcNum('4')">4</button>
-                        <button onclick="calcNum('5')">5</button>
-                        <button onclick="calcNum('6')">6</button>
-                        <button class="btn-op" onclick="calcOp('-')">-</button>
-                        <button onclick="calcNum('1')">1</button>
-                        <button onclick="calcNum('2')">2</button>
-                        <button onclick="calcNum('3')">3</button>
-                        <button class="btn-op" onclick="calcOp('+')">+</button>
-                        <button onclick="calcNum('0')">0</button>
-                        <button onclick="calcNum('.')">.</button>
-                        <button class="btn-eq" onclick="calcResult()" style="grid-column: span 2;">=</button>
-                    </div>
-                </div>
-
-                <div id="admin-sidebar-tools">
-                    <button onclick="toggleDarkMode()" class="sidebar-item w-full bg-slate-800/50 mb-2 border border-slate-700 text-yellow-400">🌙 Mode Gelap</button>
-                    <button onclick="exportJSON()" class="sidebar-item w-full text-emerald-400 text-[10px]">💾 Backup Data</button>
-                    <label class="sidebar-item w-full text-blue-400 text-[10px] cursor-pointer">
-                        📂 Restore Data <input type="file" hidden onchange="importJSON(this)">
-                    </label>
-                    <button onclick="clearData()" class="sidebar-item w-full text-red-400 hover:text-red-300 italic">🗑️ Reset Pabrik</button>
-                </div>
-            </nav>
-
-            <div class="mt-8">
-                <p class="text-[10px] text-slate-500 font-bold uppercase mb-3 tracking-widest">Access Mode</p>
-                <div class="flex bg-slate-900 p-1 rounded-xl gap-1">
-                    <button onclick="setAccessMode('admin')" id="btnAccessAdmin" class="flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white">ADMIN</button>
-                    <button onclick="setAccessMode('client')" id="btnAccessClient" class="flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500">CLIENT</button>
-                </div>
-            </div>
-            <div class="mt-4">
-                <p class="text-[10px] text-slate-500 font-bold uppercase mb-3 tracking-widest">View Mode</p>
-                <div class="flex bg-slate-900 p-1 rounded-xl gap-1">
-                    <button onclick="setView('mobile')" id="btnMob" class="flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white">MOBILE</button>
-                    <button onclick="setView('desktop')" id="btnDesk" class="flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500">DESKTOP</button>
-                </div>
-            </div>
-        </div>
-    </aside>
-
-    <main id="page-main" class="max-w-2xl mx-auto">
-        <div class="flex justify-between items-center mb-8">
-            <button onclick="toggleSidebar()" class="lg:hidden p-2 bg-white dark:bg-slate-800 rounded-xl shadow-sm border text-indigo-600 font-bold px-4 transition active:scale-95">☰ Menu</button>
-            <div class="flex gap-2" id="admin-top-actions">
-                <button onclick="toggleImportModal()" class="px-4 py-2 bg-white dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 text-indigo-600 rounded-xl text-xs font-bold shadow-sm hover:bg-indigo-50 transition">📥 Import WA</button>
-                <button onclick="exportReport()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg hover:bg-indigo-700 transition">📤 Copy Report</button>
-            </div>
-        </div>
-
-        <header class="mb-6">
-            <div class="flex justify-between items-end">
-                <div>
-                    <h1 class="text-2xl font-extrabold tracking-tighter text-slate-900 dark:text-white uppercase">DIGITAL <span class="text-indigo-600">LEDGER</span></h1>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Snowball Level <span id="currentLevel">1</span></p>
-                </div>
-                <div class="text-right admin-only-view">
-                    <p class="text-[9px] text-slate-400 uppercase font-black tracking-widest">Total Aset</p>
-                    <h2 id="totalAssetDisplay" class="text-2xl font-black text-indigo-600">Rp 0</h2>
-                </div>
-            </div>
-            <div class="level-container admin-only-view">
-                <div id="levelBar" class="level-fill" style="width: 0%"></div>
-            </div>
-            <p id="motivationText" class="text-[9px] text-center mt-1 text-slate-400 italic admin-only-view">Semangat! Sedikit lagi naik level.</p>
-        </header>
-
-        <div id="admin-dashboard-section" class="admin-only-view">
-            <div class="grid grid-cols-2 gap-4 mb-6">
-                <div class="card p-5 border-b-4 border-indigo-500">
-                    <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Uang Tunai (Cash)</p>
-                    <h2 id="summaryCash" class="text-lg font-bold text-slate-800 dark:text-white">Rp 0</h2>
-                </div>
-                <div class="card p-5 border-b-4 border-emerald-500">
-                    <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Total Stok</p>
-                    <h2 id="summaryStock" class="text-lg font-bold text-slate-800 dark:text-white">Rp 0</h2>
-                </div>
-                <div class="card p-6 col-span-2 text-center bg-slate-900 text-white border-none shadow-xl">
-                    <p class="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-widest opacity-80">Realized Profit (Cair)</p>
-                    <h2 id="summaryProfit" class="text-3xl font-black">Rp 0</h2>
-                </div>
+                <div id="itemRows" class="space-y-3 mt-6 mb-20"></div>
             </div>
 
-            <div class="card p-6 mb-4">
-                <div class="flex justify-between items-center mb-3">
-                    <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2 text-xs uppercase tracking-wider"><span>📝</span> Smart Input</h3>
-                    <input type="date" id="backdateInput" class="bg-transparent text-[10px] border-b border-slate-300 dark:border-slate-600 outline-none dark:text-white">
-                </div>
-                <textarea id="bulkInput" class="input-field h-24 mb-4 text-sm border-dashed" placeholder="Contoh: Poco M3 : 500.000 > 600.000"></textarea>
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="parseText('old')" class="py-3 bg-slate-700 text-white rounded-xl font-bold text-[10px] uppercase hover:bg-slate-800 transition">Stok Lalu [L]</button>
-                    <button onclick="parseText('new')" class="py-3 bg-emerald-600 text-white rounded-xl font-bold text-[10px] uppercase hover:bg-emerald-700 transition">Belanja Baru [B]</button>
-                </div>
-            </div>
-
-            <div class="mb-6 space-y-2">
-                <button onclick="toggleConfig('configPanel', 'configLabel', '⚙️ Atur Saldo Awal')" id="configLabel" class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest inline-block mr-4">⚙️ Atur Saldo Awal</button>
-                <button onclick="toggleConfig('extraProfitPanel', 'extraProfitLabel', '📈 Tambah Profit Manual')" id="extraProfitLabel" class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest inline-block">📈 Tambah Profit Manual</button>
-
-                <div id="configPanel" class="hidden-panel mt-2">
-                    <div class="card p-5 bg-indigo-50/50 dark:bg-slate-800 border-indigo-100 mb-4">
-                        <h3 class="font-bold text-indigo-900 dark:text-indigo-400 text-[10px] uppercase mb-2">Modal Tunai di Tangan (Awal Bulan)</h3>
-                        <input type="number" id="startBalance" class="input-field font-black text-lg text-indigo-700" value="0" onchange="calculateAll()">
+            <div id="page-hp" class="hidden">
+                <button onclick="switchPage('main')" class="mb-4 flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-bold text-xs uppercase hover:underline">
+                    <span>←</span> Kembali
+                </button>
+                <h1 class="text-2xl font-black italic mb-6 text-slate-900 dark:text-white">📱 Handphone Check</h1>
+                <div class="card p-6 space-y-4">
+                    <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase block mb-2 italic">Cek IMEI (imei.info)</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="imeiInput" class="input-field text-sm" placeholder="Masukkan 15 digit IMEI...">
+                            <button onclick="directImei()" class="bg-indigo-600 text-white px-6 rounded-xl font-bold text-[10px] hover:bg-indigo-700 transition">CEK</button>
+                        </div>
                     </div>
-                </div>
-
-                <div id="extraProfitPanel" class="hidden-panel mt-2">
-                    <div class="card p-5 bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800 mb-4">
-                        <h3 class="font-bold text-emerald-900 dark:text-emerald-400 text-[10px] uppercase mb-3">Input Profit Manual (Ex: Service / Barang Lalu)</h3>
-                        <textarea id="exBulkInput" class="input-field h-20 mb-3 text-xs border-dashed" placeholder="Nama : Modal > Jual"></textarea>
-                        <button onclick="parseExtraProfitText()" class="w-full py-2 bg-indigo-600 text-white rounded-lg font-bold text-[10px] uppercase mb-4">Simpan Profit</button>
-                        <div id="extraProfitList" class="mt-4 space-y-2 border-t pt-3 border-emerald-200 dark:border-emerald-800"></div>
+                    <div class="grid grid-cols-1 gap-2">
+                        <button onclick="window.open('https://old.beacukai.go.id/websitenewV2/cek-imei.html')" class="p-4 bg-slate-900 dark:bg-slate-800 border dark:border-slate-700 text-white rounded-xl text-xs font-bold flex justify-between items-center hover:bg-slate-800 transition">Cek IMEI Beacukai <span class="text-slate-400">🌐</span></button>
+                        <button onclick="window.open('https://sickw.com/')" class="p-4 bg-slate-900 dark:bg-slate-800 border dark:border-slate-700 text-white rounded-xl text-xs font-bold flex justify-between items-center hover:bg-slate-800 transition">SICKSW (SN/IMEI) <span class="text-slate-400">🌐</span></button>
+                        <button onclick="window.open('https://www.touchscreentest.com/')" class="p-4 bg-slate-900 dark:bg-slate-800 border dark:border-slate-700 text-white rounded-xl text-xs font-bold flex justify-between items-center hover:bg-slate-800 transition">Touchscreen Test <span class="text-slate-400">🌐</span></button>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="mb-6 space-y-4">
-            <div class="relative">
-                <input type="text" id="searchInput" onkeyup="renderRows()" placeholder="Cari unit..." class="input-field pl-10 text-sm">
-                <span class="absolute left-3 top-3.5 opacity-30 text-lg">🔍</span>
-            </div>
-            <div class="flex bg-slate-200 dark:bg-slate-800 p-1 rounded-xl gap-1">
-                <button onclick="setFilter('stok')" id="tabStok" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all bg-white text-indigo-600 shadow-sm">Stok</button>
-                <button onclick="setFilter('sold')" id="tabSold" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500">Terjual</button>
-                <button onclick="setFilter('extra')" id="tabExtra" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500">History</button>
-            </div>
-        </div>
-        
-        <div id="itemRows" class="space-y-3 mb-20"></div>
-    </main>
-
-    <div id="page-hp" class="max-w-2xl mx-auto hidden">
-        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali</button>
-        <h1 class="text-2xl font-black italic mb-6 dark:text-white">📱 Handphone Check</h1>
-        <div class="card p-6 space-y-4">
-            <div class="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border dark:border-slate-700">
-                <label class="text-[10px] font-bold text-slate-400 uppercase block mb-2 italic">Cek IMEI (imei.info)</label>
-                <div class="flex gap-2">
-                    <input type="number" id="imeiInput" class="input-field text-sm" placeholder="Masukkan 15 digit IMEI...">
-                    <button onclick="directImei()" class="bg-indigo-600 text-white px-6 rounded-xl font-bold text-[10px]">CEK</button>
+            <div id="page-dial" class="hidden">
+                <button onclick="switchPage('main')" class="mb-4 flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-bold text-xs uppercase hover:underline"><span>←</span> Kembali</button>
+                <h1 class="text-2xl font-black italic mb-6 text-slate-900 dark:text-white">🔍 Kode Dial Rahasia</h1>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="card p-4 dial-card">
+                        <h3 class="font-black text-xs text-indigo-600 dark:text-indigo-400 uppercase mb-2">SAMSUNG</h3>
+                        <p class="text-lg font-mono font-bold text-slate-800 dark:text-white">*#0*#</p>
+                        <p class="text-[10px] text-slate-500 uppercase">General Test Mode</p>
+                    </div>
+                    <div class="card p-4 dial-card">
+                        <h3 class="font-black text-xs text-indigo-600 dark:text-indigo-400 uppercase mb-2">XIAOMI / POCO</h3>
+                        <p class="text-lg font-mono font-bold text-slate-800 dark:text-white">*#*#64663#*#*</p>
+                        <p class="text-[10px] text-slate-500 uppercase">CIT (Hardware Test)</p>
+                    </div>
+                    <div class="card p-4 dial-card">
+                        <h3 class="font-black text-xs text-indigo-600 dark:text-indigo-400 uppercase mb-2">OPPO / REALME</h3>
+                        <p class="text-lg font-mono font-bold text-slate-800 dark:text-white">*#899#</p>
+                        <p class="text-[10px] text-slate-500 uppercase">Engineer Mode</p>
+                    </div>
+                    <div class="card p-4 dial-card">
+                        <h3 class="font-black text-xs text-indigo-600 dark:text-indigo-400 uppercase mb-2">VIVO / IQOO</h3>
+                        <p class="text-lg font-mono font-bold text-slate-800 dark:text-white">*#558#</p>
+                        <p class="text-[10px] text-slate-500 uppercase">Factory Test</p>
+                    </div>
+                    <div class="card p-4 dial-card">
+                        <h3 class="font-black text-xs text-indigo-600 dark:text-indigo-400 uppercase mb-2">IPHONE</h3>
+                        <p class="text-lg font-mono font-bold text-slate-800 dark:text-white">*3001#12345#*</p>
+                        <p class="text-[10px] text-slate-500 uppercase">Field Test</p>
+                    </div>
                 </div>
             </div>
-            <div class="grid grid-cols-1 gap-2">
-                <button onclick="window.open('https://old.beacukai.go.id/websitenewV2/cek-imei.html')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">Cek IMEI Beacukai <span>🌐</span></button>
-                <button onclick="window.open('https://sickw.com/')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">SICKSW (SN/IMEI) <span>🌐</span></button>
-                <button onclick="window.open('https://www.touchscreentest.com/')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">Touchscreen Test <span>🌐</span></button>
-            </div>
-        </div>
-    </div>
 
-    <div id="page-dial" class="max-w-2xl mx-auto hidden">
-        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali</button>
-        <h1 class="text-2xl font-black italic mb-6">🔍 Kode Dial Rahasia</h1>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">SAMSUNG</h3>
-                <p class="text-lg font-mono font-bold">*#0*#</p>
-                <p class="text-[10px] text-slate-500 uppercase">General Test Mode</p>
+            <div id="page-laptop" class="hidden">
+                <button onclick="switchPage('main')" class="mb-4 flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-bold text-xs uppercase hover:underline"><span>←</span> Kembali</button>
+                <h1 class="text-2xl font-black italic mb-6 text-slate-900 dark:text-white">💻 Laptop Check List</h1>
+                <div class="space-y-4">
+                    <div class="card p-5">
+                        <h3 class="font-bold text-sm mb-3 text-slate-800 dark:text-white">1. Pengecekan Fisik & Layar</h3>
+                        <ul class="text-[11px] space-y-2 text-slate-600 dark:text-slate-300 uppercase font-bold">
+                            <li class="flex items-center gap-2"><span class="text-indigo-600 dark:text-indigo-400">✓</span> Cek Engsel & Baut (Pastikan rapat)</li>
+                            <li class="flex items-center gap-2"><span class="text-indigo-600 dark:text-indigo-400">✓</span> Dead Pixel Test (Buka browser: deadpixeltest.org)</li>
+                            <li class="flex items-center gap-2"><span class="text-indigo-600 dark:text-indigo-400">✓</span> White Spot / Jamur pada LCD</li>
+                        </ul>
+                    </div>
+                    <div class="card p-5">
+                        <h3 class="font-bold text-sm mb-3 text-slate-800 dark:text-white">2. Performa & Baterai</h3>
+                        <ul class="text-[11px] space-y-2 text-slate-600 dark:text-slate-300 uppercase font-bold">
+                            <li class="flex items-center gap-2"><span class="text-indigo-600 dark:text-indigo-400">✓</span> CMD: <code class="bg-slate-100 dark:bg-slate-700 px-1 rounded lowercase">powercfg /batteryreport</code></li>
+                            <li class="flex items-center gap-2"><span class="text-indigo-600 dark:text-indigo-400">✓</span> Cek Kesehatan SSD (Gunakan CrystalDiskInfo)</li>
+                            <li class="flex items-center gap-2"><span class="text-indigo-600 dark:text-indigo-400">✓</span> Keyboard Test (Buka: keyboardtester.com)</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
-            <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">XIAOMI / POCO</h3>
-                <p class="text-lg font-mono font-bold">*#*#64663#*#*</p>
-                <p class="text-[10px] text-slate-500 uppercase">CIT (Hardware Test)</p>
-            </div>
-            <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">OPPO / REALME</h3>
-                <p class="text-lg font-mono font-bold">*#899#</p>
-                <p class="text-[10px] text-slate-500 uppercase">Engineer Mode</p>
-            </div>
-            <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">VIVO / IQOO</h3>
-                <p class="text-lg font-mono font-bold">*#558#</p>
-                <p class="text-[10px] text-slate-500 uppercase">Factory Test</p>
-            </div>
-            <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">IPHONE</h3>
-                <p class="text-lg font-mono font-bold">*3001#12345#*</p>
-                <p class="text-[10px] text-slate-500 uppercase">Field Test</p>
-            </div>
-            <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">UNIVERSAL</h3>
-                <p class="text-lg font-mono font-bold">*#06#</p>
-                <p class="text-[10px] text-slate-500 uppercase">Cek IMEI</p>
-            </div>
-        </div>
-    </div>
 
-    <div id="page-laptop" class="max-w-2xl mx-auto hidden">
-        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali</button>
-        <h1 class="text-2xl font-black italic mb-6">💻 Laptop Check List</h1>
-        <div class="space-y-4">
-            <div class="card p-5">
-                <h3 class="font-bold text-sm mb-3 text-slate-800">1. Pengecekan Fisik & Layar</h3>
-                <ul class="text-[11px] space-y-2 text-slate-600 uppercase font-bold">
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Cek Engsel & Baut (Pastikan rapat)</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Dead Pixel Test (Buka browser: deadpixeltest.org)</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> White Spot / Jamur pada LCD</li>
-                </ul>
-            </div>
-            <div class="card p-5">
-                <h3 class="font-bold text-sm mb-3 text-slate-800">2. Performa & Baterai</h3>
-                <ul class="text-[11px] space-y-2 text-slate-600 uppercase font-bold">
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> CMD: <code class="bg-slate-100 px-1 lowercase">powercfg /batteryreport</code></li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Cek Kesehatan SSD (Gunakan CrystalDiskInfo)</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Keyboard Test (Buka: keyboardtester.com)</li>
-                </ul>
-            </div>
-            <div class="card p-5">
-                <h3 class="font-bold text-sm mb-3 text-slate-800">3. Konektivitas & Suara</h3>
-                <ul class="text-[11px] space-y-2 text-slate-600 uppercase font-bold">
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Tes Semua Port USB, HDMI, Audio Jack</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Tes Webcam & Mic</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Cek Speaker (Pastikan tidak sember)</li>
-                </ul>
-            </div>
-        </div>
+        </main>
     </div>
 
     <div id="cutLossModal" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="toggleCutLossModal()"></div>
-        <div class="relative card w-full max-w-sm p-6 shadow-2xl border-t-4 border-rose-500">
+        <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" onclick="toggleCutLossModal()"></div>
+        <div class="relative card w-full max-w-sm p-6 shadow-2xl border-t-4 border-rose-500 bg-white dark:bg-slate-800">
             <h3 class="text-lg font-black text-rose-500 uppercase italic mb-4">✂️ Kalkulator Cut Loss</h3>
             <div class="space-y-3 mb-4">
-                <div class="p-3 bg-rose-50 dark:bg-slate-800 rounded-lg border border-rose-100 dark:border-rose-900">
+                <div class="p-3 bg-rose-50 dark:bg-rose-900/20 rounded-lg border border-rose-100 dark:border-rose-800">
                     <p class="text-[10px] font-bold text-rose-500 uppercase">Barang Mandek</p>
-                    <input type="number" id="clModalA" placeholder="Modal Awal" class="w-full bg-transparent p-2 text-xs border-b border-rose-300 dark:text-white outline-none">
-                    <input type="number" id="clJualA" placeholder="Jual Rugi" class="w-full bg-transparent p-2 text-xs border-b border-rose-300 dark:text-white outline-none">
+                    <input type="number" id="clModalA" placeholder="Modal Awal" class="w-full bg-transparent p-2 text-xs border-b border-rose-300 dark:border-rose-700 dark:text-white outline-none">
+                    <input type="number" id="clJualA" placeholder="Jual Rugi" class="w-full bg-transparent p-2 text-xs border-b border-rose-300 dark:border-rose-700 dark:text-white outline-none">
                 </div>
-                <div class="p-3 bg-emerald-50 dark:bg-slate-800 rounded-lg border border-emerald-100 dark:border-emerald-900">
+                <div class="p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-100 dark:border-emerald-800">
                     <p class="text-[10px] font-bold text-emerald-500 uppercase">Barang Putaran Baru</p>
-                    <input type="number" id="clModalB" placeholder="Modal Baru" class="w-full bg-transparent p-2 text-xs border-b border-emerald-300 dark:text-white outline-none">
-                    <input type="number" id="clJualB" placeholder="Potensi Jual" class="w-full bg-transparent p-2 text-xs border-b border-emerald-300 dark:text-white outline-none">
+                    <input type="number" id="clModalB" placeholder="Modal Baru" class="w-full bg-transparent p-2 text-xs border-b border-emerald-300 dark:border-emerald-700 dark:text-white outline-none">
+                    <input type="number" id="clJualB" placeholder="Potensi Jual" class="w-full bg-transparent p-2 text-xs border-b border-emerald-300 dark:border-emerald-700 dark:text-white outline-none">
                 </div>
             </div>
-            <div class="text-center p-3 bg-slate-800 rounded-xl text-white mb-4">
+            <div class="text-center p-3 bg-slate-800 dark:bg-black rounded-xl text-white mb-4">
                 <h2 id="clResult" class="text-xl font-black">Rp 0</h2>
                 <p id="clAdvice" class="text-[10px] font-bold mt-1 text-yellow-400">...</p>
             </div>
-            <button onclick="calcCutLoss()" class="w-full py-3 bg-slate-200 text-slate-800 font-bold rounded-xl">HITUNG</button>
+            <button onclick="calcCutLoss()" class="w-full py-3 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white font-bold rounded-xl hover:bg-slate-300 transition">HITUNG</button>
         </div>
     </div>
 
     <div id="importModal" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="toggleImportModal()"></div>
-        <div class="relative card w-full max-w-md p-8 shadow-2xl">
-            <h3 class="text-xl font-black text-indigo-900 dark:text-white uppercase italic mb-4">📥 Import Laporan</h3>
-            <textarea id="importArea" class="input-field h-48 mb-4 text-[11px] font-mono" placeholder="Paste report WhatsApp di sini..."></textarea>
-            <button onclick="processImport()" class="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold shadow-lg">SINKRONKAN DATA</button>
+        <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" onclick="toggleImportModal()"></div>
+        <div class="relative card w-full max-w-md p-8 shadow-2xl bg-white dark:bg-slate-800">
+            <h3 class="text-xl font-black text-indigo-900 dark:text-white uppercase italic mb-4">📥 Import Laporan WA</h3>
+            <textarea id="importArea" class="input-field h-48 mb-4 text-[11px] font-mono bg-slate-50 dark:bg-slate-900" placeholder="Paste report WhatsApp di sini..."></textarea>
+            <button onclick="processImport()" class="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold shadow-lg hover:bg-indigo-700 transition">SINKRONKAN DATA</button>
         </div>
     </div>
 
@@ -396,12 +535,15 @@
         let extraProfits = [];
         let currentFilter = 'stok';
         let accessMode = 'admin';
-        const LEVELS = [50000000, 100000000, 250000000, 500000000, 1000000000]; // Target Level
+        const LEVELS = [50000000, 100000000, 250000000, 500000000, 1000000000]; 
 
         // --- INIT ---
         window.onload = () => {
             loadData();
+            // Default dark mode check
             if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
+            // Check view mode preference
+            if(localStorage.getItem('viewMode') === 'desktop') setView('desktop');
         };
 
         function toggleDarkMode() {
@@ -411,33 +553,66 @@
 
         // --- NAVIGATION ---
         function toggleSidebar() { 
-            document.getElementById('sidebar').classList.toggle('-translate-x-full');
-            document.getElementById('overlay').classList.toggle('hidden');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            
+            // Logic for Mobile Toggle
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
         }
+        
         function toggleDropdown(id) { document.getElementById(id).classList.toggle('show'); }
+        
         function toggleConfig(panelId, labelId, originalText) {
             const panel = document.getElementById(panelId);
             const label = document.getElementById(labelId);
             panel.classList.toggle('hidden-panel');
             label.innerText = panel.classList.contains('hidden-panel') ? originalText : "✖ Tutup";
         }
+        
         function switchPage(page) {
             ['page-main', 'page-hp', 'page-laptop', 'page-dial'].forEach(p => document.getElementById(p).classList.add('hidden'));
             document.getElementById('page-' + page).classList.remove('hidden');
-            if(window.innerWidth < 1024) toggleSidebar();
+            
+            // Auto close sidebar on mobile after click
+            if(window.innerWidth < 1024) {
+                 document.getElementById('sidebar').classList.add('-translate-x-full');
+                 document.getElementById('overlay').classList.add('hidden');
+            }
             window.scrollTo(0,0);
         }
 
         function setView(mode) {
             const body = document.body;
+            const btnDesk = document.getElementById('btnDesk');
+            const btnMob = document.getElementById('btnMob');
+            const sidebar = document.getElementById('sidebar');
+
             if(mode === 'desktop') {
                 body.classList.add('mode-desktop');
-                document.getElementById('btnDesk').className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white";
-                document.getElementById('btnMob').className = "flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500";
+                localStorage.setItem('viewMode', 'desktop');
+                
+                btnDesk.className = "flex-1 py-1.5 rounded text-[9px] font-black bg-indigo-600 text-white shadow-sm";
+                btnMob.className = "flex-1 py-1.5 rounded text-[9px] font-black text-slate-500 hover:text-slate-700";
+                
+                // Force sidebar visible in desktop mode logic handled by CSS media queries mostly
+                // but we ensure classes are clean
+                sidebar.classList.remove('-translate-x-full'); 
+                
             } else {
                 body.classList.remove('mode-desktop');
-                document.getElementById('btnMob').className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white";
-                document.getElementById('btnDesk').className = "flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500";
+                localStorage.setItem('viewMode', 'mobile');
+                
+                btnMob.className = "flex-1 py-1.5 rounded text-[9px] font-black bg-indigo-600 text-white shadow-sm";
+                btnDesk.className = "flex-1 py-1.5 rounded text-[9px] font-black text-slate-500 hover:text-slate-700";
+                
+                // Reset sidebar for mobile
+                if(window.innerWidth < 1024) sidebar.classList.add('-translate-x-full');
             }
         }
 
@@ -448,14 +623,14 @@
             const adminSide = document.getElementById('admin-sidebar-tools');
             
             if(mode === 'admin') {
-                document.getElementById('btnAccessAdmin').className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white";
-                document.getElementById('btnAccessClient').className = "flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500";
+                document.getElementById('btnAccessAdmin').className = "flex-1 py-1.5 rounded text-[9px] font-black bg-white dark:bg-slate-600 shadow-sm text-slate-900 dark:text-white";
+                document.getElementById('btnAccessClient').className = "flex-1 py-1.5 rounded text-[9px] font-black text-slate-400 hover:text-slate-600";
                 adminViews.forEach(v => v.style.display = 'block');
                 if(adminTop) adminTop.style.display = 'flex';
                 if(adminSide) adminSide.style.display = 'block';
             } else {
-                document.getElementById('btnAccessClient').className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white";
-                document.getElementById('btnAccessAdmin').className = "flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500";
+                document.getElementById('btnAccessClient').className = "flex-1 py-1.5 rounded text-[9px] font-black bg-white dark:bg-slate-600 shadow-sm text-slate-900 dark:text-white";
+                document.getElementById('btnAccessAdmin').className = "flex-1 py-1.5 rounded text-[9px] font-black text-slate-400 hover:text-slate-600";
                 adminViews.forEach(v => v.style.display = 'none');
                 if(adminTop) adminTop.style.display = 'none';
                 if(adminSide) adminSide.style.display = 'none';
@@ -567,7 +742,7 @@
                 extraProfits.filter(p => p.name.toLowerCase().includes(search)).forEach(p => {
                     const div = document.createElement('div');
                     div.className = "card p-4 border-l-4 border-slate-300 dark:border-slate-600 flex justify-between items-center";
-                    div.innerHTML = `<div><span class="text-[9px] font-bold bg-slate-200 px-1 rounded">MANUAL</span><h4 class="font-bold text-sm dark:text-white">${p.name}</h4><p class="text-[10px] text-emerald-500 font-bold">Profit: +${p.profit.toLocaleString()}</p></div><button onclick="removeExtraProfit(${p.id})" class="text-slate-300">✕</button>`;
+                    div.innerHTML = `<div><span class="text-[9px] font-bold bg-slate-200 dark:bg-slate-700 dark:text-slate-300 px-1 rounded">MANUAL</span><h4 class="font-bold text-sm text-slate-800 dark:text-white">${p.name}</h4><p class="text-[10px] text-emerald-500 font-bold">Profit: +${p.profit.toLocaleString()}</p></div><button onclick="removeExtraProfit(${p.id})" class="text-slate-300 hover:text-red-500">✕</button>`;
                     container.appendChild(div);
                 });
                 return;
@@ -586,18 +761,18 @@
                 let agingClass = item.status === 'sold' ? 'border-emerald-500' : 'border-slate-100 dark:border-slate-700';
                 let ageBadge = '';
                 if(item.status === 'stok') {
-                    if(ageDays > 30) { agingClass = 'aging-danger'; ageBadge = `<span class="text-red-500 font-bold ml-1">⚠️ ${ageDays} Hari</span>`; }
-                    else if(ageDays > 14) { agingClass = 'aging-warning'; ageBadge = `<span class="text-yellow-600 font-bold ml-1">⚡ ${ageDays} Hari</span>`; }
+                    if(ageDays > 30) { agingClass = 'aging-danger'; ageBadge = `<span class="text-red-500 font-bold ml-1 text-[10px]">⚠️ ${ageDays} Hari</span>`; }
+                    else if(ageDays > 14) { agingClass = 'aging-warning'; ageBadge = `<span class="text-yellow-600 font-bold ml-1 text-[10px]">⚡ ${ageDays} Hari</span>`; }
                 }
 
                 const card = document.createElement('div');
                 if(accessMode === 'admin') {
-                    card.className = `p-4 rounded-2xl border-l-4 card transition-all ${agingClass}`;
+                    card.className = `p-4 rounded-2xl border-l-4 card transition-all hover:translate-y-[-2px] ${agingClass}`;
                     card.innerHTML = `
                         <div class="flex justify-between items-center">
                             <div class="flex-1">
                                 <div class="flex items-center gap-2 mb-1">
-                                    <span class="text-[7px] font-black px-1.5 py-0.5 rounded uppercase ${item.type === 'new' ? 'bg-indigo-100 text-indigo-600' : 'bg-orange-100 text-orange-600'}">${item.type === 'new' ? 'BARU [B]' : 'LAMA [L]'}</span>
+                                    <span class="text-[7px] font-black px-1.5 py-0.5 rounded uppercase ${item.type === 'new' ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300' : 'bg-orange-100 text-orange-600 dark:bg-orange-900 dark:text-orange-300'}">${item.type === 'new' ? 'BARU' : 'LAMA'}</span>
                                     <h4 class="font-bold text-slate-800 dark:text-white text-sm">${item.name}</h4>
                                     ${ageBadge}
                                 </div>
@@ -609,11 +784,11 @@
                             </div>
                             <div class="flex flex-col items-end gap-2">
                                 <button onclick="removeItem(${item.id})" class="text-slate-300 hover:text-red-400 text-xs transition">✕</button>
-                                ${item.status !== 'sold' ? `<button onclick="toggleSold(${item.id})" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg font-bold text-[10px] hover:bg-emerald-700 transition">Laku? ✓</button>` : `<span class="badge-profit">+${profit.toLocaleString()}</span>`}
+                                ${item.status !== 'sold' ? `<button onclick="toggleSold(${item.id})" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg font-bold text-[10px] hover:bg-emerald-700 transition shadow-lg shadow-emerald-500/30">Laku? ✓</button>` : `<span class="badge-profit">+${profit.toLocaleString()}</span>`}
                             </div>
                         </div>`;
                 } else {
-                    card.className = "client-item-card card flex justify-between items-center transition-all active:scale-[0.98]";
+                    card.className = "client-item-card card flex justify-between items-center transition-all p-5";
                     card.innerHTML = `<div class="flex-1"><h4 class="font-extrabold text-slate-800 dark:text-white text-lg mb-1 tracking-tight">${item.name}</h4><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full ${item.status === 'sold' ? 'bg-red-400' : 'bg-emerald-400'} animate-pulse"></span><span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${item.status === 'sold' ? 'Out of Stock' : 'Ready Stock'}</span></div></div><div class="text-right"><p class="text-[10px] font-black text-indigo-400 uppercase tracking-tighter mb-0.5">Price</p><div class="text-indigo-600 dark:text-indigo-400 font-black text-xl tracking-tighter">Rp ${item.price.toLocaleString('id-ID')}</div></div>`;
                 }
                 container.appendChild(card);
@@ -648,7 +823,7 @@
             list.innerHTML = '';
             extraProfits.forEach(p => {
                 const div = document.createElement('div');
-                div.className = "flex justify-between items-center text-[10px] bg-white dark:bg-slate-700 p-2 rounded-lg border border-emerald-100 dark:border-emerald-800";
+                div.className = "flex justify-between items-center text-[10px] bg-white dark:bg-slate-900 p-2 rounded-lg border border-emerald-100 dark:border-emerald-900";
                 div.innerHTML = `<div><b class="text-slate-700 dark:text-white">${p.name}</b><p class="text-emerald-500">+${p.profit.toLocaleString()}</p></div><button onclick="removeExtraProfit(${p.id})" class="text-red-400 px-2">✕</button>`;
                 list.appendChild(div);
             });
@@ -716,9 +891,9 @@
 
         function setFilter(filter) {
             currentFilter = filter;
-            document.getElementById('tabStok').className = filter === 'stok' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm transition" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500 transition";
-            document.getElementById('tabSold').className = filter === 'sold' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm transition" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500 transition";
-            document.getElementById('tabExtra').className = filter === 'extra' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm transition" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500 transition";
+            document.getElementById('tabStok').className = filter === 'stok' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm transition" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 transition";
+            document.getElementById('tabSold').className = filter === 'sold' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm transition" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 transition";
+            document.getElementById('tabExtra').className = filter === 'extra' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm transition" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 transition";
             renderRows();
         }
     </script>
