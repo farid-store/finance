@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ledger Pro: Snowball Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-main: #f8fafc; --sidebar-bg: #0f172a; --accent: #6366f1; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: #1e293b; margin: auto; }
+        .card { background: white; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .input-field { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; transition: 0.3s; background: #fdfdfd; }
+        .input-field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+        #sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 50; }
+        .sidebar-item { display: flex; align-items: center; padding: 12px 16px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; color: #94a3b8; transition: 0.2s; cursor: pointer; }
+        .sidebar-item:hover { background: #334155; color: white; }
+        .hidden-panel { display: none; }
+        
+        /* Snowball Features Styling */
+        .aging-warning { background-color: #fef9c3 !important; border-left: 4px solid #eab308 !important; }
+        .aging-danger { background-color: #fee2e2 !important; border-left: 4px solid #ef4444 !important; }
+        .fast-mover-icon { color: #f59e0b; text-shadow: 0 0 5px rgba(245, 158, 11, 0.5); animation: pulse 2s infinite; }
+        .level-bar-container { background: #1e293b; height: 12px; border-radius: 6px; overflow: hidden; position: relative; }
+        .level-bar-fill { height: 100%; background: linear-gradient(90deg, #4f46e5, #ec4899); transition: width 1s ease-in-out; }
+        
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
+        /* Calculator Styles */
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .calc-grid button { height: 35px; border-radius: 8px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; background: #334155; color: white; }
+        .calc-grid button:hover { background: #475569; }
+        .calc-grid .btn-eq { background: #6366f1 !important; grid-column: span 2; }
+        .calc-grid .btn-ac { color: #f87171; }
+    </style>
+</head>
+<body class="p-4 md:p-8 antialiased pb-24">
+
+    <div id="overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-40" onclick="toggleSidebar()"></div>
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#0f172a] text-white shadow-2xl flex flex-col -translate-x-full lg:translate-x-0">
+        <div class="p-6 overflow-y-auto">
+            <h2 class="text-xl font-extrabold mb-8 flex items-center gap-2 italic tracking-tight">
+                <span class="text-indigo-500">❄️</span> SNOWBALL <span class="text-indigo-400">PRO</span>
+            </h2>
+            <nav class="space-y-2">
+                <div onclick="switchPage('main')" class="sidebar-item hover:bg-indigo-600 hover:text-white transition bg-slate-800/50 text-white">
+                    <span class="mr-3 text-lg">🏠</span> Dashboard
+                </div>
+                <div onclick="toggleCutLossModal()" class="sidebar-item text-rose-400 hover:text-rose-200">
+                    <span class="mr-3 text-lg">✂️</span> Kalkulator Cut Loss
+                </div>
+                <div class="border-t border-slate-700 my-4 pt-4">
+                    <p class="text-[10px] text-slate-500 font-bold uppercase mb-2">Tools</p>
+                    <div onclick="directImei()" class="sidebar-item text-xs">🔍 Cek IMEI</div>
+                    <div onclick="window.open('https://deadpixeltest.org')" class="sidebar-item text-xs">🖥️ Tes Layar (DeadPixel)</div>
+                </div>
+
+                <div class="bg-slate-900 rounded-xl p-3 border border-slate-700 mt-4">
+                     <div class="text-right mb-2 text-white font-mono text-lg font-bold" id="calc-curr">0</div>
+                     <div class="calc-grid">
+                        <button class="btn-ac" onclick="calcClear()">C</button>
+                        <button onclick="calcDel()">←</button>
+                        <button onclick="calcOp('/')">÷</button>
+                        <button onclick="calcOp('*')">×</button>
+                        <button onclick="calcNum('7')">7</button>
+                        <button onclick="calcNum('8')">8</button>
+                        <button onclick="calcNum('9')">9</button>
+                        <button onclick="calcOp('-')">-</button>
+                        <button onclick="calcNum('4')">4</button>
+                        <button onclick="calcNum('5')">5</button>
+                        <button onclick="calcNum('6')">6</button>
+                        <button onclick="calcOp('+')">+</button>
+                        <button onclick="calcNum('1')">1</button>
+                        <button onclick="calcNum('2')">2</button>
+                        <button onclick="calcNum('3')">3</button>
+                        <button class="btn-eq" onclick="calcResult()">=</button>
+                        <button onclick="calcNum('0')" style="grid-column: span 2">0</button>
+                        <button onclick="calcNum('.')">.</button>
+                     </div>
+                </div>
+
+                <div class="mt-8">
+                    <button onclick="exportJSON()" class="sidebar-item w-full text-emerald-400 border border-emerald-900 mb-2 justify-center">💾 Backup JSON (Aman)</button>
+                    <input type="file" id="jsonInput" hidden onchange="importJSON(this)">
+                    <button onclick="document.getElementById('jsonInput').click()" class="sidebar-item w-full text-blue-400 border border-blue-900 justify-center">📂 Restore JSON</button>
+                </div>
+                
+                <div class="mt-4">
+                    <button onclick="clearData()" class="sidebar-item w-full text-red-500 italic text-[10px]">⚠️ Reset Pabrik</button>
+                </div>
+            </nav>
+        </div>
+    </aside>
+
+    <main id="page-main" class="max-w-2xl mx-auto lg:ml-72 transition-all duration-300">
+        <div class="flex justify-between items-center mb-6">
+            <button onclick="toggleSidebar()" class="lg:hidden p-2 bg-white rounded-xl shadow-sm border text-indigo-600 font-bold px-4">☰ Menu</button>
+            <div class="flex gap-2">
+                <button onclick="toggleImportModal()" class="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-[10px] font-bold">📄 Import WA</button>
+                <button onclick="exportReport()" class="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-[10px] font-bold shadow-lg hover:bg-indigo-700">📋 Copy Laporan WA</button>
+            </div>
+        </div>
+
+        <div class="mb-8">
+            <div class="flex justify-between items-end mb-2">
+                <div>
+                    <h1 class="text-2xl font-black text-slate-900 tracking-tighter italic">LEVEL <span id="currentLevel">1</span></h1>
+                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Target Aset: <span id="nextLevelTarget">50 Juta</span></p>
+                </div>
+                <div class="text-right">
+                    <p class="text-[10px] text-slate-400 font-bold uppercase">Total Aset (Cash + Barang)</p>
+                    <h2 id="totalAssetDisplay" class="text-xl font-black text-indigo-600">Rp 0</h2>
+                </div>
+            </div>
+            <div class="level-bar-container">
+                <div id="levelBar" class="level-bar-fill" style="width: 0%"></div>
+            </div>
+            <p class="text-[9px] text-center mt-1 text-slate-400 font-bold italic" id="motivationText">Semangat! Sedikit lagi naik level.</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 mb-6">
+            <div class="card p-4 border-b-4 border-indigo-500">
+                <p class="text-[9px] text-slate-400 uppercase font-bold">Modal Tunai (Ready)</p>
+                <h2 id="summaryCash" class="text-lg font-black text-slate-800">Rp 0</h2>
+            </div>
+            <div class="card p-4 border-b-4 border-emerald-500">
+                <p class="text-[9px] text-slate-400 uppercase font-bold">Aset Barang (Stok)</p>
+                <h2 id="summaryStock" class="text-lg font-black text-slate-800">Rp 0</h2>
+            </div>
+            </div>
+
+        <div class="card p-5 mb-6 bg-white shadow-sm">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider">📝 Input Barang Cepat</h3>
+                <div class="flex items-center gap-2">
+                   <span class="text-[9px] font-bold text-slate-400">TANGGAL MASUK:</span>
+                   <input type="date" id="backdateInput" class="bg-slate-100 border-none rounded p-1 text-[10px] font-bold text-slate-600">
+                </div>
+            </div>
+            <textarea id="bulkInput" class="input-field h-20 mb-3 text-xs border-dashed font-mono" placeholder="Format: Nama HP : Modal > Harga Jual&#10;Contoh: iPhone 11 : 4000000 > 4500000"></textarea>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="parseText('old')" class="py-2.5 bg-orange-100 text-orange-700 rounded-lg font-bold text-[10px] uppercase hover:bg-orange-200">Stok Lama [L]</button>
+                <button onclick="parseText('new')" class="py-2.5 bg-indigo-600 text-white rounded-lg font-bold text-[10px] uppercase hover:bg-indigo-700">Belanja Baru [B]</button>
+            </div>
+            <p class="text-[9px] text-slate-400 mt-2 text-center italic">*Kosongkan tanggal untuk pakai hari ini.</p>
+        </div>
+
+        <div class="mb-6">
+            <button onclick="document.getElementById('configPanel').classList.toggle('hidden-panel')" class="text-[10px] font-bold text-slate-400 hover:text-indigo-600 uppercase tracking-widest">⚙️ Set Modal Awal Cash</button>
+            <div id="configPanel" class="hidden-panel mt-2 card p-4 bg-slate-50">
+                <label class="text-[10px] font-bold uppercase mb-1 block">Saldo Awal Cash (Awal Bulan)</label>
+                <input type="number" id="startBalance" class="input-field font-bold text-indigo-700" value="0" onchange="calculateAll()">
+            </div>
+        </div>
+
+        <div class="mb-4 space-y-3">
+            <div class="relative">
+                <input type="text" id="searchInput" onkeyup="renderRows()" placeholder="Cari unit..." class="input-field pl-9 text-sm">
+                <span class="absolute left-3 top-3 opacity-30">🔍</span>
+            </div>
+            <div class="flex bg-slate-200 p-1 rounded-xl gap-1">
+                <button onclick="setFilter('stok')" id="tabStok" class="flex-1 py-2 rounded-lg text-[10px] font-black uppercase bg-white shadow text-indigo-600">Stok Aktif</button>
+                <button onclick="setFilter('sold')" id="tabSold" class="flex-1 py-2 rounded-lg text-[10px] font-black uppercase text-slate-500">History Sold</button>
+            </div>
+        </div>
+        
+        <div id="itemRows" class="space-y-3 pb-20"></div>
+    </main>
+
+    <div id="editModal" class="fixed inset-0 z-50 flex items-center justify-center hidden p-4">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeEditModal()"></div>
+        <div class="relative bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl transform transition-all">
+            <h3 class="text-lg font-black text-slate-800 uppercase italic mb-4">Edit Data Unit</h3>
+            <input type="hidden" id="editId">
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase">Nama Unit</label>
+                    <input type="text" id="editName" class="input-field text-sm font-bold">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase">Modal</label>
+                        <input type="number" id="editModalPrice" class="input-field text-sm">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase">Jual</label>
+                        <input type="number" id="editSellPrice" class="input-field text-sm">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase">Kondisi / Minus / Note</label>
+                    <input type="text" id="editNotes" class="input-field text-xs" placeholder="Cth: FaceID Off, Lecet Pemakaian">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase">Tanggal Masuk (Backdate)</label>
+                    <input type="date" id="editDateIn" class="input-field text-xs">
+                </div>
+                <div id="buyerField" class="hidden">
+                    <label class="text-[10px] font-bold text-emerald-600 uppercase">Nama Pembeli</label>
+                    <input type="text" id="editBuyer" class="input-field text-xs border-emerald-200 bg-emerald-50" placeholder="Nama Customer">
+                </div>
+                <button onclick="saveEdit()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg hover:bg-indigo-700">SIMPAN PERUBAHAN</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="cutLossModal" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
+        <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onclick="toggleCutLossModal()"></div>
+        <div class="relative bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl border-t-4 border-rose-500">
+            <h3 class="text-lg font-black text-rose-600 uppercase italic mb-1">✂️ Kalkulator Cut Loss</h3>
+            <p class="text-[10px] text-slate-500 mb-4">Hitung apakah jual rugi lebih baik daripada uang mati.</p>
+            
+            <div class="space-y-2 mb-4">
+                <div class="p-3 bg-rose-50 rounded-lg border border-rose-100">
+                    <p class="text-[10px] font-bold text-rose-400 uppercase">Barang Mandek (Sekarang)</p>
+                    <input type="number" id="clModalA" placeholder="Modal Awal" class="w-full bg-white p-2 text-xs rounded border mb-1">
+                    <input type="number" id="clJualA" placeholder="Rencana Jual (Rugi)" class="w-full bg-white p-2 text-xs rounded border">
+                </div>
+                <div class="p-3 bg-emerald-50 rounded-lg border border-emerald-100">
+                    <p class="text-[10px] font-bold text-emerald-400 uppercase">Barang Pengganti (Putaran Baru)</p>
+                    <input type="number" id="clModalB" placeholder="Modal Barang Baru" class="w-full bg-white p-2 text-xs rounded border mb-1">
+                    <input type="number" id="clJualB" placeholder="Potensi Jual Untung" class="w-full bg-white p-2 text-xs rounded border">
+                </div>
+            </div>
+            <div class="text-center p-3 bg-slate-800 rounded-xl text-white mb-4">
+                <p class="text-[10px] uppercase opacity-70">Keputusan Akhir (Net Profit)</p>
+                <h2 id="clResult" class="text-xl font-black">Rp 0</h2>
+                <p id="clAdvice" class="text-[10px] font-bold mt-1 text-yellow-400">Isi data dulu...</p>
+            </div>
+            <button onclick="calcCutLoss()" class="w-full py-2 bg-slate-200 text-slate-700 font-bold rounded-lg mb-2">HITUNG</button>
+            <button onclick="toggleCutLossModal()" class="w-full py-2 text-slate-400 text-xs">Tutup</button>
+        </div>
+    </div>
+
+    <div id="importModal" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="toggleImportModal()"></div>
+        <div class="relative bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl">
+            <h3 class="text-xl font-black text-indigo-900 uppercase italic mb-4">📄 Import Laporan WA</h3>
+            <textarea id="importArea" class="input-field h-48 mb-4 text-[10px] font-mono" placeholder="Paste laporan WhatsApp di sini..."></textarea>
+            <button onclick="processImport()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg">PROSES TEXT</button>
+        </div>
+    </div>
+
+    <script>
+        // --- CORE DATA & CONFIG ---
+        let items = [];
+        let currentFilter = 'stok';
+        const LEVELS = [50000000, 100000000, 250000000, 500000000, 1000000000]; // 50jt, 100jt, 250jt...
+
+        // --- INIT ---
+        window.onload = () => { loadData(); };
+
+        // --- SNOWBALL LOGIC ---
+        function calculateAll() {
+            const start = Number(document.getElementById('startBalance').value) || 0;
+            let cashUsed = 0, cashIn = 0, totalStockValue = 0, profitRealized = 0;
+            
+            items.forEach(i => {
+                if (i.status === 'sold') {
+                    if (i.type === 'new') cashUsed += i.modal;
+                    cashIn += i.price;
+                    profitRealized += (i.price - i.modal);
+                } else {
+                    if (i.type === 'new') cashUsed += i.modal;
+                    totalStockValue += i.modal; // Aset dinilai dari Modal, bukan harga jual
+                }
+            });
+
+            const currentCash = start - cashUsed + cashIn;
+            const totalAsset = currentCash + totalStockValue;
+
+            // Update UI
+            document.getElementById('summaryCash').innerText = formatRupiah(currentCash);
+            document.getElementById('summaryStock').innerText = formatRupiah(totalStockValue);
+            document.getElementById('totalAssetDisplay').innerText = formatRupiah(totalAsset);
+
+            // Level Logic
+            let currentLevel = 1;
+            let nextTarget = LEVELS[0];
+            for (let i = 0; i < LEVELS.length; i++) {
+                if (totalAsset >= LEVELS[i]) {
+                    currentLevel = i + 2;
+                    nextTarget = LEVELS[i+1] || LEVELS[i] * 2;
+                } else {
+                    nextTarget = LEVELS[i];
+                    break;
+                }
+            }
+            
+            // Progress Bar
+            let prevTarget = currentLevel === 1 ? 0 : LEVELS[currentLevel-2];
+            let progress = ((totalAsset - prevTarget) / (nextTarget - prevTarget)) * 100;
+            if (progress > 100) progress = 100;
+            if (progress < 0) progress = 0;
+
+            document.getElementById('currentLevel').innerText = currentLevel;
+            document.getElementById('nextLevelTarget').innerText = (nextTarget / 1000000) + " Juta";
+            document.getElementById('levelBar').style.width = progress + "%";
+            document.getElementById('motivationText').innerText = progress > 80 ? "🔥 DIKIT LAGI! Gaspol terus!" : "❄️ Keep Snowballing! Jangan ambil profit.";
+            
+            renderRows();
+            saveData();
+        }
+
+        function renderRows() {
+            const container = document.getElementById('itemRows');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const now = new Date();
+
+            let display = items.filter(i => i.status === currentFilter && i.name.toLowerCase().includes(search));
+            
+            // Sort: Stok based on aging (oldest first), Sold based on recent
+            if(currentFilter === 'stok') {
+                display.sort((a, b) => new Date(a.dateObj || a.entryDate) - new Date(b.dateObj || b.entryDate));
+            } else {
+                display.sort((a, b) => new Date(b.soldDateObj || b.soldAt) - new Date(a.soldDateObj || a.soldAt));
+            }
+
+            container.innerHTML = '';
+            
+            display.forEach(item => {
+                // Aging Calculation
+                const entryDate = new Date(item.dateObj || item.entryDate); // Fallback for old data
+                const ageInDays = Math.floor((now - entryDate) / (1000 * 60 * 60 * 24));
+                
+                let rowClass = "bg-white border-slate-100";
+                let ageBadge = "";
+                
+                // Warning Colors for Stock
+                if(item.status === 'stok') {
+                    if(ageInDays > 30) {
+                        rowClass = "aging-danger"; // Merah
+                        ageBadge = `<span class="text-[9px] bg-red-600 text-white px-1 rounded font-bold">☠️ ${ageInDays} Hari</span>`;
+                    } else if (ageInDays > 14) {
+                        rowClass = "aging-warning"; // Kuning
+                        ageBadge = `<span class="text-[9px] bg-yellow-500 text-white px-1 rounded font-bold">⚠️ ${ageInDays} Hari</span>`;
+                    } else {
+                        ageBadge = `<span class="text-[9px] text-slate-400 font-medium">${ageInDays} Hari</span>`;
+                    }
+                }
+
+                // Fast Mover Logic for Sold Items
+                let fastMoverIcon = "";
+                if(item.status === 'sold') {
+                    const soldDate = new Date(item.soldDateObj || now);
+                    const sellSpeed = Math.floor((soldDate - entryDate) / (1000 * 60 * 60 * 24));
+                    if(sellSpeed <= 3) fastMoverIcon = `<span class="fast-mover-icon text-lg ml-1" title="Laku Cepat (Fast Mover)">⚡</span>`;
+                    rowClass = "bg-white border-emerald-100";
+                }
+
+                const profit = item.price - item.modal;
+                const profitClass = profit >= 0 ? "text-emerald-600" : "text-rose-500";
+                const profitPrefix = profit >= 0 ? "+" : "";
+
+                const div = document.createElement('div');
+                div.className = `p-3 rounded-xl border-l-4 shadow-sm transition-all ${rowClass}`;
+                
+                div.innerHTML = `
+                    <div class="flex justify-between items-start cursor-pointer" onclick="openEditModal(${item.id})">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-[8px] font-black px-1.5 py-0.5 rounded uppercase ${item.type === 'new' ? 'bg-indigo-100 text-indigo-600' : 'bg-orange-100 text-orange-600'}">${item.type === 'new' ? 'B' : 'L'}</span>
+                                <h4 class="font-bold text-slate-800 text-xs">${item.name} ${fastMoverIcon}</h4>
+                                ${ageBadge}
+                            </div>
+                            <div class="flex gap-3 text-[10px] text-slate-500 font-mono">
+                                <span>M: ${formatNum(item.modal)}</span>
+                                <span>➜</span>
+                                <span>J: ${formatNum(item.price)}</span>
+                            </div>
+                            ${item.notes ? `<p class="text-[9px] text-amber-600 italic mt-1">📝 ${item.notes}</p>` : ''}
+                            ${item.buyer ? `<p class="text-[9px] text-emerald-600 font-bold mt-0.5">👤 ${item.buyer}</p>` : ''}
+                            <p class="text-[8px] text-slate-300 mt-1">${formatDate(entryDate)} ${item.status === 'sold' ? ' ➤ ' + formatDate(new Date(item.soldDateObj)) : ''}</p>
+                        </div>
+                        <div class="flex flex-col items-end gap-2" onclick="event.stopPropagation()">
+                             ${item.status === 'stok' 
+                                ? `<button onclick="markSold(${item.id})" class="bg-emerald-500 text-white px-3 py-1 rounded-md font-bold text-[10px] shadow hover:bg-emerald-600">LAKU ✓</button>` 
+                                : `<span class="text-[10px] font-black ${profitClass}">${profitPrefix}${formatNum(profit)}</span>`
+                             }
+                             <button onclick="deleteItem(${item.id})" class="text-slate-300 hover:text-red-400 text-[10px]">✕</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // --- CRUD LOGIC ---
+        function parseText(type) {
+            const rawText = document.getElementById('bulkInput').value;
+            const customDate = document.getElementById('backdateInput').value;
+            
+            if (!rawText.trim()) return;
+            
+            // Determine timestamp: Custom date (set to 12:00 PM) or Now
+            let entryTime;
+            if (customDate) {
+                entryTime = new Date(customDate);
+                entryTime.setHours(12, 0, 0, 0); 
+            } else {
+                entryTime = new Date();
+            }
+
+            rawText.split('\n').forEach(line => {
+                if (line.includes(':') && line.includes('>')) {
+                    const parts = line.split(/[:>]/);
+                    const name = parts[0].trim().replace(/^-\s*/, '').replace(/\[[BL]\]\s*/, '');
+                    const modal = Number(parts[1].replace(/[^0-9]/g, ''));
+                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
+                    if (name && modal) {
+                        items.push({ 
+                            id: Date.now() + Math.random(), 
+                            name, modal, price, 
+                            status: 'stok', 
+                            type, 
+                            dateObj: entryTime.toISOString(), // Store ISO string for consistency
+                            entryDate: formatDate(entryTime), // Legacy display support
+                            notes: '',
+                            buyer: ''
+                        });
+                    }
+                }
+            });
+            document.getElementById('bulkInput').value = '';
+            calculateAll();
+        }
+
+        function markSold(id) {
+            const item = items.find(i => i.id === id);
+            if (item) {
+                const buyer = prompt("Nama Pembeli (Optional):", "") || "";
+                item.status = 'sold';
+                item.soldDateObj = new Date().toISOString();
+                item.soldAt = formatDate(new Date());
+                item.buyer = buyer;
+                
+                // Auto generate Invoice text
+                const invoice = `*INVOICE*\nUnit: ${item.name}\nHarga: ${formatRupiah(item.price)}\n\nTerima kasih Kak ${buyer}! Garansi personal 7 hari (Segel utuh).`;
+                if(confirm("Barang Laku! Kirim Nota ke WA?")) {
+                    window.open(`https://wa.me/?text=${encodeURIComponent(invoice)}`, '_blank');
+                }
+                calculateAll();
+            }
+        }
+
+        function deleteItem(id) {
+            if(confirm('Hapus item ini permanen?')) {
+                items = items.filter(i => i.id !== id);
+                calculateAll();
+            }
+        }
+
+        // --- EDIT MODAL ---
+        function openEditModal(id) {
+            const item = items.find(i => i.id === id);
+            if(!item) return;
+            document.getElementById('editId').value = id;
+            document.getElementById('editName').value = item.name;
+            document.getElementById('editModalPrice').value = item.modal;
+            document.getElementById('editSellPrice').value = item.price;
+            document.getElementById('editNotes').value = item.notes || '';
+            document.getElementById('editBuyer').value = item.buyer || '';
+            
+            // Format date for input type="date"
+            const d = new Date(item.dateObj || item.entryDate);
+            if(!isNaN(d)) {
+                document.getElementById('editDateIn').value = d.toISOString().split('T')[0];
+            }
+
+            if(item.status === 'sold') document.getElementById('buyerField').classList.remove('hidden');
+            else document.getElementById('buyerField').classList.add('hidden');
+
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function saveEdit() {
+            const id = parseFloat(document.getElementById('editId').value);
+            const item = items.find(i => i.id === id);
+            if(item) {
+                item.name = document.getElementById('editName').value;
+                item.modal = Number(document.getElementById('editModalPrice').value);
+                item.price = Number(document.getElementById('editSellPrice').value);
+                item.notes = document.getElementById('editNotes').value;
+                item.buyer = document.getElementById('editBuyer').value;
+                
+                // Handle Date Change
+                const newDateStr = document.getElementById('editDateIn').value;
+                if(newDateStr) {
+                    const d = new Date(newDateStr);
+                    d.setHours(12,0,0);
+                    item.dateObj = d.toISOString();
+                    item.entryDate = formatDate(d);
+                }
+                
+                closeEditModal();
+                calculateAll();
+            }
+        }
+
+        function closeEditModal() { document.getElementById('editModal').classList.add('hidden'); }
+
+        // --- CUT LOSS CALCULATOR ---
+        function toggleCutLossModal() { document.getElementById('cutLossModal').classList.toggle('hidden'); }
+        function calcCutLoss() {
+            const mA = Number(document.getElementById('clModalA').value) || 0;
+            const jA = Number(document.getElementById('clJualA').value) || 0;
+            const mB = Number(document.getElementById('clModalB').value) || 0;
+            const jB = Number(document.getElementById('clJualB').value) || 0;
+
+            const rugiA = jA - mA; // Pasti minus
+            const untungB = jB - mB;
+            const net = rugiA + untungB;
+
+            const resEl = document.getElementById('clResult');
+            const advEl = document.getElementById('clAdvice');
+
+            resEl.innerText = formatRupiah(net);
+            
+            if (net > 0) {
+                resEl.className = "text-xl font-black text-emerald-400";
+                advEl.innerText = "✅ REKOMENDASI: CUT LOSS SEKARANG! Putar uang ke barang B, anda masih untung total.";
+            } else {
+                resEl.className = "text-xl font-black text-rose-400";
+                advEl.innerText = "❌ JANGAN DULU. Barang pengganti belum cukup menutupi kerugian.";
+            }
+        }
+
+        // --- DATA MANAGEMENT (JSON & LEGACY) ---
+        function exportJSON() {
+            const dataStr = JSON.stringify({ startBalance: document.getElementById('startBalance').value, items }, null, 2);
+            const blob = new Blob([dataStr], {type: "application/json"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Backup_SnowballLedger_${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function importJSON(input) {
+            const file = input.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if(data.items && confirm(`Restore ${data.items.length} data item? Data saat ini akan ditimpa.`)) {
+                        items = data.items;
+                        document.getElementById('startBalance').value = data.startBalance || 0;
+                        calculateAll();
+                        alert("Restore Sukses!");
+                    }
+                } catch(err) { alert("File rusak atau bukan JSON yang valid."); }
+            };
+            reader.readAsText(file);
+        }
+
+        function exportReport() {
+            let report = `*LAPORAN SNOWBALL*\nPer: ${formatDate(new Date())}\n\n*ASET SAAT INI*\nTunai: ${document.getElementById('summaryCash').innerText}\nStok: ${document.getElementById('summaryStock').innerText}\nTOTAL: ${document.getElementById('totalAssetDisplay').innerText}\n----------------\n`;
+            
+            report += `*BARANG TERJUAL (Bulan Ini)*\n`;
+            items.filter(i => i.status === 'sold').forEach(i => {
+                const profit = i.price - i.modal;
+                report += `✅ ${i.name}\n   M: ${formatNum(i.modal)} > J: ${formatNum(i.price)} (Cuan: ${formatNum(profit)})\n`;
+            });
+
+            report += `\n*STOK GANTUNG (Aging)*\n`;
+            items.filter(i => i.status === 'stok').forEach(i => {
+                report += `📦 ${i.name} [M: ${formatNum(i.modal)}]\n`;
+            });
+
+            navigator.clipboard.writeText(report).then(() => alert("Laporan disalin ke Clipboard!"));
+        }
+
+        // Legacy Text Import
+        function toggleImportModal() { document.getElementById('importModal').classList.toggle('hidden'); }
+        function processImport() {
+            const text = document.getElementById('importArea').value;
+            if(!text) return;
+            // Simplified Import Logic for Legacy Text
+            const lines = text.split('\n');
+            let count = 0;
+            lines.forEach(l => {
+                // Try parse simple logic
+                if(l.includes('[B]') || l.includes('[L]')) {
+                    // Very basic parsing for restore from WA text
+                    const type = l.includes('[B]') ? 'new' : 'old';
+                    const clean = l.replace(/✅|📦|-|\[B\]|\[L\]/g, '').trim();
+                    const parts = clean.split(/[:>]/);
+                    if(parts.length >= 2) {
+                        items.push({
+                            id: Date.now() + Math.random(),
+                            name: parts[0].trim(),
+                            modal: 0, // Text report usually doesn't have modal clean structure, manual check needed
+                            price: 0,
+                            status: 'stok',
+                            type,
+                            dateObj: new Date().toISOString(),
+                            entryDate: formatDate(new Date())
+                        });
+                        count++;
+                    }
+                }
+            });
+            alert(`Berhasil import ${count} baris (Perlu edit manual harga).`);
+            toggleImportModal();
+            calculateAll();
+        }
+
+        // --- UTILS ---
+        function saveData() { localStorage.setItem('ledger_snowball_v1', JSON.stringify({ startBalance: document.getElementById('startBalance').value, items })); }
+        function loadData() {
+            const data = JSON.parse(localStorage.getItem('ledger_snowball_v1'));
+            if (data) {
+                document.getElementById('startBalance').value = data.startBalance || 0;
+                items = data.items || [];
+                // Migration: Ensure dateObj exists for old data
+                items.forEach(i => { if(!i.dateObj) i.dateObj = new Date().toISOString(); });
+                calculateAll();
+            }
+        }
+        function clearData() { if(confirm('RESET PABRIK? Semua data hilang.')) { localStorage.removeItem('ledger_snowball_v1'); location.reload(); }}
+        function formatRupiah(num) { return "Rp " + num.toLocaleString('id-ID'); }
+        function formatNum(num) { return num.toLocaleString('id-ID'); }
+        function formatDate(date) { 
+            const d = new Date(date);
+            return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+        }
+        function setFilter(f) { currentFilter = f; document.getElementById('tabStok').className = f==='stok' ? "flex-1 py-2 rounded-lg text-[10px] font-black uppercase bg-white shadow text-indigo-600" : "flex-1 py-2 rounded-lg text-[10px] font-black uppercase text-slate-500"; document.getElementById('tabSold').className = f==='sold' ? "flex-1 py-2 rounded-lg text-[10px] font-black uppercase bg-white shadow text-indigo-600" : "flex-1 py-2 rounded-lg text-[10px] font-black uppercase text-slate-500"; renderRows(); }
+        
+        // --- CALCULATOR ---
+        let cInput = '0', cPrev = '', cOp = null;
+        function calcNum(n) { if (n === '.' && cInput.includes('.')) return; cInput = (cInput === '0' && n !== '.') ? n : cInput + n; calcUpd(); }
+        function calcOp(op) { if (cInput === '') return; if (cPrev !== '') calcResult(); cOp = op; cPrev = cInput; cInput = ''; calcUpd(); }
+        function calcResult() { let res; const p = parseFloat(cPrev), c = parseFloat(cInput); if (isNaN(p) || isNaN(c)) return; switch (cOp) { case '+': res = p + c; break; case '-': res = p - c; break; case '*': res = p * c; break; case '/': res = p / c; break; } cInput = parseFloat(res.toFixed(10)).toString(); cOp = null; cPrev = ''; calcUpd(); }
+        function calcClear() { cInput = '0'; cPrev = ''; cOp = null; calcUpd(); }
+        function calcDel() { cInput = cInput.toString().slice(0, -1) || '0'; calcUpd(); }
+        function calcUpd() { document.getElementById('calc-curr').innerText = parseFloat(cInput).toLocaleString('id-ID'); }
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('overlay').classList.toggle('hidden'); }
+        function directImei() { window.open('https://www.imei.info/?imei=' + prompt("Masukkan IMEI"), '_blank'); }
+
+    </script>
+</body>
+</html>
