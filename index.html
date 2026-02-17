@@ -24,19 +24,19 @@
     <style>
         /* --- CORE VARIABLES --- */
         :root { 
-            --bg-main: #f1f5f9; 
+            --bg-main: #f8fafc; /* Lebih terang dikit */
             --sidebar-bg: #ffffff; 
             --accent: #4f46e5; 
             --card-bg: #ffffff;
             --text-main: #334155;
             --text-muted: #64748b;
             --border-color: #e2e8f0;
-            --input-bg: #f8fafc;
+            --input-bg: #f1f5f9;
         }
 
-        /* --- DARK MODE PREMIUM (REVISI) --- */
+        /* --- DARK MODE --- */
         .dark-mode {
-            --bg-main: #020617; /* Lebih gelap, deep blue black */
+            --bg-main: #020617; 
             --sidebar-bg: #0f172a; 
             --card-bg: #1e293b;
             --text-main: #e2e8f0;
@@ -53,36 +53,38 @@
             margin: 0; 
             transition: background-color 0.3s ease, color 0.3s ease; 
             overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
         
         /* Scrollbar Halus */
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 20px; }
 
         /* Card Styling */
         .card { 
             background: var(--card-bg); 
-            border-radius: 16px; 
+            border-radius: 14px; 
             border: 1px solid var(--border-color); 
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); 
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.03); 
         }
         
         /* Input Field Styling */
         .input-field { 
             width: 100%; 
-            padding: 12px 16px; 
-            border-radius: 12px; 
+            padding: 12px 14px; 
+            border-radius: 10px; 
             border: 1px solid var(--border-color); 
             outline: none; 
             transition: 0.3s; 
             background: var(--input-bg); 
             color: var(--text-main); 
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            font-weight: 500;
         }
         .input-field:focus { 
             border-color: var(--accent); 
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); 
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1); 
         }
         
         /* Sidebar Styling */
@@ -95,17 +97,17 @@
         .sidebar-item { 
             display: flex; 
             align-items: center; 
-            padding: 10px 14px; 
-            border-radius: 10px; 
+            padding: 10px 12px; 
+            border-radius: 8px; 
             font-size: 0.85rem; 
             font-weight: 600; 
             color: var(--text-muted); 
             transition: 0.2s; 
             cursor: pointer; 
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
         .sidebar-item:hover { 
-            background: rgba(99, 102, 241, 0.1); 
+            background: rgba(99, 102, 241, 0.08); 
             color: var(--accent); 
         }
         .dark-mode .sidebar-item:hover { 
@@ -118,16 +120,16 @@
             max-height: 0; 
             overflow: hidden; 
             transition: max-height 0.3s ease-out; 
-            background: rgba(0,0,0,0.03); 
+            background: rgba(0,0,0,0.02); 
             border-radius: 8px; 
             margin: 0 8px; 
         }
         .dark-mode .dropdown-content { background: rgba(0,0,0,0.2); }
         .dropdown-content.show { max-height: 800px; margin-bottom: 8px; }
         
-        /* --- DESKTOP VIEW REVISION --- */
+        /* --- DESKTOP VIEW --- */
         .mode-desktop { 
-            max-width: 1200px !important; 
+            max-width: 1000px !important; 
             margin: 0 auto; 
             min-height: 100vh;
             border-left: 1px solid var(--border-color); 
@@ -139,43 +141,39 @@
         
         /* Layout Handling */
         .layout-wrapper { display: flex; width: 100%; min-height: 100vh; }
-        .main-content { flex: 1; padding: 20px; max-width: 800px; margin: 0 auto; width: 100%; }
+        .main-content { flex: 1; padding: 20px; max-width: 700px; margin: 0 auto; width: 100%; }
         
         /* Mobile Default */
         @media (max-width: 1024px) {
             .mode-desktop { display: block; border: none; }
             .layout-wrapper { display: block; }
-            .sidebar-desktop-visible { transform: translateX(-100%); position: fixed; height: 100%; }
         }
 
         /* Desktop State */
         @media (min-width: 1024px) {
             #sidebar { transform: translateX(0); position: sticky; top: 0; height: 100vh; }
-            /* Jika mode mobile dipaksa di layar besar */
             body:not(.mode-desktop) #sidebar { position: fixed; }
         }
 
         .hidden-panel { display: none; }
-        .badge-profit { background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.2); }
-        .dial-card { border-left: 4px solid var(--accent); }
+        .badge-profit { background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.2); }
         
-        /* Calculator Style Refined */
+        /* Calculator */
         .sidebar-calc { 
             background: var(--card-bg); 
-            border-radius: 16px; 
-            padding: 15px; 
+            border-radius: 12px; 
+            padding: 12px; 
             margin: 15px 0; 
             border: 1px solid var(--border-color); 
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
         }
         .dark-mode .sidebar-calc { background: #0f172a; }
-        .calc-display { text-align: right; margin-bottom: 10px; padding: 10px; background: var(--bg-main); border-radius: 10px; border: 1px solid var(--border-color); }
-        #calc-prev { color: var(--text-muted); font-size: 11px; min-height: 16px; }
-        #calc-curr { color: var(--text-main); font-size: 20px; font-weight: 700; }
-        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .calc-display { text-align: right; margin-bottom: 8px; padding: 8px; background: var(--bg-main); border-radius: 8px; border: 1px solid var(--border-color); }
+        #calc-prev { color: var(--text-muted); font-size: 10px; min-height: 14px; }
+        #calc-curr { color: var(--text-main); font-size: 16px; font-weight: 700; }
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
         .calc-grid button { 
-            height: 36px; border-radius: 8px; border: 1px solid var(--border-color); 
-            font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+            height: 32px; border-radius: 6px; border: 1px solid var(--border-color); 
+            font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.2s; 
             background: var(--card-bg); color: var(--text-main); 
         }
         .calc-grid button:hover { background: var(--bg-main); border-color: var(--accent); }
@@ -184,12 +182,12 @@
         .calc-grid .btn-ac { color: #ef4444; background: rgba(239, 68, 68, 0.1); border: none; }
 
         /* Level Bar */
-        .level-container { background: var(--border-color); height: 8px; border-radius: 10px; overflow: hidden; margin-top: 8px; }
+        .level-container { background: var(--border-color); height: 6px; border-radius: 10px; overflow: hidden; margin-top: 8px; }
         .level-fill { height: 100%; background: linear-gradient(90deg, #6366f1, #ec4899); transition: width 1s ease; border-radius: 10px; }
 
-        /* Aging Indicators (Softer) */
-        .aging-warning { border-left: 4px solid #facc15 !important; background: linear-gradient(to right, rgba(250, 204, 21, 0.1), transparent) !important; }
-        .aging-danger { border-left: 4px solid #f87171 !important; background: linear-gradient(to right, rgba(248, 113, 113, 0.1), transparent) !important; }
+        /* Aging Indicators (Cleaner) */
+        .aging-warning { border-left: 3px solid #facc15 !important; background: linear-gradient(to right, rgba(250, 204, 21, 0.05), transparent) !important; }
+        .aging-danger { border-left: 3px solid #f87171 !important; background: linear-gradient(to right, rgba(248, 113, 113, 0.05), transparent) !important; }
     </style>
 </head>
 <body class="antialiased pb-24">
@@ -198,10 +196,10 @@
 
     <div class="layout-wrapper">
         
-        <aside id="sidebar" class="w-72 h-screen flex flex-col justify-between overflow-y-auto fixed lg:sticky top-0 -translate-x-full lg:translate-x-0 bg-white dark:bg-slate-900 shadow-xl lg:shadow-none border-r border-slate-200 dark:border-slate-800">
-            <div class="p-5">
-                <div class="mb-8 flex items-center gap-3 px-2">
-                    <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white text-lg">❄️</div>
+        <aside id="sidebar" class="w-64 h-screen flex flex-col justify-between overflow-y-auto fixed lg:sticky top-0 -translate-x-full lg:translate-x-0 bg-white dark:bg-slate-900 shadow-xl lg:shadow-none border-r border-slate-200 dark:border-slate-800">
+            <div class="p-4">
+                <div class="mb-6 flex items-center gap-3 px-2">
+                    <div class="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center text-white text-sm">❄️</div>
                     <div>
                         <h2 class="text-sm font-extrabold tracking-tight text-slate-900 dark:text-white">SNOWBALL</h2>
                         <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Digital Ledger</p>
@@ -210,33 +208,33 @@
 
                 <nav class="space-y-1">
                     <div onclick="switchPage('main')" class="sidebar-item hover:bg-slate-100 dark:hover:bg-slate-800">
-                        <span class="mr-3 text-lg">📊</span> Dashboard
+                        <span class="mr-3 text-base">📊</span> Dashboard
                     </div>
                     
                     <div>
                         <div onclick="toggleDropdown('dropCheck')" class="sidebar-item justify-between hover:bg-slate-100 dark:hover:bg-slate-800">
-                            <span class="flex items-center"><span class="mr-3 text-lg">🔍</span> Tools & Cek</span>
+                            <span class="flex items-center"><span class="mr-3 text-base">🔍</span> Tools & Cek</span>
                             <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </div>
                         <div id="dropCheck" class="dropdown-content">
-                            <div onclick="switchPage('hp')" class="sidebar-item text-xs pl-11">Handphone Check</div>
-                            <div onclick="switchPage('dial')" class="sidebar-item text-xs pl-11">Dial Check (Kode)</div>
-                            <div onclick="switchPage('laptop')" class="sidebar-item text-xs pl-11">Laptop Check</div>
-                            <div onclick="toggleCutLossModal()" class="sidebar-item text-xs pl-11 text-rose-500">✂️ Hitung Cut Loss</div>
+                            <div onclick="switchPage('hp')" class="sidebar-item text-[11px] pl-11">Handphone Check</div>
+                            <div onclick="switchPage('dial')" class="sidebar-item text-[11px] pl-11">Dial Check (Kode)</div>
+                            <div onclick="switchPage('laptop')" class="sidebar-item text-[11px] pl-11">Laptop Check</div>
+                            <div onclick="toggleCutLossModal()" class="sidebar-item text-[11px] pl-11 text-rose-500">✂️ Hitung Cut Loss</div>
                         </div>
                     </div>
 
                     <div>
                         <div onclick="toggleDropdown('dropWarranty')" class="sidebar-item justify-between hover:bg-slate-100 dark:hover:bg-slate-800">
-                            <span class="flex items-center"><span class="mr-3 text-lg">🛡️</span> Cek Garansi</span>
+                            <span class="flex items-center"><span class="mr-3 text-base">🛡️</span> Cek Garansi</span>
                             <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </div>
                         <div id="dropWarranty" class="dropdown-content">
-                            <a href="https://www.mi.com/global/verify/#/en/tab/imei" target="_blank" class="sidebar-item text-xs pl-11">Xiaomi Official</a>
-                            <a href="https://checkcoverage.apple.com/" target="_blank" class="sidebar-item text-xs pl-11 font-bold text-indigo-500">Apple Official</a>
-                            <a href="https://www.samsung.com/us/support/warranty/" target="_blank" class="sidebar-item text-xs pl-11">Samsung Official</a>
-                            <a href="https://www.vivo.com/en/support/IMEI" target="_blank" class="sidebar-item text-xs pl-11">Vivo Official</a>
-                            <a href="https://support.oppo.com/en/warranty-check/" target="_blank" class="sidebar-item text-xs pl-11">OPPO Official</a>
+                            <a href="https://www.mi.com/global/verify/#/en/tab/imei" target="_blank" class="sidebar-item text-[11px] pl-11">Xiaomi Official</a>
+                            <a href="https://checkcoverage.apple.com/" target="_blank" class="sidebar-item text-[11px] pl-11 font-bold text-indigo-500">Apple Official</a>
+                            <a href="https://www.samsung.com/us/support/warranty/" target="_blank" class="sidebar-item text-[11px] pl-11">Samsung Official</a>
+                            <a href="https://www.vivo.com/en/support/IMEI" target="_blank" class="sidebar-item text-[11px] pl-11">Vivo Official</a>
+                            <a href="https://support.oppo.com/en/warranty-check/" target="_blank" class="sidebar-item text-[11px] pl-11">OPPO Official</a>
                         </div>
                     </div>
 
@@ -270,24 +268,24 @@
                 </nav>
             </div>
 
-            <div class="p-5 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+            <div class="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
                 <div id="admin-sidebar-tools">
-                    <button onclick="toggleDarkMode()" class="sidebar-item w-full justify-center mb-3 border border-slate-300 dark:border-slate-700 rounded-lg text-xs hover:bg-slate-200 dark:hover:bg-slate-800">
+                    <button onclick="toggleDarkMode()" class="sidebar-item w-full justify-center mb-3 border border-slate-300 dark:border-slate-700 rounded-lg text-[10px] hover:bg-slate-200 dark:hover:bg-slate-800">
                         🌙 Toggle Dark Mode
                     </button>
                     
                     <div class="grid grid-cols-3 gap-2 mb-4">
                         <button onclick="exportJSON()" class="flex flex-col items-center justify-center p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-emerald-500 hover:text-emerald-500 transition group" title="Backup Data">
-                            <span class="text-lg mb-1">💾</span>
+                            <span class="text-base mb-1">💾</span>
                             <span class="text-[8px] font-bold uppercase text-slate-400 group-hover:text-emerald-500">Save</span>
                         </button>
                         <label class="flex flex-col items-center justify-center p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-blue-500 hover:text-blue-500 transition cursor-pointer group" title="Restore Data">
-                            <span class="text-lg mb-1">📂</span>
+                            <span class="text-base mb-1">📂</span>
                             <span class="text-[8px] font-bold uppercase text-slate-400 group-hover:text-blue-500">Load</span>
                             <input type="file" hidden onchange="importJSON(this)">
                         </label>
                         <button onclick="clearData()" class="flex flex-col items-center justify-center p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-rose-500 hover:text-rose-500 transition group" title="Reset Pabrik">
-                            <span class="text-lg mb-1">🗑️</span>
+                            <span class="text-base mb-1">🗑️</span>
                             <span class="text-[8px] font-bold uppercase text-slate-400 group-hover:text-rose-500">Reset</span>
                         </button>
                     </div>
@@ -307,12 +305,16 @@
         </aside>
 
         <main class="main-content">
-            <div class="flex justify-between items-center mb-6 lg:hidden">
-                <button onclick="toggleSidebar()" class="p-2.5 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold active:scale-95">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+            <div class="flex justify-between items-center mb-5 lg:hidden">
+                <button onclick="toggleSidebar()" class="p-2.5 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 active:scale-95">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
                 </button>
+                
                 <div class="flex gap-2">
-                    <button onclick="exportReport()" class="p-2.5 bg-indigo-600 text-white rounded-xl shadow-lg active:scale-95">
+                    <button onclick="toggleImportModal()" class="p-2.5 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm active:scale-95 flex items-center justify-center" title="Import Laporan">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    </button>
+                    <button onclick="exportReport()" class="p-2.5 bg-indigo-600 text-white rounded-xl shadow-lg active:scale-95 flex items-center justify-center" title="Salin Laporan">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
                     </button>
                 </div>
@@ -320,52 +322,51 @@
 
             <div id="page-main">
                 <header class="mb-6">
-    <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm gap-3">
-        
-        <div class="flex flex-col gap-1">
-            <h1 class="text-lg font-black tracking-tight text-slate-900 dark:text-white uppercase leading-tight">
-                DIGITAL <span class="text-indigo-500">LEDGER</span>
-            </h1>
-            <div>
-                <span class="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wide">
-                    Level <span id="currentLevel">1</span>
-                </span>
-            </div>
-        </div>
+                    <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm gap-3">
+                        <div class="flex flex-col gap-1">
+                            <h1 class="text-base font-black tracking-tight text-slate-900 dark:text-white uppercase leading-tight">
+                                DIGITAL <span class="text-indigo-500">LEDGER</span>
+                            </h1>
+                            <div>
+                                <span class="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide">
+                                    Level <span id="currentLevel">1</span>
+                                </span>
+                            </div>
+                        </div>
 
-        <div class="text-right admin-only-view">
-            <p class="text-[8px] text-slate-400 uppercase font-bold tracking-widest leading-none mb-0.5">Total Aset</p>
-            <h2 id="totalAssetDisplay" class="text-lg font-black text-indigo-600 dark:text-indigo-400 leading-none">
-                Rp 0
-            </h2>
-        </div>
-    </div>
-    
-    <div class="level-container admin-only-view mt-2 h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-        <div id="levelBar" class="level-fill h-full bg-indigo-500 transition-all duration-500" style="width: 0%"></div>
-    </div>
-    
-    <p id="motivationText" class="text-[9px] text-right mt-1 text-slate-400 italic admin-only-view">
-        Sikit lagi naik level!
-    </p>
-</header>
+                        <div class="text-right admin-only-view">
+                            <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest leading-none mb-1">Total Aset</p>
+                            <h2 id="totalAssetDisplay" class="text-lg font-black text-indigo-600 dark:text-indigo-400 leading-none">
+                                Rp 0
+                            </h2>
+                        </div>
+                    </div>
+                    
+                    <div class="level-container admin-only-view mt-2 h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                        <div id="levelBar" class="level-fill h-full bg-indigo-500 transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    
+                    <p id="motivationText" class="text-[10px] text-right mt-1 text-slate-400 italic admin-only-view">
+                        Sikit lagi naik level!
+                    </p>
+                </header>
 
-                <div id="admin-dashboard-section" class="admin-only-view space-y-6">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="card p-5 border-t-4 border-indigo-500">
+                <div id="admin-dashboard-section" class="admin-only-view space-y-5">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="card p-4 border-t-4 border-indigo-500">
                             <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Uang Tunai (Cash)</p>
-                            <h2 id="summaryCash" class="text-lg md:text-xl font-bold text-slate-800 dark:text-white">Rp 0</h2>
+                            <h2 id="summaryCash" class="text-base font-bold text-slate-800 dark:text-white">Rp 0</h2>
                         </div>
-                        <div class="card p-5 border-t-4 border-emerald-500">
+                        <div class="card p-4 border-t-4 border-emerald-500">
                             <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Total Stok</p>
-                            <h2 id="summaryStock" class="text-lg md:text-xl font-bold text-slate-800 dark:text-white">Rp 0</h2>
+                            <h2 id="summaryStock" class="text-base font-bold text-slate-800 dark:text-white">Rp 0</h2>
                         </div>
-                        <div class="card p-6 col-span-2 relative overflow-hidden bg-slate-900 dark:bg-black text-white border-none shadow-xl group">
+                        <div class="card p-5 col-span-2 relative overflow-hidden bg-slate-900 dark:bg-black text-white border-none shadow-xl group">
                             <div class="absolute right-0 top-0 w-32 h-32 bg-indigo-600 rounded-full blur-3xl opacity-20 group-hover:opacity-30 transition"></div>
                             <div class="relative z-10 flex justify-between items-center">
                                 <div>
                                     <p class="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-widest">Realized Profit (Cair)</p>
-                                    <h2 id="summaryProfit" class="text-3xl md:text-4xl font-black tracking-tight text-white">Rp 0</h2>
+                                    <h2 id="summaryProfit" class="text-2xl font-black tracking-tight text-white">Rp 0</h2>
                                 </div>
                                 <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-xl">💰</div>
                             </div>
@@ -379,14 +380,14 @@
                             </h3>
                             <input type="date" id="backdateInput" class="bg-transparent text-[10px] font-bold text-slate-500 dark:text-slate-400 border-b border-slate-300 dark:border-slate-600 outline-none">
                         </div>
-                        <textarea id="bulkInput" class="input-field h-24 mb-4 font-mono text-sm border-dashed bg-slate-50 dark:bg-slate-900/50" placeholder="Contoh: Poco M3 : 500.000 > 600.000"></textarea>
+                        <textarea id="bulkInput" class="input-field h-24 mb-4 font-mono text-xs border-dashed bg-slate-50 dark:bg-slate-900/50" placeholder="Contoh: Poco M3 : 500.000 > 600.000"></textarea>
                         <div class="grid grid-cols-2 gap-3">
                             <button onclick="parseText('old')" class="py-3 bg-slate-700 dark:bg-slate-700 text-white rounded-xl font-bold text-[10px] uppercase hover:bg-slate-600 transition shadow-lg shadow-slate-500/20">Stok Lalu [L]</button>
                             <button onclick="parseText('new')" class="py-3 bg-indigo-600 text-white rounded-xl font-bold text-[10px] uppercase hover:bg-indigo-500 transition shadow-lg shadow-indigo-500/20">Belanja Baru [B]</button>
                         </div>
                     </div>
 
-                    <div class="flex gap-4 overflow-x-auto pb-2">
+                    <div class="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                         <button onclick="toggleConfig('configPanel', 'configLabel', '⚙️ Atur Saldo Awal')" id="configLabel" class="flex-shrink-0 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest shadow-sm">⚙️ Atur Saldo Awal</button>
                         <button onclick="toggleConfig('extraProfitPanel', 'extraProfitLabel', '📈 Tambah Profit Manual')" id="extraProfitLabel" class="flex-shrink-0 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest shadow-sm">📈 Tambah Profit Manual</button>
                     </div>
@@ -419,10 +420,6 @@
                         <button onclick="setFilter('sold')" id="tabSold" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">Terjual</button>
                         <button onclick="setFilter('extra')" id="tabExtra" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">History</button>
                     </div>
-                    
-                    <div class="flex justify-end lg:hidden" id="admin-top-actions">
-                        <button onclick="toggleImportModal()" class="text-xs text-indigo-500 font-bold underline">Import Laporan WA</button>
-                    </div>
                 </div>
                 
                 <div id="itemRows" class="space-y-3 mt-6 mb-20"></div>
@@ -432,7 +429,7 @@
                 <button onclick="switchPage('main')" class="mb-4 flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-bold text-xs uppercase hover:underline">
                     <span>←</span> Kembali
                 </button>
-                <h1 class="text-2xl font-black italic mb-6 text-slate-900 dark:text-white">📱 Handphone Check</h1>
+                <h1 class="text-xl font-black italic mb-6 text-slate-900 dark:text-white">📱 Handphone Check</h1>
                 <div class="card p-6 space-y-4">
                     <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
                         <label class="text-[10px] font-bold text-slate-400 uppercase block mb-2 italic">Cek IMEI (imei.info)</label>
@@ -451,30 +448,30 @@
 
             <div id="page-dial" class="hidden">
                 <button onclick="switchPage('main')" class="mb-4 flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-bold text-xs uppercase hover:underline"><span>←</span> Kembali</button>
-                <h1 class="text-2xl font-black italic mb-6 text-slate-900 dark:text-white">🔍 Kode Dial Rahasia</h1>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <h1 class="text-xl font-black italic mb-6 text-slate-900 dark:text-white">🔍 Kode Dial Rahasia</h1>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div class="card p-4 dial-card">
-                        <h3 class="font-black text-xs text-indigo-600 dark:text-indigo-400 uppercase mb-2">SAMSUNG</h3>
+                        <h3 class="font-black text-[10px] text-indigo-600 dark:text-indigo-400 uppercase mb-2">SAMSUNG</h3>
                         <p class="text-lg font-mono font-bold text-slate-800 dark:text-white">*#0*#</p>
                         <p class="text-[10px] text-slate-500 uppercase">General Test Mode</p>
                     </div>
                     <div class="card p-4 dial-card">
-                        <h3 class="font-black text-xs text-indigo-600 dark:text-indigo-400 uppercase mb-2">XIAOMI / POCO</h3>
+                        <h3 class="font-black text-[10px] text-indigo-600 dark:text-indigo-400 uppercase mb-2">XIAOMI / POCO</h3>
                         <p class="text-lg font-mono font-bold text-slate-800 dark:text-white">*#*#64663#*#*</p>
                         <p class="text-[10px] text-slate-500 uppercase">CIT (Hardware Test)</p>
                     </div>
                     <div class="card p-4 dial-card">
-                        <h3 class="font-black text-xs text-indigo-600 dark:text-indigo-400 uppercase mb-2">OPPO / REALME</h3>
+                        <h3 class="font-black text-[10px] text-indigo-600 dark:text-indigo-400 uppercase mb-2">OPPO / REALME</h3>
                         <p class="text-lg font-mono font-bold text-slate-800 dark:text-white">*#899#</p>
                         <p class="text-[10px] text-slate-500 uppercase">Engineer Mode</p>
                     </div>
                     <div class="card p-4 dial-card">
-                        <h3 class="font-black text-xs text-indigo-600 dark:text-indigo-400 uppercase mb-2">VIVO / IQOO</h3>
+                        <h3 class="font-black text-[10px] text-indigo-600 dark:text-indigo-400 uppercase mb-2">VIVO / IQOO</h3>
                         <p class="text-lg font-mono font-bold text-slate-800 dark:text-white">*#558#</p>
                         <p class="text-[10px] text-slate-500 uppercase">Factory Test</p>
                     </div>
                     <div class="card p-4 dial-card">
-                        <h3 class="font-black text-xs text-indigo-600 dark:text-indigo-400 uppercase mb-2">IPHONE</h3>
+                        <h3 class="font-black text-[10px] text-indigo-600 dark:text-indigo-400 uppercase mb-2">IPHONE</h3>
                         <p class="text-lg font-mono font-bold text-slate-800 dark:text-white">*3001#12345#*</p>
                         <p class="text-[10px] text-slate-500 uppercase">Field Test</p>
                     </div>
@@ -483,11 +480,11 @@
 
             <div id="page-laptop" class="hidden">
                 <button onclick="switchPage('main')" class="mb-4 flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-bold text-xs uppercase hover:underline"><span>←</span> Kembali</button>
-                <h1 class="text-2xl font-black italic mb-6 text-slate-900 dark:text-white">💻 Laptop Check List</h1>
+                <h1 class="text-xl font-black italic mb-6 text-slate-900 dark:text-white">💻 Laptop Check List</h1>
                 <div class="space-y-4">
                     <div class="card p-5">
                         <h3 class="font-bold text-sm mb-3 text-slate-800 dark:text-white">1. Pengecekan Fisik & Layar</h3>
-                        <ul class="text-[11px] space-y-2 text-slate-600 dark:text-slate-300 uppercase font-bold">
+                        <ul class="text-[10px] space-y-2 text-slate-600 dark:text-slate-300 uppercase font-bold">
                             <li class="flex items-center gap-2"><span class="text-indigo-600 dark:text-indigo-400">✓</span> Cek Engsel & Baut (Pastikan rapat)</li>
                             <li class="flex items-center gap-2"><span class="text-indigo-600 dark:text-indigo-400">✓</span> Dead Pixel Test (Buka browser: deadpixeltest.org)</li>
                             <li class="flex items-center gap-2"><span class="text-indigo-600 dark:text-indigo-400">✓</span> White Spot / Jamur pada LCD</li>
@@ -495,7 +492,7 @@
                     </div>
                     <div class="card p-5">
                         <h3 class="font-bold text-sm mb-3 text-slate-800 dark:text-white">2. Performa & Baterai</h3>
-                        <ul class="text-[11px] space-y-2 text-slate-600 dark:text-slate-300 uppercase font-bold">
+                        <ul class="text-[10px] space-y-2 text-slate-600 dark:text-slate-300 uppercase font-bold">
                             <li class="flex items-center gap-2"><span class="text-indigo-600 dark:text-indigo-400">✓</span> CMD: <code class="bg-slate-100 dark:bg-slate-700 px-1 rounded lowercase">powercfg /batteryreport</code></li>
                             <li class="flex items-center gap-2"><span class="text-indigo-600 dark:text-indigo-400">✓</span> Cek Kesehatan SSD (Gunakan CrystalDiskInfo)</li>
                             <li class="flex items-center gap-2"><span class="text-indigo-600 dark:text-indigo-400">✓</span> Keyboard Test (Buka: keyboardtester.com)</li>
@@ -527,16 +524,16 @@
                 <h2 id="clResult" class="text-xl font-black">Rp 0</h2>
                 <p id="clAdvice" class="text-[10px] font-bold mt-1 text-yellow-400">...</p>
             </div>
-            <button onclick="calcCutLoss()" class="w-full py-3 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white font-bold rounded-xl hover:bg-slate-300 transition">HITUNG</button>
+            <button onclick="calcCutLoss()" class="w-full py-3 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white font-bold rounded-xl hover:bg-slate-300 transition text-xs">HITUNG</button>
         </div>
     </div>
 
     <div id="importModal" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
         <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" onclick="toggleImportModal()"></div>
         <div class="relative card w-full max-w-md p-8 shadow-2xl bg-white dark:bg-slate-800">
-            <h3 class="text-xl font-black text-indigo-900 dark:text-white uppercase italic mb-4">📥 Import Laporan WA</h3>
+            <h3 class="text-lg font-black text-indigo-900 dark:text-white uppercase italic mb-4">📥 Import Laporan WA</h3>
             <textarea id="importArea" class="input-field h-48 mb-4 text-[11px] font-mono bg-slate-50 dark:bg-slate-900" placeholder="Paste report WhatsApp di sini..."></textarea>
-            <button onclick="processImport()" class="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold shadow-lg hover:bg-indigo-700 transition">SINKRONKAN DATA</button>
+            <button onclick="processImport()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg hover:bg-indigo-700 transition text-xs">SINKRONKAN DATA</button>
         </div>
     </div>
 
@@ -551,9 +548,7 @@
         // --- INIT ---
         window.onload = () => {
             loadData();
-            // Default dark mode check
             if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
-            // Check view mode preference
             if(localStorage.getItem('viewMode') === 'desktop') setView('desktop');
         };
 
@@ -566,8 +561,6 @@
         function toggleSidebar() { 
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('overlay');
-            
-            // Logic for Mobile Toggle
             if (sidebar.classList.contains('-translate-x-full')) {
                 sidebar.classList.remove('-translate-x-full');
                 overlay.classList.remove('hidden');
@@ -589,8 +582,6 @@
         function switchPage(page) {
             ['page-main', 'page-hp', 'page-laptop', 'page-dial'].forEach(p => document.getElementById(p).classList.add('hidden'));
             document.getElementById('page-' + page).classList.remove('hidden');
-            
-            // Auto close sidebar on mobile after click
             if(window.innerWidth < 1024) {
                  document.getElementById('sidebar').classList.add('-translate-x-full');
                  document.getElementById('overlay').classList.add('hidden');
@@ -607,22 +598,14 @@
             if(mode === 'desktop') {
                 body.classList.add('mode-desktop');
                 localStorage.setItem('viewMode', 'desktop');
-                
                 btnDesk.className = "flex-1 py-1.5 rounded text-[9px] font-black bg-indigo-600 text-white shadow-sm";
                 btnMob.className = "flex-1 py-1.5 rounded text-[9px] font-black text-slate-500 hover:text-slate-700";
-                
-                // Force sidebar visible in desktop mode logic handled by CSS media queries mostly
-                // but we ensure classes are clean
                 sidebar.classList.remove('-translate-x-full'); 
-                
             } else {
                 body.classList.remove('mode-desktop');
                 localStorage.setItem('viewMode', 'mobile');
-                
                 btnMob.className = "flex-1 py-1.5 rounded text-[9px] font-black bg-indigo-600 text-white shadow-sm";
                 btnDesk.className = "flex-1 py-1.5 rounded text-[9px] font-black text-slate-500 hover:text-slate-700";
-                
-                // Reset sidebar for mobile
                 if(window.innerWidth < 1024) sidebar.classList.add('-translate-x-full');
             }
         }
@@ -630,21 +613,14 @@
         function setAccessMode(mode) {
             accessMode = mode;
             const adminViews = document.querySelectorAll('.admin-only-view');
-            const adminTop = document.getElementById('admin-top-actions');
-            const adminSide = document.getElementById('admin-sidebar-tools');
-            
             if(mode === 'admin') {
                 document.getElementById('btnAccessAdmin').className = "flex-1 py-1.5 rounded text-[9px] font-black bg-white dark:bg-slate-600 shadow-sm text-slate-900 dark:text-white";
                 document.getElementById('btnAccessClient').className = "flex-1 py-1.5 rounded text-[9px] font-black text-slate-400 hover:text-slate-600";
                 adminViews.forEach(v => v.style.display = 'block');
-                if(adminTop) adminTop.style.display = 'flex';
-                if(adminSide) adminSide.style.display = 'block';
             } else {
                 document.getElementById('btnAccessClient').className = "flex-1 py-1.5 rounded text-[9px] font-black bg-white dark:bg-slate-600 shadow-sm text-slate-900 dark:text-white";
                 document.getElementById('btnAccessAdmin').className = "flex-1 py-1.5 rounded text-[9px] font-black text-slate-400 hover:text-slate-600";
                 adminViews.forEach(v => v.style.display = 'none');
-                if(adminTop) adminTop.style.display = 'none';
-                if(adminSide) adminSide.style.display = 'none';
             }
             renderRows();
         }
@@ -662,7 +638,7 @@
         }
         function calcResult() { let res; const p = parseFloat(cPrev), c = parseFloat(cInput); if (isNaN(p) || isNaN(c)) return; switch (cOp) { case '+': res = p + c; break; case '-': res = p - c; break; case '*': res = p * c; break; case '/': res = p / c; break; } cInput = parseFloat(res.toFixed(10)).toString(); cOp = null; cPrev = ''; calcUpd(); }
 
-        // --- CORE LOGIC (Snowball Integrated) ---
+        // --- CORE LOGIC ---
         function calculateAll() {
             const start = Number(document.getElementById('startBalance').value) || 0;
             let cashUsed = 0, cashIn = 0, totalStock = 0, profit = 0;
@@ -768,7 +744,6 @@
                 const dateStr = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
                 const ageDays = Math.floor((now - d) / (1000 * 60 * 60 * 24));
                 
-                // Aging Logic (Snowball Feature)
                 let agingClass = item.status === 'sold' ? 'border-emerald-500' : 'border-slate-100 dark:border-slate-700';
                 let ageBadge = '';
                 if(item.status === 'stok') {
@@ -778,12 +753,12 @@
 
                 const card = document.createElement('div');
                 if(accessMode === 'admin') {
-                    card.className = `p-4 rounded-2xl border-l-4 card transition-all hover:translate-y-[-2px] ${agingClass}`;
+                    card.className = `p-4 rounded-xl border-l-4 card transition-all hover:translate-y-[-2px] ${agingClass}`;
                     card.innerHTML = `
                         <div class="flex justify-between items-center">
                             <div class="flex-1">
                                 <div class="flex items-center gap-2 mb-1">
-                                    <span class="text-[7px] font-black px-1.5 py-0.5 rounded uppercase ${item.type === 'new' ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300' : 'bg-orange-100 text-orange-600 dark:bg-orange-900 dark:text-orange-300'}">${item.type === 'new' ? 'BARU' : 'LAMA'}</span>
+                                    <span class="text-[8px] font-black px-1.5 py-0.5 rounded uppercase ${item.type === 'new' ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300' : 'bg-orange-100 text-orange-600 dark:bg-orange-900 dark:text-orange-300'}">${item.type === 'new' ? 'BARU' : 'LAMA'}</span>
                                     <h4 class="font-bold text-slate-800 dark:text-white text-sm">${item.name}</h4>
                                     ${ageBadge}
                                 </div>
@@ -791,7 +766,7 @@
                                     <span>M: <b class="text-slate-700 dark:text-white">${item.modal.toLocaleString()}</b></span>
                                     <span>J: <b class="text-slate-700 dark:text-white">${item.price.toLocaleString()}</b></span>
                                 </div>
-                                <div class="mt-1 text-[8px] text-slate-400 font-bold uppercase italic">📅 Masuk: ${dateStr}</div>
+                                <div class="mt-1 text-[9px] text-slate-400 font-bold uppercase italic">📅 Masuk: ${dateStr}</div>
                             </div>
                             <div class="flex flex-col items-end gap-2">
                                 <button onclick="removeItem(${item.id})" class="text-slate-300 hover:text-red-400 text-xs transition">✕</button>
@@ -800,7 +775,7 @@
                         </div>`;
                 } else {
                     card.className = "client-item-card card flex justify-between items-center transition-all p-5";
-                    card.innerHTML = `<div class="flex-1"><h4 class="font-extrabold text-slate-800 dark:text-white text-lg mb-1 tracking-tight">${item.name}</h4><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full ${item.status === 'sold' ? 'bg-red-400' : 'bg-emerald-400'} animate-pulse"></span><span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${item.status === 'sold' ? 'Out of Stock' : 'Ready Stock'}</span></div></div><div class="text-right"><p class="text-[10px] font-black text-indigo-400 uppercase tracking-tighter mb-0.5">Price</p><div class="text-indigo-600 dark:text-indigo-400 font-black text-xl tracking-tighter">Rp ${item.price.toLocaleString('id-ID')}</div></div>`;
+                    card.innerHTML = `<div class="flex-1"><h4 class="font-extrabold text-slate-800 dark:text-white text-base mb-1 tracking-tight">${item.name}</h4><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full ${item.status === 'sold' ? 'bg-red-400' : 'bg-emerald-400'} animate-pulse"></span><span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${item.status === 'sold' ? 'Out of Stock' : 'Ready Stock'}</span></div></div><div class="text-right"><p class="text-[10px] font-black text-indigo-400 uppercase tracking-tighter mb-0.5">Price</p><div class="text-indigo-600 dark:text-indigo-400 font-black text-xl tracking-tighter">Rp ${item.price.toLocaleString('id-ID')}</div></div>`;
                 }
                 container.appendChild(card);
             });
@@ -897,7 +872,7 @@
         }
         function clearData() { if(confirm('Hapus permanen?')) { localStorage.clear(); location.reload(); } }
         function toggleImportModal() { document.getElementById('importModal').classList.toggle('hidden'); }
-        function processImport() { alert("Gunakan format JSON untuk import/export yang lebih aman di versi ini."); }
+        function processImport() { alert("Fitur ini membutuhkan penyesuaian format teks manual. Gunakan backup JSON untuk keamanan data."); }
         function directImei() { window.open(`https://www.imei.info/?imei=${document.getElementById('imeiInput').value}`, '_blank'); }
 
         function setFilter(filter) {
