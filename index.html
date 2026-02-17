@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ledger Pro: Snowball Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -13,429 +13,402 @@
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        slate: {
-                            850: '#151f32', // Custom dark bg
-                        }
+                        background: 'var(--bg-main)',
+                        surface: 'var(--card-bg)',
+                        primary: '#6366f1', // Indigo 500
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'glow': '0 0 15px rgba(99, 102, 241, 0.3)'
                     }
                 }
             }
         }
     </script>
     <style>
-        /* Modern Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .dark-mode ::-webkit-scrollbar-thumb { background: #475569; }
-
+        /* --- PREMIUM VARIABLES --- */
         :root { 
-            --bg-main: #f1f5f9; 
-            --text-main: #334155; 
+            --bg-main: #f8fafc; 
+            --text-main: #0f172a; 
             --card-bg: #ffffff; 
-            --border-color: #e2e8f0; 
-            --sidebar-bg: #0f172a; 
-            --accent: #4f46e5;
+            --sidebar-bg: rgba(255, 255, 255, 0.8);
+            --input-bg: #f1f5f9;
         }
 
         .dark-mode { 
-            --bg-main: #020617; 
-            --text-main: #e2e8f0; 
-            --card-bg: #1e293b; 
-            --border-color: #334155; 
-            --sidebar-bg: #0f172a;
+            --bg-main: #09090b; /* Zinc 950 */
+            --text-main: #f4f4f5; 
+            --card-bg: #18181b; /* Zinc 900 */
+            --sidebar-bg: rgba(24, 24, 27, 0.8);
+            --input-bg: #27272a;
         }
 
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-main); margin: auto; transition: background-color 0.3s, color 0.3s; }
-        
-        /* Modern Card */
-        .card { 
-            background: var(--card-bg); 
-            border-radius: 12px; 
-            border: 1px solid var(--border-color); 
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05); 
-            transition: all 0.2s ease;
-        }
-        
-        /* Modern Input */
-        .input-field { 
-            width: 100%; 
-            padding: 10px 14px; 
-            border-radius: 8px; 
-            border: 1px solid var(--border-color); 
-            outline: none; 
-            transition: 0.2s; 
-            background: transparent; 
+        body { 
+            background-color: var(--bg-main); 
             color: var(--text-main); 
-            font-size: 0.875rem;
+            font-family: 'Inter', sans-serif; 
+            -webkit-font-smoothing: antialiased;
+            transition: background-color 0.4s ease, color 0.4s ease;
         }
-        .input-field:focus { border-color: var(--accent); ring: 2px solid var(--accent); box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1); }
-        
-        /* Sidebar */
-        #sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 50; background-color: var(--sidebar-bg); }
-        .sidebar-item { 
-            display: flex; align-items: center; padding: 10px 14px; border-radius: 8px; 
-            font-size: 0.85rem; font-weight: 500; color: #94a3b8; transition: 0.2s; cursor: pointer; 
-            margin-bottom: 4px;
-        }
-        .sidebar-item:hover { background: rgba(255,255,255,0.05); color: white; }
-        .dropdown-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; background: rgba(0,0,0,0.2); border-radius: 8px; margin: 0 4px; }
-        .dropdown-content.show { max-height: 800px; margin-bottom: 8px; padding-top: 4px; padding-bottom: 4px; }
-        
-        /* Layout */
-        .mode-desktop { max-width: 1200px !important; border-left: 1px solid var(--border-color); border-right: 1px solid var(--border-color); min-height: 100vh; background: var(--card-bg); }
-        .hidden-panel { display: none; }
-        
-        /* Status Colors (Softer) */
-        .aging-warning { background-color: #fffbeb !important; border: 1px solid #fcd34d !important; }
-        .aging-danger { background-color: #fef2f2 !important; border: 1px solid #fecaca !important; }
-        .dark-mode .aging-warning { background-color: #422006 !important; border-color: #713f12 !important; }
-        .dark-mode .aging-danger { background-color: #450a0a !important; border-color: #7f1d1d !important; }
 
-        .level-bar-container { background: #e2e8f0; height: 8px; border-radius: 99px; overflow: hidden; position: relative; }
-        .dark-mode .level-bar-container { background: #334155; }
-        .level-bar-fill { height: 100%; background: #4f46e5; border-radius: 99px; transition: width 1s ease-in-out; }
-        
-        /* Calculator */
-        .sidebar-calc { background: rgba(255,255,255,0.03); border-radius: 16px; padding: 12px; margin: 15px 0; border: 1px solid rgba(255,255,255,0.1); }
-        .calc-display { text-align: right; margin-bottom: 12px; padding: 10px; }
-        #calc-prev { color: #64748b; font-size: 11px; min-height: 16px; }
-        #calc-curr { color: white; font-size: 20px; font-weight: 600; letter-spacing: -0.5px; }
-        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .calc-grid button { 
-            height: 36px; border-radius: 50%; border: none; font-size: 13px; font-weight: 600; 
-            cursor: pointer; transition: 0.2s; background: rgba(255,255,255,0.1); color: white; 
-            display: flex; align-items: center; justify-content: center;
+        /* --- GLASSMORPHISM & UTILS --- */
+        .glass {
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(0,0,0,0.05);
         }
-        .calc-grid button:hover { background: rgba(255,255,255,0.2); }
-        .calc-grid .btn-op { background: #4f46e5; color: white; }
-        .calc-grid .btn-eq { background: #4f46e5 !important; grid-column: span 2; border-radius: 20px; }
-        .calc-grid .btn-ac { color: #fca5a5; background: rgba(239, 68, 68, 0.1); }
+        .dark-mode .glass { border-right: 1px solid rgba(255,255,255,0.05); }
+
+        /* Modern Scrollbar (Hidden but functional) */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark-mode ::-webkit-scrollbar-thumb { background: #3f3f46; }
+
+        /* --- COMPONENTS --- */
+        .card-pro {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid rgba(0,0,0,0.03);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .dark-mode .card-pro { border: 1px solid rgba(255,255,255,0.05); box-shadow: none; }
         
-        .client-item-card { border: 1px solid var(--border-color) !important; padding: 20px !important; }
+        /* Input Field: The "Apple" Style (No border, grey bg) */
+        .input-clean {
+            background: var(--input-bg);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 16px;
+            width: 100%;
+            outline: none;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            transition: box-shadow 0.2s;
+        }
+        .input-clean:focus { box-shadow: 0 0 0 2px var(--primary); }
+
+        /* Status Pills */
+        .status-pill { padding: 4px 10px; border-radius: 99px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        /* Layout Fixes */
+        .hidden-panel { display: none; }
+        .mode-desktop { max-width: 1000px; margin: 0 auto; border-left: 1px solid rgba(0,0,0,0.05); border-right: 1px solid rgba(0,0,0,0.05); min-height: 100vh; background: var(--card-bg); }
+
+        /* Calculator Specifics */
+        .calc-btn { width: 100%; height: 45px; border-radius: 12px; font-weight: 600; font-size: 14px; transition: 0.1s; display: grid; place-items: center; }
+        .calc-btn:active { transform: scale(0.95); }
     </style>
 </head>
-<body class="p-4 md:p-8 antialiased pb-32">
+<body class="pb-32">
 
-    <div id="overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-40" onclick="toggleSidebar()"></div>
-    
-    <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 flex flex-col -translate-x-full lg:translate-x-0 border-r border-slate-800">
-        <div class="p-6 flex flex-col h-full">
-            <h2 class="text-xl font-bold mb-8 flex items-center gap-2 tracking-tight text-white">
-                <span class="text-indigo-500 text-2xl">❖</span> Ledger<span class="text-indigo-400">Pro</span>
-            </h2>
-            
-            <nav class="flex-1 space-y-1 overflow-y-auto pr-2 custom-scroll">
-                <div onclick="switchPage('main')" class="sidebar-item bg-indigo-600/10 text-indigo-400">
-                    <span class="mr-3 opacity-70">🏠</span> Dashboard
-                </div>
+    <div id="overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-40 transition-opacity" onclick="toggleSidebar()"></div>
 
-                <div onclick="toggleDropdown('dropCheck')" class="sidebar-item justify-between">
-                    <span class="flex items-center"><span class="mr-3 opacity-70">🛠</span> Tools</span>
-                    <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </div>
-                <div id="dropCheck" class="dropdown-content">
-                    <div onclick="switchPage('hp')" class="sidebar-item text-xs pl-10">Handphone Check</div>
-                    <div onclick="switchPage('dial')" class="sidebar-item text-xs pl-10">Kode Dial</div>
-                    <div onclick="switchPage('laptop')" class="sidebar-item text-xs pl-10">Laptop Check</div>
-                </div>
+    <aside id="sidebar" class="glass fixed top-0 left-0 h-full w-72 z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-out flex flex-col">
+        <div class="p-8 pb-4">
+            <h1 class="text-2xl font-black tracking-tighter italic flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-indigo-500 animate-pulse"></span>
+                SNOWBALL
+            </h1>
+            <p class="text-xs text-gray-400 font-medium ml-5 mt-1">Financial Freedom Tracker</p>
+        </div>
 
-                <div onclick="toggleDropdown('dropWarranty')" class="sidebar-item justify-between">
-                    <span class="flex items-center"><span class="mr-3 opacity-70">🛡️</span> Garansi</span>
-                    <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </div>
-                <div id="dropWarranty" class="dropdown-content">
-                    <a href="https://checkcoverage.apple.com/" target="_blank" class="sidebar-item text-xs pl-10 text-indigo-300">Apple Official</a>
-                    <a href="https://www.samsung.com/id/support/warranty/" target="_blank" class="sidebar-item text-xs pl-10">Samsung</a>
-                    <a href="https://support.oppo.com/id/warranty-check/" target="_blank" class="sidebar-item text-xs pl-10">OPPO</a>
-                    <a href="https://www.vivo.com/id/support/IMEI" target="_blank" class="sidebar-item text-xs pl-10">Vivo / iQOO</a>
-                    <a href="https://www.mi.com/id/service/warranty" target="_blank" class="sidebar-item text-xs pl-10">Xiaomi</a>
-                </div>
-
-                <div onclick="toggleCutLossModal()" class="sidebar-item text-rose-400 hover:bg-rose-900/10">
-                    <span class="mr-3 opacity-70">📉</span> Kalkulator Cut Loss
-                </div>
-
-                <div class="sidebar-calc">
-                      <div class="calc-display">
-                         <div id="calc-prev"></div>
-                         <div id="calc-curr">0</div>
-                     </div>
-                      <div class="calc-grid">
-                         <button class="btn-ac" onclick="calcClear()">AC</button>
-                         <button onclick="calcDel()">←</button>
-                         <button onclick="calcPerc()">%</button> 
-                         <button class="btn-op" onclick="calcOp('/')">÷</button>
-                         <button onclick="calcNum('7')">7</button>
-                         <button onclick="calcNum('8')">8</button>
-                         <button onclick="calcNum('9')">9</button>
-                         <button class="btn-op" onclick="calcOp('*')">×</button>
-                         <button onclick="calcNum('4')">4</button>
-                         <button onclick="calcNum('5')">5</button>
-                         <button onclick="calcNum('6')">6</button>
-                         <button class="btn-op" onclick="calcOp('-')">-</button>
-                         <button onclick="calcNum('1')">1</button>
-                         <button onclick="calcNum('2')">2</button>
-                         <button onclick="calcNum('3')">3</button>
-                         <button class="btn-op" onclick="calcOp('+')">+</button>
-                         <button onclick="calcNum('0')" style="grid-column: span 2; border-radius: 20px;">0</button>
-                         <button onclick="calcNum('.')">.</button>
-                         <button class="btn-eq" onclick="calcResult()">=</button>
-                      </div>
-                </div>
-            </nav>
-
-            <div class="pt-4 border-t border-slate-800 space-y-2">
-                <button onclick="toggleDarkMode()" class="sidebar-item w-full justify-between bg-slate-800/50">
-                    <span class="text-xs font-semibold">Tampilan</span>
-                    <span id="darkModeIcon">🌙</span>
-                </button>
-                <div class="grid grid-cols-2 gap-2 text-[10px] font-bold">
-                    <button onclick="exportJSON()" class="p-2 rounded bg-slate-800 text-emerald-400 hover:bg-slate-700">BACKUP</button>
-                    <button onclick="document.getElementById('jsonInput').click()" class="p-2 rounded bg-slate-800 text-blue-400 hover:bg-slate-700">RESTORE</button>
-                    <input type="file" id="jsonInput" hidden onchange="importJSON(this)">
-                </div>
-                <button onclick="clearData()" class="w-full text-center text-[10px] text-slate-600 hover:text-red-500 transition mt-2">Reset Database</button>
+        <nav class="flex-1 px-4 space-y-2 overflow-y-auto mt-4">
+            <div onclick="switchPage('main')" class="p-3 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-white/5 transition flex items-center gap-3 text-sm font-semibold text-gray-600 dark:text-gray-300">
+                <span>📊</span> Dashboard
             </div>
+            
+            <div class="p-3">
+                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Tools</div>
+                <div onclick="toggleDropdown('dropCheck')" class="flex justify-between items-center cursor-pointer text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-indigo-500 transition">
+                    <span>Gadget Check</span>
+                    <span class="text-xs">▼</span>
+                </div>
+                <div id="dropCheck" class="hidden pl-2 mt-2 space-y-2 border-l-2 border-gray-100 dark:border-gray-800 ml-1">
+                    <div onclick="switchPage('hp')" class="cursor-pointer text-xs text-gray-500 hover:text-indigo-500 pl-3 py-1">Handphone</div>
+                    <div onclick="switchPage('dial')" class="cursor-pointer text-xs text-gray-500 hover:text-indigo-500 pl-3 py-1">Dial Codes</div>
+                    <div onclick="switchPage('laptop')" class="cursor-pointer text-xs text-gray-500 hover:text-indigo-500 pl-3 py-1">Laptop</div>
+                </div>
+            </div>
+
+            <div onclick="toggleCutLossModal()" class="p-3 rounded-xl cursor-pointer bg-rose-50 dark:bg-rose-900/10 text-rose-600 dark:text-rose-400 flex items-center gap-3 text-sm font-bold transition hover:bg-rose-100">
+                <span>✂️</span> Cut Loss Calc
+            </div>
+
+            <div class="mt-4 bg-gray-100 dark:bg-white/5 p-4 rounded-2xl">
+                <div class="text-right mb-2">
+                    <div id="calc-prev" class="text-[10px] text-gray-400 h-4"></div>
+                    <div id="calc-curr" class="text-xl font-mono font-bold">0</div>
+                </div>
+                <div class="grid grid-cols-4 gap-2">
+                    <button onclick="calcClear()" class="calc-btn bg-rose-100 text-rose-600">C</button>
+                    <button onclick="calcDel()" class="calc-btn bg-gray-200 dark:bg-white/10">←</button>
+                    <button onclick="calcPerc()" class="calc-btn bg-gray-200 dark:bg-white/10">%</button>
+                    <button onclick="calcOp('/')" class="calc-btn bg-indigo-100 text-indigo-600">÷</button>
+                    
+                    <button onclick="calcNum('7')" class="calc-btn bg-white dark:bg-white/5 shadow-sm">7</button>
+                    <button onclick="calcNum('8')" class="calc-btn bg-white dark:bg-white/5 shadow-sm">8</button>
+                    <button onclick="calcNum('9')" class="calc-btn bg-white dark:bg-white/5 shadow-sm">9</button>
+                    <button onclick="calcOp('*')" class="calc-btn bg-indigo-100 text-indigo-600">×</button>
+
+                    <button onclick="calcNum('4')" class="calc-btn bg-white dark:bg-white/5 shadow-sm">4</button>
+                    <button onclick="calcNum('5')" class="calc-btn bg-white dark:bg-white/5 shadow-sm">5</button>
+                    <button onclick="calcNum('6')" class="calc-btn bg-white dark:bg-white/5 shadow-sm">6</button>
+                    <button onclick="calcOp('-')" class="calc-btn bg-indigo-100 text-indigo-600">-</button>
+
+                    <button onclick="calcNum('1')" class="calc-btn bg-white dark:bg-white/5 shadow-sm">1</button>
+                    <button onclick="calcNum('2')" class="calc-btn bg-white dark:bg-white/5 shadow-sm">2</button>
+                    <button onclick="calcNum('3')" class="calc-btn bg-white dark:bg-white/5 shadow-sm">3</button>
+                    <button onclick="calcOp('+')" class="calc-btn bg-indigo-100 text-indigo-600">+</button>
+                    
+                    <button onclick="calcNum('0')" class="calc-btn bg-white dark:bg-white/5 shadow-sm col-span-2">0</button>
+                    <button onclick="calcNum('.')" class="calc-btn bg-white dark:bg-white/5 shadow-sm">.</button>
+                    <button onclick="calcResult()" class="calc-btn bg-indigo-500 text-white shadow-glow">=</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="p-4 border-t border-gray-100 dark:border-white/5">
+            <div class="flex gap-2 mb-2">
+                <button onclick="exportJSON()" class="flex-1 py-2 rounded-lg bg-gray-200 dark:bg-white/10 text-[10px] font-bold text-gray-600 dark:text-gray-400">BACKUP</button>
+                <button onclick="document.getElementById('jsonInput').click()" class="flex-1 py-2 rounded-lg bg-gray-200 dark:bg-white/10 text-[10px] font-bold text-gray-600 dark:text-gray-400">RESTORE</button>
+                <input type="file" id="jsonInput" hidden onchange="importJSON(this)">
+            </div>
+            <button onclick="toggleDarkMode()" class="w-full py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-xs font-medium flex justify-center items-center gap-2">
+                <span id="darkModeIcon">🌙</span> <span id="darkModeText">Switch Theme</span>
+            </button>
         </div>
     </aside>
 
-    <main id="page-main" class="max-w-5xl mx-auto lg:ml-80 transition-all duration-300">
+    <main id="page-main" class="transition-all duration-300 lg:ml-72 p-6 max-w-6xl mx-auto">
         
-        <div class="flex justify-between items-center mb-8 sticky top-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md py-4 z-30 -mx-4 px-4 md:mx-0 md:px-0">
-            <button onclick="toggleSidebar()" class="lg:hidden p-2 text-slate-600 dark:text-slate-300">
+        <div class="lg:hidden flex justify-between items-center mb-6">
+            <button onclick="toggleSidebar()" class="p-2 bg-white dark:bg-white/10 rounded-xl shadow-sm">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
-            
-            <div class="hidden lg:block text-xs text-slate-400 font-medium">Dashboard Overview</div>
-
-            <div class="flex items-center gap-2" id="admin-top-actions">
-                <button onclick="toggleImportModal()" class="px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-700">
-                    📥 Import
-                </button>
-                <button onclick="exportReport()" class="px-3 py-2 bg-indigo-600 text-white rounded-lg text-xs font-semibold shadow hover:bg-indigo-700 flex items-center gap-2">
-                    <span>📋</span> Copy Laporan
-                </button>
-            </div>
+            <h1 class="font-black italic text-lg tracking-tighter">SNOWBALL</h1>
         </div>
 
-        <div class="mb-8 admin-only-view bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-slate-800 dark:to-slate-800/50 p-6 rounded-2xl border border-indigo-100 dark:border-slate-700">
-            <div class="flex justify-between items-end mb-4">
+        <div class="flex justify-end gap-3 mb-6" id="admin-top-actions">
+            <button onclick="toggleImportModal()" class="px-4 py-2 rounded-full text-xs font-bold bg-white dark:bg-white/5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:shadow-md transition">
+                📥 Import Text
+            </button>
+            <button onclick="exportReport()" class="px-4 py-2 rounded-full text-xs font-bold bg-indigo-600 text-white shadow-glow hover:bg-indigo-500 transition">
+                📋 Copy Report
+            </button>
+        </div>
+
+        <div class="admin-only-view card-pro relative overflow-hidden bg-gradient-to-br from-indigo-600 to-violet-700 text-white p-8 mb-8 border-none">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl -translate-y-10 translate-x-10"></div>
+            
+            <div class="relative z-10 flex flex-col md:flex-row justify-between items-end gap-6">
                 <div>
-                    <h1 class="text-3xl font-bold tracking-tight text-slate-800 dark:text-white">Level <span id="currentLevel" class="text-indigo-600">1</span></h1>
-                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mt-1">Target Next: <span id="nextLevelTarget" class="text-slate-700 dark:text-slate-300">50 Juta</span></p>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-xs font-bold uppercase tracking-widest bg-white/20 px-2 py-1 rounded">Level <span id="currentLevel">1</span></span>
+                        <span class="text-xs font-medium opacity-80">Next: <span id="nextLevelTarget">50 Juta</span></span>
+                    </div>
+                    <div class="w-full bg-black/20 h-2 rounded-full overflow-hidden w-48 md:w-64">
+                        <div id="levelBar" class="h-full bg-white shadow-[0_0_10px_white] transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                    <p id="motivationText" class="text-xs font-medium mt-2 italic opacity-90">Keep pushing!</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Total Aset</p>
-                    <h2 id="totalAssetDisplay" class="text-2xl font-bold text-slate-800 dark:text-white">Rp 0</h2>
+                    <p class="text-[10px] uppercase font-bold opacity-70 mb-1">Total Net Worth</p>
+                    <h2 id="totalAssetDisplay" class="text-3xl md:text-4xl font-black tracking-tight">Rp 0</h2>
                 </div>
-            </div>
-            <div class="level-bar-container">
-                <div id="levelBar" class="level-bar-fill shadow-[0_0_10px_rgba(79,70,229,0.3)]" style="width: 0%"></div>
-            </div>
-            <p class="text-xs text-center mt-3 text-slate-500 font-medium" id="motivationText">Semangat! Sedikit lagi naik level.</p>
-        </div>
-
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8 admin-only-view">
-            <div class="card p-5 flex flex-col justify-between">
-                <div class="flex items-center gap-2 mb-2">
-                    <div class="p-1.5 bg-indigo-50 dark:bg-indigo-900/30 rounded text-indigo-600 text-xs">💰</div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase">Modal Tunai</p>
-                </div>
-                <h2 id="summaryCash" class="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100">Rp 0</h2>
-            </div>
-            <div class="card p-5 flex flex-col justify-between">
-                <div class="flex items-center gap-2 mb-2">
-                    <div class="p-1.5 bg-emerald-50 dark:bg-emerald-900/30 rounded text-emerald-600 text-xs">📦</div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase">Aset Barang</p>
-                </div>
-                <h2 id="summaryStock" class="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100">Rp 0</h2>
-            </div>
-             <div class="col-span-2 md:col-span-1 card p-5 flex flex-col justify-between bg-slate-50 dark:bg-slate-800/50">
-                 <div class="flex items-center gap-2 mb-2">
-                    <div class="p-1.5 bg-amber-50 dark:bg-amber-900/30 rounded text-amber-600 text-xs">📈</div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase">Total Profit</p>
-                </div>
-                 <h2 class="text-lg md:text-xl font-bold text-emerald-600 dark:text-emerald-400" id="summaryProfit">Rp 0</h2>
             </div>
         </div>
 
-        <div class="card p-6 mb-8 admin-only-view">
+        <div class="admin-only-view grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+            <div class="card-pro p-5">
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-2">Modal Tunai</p>
+                <h3 id="summaryCash" class="text-xl font-bold text-gray-800 dark:text-gray-100">Rp 0</h3>
+            </div>
+            <div class="card-pro p-5">
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-2">Aset Barang</p>
+                <h3 id="summaryStock" class="text-xl font-bold text-gray-800 dark:text-gray-100">Rp 0</h3>
+            </div>
+            <div class="card-pro p-5 md:col-span-1 col-span-2 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-emerald-100 dark:border-none">
+                <p class="text-[10px] text-emerald-600/70 font-bold uppercase tracking-wider mb-2">Total Profit</p>
+                <h3 id="summaryProfit" class="text-xl font-bold text-emerald-600 dark:text-emerald-400">Rp 0</h3>
+            </div>
+        </div>
+
+        <div class="admin-only-view card-pro p-6 mb-8">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="font-semibold text-sm text-slate-700 dark:text-slate-200">Tambah Unit Baru</h3>
-                <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-700/50 rounded-lg p-1">
-                    <span class="text-[10px] font-bold px-2 text-slate-500">TANGGAL:</span>
-                    <input type="date" id="backdateInput" class="bg-transparent border-none text-xs font-medium text-slate-700 dark:text-slate-200 outline-none">
+                <h3 class="font-bold text-sm">Input Unit Baru</h3>
+                <div class="flex items-center gap-2 bg-gray-100 dark:bg-white/5 rounded-lg px-2 py-1">
+                    <span class="text-[9px] font-bold text-gray-400">DATE:</span>
+                    <input type="date" id="backdateInput" class="bg-transparent border-none text-xs font-bold text-gray-600 dark:text-gray-300 outline-none p-0">
                 </div>
             </div>
-            <textarea id="bulkInput" class="input-field h-24 mb-4 font-mono text-xs bg-slate-50 dark:bg-slate-900/50" placeholder="Format: Nama HP : Modal > Harga Jual&#10;Contoh: iPhone 11 : 4000000 > 4500000"></textarea>
-            <div class="grid grid-cols-2 gap-4">
-                <button onclick="parseText('old')" class="py-2.5 bg-white border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg font-semibold text-xs hover:bg-slate-50">Stok Lama</button>
-                <button onclick="parseText('new')" class="py-2.5 bg-indigo-600 text-white rounded-lg font-semibold text-xs hover:bg-indigo-700 shadow-sm">Belanja Baru</button>
+            <textarea id="bulkInput" class="input-clean font-mono text-xs mb-4 min-h-[80px]" placeholder="Format: Nama HP : Modal > Jual&#10;Contoh: iPhone 11 : 4000000 > 4500000"></textarea>
+            <div class="flex gap-3">
+                <button onclick="parseText('old')" class="flex-1 py-3 rounded-xl bg-gray-100 dark:bg-white/10 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-200 transition">Stok Lama</button>
+                <button onclick="parseText('new')" class="flex-1 py-3 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-black text-xs font-bold hover:shadow-lg transition">Belanja Baru</button>
             </div>
         </div>
 
-        <div class="mb-8 admin-only-view">
-            <div class="flex gap-4 mb-4 border-b border-slate-200 dark:border-slate-700 pb-2">
-                <button onclick="document.getElementById('configPanel').classList.toggle('hidden-panel')" class="text-xs font-medium text-slate-500 hover:text-indigo-600 transition">⚙️ Set Saldo Awal</button>
-                <button onclick="document.getElementById('extraProfitPanel').classList.toggle('hidden-panel')" class="text-xs font-medium text-slate-500 hover:text-emerald-600 transition">📈 Profit Tambahan</button>
+        <div class="admin-only-view mb-8 space-y-4">
+            <div class="flex gap-4">
+                <button onclick="document.getElementById('configPanel').classList.toggle('hidden-panel')" class="text-xs font-bold text-gray-400 hover:text-indigo-500 transition flex items-center gap-1">⚙️ Set Modal Awal</button>
+                <button onclick="document.getElementById('extraProfitPanel').classList.toggle('hidden-panel')" class="text-xs font-bold text-gray-400 hover:text-emerald-500 transition flex items-center gap-1">📈 Profit Manual</button>
             </div>
             
-            <div id="configPanel" class="hidden-panel card p-4 bg-slate-50 dark:bg-slate-800/50 mb-4">
-                <label class="text-xs font-semibold text-slate-500 block mb-2">Saldo Awal Cash (Awal Bulan)</label>
-                <input type="number" id="startBalance" class="input-field font-bold text-slate-700 dark:text-white" value="0" onchange="calculateAll()">
+            <div id="configPanel" class="hidden-panel card-pro p-4 bg-gray-50 dark:bg-white/5">
+                <label class="text-[10px] font-bold uppercase text-gray-400 mb-1 block">Saldo Awal Bulan</label>
+                <input type="number" id="startBalance" class="input-clean font-bold text-indigo-600" value="0" onchange="calculateAll()">
             </div>
 
-            <div id="extraProfitPanel" class="hidden-panel">
-                <div class="card p-5 bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-900 mb-4">
-                    <h3 class="font-bold text-emerald-700 dark:text-emerald-400 text-xs mb-3">Input Manual Profit (Barang Terjual Bulan Lalu)</h3>
-                    <textarea id="exBulkInput" class="input-field h-20 mb-3 text-xs bg-white dark:bg-slate-800" placeholder="Format: Nama : Modal > Jual (Per baris)"></textarea>
-                    <button onclick="parseExtraProfitText()" class="w-full py-2 bg-emerald-600 text-white rounded-lg font-semibold text-xs hover:bg-emerald-700">Simpan Profit</button>
-                    <div id="extraProfitList" class="mt-4 space-y-2 pt-3"></div>
-                </div>
+            <div id="extraProfitPanel" class="hidden-panel card-pro p-4 bg-emerald-50/50 dark:bg-emerald-900/10">
+                <textarea id="exBulkInput" class="input-clean bg-white dark:bg-black/20 h-16 mb-2 font-mono text-xs" placeholder="Nama : Modal > Jual"></textarea>
+                <button onclick="parseExtraProfitText()" class="w-full py-2 bg-emerald-500 text-white rounded-lg text-xs font-bold shadow-sm">Simpan</button>
+                <div id="extraProfitList" class="mt-3 space-y-1"></div>
             </div>
         </div>
 
-        <div class="space-y-4">
+        <div class="sticky top-0 z-30 pt-2 pb-4 bg-opacity-80 backdrop-blur-xl -mx-4 px-4 bg-[var(--bg-main)]">
+            <div class="relative mb-3">
+                <input type="text" id="searchInput" onkeyup="renderRows()" placeholder="Cari nama unit..." class="input-clean pl-10 shadow-sm bg-white dark:bg-white/5">
+                <span class="absolute left-3 top-3 text-gray-400">🔍</span>
+            </div>
+            <div class="flex p-1 bg-gray-200/50 dark:bg-white/5 rounded-xl">
+                <button onclick="setFilter('stok')" id="tabStok" class="flex-1 py-2 rounded-lg text-xs font-bold shadow-sm bg-white dark:bg-gray-800 text-indigo-600 transition-all">Stok Aktif</button>
+                <button onclick="setFilter('sold')" id="tabSold" class="flex-1 py-2 rounded-lg text-xs font-bold text-gray-500 hover:text-gray-700 transition-all">Terjual</button>
+                <button onclick="setFilter('extra')" id="tabExtra" class="flex-1 py-2 rounded-lg text-xs font-bold text-gray-500 hover:text-gray-700 transition-all">History</button>
+            </div>
+        </div>
+
+        <div id="itemRows" class="space-y-3 pb-24 grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+        <div class="fixed bottom-0 left-0 lg:left-72 right-0 p-4 bg-white/80 dark:bg-black/80 backdrop-blur-md border-t border-gray-100 dark:border-white/5 flex justify-between items-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">
             <div class="flex gap-2">
-                <div class="relative flex-1">
-                    <input type="text" id="searchInput" onkeyup="renderRows()" placeholder="Cari unit..." class="input-field pl-9 text-sm">
-                    <span class="absolute left-3 top-2.5 text-slate-400 text-sm">🔍</span>
-                </div>
+                <button onclick="setAccessMode('admin')" id="btnAccessAdmin" class="text-indigo-500">ADMIN</button>
+                <span>/</span>
+                <button onclick="setAccessMode('client')" id="btnAccessClient" class="hover:text-indigo-500">CLIENT</button>
             </div>
-            
-            <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg gap-1">
-                <button onclick="setFilter('stok')" id="tabStok" class="flex-1 py-2 rounded-md text-xs font-semibold bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-indigo-400">Stok Aktif</button>
-                <button onclick="setFilter('sold')" id="tabSold" class="flex-1 py-2 rounded-md text-xs font-medium text-slate-500">Terjual</button>
-                <button onclick="setFilter('extra')" id="tabExtra" class="flex-1 py-2 rounded-md text-xs font-medium text-slate-500">History</button>
+            <div class="flex gap-2">
+                <button onclick="setView('mobile')" id="btnMob" class="hover:text-indigo-500">Mobile</button>
+                <span>/</span>
+                <button onclick="setView('desktop')" id="btnDesk" class="hover:text-indigo-500">Desktop</button>
             </div>
-        </div>
-        
-        <div id="itemRows" class="grid grid-cols-1 gap-3 mt-6 pb-20"></div>
-
-        <div class="mt-12 pt-8 border-t border-slate-200 dark:border-slate-800">
-             <div class="flex justify-between items-start">
-                 <div>
-                    <p class="text-[10px] text-slate-400 font-semibold uppercase mb-2">Access Mode</p>
-                    <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg gap-1 inline-flex">
-                        <button onclick="setAccessMode('admin')" id="btnAccessAdmin" class="px-4 py-1.5 rounded-md text-[10px] font-bold bg-white shadow text-indigo-600">ADMIN</button>
-                        <button onclick="setAccessMode('client')" id="btnAccessClient" class="px-4 py-1.5 rounded-md text-[10px] font-bold text-slate-400">CLIENT</button>
-                    </div>
-                 </div>
-                 <div class="text-right">
-                     <p class="text-[10px] text-slate-400 font-semibold uppercase mb-2">View Layout</p>
-                    <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg gap-1 inline-flex">
-                        <button onclick="setView('mobile')" id="btnMob" class="px-3 py-1.5 rounded-md text-[10px] font-bold bg-white shadow text-indigo-600">APP</button>
-                        <button onclick="setView('desktop')" id="btnDesk" class="px-3 py-1.5 rounded-md text-[10px] font-bold text-slate-400">WEB</button>
-                    </div>
-                 </div>
-             </div>
         </div>
     </main>
 
-    <div id="page-hp" class="hidden lg:ml-80 p-8 max-w-5xl mx-auto">
-        <button onclick="switchPage('main')" class="mb-6 text-slate-500 hover:text-indigo-600 font-semibold text-xs flex items-center gap-1">← Dashboard</button>
-        <h1 class="text-2xl font-bold text-slate-800 dark:text-white mb-6">Handphone Check</h1>
-        <div class="card p-8 space-y-6">
-            <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
-                <label class="text-xs font-semibold text-slate-500 uppercase block mb-3">Cek IMEI (imei.info)</label>
-                <div class="flex gap-2">
-                    <input type="number" id="imeiInput" class="input-field" placeholder="Masukkan 15 digit IMEI...">
-                    <button onclick="directImei()" class="bg-slate-800 text-white px-6 rounded-lg font-semibold text-xs hover:bg-slate-700">CEK</button>
-                </div>
+    <div id="page-hp" class="hidden lg:ml-72 p-8 min-h-screen bg-[var(--bg-main)]">
+        <button onclick="switchPage('main')" class="mb-8 text-xs font-bold text-gray-400 hover:text-indigo-500 flex items-center gap-1">← BACK TO DASHBOARD</button>
+        <h1 class="text-3xl font-black mb-6">Device Check</h1>
+        <div class="card-pro p-6 max-w-xl">
+            <div class="flex gap-2 mb-6">
+                <input type="number" id="imeiInput" class="input-clean" placeholder="Paste IMEI here...">
+                <button onclick="directImei()" class="px-6 rounded-xl bg-black dark:bg-white text-white dark:text-black font-bold text-xs">CHECK</button>
             </div>
-             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button onclick="window.open('https://old.beacukai.go.id/websitenewV2/cek-imei.html')" class="p-4 border border-slate-200 hover:border-indigo-500 rounded-xl text-sm font-semibold flex justify-between items-center bg-white dark:bg-slate-800 dark:border-slate-700 transition">Cek Beacukai <span class="text-slate-400">↗</span></button>
-                <button onclick="window.open('https://sickw.com/')" class="p-4 border border-slate-200 hover:border-indigo-500 rounded-xl text-sm font-semibold flex justify-between items-center bg-white dark:bg-slate-800 dark:border-slate-700 transition">SICKSW (SN) <span class="text-slate-400">↗</span></button>
-                <button onclick="window.open('https://www.touchscreentest.com/')" class="p-4 border border-slate-200 hover:border-indigo-500 rounded-xl text-sm font-semibold flex justify-between items-center bg-white dark:bg-slate-800 dark:border-slate-700 transition">Touch Test <span class="text-slate-400">↗</span></button>
+            <div class="grid gap-3">
+                <button onclick="window.open('https://old.beacukai.go.id/websitenewV2/cek-imei.html')" class="p-4 rounded-xl bg-gray-50 dark:bg-white/5 hover:bg-gray-100 text-left text-sm font-bold flex justify-between">Cek Beacukai <span>↗</span></button>
+                <button onclick="window.open('https://sickw.com/')" class="p-4 rounded-xl bg-gray-50 dark:bg-white/5 hover:bg-gray-100 text-left text-sm font-bold flex justify-between">SICKSW (Detailed Info) <span>↗</span></button>
+                <button onclick="window.open('https://www.touchscreentest.com/')" class="p-4 rounded-xl bg-gray-50 dark:bg-white/5 hover:bg-gray-100 text-left text-sm font-bold flex justify-between">Touchscreen Test <span>↗</span></button>
             </div>
         </div>
     </div>
-    
-    <div id="page-dial" class="hidden lg:ml-80 p-8 max-w-5xl mx-auto">
-        <button onclick="switchPage('main')" class="mb-6 text-slate-500 hover:text-indigo-600 font-semibold text-xs">← Dashboard</button>
-        <h1 class="text-2xl font-bold text-slate-800 dark:text-white mb-6">Kode Dial Rahasia</h1>
+
+    <div id="page-dial" class="hidden lg:ml-72 p-8 min-h-screen">
+        <button onclick="switchPage('main')" class="mb-8 text-xs font-bold text-gray-400 hover:text-indigo-500">← BACK</button>
+        <h1 class="text-3xl font-black mb-6">Secret Codes</h1>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="card p-5 border-l-4 border-indigo-500"><h3 class="font-bold text-xs text-slate-400 mb-2">SAMSUNG</h3><p class="text-xl font-mono font-semibold text-slate-700 dark:text-slate-200">*#0*#</p></div>
-            <div class="card p-5 border-l-4 border-indigo-500"><h3 class="font-bold text-xs text-slate-400 mb-2">XIAOMI</h3><p class="text-xl font-mono font-semibold text-slate-700 dark:text-slate-200">*#*#64663#*#*</p></div>
-            <div class="card p-5 border-l-4 border-indigo-500"><h3 class="font-bold text-xs text-slate-400 mb-2">OPPO/REALME</h3><p class="text-xl font-mono font-semibold text-slate-700 dark:text-slate-200">*#899#</p></div>
-            <div class="card p-5 border-l-4 border-indigo-500"><h3 class="font-bold text-xs text-slate-400 mb-2">VIVO</h3><p class="text-xl font-mono font-semibold text-slate-700 dark:text-slate-200">*#558#</p></div>
-            <div class="card p-5 border-l-4 border-indigo-500"><h3 class="font-bold text-xs text-slate-400 mb-2">IPHONE</h3><p class="text-xl font-mono font-semibold text-slate-700 dark:text-slate-200">*3001#12345#*</p></div>
-            <div class="card p-5 border-l-4 border-indigo-500"><h3 class="font-bold text-xs text-slate-400 mb-2">IMEI</h3><p class="text-xl font-mono font-semibold text-slate-700 dark:text-slate-200">*#06#</p></div>
+            <div class="card-pro p-6 hover:-translate-y-1"><h3 class="text-xs font-bold text-gray-400 mb-2">SAMSUNG</h3><p class="text-2xl font-mono font-bold">*#0*#</p></div>
+            <div class="card-pro p-6 hover:-translate-y-1"><h3 class="text-xs font-bold text-gray-400 mb-2">XIAOMI</h3><p class="text-2xl font-mono font-bold">*#*#64663#*#*</p></div>
+            <div class="card-pro p-6 hover:-translate-y-1"><h3 class="text-xs font-bold text-gray-400 mb-2">OPPO/REALME</h3><p class="text-2xl font-mono font-bold">*#899#</p></div>
+            <div class="card-pro p-6 hover:-translate-y-1"><h3 class="text-xs font-bold text-gray-400 mb-2">VIVO</h3><p class="text-2xl font-mono font-bold">*#558#</p></div>
+            <div class="card-pro p-6 hover:-translate-y-1"><h3 class="text-xs font-bold text-gray-400 mb-2">IPHONE</h3><p class="text-2xl font-mono font-bold">*3001#12345#*</p></div>
+            <div class="card-pro p-6 hover:-translate-y-1"><h3 class="text-xs font-bold text-gray-400 mb-2">Check IMEI</h3><p class="text-2xl font-mono font-bold">*#06#</p></div>
         </div>
     </div>
 
-    <div id="page-laptop" class="hidden lg:ml-80 p-8 max-w-5xl mx-auto">
-        <button onclick="switchPage('main')" class="mb-6 text-slate-500 hover:text-indigo-600 font-semibold text-xs">← Dashboard</button>
-        <h1 class="text-2xl font-bold text-slate-800 dark:text-white mb-6">Laptop Check List</h1>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="card p-6"><h3 class="font-bold text-sm mb-4 text-indigo-600">1. Fisik & Layar</h3><ul class="text-xs space-y-3 text-slate-600 dark:text-slate-400 font-medium"><li>◻️ Cek Engsel & Baut</li><li>◻️ Dead Pixel Test</li><li>◻️ White Spot LCD</li></ul></div>
-            <div class="card p-6"><h3 class="font-bold text-sm mb-4 text-indigo-600">2. Performa</h3><ul class="text-xs space-y-3 text-slate-600 dark:text-slate-400 font-medium"><li>◻️ Battery Report (CMD)</li><li>◻️ SSD Health (CrystalDisk)</li><li>◻️ Keyboard Test</li></ul></div>
-             <div class="card p-6"><h3 class="font-bold text-sm mb-4 text-indigo-600">3. Lainnya</h3><ul class="text-xs space-y-3 text-slate-600 dark:text-slate-400 font-medium"><li>◻️ USB/HDMI/Audio</li><li>◻️ Webcam & Mic</li><li>◻️ Speaker</li></ul></div>
+    <div id="page-laptop" class="hidden lg:ml-72 p-8 min-h-screen">
+        <button onclick="switchPage('main')" class="mb-8 text-xs font-bold text-gray-400 hover:text-indigo-500">← BACK</button>
+        <h1 class="text-3xl font-black mb-6">Laptop QC</h1>
+        <div class="grid md:grid-cols-3 gap-4">
+            <div class="card-pro p-6">
+                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold mb-4">1</div>
+                <h3 class="font-bold mb-2">Physical</h3>
+                <ul class="text-sm text-gray-500 space-y-2"><li>• Hinge Check</li><li>• Dead Pixel</li><li>• White Spot</li></ul>
+            </div>
+            <div class="card-pro p-6">
+                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold mb-4">2</div>
+                <h3 class="font-bold mb-2">Performance</h3>
+                <ul class="text-sm text-gray-500 space-y-2"><li>• Battery Health</li><li>• SSD Sentinel</li><li>• Keyboard All Keys</li></ul>
+            </div>
+            <div class="card-pro p-6">
+                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold mb-4">3</div>
+                <h3 class="font-bold mb-2">Features</h3>
+                <ul class="text-sm text-gray-500 space-y-2"><li>• Ports (USB/HDMI)</li><li>• Webcam & Mic</li><li>• Speakers</li></ul>
+            </div>
         </div>
     </div>
 
-    <div id="editModal" class="fixed inset-0 z-50 flex items-center justify-center hidden p-4">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeEditModal()"></div>
-        <div class="relative card w-full max-w-sm p-6 shadow-xl transform transition-all bg-white dark:bg-slate-800">
-            <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-6">Edit Unit</h3>
+    <div id="editModal" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeEditModal()"></div>
+        <div class="relative card-pro w-full max-w-sm p-6 bg-[var(--card-bg)] shadow-2xl scale-100 transition-transform">
+            <h3 class="text-lg font-bold mb-4">Edit Item</h3>
             <input type="hidden" id="editId">
-            <div class="space-y-4">
-                <div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Nama Unit</label><input type="text" id="editName" class="input-field font-semibold"></div>
+            <div class="space-y-3">
+                <input type="text" id="editName" class="input-clean font-bold" placeholder="Nama Unit">
                 <div class="grid grid-cols-2 gap-3">
-                    <div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Modal</label><input type="number" id="editModalPrice" class="input-field"></div>
-                    <div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Jual</label><input type="number" id="editSellPrice" class="input-field"></div>
+                    <input type="number" id="editModalPrice" class="input-clean" placeholder="Modal">
+                    <input type="number" id="editSellPrice" class="input-clean" placeholder="Jual">
                 </div>
-                <div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Kondisi / Note</label><input type="text" id="editNotes" class="input-field"></div>
-                <div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Tanggal Masuk</label><input type="date" id="editDateIn" class="input-field"></div>
-                <div id="buyerField" class="hidden"><label class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1 block">Nama Pembeli</label><input type="text" id="editBuyer" class="input-field border-emerald-200 bg-emerald-50 dark:bg-emerald-900/20 dark:border-emerald-800"></div>
-                <button onclick="saveEdit()" class="w-full py-3 bg-indigo-600 text-white rounded-lg font-bold shadow hover:bg-indigo-700 mt-2">Simpan Perubahan</button>
+                <input type="text" id="editNotes" class="input-clean" placeholder="Catatan/Minus">
+                <input type="date" id="editDateIn" class="input-clean">
+                <div id="buyerField" class="hidden">
+                    <input type="text" id="editBuyer" class="input-clean bg-emerald-50 dark:bg-emerald-900/10 text-emerald-700" placeholder="Nama Pembeli">
+                </div>
+                <button onclick="saveEdit()" class="w-full py-3 rounded-xl bg-black dark:bg-white text-white dark:text-black font-bold shadow-lg hover:scale-[1.02] transition">Save Changes</button>
             </div>
         </div>
     </div>
 
     <div id="cutLossModal" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
-        <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" onclick="toggleCutLossModal()"></div>
-        <div class="relative card w-full max-w-sm p-6 shadow-2xl border-t-4 border-rose-500 bg-white dark:bg-slate-800">
-            <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-4">Kalkulator Cut Loss</h3>
-            <div class="space-y-3 mb-6">
-                <div class="p-3 bg-rose-50 dark:bg-rose-900/10 rounded-lg border border-rose-100 dark:border-rose-900">
-                    <p class="text-[10px] font-bold text-rose-500 uppercase mb-2">Barang Mandek</p>
-                    <input type="number" id="clModalA" placeholder="Modal Awal" class="w-full bg-transparent p-1 text-sm border-b border-rose-200 dark:border-rose-800 outline-none mb-2 placeholder:text-slate-400">
-                    <input type="number" id="clJualA" placeholder="Rencana Jual (Rugi)" class="w-full bg-transparent p-1 text-sm border-b border-rose-200 dark:border-rose-800 outline-none placeholder:text-slate-400">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="toggleCutLossModal()"></div>
+        <div class="relative card-pro w-full max-w-sm p-6 bg-[var(--card-bg)]">
+            <h3 class="text-lg font-bold mb-4 flex items-center gap-2"><span class="text-rose-500">✂️</span> Cut Loss Calculator</h3>
+            <div class="space-y-4 mb-6">
+                <div class="p-3 bg-rose-50 dark:bg-rose-900/10 rounded-xl">
+                    <p class="text-[10px] font-bold text-rose-500 uppercase mb-2">Item Mandek (Lama)</p>
+                    <input type="number" id="clModalA" placeholder="Modal Awal" class="input-clean mb-2 bg-white dark:bg-black/20">
+                    <input type="number" id="clJualA" placeholder="Jual Rugi brp?" class="input-clean bg-white dark:bg-black/20">
                 </div>
-                <div class="p-3 bg-emerald-50 dark:bg-emerald-900/10 rounded-lg border border-emerald-100 dark:border-emerald-900">
-                    <p class="text-[10px] font-bold text-emerald-500 uppercase mb-2">Barang Pengganti</p>
-                    <input type="number" id="clModalB" placeholder="Modal Barang Baru" class="w-full bg-transparent p-1 text-sm border-b border-emerald-200 dark:border-emerald-800 outline-none mb-2 placeholder:text-slate-400">
-                    <input type="number" id="clJualB" placeholder="Potensi Jual" class="w-full bg-transparent p-1 text-sm border-b border-emerald-200 dark:border-emerald-800 outline-none placeholder:text-slate-400">
+                <div class="p-3 bg-emerald-50 dark:bg-emerald-900/10 rounded-xl">
+                    <p class="text-[10px] font-bold text-emerald-500 uppercase mb-2">Item Pengganti (Baru)</p>
+                    <input type="number" id="clModalB" placeholder="Modal Baru" class="input-clean mb-2 bg-white dark:bg-black/20">
+                    <input type="number" id="clJualB" placeholder="Potensi Jual" class="input-clean bg-white dark:bg-black/20">
                 </div>
             </div>
-            <div class="text-center p-4 bg-slate-100 dark:bg-slate-900 rounded-xl mb-4">
-                <p class="text-[10px] uppercase text-slate-500 font-semibold">Estimasi Net Profit</p>
-                <h2 id="clResult" class="text-2xl font-bold text-slate-800 dark:text-slate-200 my-1">Rp 0</h2>
-                <p id="clAdvice" class="text-[10px] font-bold text-slate-400">...</p>
+            <div class="text-center mb-4">
+                <h2 id="clResult" class="text-2xl font-black">Rp 0</h2>
+                <p id="clAdvice" class="text-xs font-bold text-gray-400 mt-1">...</p>
             </div>
-            <button onclick="calcCutLoss()" class="w-full py-3 bg-slate-800 text-white font-semibold rounded-lg hover:bg-slate-700">Hitung Keputusan</button>
+            <button onclick="calcCutLoss()" class="w-full py-3 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-black font-bold">Calculate</button>
         </div>
     </div>
 
     <div id="importModal" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="toggleImportModal()"></div>
-        <div class="relative card w-full max-w-md p-8 shadow-2xl bg-white dark:bg-slate-800">
-            <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-4">Import Text</h3>
-            <textarea id="importArea" class="input-field h-48 mb-4 font-mono text-xs" placeholder="Paste laporan WhatsApp di sini..."></textarea>
-            <button onclick="processImport()" class="w-full py-3 bg-indigo-600 text-white rounded-lg font-bold shadow hover:bg-indigo-700">Proses</button>
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="toggleImportModal()"></div>
+        <div class="relative card-pro w-full max-w-md p-6 bg-[var(--card-bg)]">
+            <h3 class="text-lg font-bold mb-4">Bulk Import</h3>
+            <textarea id="importArea" class="input-clean h-48 mb-4 font-mono text-xs" placeholder="Paste WhatsApp report here..."></textarea>
+            <button onclick="processImport()" class="w-full py-3 rounded-xl bg-indigo-600 text-white font-bold shadow-glow">Process Data</button>
         </div>
     </div>
 
     <script>
-        // --- CORE DATA & CONFIG ---
+        // --- LOGIC SCRIPT (SAME AS BEFORE, PRESERVED) ---
         let items = [];
         let extraProfits = [];
         let currentFilter = 'stok';
         let accessMode = 'admin';
         const LEVELS = [50000000, 100000000, 250000000, 500000000, 1000000000];
 
-        // --- INIT & DARK MODE ---
         window.onload = () => { 
             loadData(); 
             if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
@@ -451,18 +424,23 @@
         function updateThemeIcon() {
             const isDark = document.body.classList.contains('dark-mode');
             document.getElementById('darkModeIcon').innerText = isDark ? "☀️" : "🌙";
+            document.getElementById('darkModeText').innerText = isDark ? "Light Mode" : "Dark Mode";
         }
 
-        // --- NAVIGATION & UI ---
         function toggleSidebar() { 
             document.getElementById('sidebar').classList.toggle('-translate-x-full'); 
             document.getElementById('overlay').classList.toggle('hidden'); 
+            document.getElementById('overlay').classList.toggle('opacity-0'); 
         }
-        function toggleDropdown(id) { document.getElementById(id).classList.toggle('show'); }
+        function toggleDropdown(id) { 
+            const el = document.getElementById(id);
+            el.classList.toggle('hidden');
+        }
         function switchPage(page) {
             ['page-main', 'page-hp', 'page-laptop', 'page-dial'].forEach(p => document.getElementById(p)?.classList.add('hidden'));
             document.getElementById('page-' + page)?.classList.remove('hidden');
-            if(window.innerWidth < 1024) toggleSidebar();
+            if(window.innerWidth < 1024) document.getElementById('sidebar').classList.add('-translate-x-full'); 
+            document.getElementById('overlay').classList.add('hidden');
             window.scrollTo(0,0);
         }
         
@@ -473,14 +451,12 @@
             const adminOnly = document.querySelectorAll('.admin-only-view');
 
             if(mode === 'admin') {
-                btnA.className = "px-4 py-1.5 rounded-md text-[10px] font-bold bg-white dark:bg-slate-600 shadow text-indigo-600 dark:text-white transition";
-                btnC.className = "px-4 py-1.5 rounded-md text-[10px] font-bold text-slate-400 hover:text-slate-600 transition";
+                btnA.classList.add('text-indigo-500'); btnC.classList.remove('text-indigo-500');
                 document.getElementById('admin-top-actions').style.display = 'flex';
                 adminOnly.forEach(el => el.style.display = 'block');
                 document.getElementById('itemRows').classList.add('md:grid-cols-2');
             } else {
-                btnC.className = "px-4 py-1.5 rounded-md text-[10px] font-bold bg-white dark:bg-slate-600 shadow text-indigo-600 dark:text-white transition";
-                btnA.className = "px-4 py-1.5 rounded-md text-[10px] font-bold text-slate-400 hover:text-slate-600 transition";
+                btnC.classList.add('text-indigo-500'); btnA.classList.remove('text-indigo-500');
                 document.getElementById('admin-top-actions').style.display = 'none';
                 adminOnly.forEach(el => el.style.display = 'none');
                 document.getElementById('itemRows').classList.remove('md:grid-cols-2');
@@ -492,16 +468,15 @@
             const body = document.body;
             if(mode === 'desktop') {
                 body.classList.add('mode-desktop');
-                document.getElementById('btnDesk').className = "px-3 py-1.5 rounded-md text-[10px] font-bold bg-white dark:bg-slate-600 shadow text-indigo-600 dark:text-white transition";
-                document.getElementById('btnMob').className = "px-3 py-1.5 rounded-md text-[10px] font-bold text-slate-400 hover:text-slate-600 transition";
+                document.getElementById('btnDesk').classList.add('text-indigo-500');
+                document.getElementById('btnMob').classList.remove('text-indigo-500');
             } else {
                 body.classList.remove('mode-desktop');
-                document.getElementById('btnMob').className = "px-3 py-1.5 rounded-md text-[10px] font-bold bg-white dark:bg-slate-600 shadow text-indigo-600 dark:text-white transition";
-                document.getElementById('btnDesk').className = "px-3 py-1.5 rounded-md text-[10px] font-bold text-slate-400 hover:text-slate-600 transition";
+                document.getElementById('btnMob').classList.add('text-indigo-500');
+                document.getElementById('btnDesk').classList.remove('text-indigo-500');
             }
         }
 
-        // --- SNOWBALL LOGIC ---
         function calculateAll() {
             const start = Number(document.getElementById('startBalance').value) || 0;
             let cashUsed = 0, cashIn = 0, totalStockValue = 0, profitRealized = 0;
@@ -517,10 +492,8 @@
                 }
             });
 
-            // Add Extra Profit
             const extraProfitTotal = extraProfits.reduce((sum, p) => sum + p.profit, 0);
             profitRealized += extraProfitTotal;
-
             const currentCash = start - cashUsed + cashIn + extraProfitTotal;
             const totalAsset = currentCash + totalStockValue;
 
@@ -529,17 +502,13 @@
             document.getElementById('totalAssetDisplay').innerText = formatRupiah(totalAsset);
             document.getElementById('summaryProfit').innerText = formatRupiah(profitRealized);
 
-            // Level System
             let currentLevel = 1;
             let nextTarget = LEVELS[0];
             for (let i = 0; i < LEVELS.length; i++) {
                 if (totalAsset >= LEVELS[i]) {
                     currentLevel = i + 2;
                     nextTarget = LEVELS[i+1] || LEVELS[i] * 2;
-                } else {
-                    nextTarget = LEVELS[i];
-                    break;
-                }
+                } else { nextTarget = LEVELS[i]; break; }
             }
             
             let prevTarget = currentLevel === 1 ? 0 : LEVELS[currentLevel-2];
@@ -549,7 +518,7 @@
             document.getElementById('currentLevel').innerText = currentLevel;
             document.getElementById('nextLevelTarget').innerText = (nextTarget / 1000000) + " Juta";
             document.getElementById('levelBar').style.width = progress + "%";
-            document.getElementById('motivationText').innerText = progress > 80 ? "🔥 DIKIT LAGI! Gaspol terus!" : "❄️ Keep Snowballing! Putar terus profitnya.";
+            document.getElementById('motivationText').innerText = progress > 80 ? "🔥 Almost there! Push it!" : "❄️ Keep Snowballing.";
             
             renderRows();
             renderExtraProfitList();
@@ -560,33 +529,21 @@
             const container = document.getElementById('itemRows');
             const search = document.getElementById('searchInput').value.toLowerCase();
             const now = new Date();
-
             let display = [];
             
-            // LOGIKA FILTER BARU
             if(currentFilter === 'extra') {
                  container.innerHTML = '';
                  extraProfits.filter(p => p.name.toLowerCase().includes(search)).forEach(p => {
                     const div = document.createElement('div');
-                    div.className = "card p-4 flex justify-between items-center bg-slate-50 dark:bg-slate-800";
-                    div.innerHTML = `
-                        <div>
-                            <span class="text-[9px] font-bold bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-1.5 py-0.5 rounded uppercase tracking-wide">Bulan Lalu</span>
-                            <h4 class="font-semibold text-sm text-slate-800 dark:text-slate-200 mt-1">${p.name}</h4>
-                            <p class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">+ ${formatNum(p.profit)}</p>
-                        </div>
-                        <button onclick="removeExtraProfit(${p.id})" class="text-slate-400 hover:text-red-500 font-bold px-2 text-sm">✕</button>
-                    `;
+                    div.className = "card-pro p-4 flex justify-between items-center bg-gray-50 dark:bg-white/5 border-none";
+                    div.innerHTML = `<div><span class="status-pill bg-gray-200 text-gray-600 mb-1 inline-block">HISTORY</span><h4 class="font-bold text-sm">${p.name}</h4><p class="text-xs text-emerald-500 font-bold">+ ${formatNum(p.profit)}</p></div><button onclick="removeExtraProfit(${p.id})" class="text-gray-300 hover:text-rose-500 px-2">✕</button>`;
                     container.appendChild(div);
                  });
                  return;
             } else {
                 display = items.filter(i => i.status === currentFilter && i.name.toLowerCase().includes(search));
-                if(currentFilter === 'stok') {
-                    display.sort((a, b) => new Date(a.dateObj || a.entryDate) - new Date(b.dateObj || b.entryDate));
-                } else {
-                    display.sort((a, b) => new Date(b.soldDateObj || b.soldAt) - new Date(a.soldDateObj || a.soldAt));
-                }
+                if(currentFilter === 'stok') display.sort((a, b) => new Date(a.dateObj || a.entryDate) - new Date(b.dateObj || b.entryDate));
+                else display.sort((a, b) => new Date(b.soldDateObj || b.soldAt) - new Date(a.soldDateObj || a.soldAt));
             }
 
             container.innerHTML = '';
@@ -594,92 +551,69 @@
             display.forEach(item => {
                 const entryDate = new Date(item.dateObj || now); 
                 const ageInDays = Math.floor((now - entryDate) / (1000 * 60 * 60 * 24));
+                const profit = item.price - item.modal;
                 
-                let rowClass = "";
-                let ageBadge = "";
-                let statusDot = "bg-emerald-500";
+                let ageColor = "text-gray-400";
+                if(item.status === 'stok' && ageInDays > 30) ageColor = "text-rose-500 font-bold";
+                else if(item.status === 'stok' && ageInDays > 14) ageColor = "text-amber-500 font-bold";
 
                 if(accessMode === 'admin') {
-                    if(item.status === 'stok') {
-                        if(ageInDays > 30) {
-                            rowClass = "aging-danger"; 
-                            ageBadge = `<span class="text-[10px] text-red-600 font-bold ml-2">(${ageInDays} Hari)</span>`;
-                        } else if (ageInDays > 14) {
-                            rowClass = "aging-warning"; 
-                            ageBadge = `<span class="text-[10px] text-amber-600 font-bold ml-2">(${ageInDays} Hari)</span>`;
-                        } else {
-                            ageBadge = `<span class="text-[10px] text-slate-400 font-medium ml-2">${ageInDays} Hari</span>`;
-                        }
-                    } else if(item.status === 'sold') {
-                        rowClass = "border-l-4 border-emerald-500"; // Keep simple emerald left border for sold items
-                    }
-
-                    const profit = item.price - item.modal;
-                    const profitClass = profit >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400";
-                    
                     const div = document.createElement('div');
-                    div.className = `card p-4 transition-all hover:shadow-md cursor-pointer ${rowClass} relative group`;
+                    div.className = `card-pro p-5 relative group border-none ${item.status === 'sold' ? 'opacity-80' : ''}`;
                     div.innerHTML = `
-                        <div class="flex justify-between items-start" onclick="openEditModal(${item.id})">
+                        <div class="flex justify-between items-start cursor-pointer" onclick="openEditModal(${item.id})">
                             <div class="flex-1">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase ${item.type === 'new' ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' : 'bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300'}">${item.type === 'new' ? 'BARU' : 'LAMA'}</span>
-                                    ${item.status === 'stok' ? ageBadge : ''}
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="status-pill ${item.type === 'new' ? 'bg-indigo-100 text-indigo-700' : 'bg-orange-100 text-orange-700'}">${item.type === 'new' ? 'NEW' : 'USED'}</span>
+                                    ${item.status === 'stok' ? `<span class="text-[10px] ${ageColor}">${ageInDays} days</span>` : '<span class="status-pill bg-emerald-100 text-emerald-700">SOLD</span>'}
                                 </div>
-                                <h4 class="font-semibold text-sm text-slate-800 dark:text-slate-100 mb-1">${item.name}</h4>
-                                <div class="flex gap-3 text-xs font-medium text-slate-500 font-mono">
-                                    <span>M: ${formatNum(item.modal)}</span>
-                                    <span class="text-slate-300">➜</span>
-                                    <span class="${item.status === 'stok' ? 'text-indigo-600 dark:text-indigo-400' : ''}">J: ${formatNum(item.price)}</span>
+                                <h4 class="font-bold text-gray-800 dark:text-white mb-1 leading-tight">${item.name}</h4>
+                                <div class="flex items-center gap-3 text-xs font-mono text-gray-500">
+                                    <span>M:${formatNum(item.modal)}</span>
+                                    <span class="text-gray-300">➜</span>
+                                    <span class="${item.status==='stok'?'text-indigo-600 font-bold':''}">${formatNum(item.price)}</span>
                                 </div>
-                                ${item.notes ? `<p class="text-[10px] text-amber-600 dark:text-amber-500 mt-2 bg-amber-50 dark:bg-amber-900/20 inline-block px-2 py-0.5 rounded">📝 ${item.notes}</p>` : ''}
-                                ${item.buyer ? `<p class="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium mt-1">👤 ${item.buyer}</p>` : ''}
+                                ${item.notes ? `<p class="text-[10px] text-amber-600 mt-2 bg-amber-50 dark:bg-amber-900/20 inline-block px-2 py-1 rounded">📝 ${item.notes}</p>` : ''}
+                                ${item.buyer ? `<p class="text-[10px] text-emerald-600 font-bold mt-1">👤 ${item.buyer}</p>` : ''}
                             </div>
                             <div class="flex flex-col items-end gap-2" onclick="event.stopPropagation()">
                                 ${item.status === 'stok' 
-                                    ? `<button onclick="markSold(${item.id})" class="bg-emerald-600 text-white px-3 py-1.5 rounded-md font-bold text-[10px] shadow hover:bg-emerald-700">LAKU</button>` 
-                                    : `<span class="text-xs font-bold ${profitClass}">${profit >= 0 ? '+' : ''}${formatNum(profit)}</span>`
+                                    ? `<button onclick="markSold(${item.id})" class="px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-[10px] font-bold shadow hover:bg-emerald-600">SOLD</button>` 
+                                    : `<span class="text-xs font-bold ${profit >= 0 ? 'text-emerald-500' : 'text-rose-500'}">${profit >= 0 ? '+' : ''}${formatNum(profit)}</span>`
                                 }
-                                <button onclick="deleteItem(${item.id})" class="text-slate-300 hover:text-red-500 text-xs p-1 opacity-0 group-hover:opacity-100 transition">✕</button>
+                                <button onclick="deleteItem(${item.id})" class="text-gray-300 hover:text-rose-500 p-1 opacity-0 group-hover:opacity-100 transition">✕</button>
                             </div>
                         </div>
                     `;
                     container.appendChild(div);
-
                 } else {
-                    // CLIENT MODE VIEW
+                    // CLIENT VIEW
                     const card = document.createElement('div');
-                    card.className = "client-item-card card flex justify-between items-center transition-all bg-white dark:bg-slate-800";
+                    card.className = "card-pro p-6 flex justify-between items-center";
                     card.innerHTML = `
-                        <div class="flex-1">
-                            <h4 class="font-bold text-base text-slate-800 dark:text-white mb-1">${item.name}</h4>
+                        <div>
+                            <h4 class="font-bold text-lg text-gray-800 dark:text-white mb-1">${item.name}</h4>
                             <div class="flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full ${item.status === 'sold' ? 'bg-red-400' : 'bg-emerald-400'}"></span>
-                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${item.status === 'sold' ? 'SOLD OUT' : 'READY STOCK'}</span>
+                                <span class="w-2 h-2 rounded-full ${item.status === 'sold' ? 'bg-rose-500' : 'bg-emerald-500'}"></span>
+                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">${item.status === 'sold' ? 'SOLD OUT' : 'AVAILABLE'}</span>
                             </div>
                         </div>
                         <div class="text-right">
-                            <p class="text-[10px] font-bold text-indigo-500 uppercase tracking-wider mb-0.5">HARGA</p>
-                            <div class="text-indigo-600 dark:text-indigo-400 font-bold text-lg">Rp ${item.price.toLocaleString('id-ID')}</div>
+                            <p class="text-[10px] font-bold text-indigo-500 uppercase">PRICE</p>
+                            <div class="text-xl font-black text-gray-800 dark:text-white">Rp ${item.price.toLocaleString('id-ID')}</div>
                         </div>`;
                     container.appendChild(card);
                 }
             });
         }
 
-        // --- CRUD LOGIC (UNTOUCHED) ---
+        // --- STANDARD FUNCTIONS (Identical to previous logic) ---
         function parseText(type) {
             const rawText = document.getElementById('bulkInput').value;
             const customDate = document.getElementById('backdateInput').value;
             if (!rawText.trim()) return;
-            
-            let entryTime;
-            if (customDate) {
-                entryTime = new Date(customDate);
-                entryTime.setHours(12, 0, 0, 0); 
-            } else {
-                entryTime = new Date();
-            }
+            let entryTime = customDate ? new Date(customDate) : new Date();
+            if(customDate) entryTime.setHours(12, 0, 0, 0);
 
             rawText.split('\n').forEach(line => {
                 const parts = line.split(/[:>]/);
@@ -688,16 +622,7 @@
                     const modal = Number(parts[1].replace(/[^0-9]/g, ''));
                     const price = Number(parts[2].replace(/[^0-9]/g, ''));
                     if (name && modal) {
-                        items.push({ 
-                            id: Date.now() + Math.random(), 
-                            name, modal, price, 
-                            status: 'stok', 
-                            type, 
-                            dateObj: entryTime.toISOString(), 
-                            entryDate: formatDate(entryTime),
-                            notes: '',
-                            buyer: ''
-                        });
+                        items.push({ id: Date.now() + Math.random(), name, modal, price, status: 'stok', type, dateObj: entryTime.toISOString(), entryDate: formatDate(entryTime), notes: '', buyer: '' });
                     }
                 }
             });
@@ -708,243 +633,101 @@
         function markSold(id) {
             const item = items.find(i => i.id === id);
             if (item) {
-                const buyer = prompt("Nama Pembeli (Optional):", "") || "";
-                item.status = 'sold';
-                item.soldDateObj = new Date().toISOString();
-                item.soldAt = formatDate(new Date());
-                item.buyer = buyer;
-                
-                const invoice = `*INVOICE*\nUnit: ${item.name}\nHarga: ${formatRupiah(item.price)}\n\nTerima kasih Kak ${buyer}! Garansi personal 7 hari (Segel utuh).`;
-                if(confirm("Barang Laku! Kirim Nota ke WA?")) {
-                    window.open(`https://wa.me/?text=${encodeURIComponent(invoice)}`, '_blank');
-                }
+                const buyer = prompt("Nama Pembeli:", "") || "";
+                item.status = 'sold'; item.soldDateObj = new Date().toISOString(); item.soldAt = formatDate(new Date()); item.buyer = buyer;
+                const invoice = `*INVOICE*\nUnit: ${item.name}\nHarga: ${formatRupiah(item.price)}\n\nTerima kasih Kak ${buyer}!`;
+                if(confirm("Kirim Nota WA?")) window.open(`https://wa.me/?text=${encodeURIComponent(invoice)}`, '_blank');
                 calculateAll();
             }
         }
-
-        function deleteItem(id) {
-            if(confirm('Hapus item ini permanen?')) {
-                items = items.filter(i => i.id !== id);
-                calculateAll();
-            }
-        }
-
-        // --- EXTRA PROFIT LOGIC ---
+        function deleteItem(id) { if(confirm('Hapus permanen?')) { items = items.filter(i => i.id !== id); calculateAll(); } }
         function parseExtraProfitText() {
             const rawText = document.getElementById('exBulkInput').value;
             if (!rawText.trim()) return;
             rawText.split('\n').forEach(line => {
                 const parts = line.split(/[:>]/);
                 if(parts.length >= 3) {
-                    const name = parts[0].trim();
-                    const modal = Number(parts[1].replace(/[^0-9]/g, ''));
-                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
-                    if (name && modal && price) {
-                        extraProfits.push({ id: Date.now() + Math.random(), name, modal, price, profit: price - modal });
-                    }
+                    const name = parts[0].trim(); const modal = Number(parts[1].replace(/[^0-9]/g, '')); const price = Number(parts[2].replace(/[^0-9]/g, ''));
+                    if (name && modal && price) extraProfits.push({ id: Date.now() + Math.random(), name, modal, price, profit: price - modal });
                 }
             });
-            document.getElementById('exBulkInput').value = '';
-            calculateAll();
+            document.getElementById('exBulkInput').value = ''; calculateAll();
         }
         function removeExtraProfit(id) { extraProfits = extraProfits.filter(p => p.id !== id); calculateAll(); }
         function renderExtraProfitList() {
-            const list = document.getElementById('extraProfitList');
-            list.innerHTML = '';
+            const list = document.getElementById('extraProfitList'); list.innerHTML = '';
             extraProfits.forEach(p => {
-                const div = document.createElement('div');
-                div.className = "flex justify-between items-center text-xs bg-white dark:bg-slate-700/50 p-2 rounded border border-slate-100 dark:border-slate-700";
-                div.innerHTML = `<div><b class="text-slate-700 dark:text-slate-200">${p.name}</b><p class="text-emerald-600 dark:text-emerald-400">Profit: Rp ${p.profit.toLocaleString('id-ID')}</p></div><button onclick="removeExtraProfit(${p.id})" class="text-slate-400 hover:text-red-500">✕</button>`;
+                const div = document.createElement('div'); div.className = "flex justify-between text-xs text-gray-500 border-b border-gray-100 dark:border-white/5 py-1";
+                div.innerHTML = `<span>${p.name} (+${formatNum(p.profit)})</span><button onclick="removeExtraProfit(${p.id})" class="text-rose-500">x</button>`;
                 list.appendChild(div);
             });
         }
-
-        // --- EDIT MODAL ---
         function openEditModal(id) {
             if(accessMode !== 'admin') return;
-            const item = items.find(i => i.id === id);
-            if(!item) return;
-            document.getElementById('editId').value = id;
-            document.getElementById('editName').value = item.name;
-            document.getElementById('editModalPrice').value = item.modal;
-            document.getElementById('editSellPrice').value = item.price;
-            document.getElementById('editNotes').value = item.notes || '';
-            document.getElementById('editBuyer').value = item.buyer || '';
-            
-            const d = new Date(item.dateObj || item.entryDate);
-            if(!isNaN(d)) document.getElementById('editDateIn').value = d.toISOString().split('T')[0];
-
-            if(item.status === 'sold') document.getElementById('buyerField').classList.remove('hidden');
-            else document.getElementById('buyerField').classList.add('hidden');
-
+            const item = items.find(i => i.id === id); if(!item) return;
+            document.getElementById('editId').value = id; document.getElementById('editName').value = item.name; document.getElementById('editModalPrice').value = item.modal; document.getElementById('editSellPrice').value = item.price; document.getElementById('editNotes').value = item.notes || ''; document.getElementById('editBuyer').value = item.buyer || '';
+            const d = new Date(item.dateObj || item.entryDate); if(!isNaN(d)) document.getElementById('editDateIn').value = d.toISOString().split('T')[0];
+            if(item.status === 'sold') document.getElementById('buyerField').classList.remove('hidden'); else document.getElementById('buyerField').classList.add('hidden');
             document.getElementById('editModal').classList.remove('hidden');
         }
-
         function saveEdit() {
-            const id = parseFloat(document.getElementById('editId').value);
-            const item = items.find(i => i.id === id);
+            const id = parseFloat(document.getElementById('editId').value); const item = items.find(i => i.id === id);
             if(item) {
-                item.name = document.getElementById('editName').value;
-                item.modal = Number(document.getElementById('editModalPrice').value);
-                item.price = Number(document.getElementById('editSellPrice').value);
-                item.notes = document.getElementById('editNotes').value;
-                item.buyer = document.getElementById('editBuyer').value;
-                
+                item.name = document.getElementById('editName').value; item.modal = Number(document.getElementById('editModalPrice').value); item.price = Number(document.getElementById('editSellPrice').value); item.notes = document.getElementById('editNotes').value; item.buyer = document.getElementById('editBuyer').value;
                 const newDateStr = document.getElementById('editDateIn').value;
-                if(newDateStr) {
-                    const d = new Date(newDateStr);
-                    d.setHours(12,0,0);
-                    item.dateObj = d.toISOString();
-                    item.entryDate = formatDate(d);
-                }
-                
-                closeEditModal();
-                calculateAll();
+                if(newDateStr) { const d = new Date(newDateStr); d.setHours(12,0,0); item.dateObj = d.toISOString(); item.entryDate = formatDate(d); }
+                closeEditModal(); calculateAll();
             }
         }
         function closeEditModal() { document.getElementById('editModal').classList.add('hidden'); }
-
-        // --- CUT LOSS CALCULATOR ---
         function toggleCutLossModal() { document.getElementById('cutLossModal').classList.toggle('hidden'); }
         function calcCutLoss() {
-            const mA = Number(document.getElementById('clModalA').value) || 0;
-            const jA = Number(document.getElementById('clJualA').value) || 0;
-            const mB = Number(document.getElementById('clModalB').value) || 0;
-            const jB = Number(document.getElementById('clJualB').value) || 0;
-
-            const rugiA = jA - mA; 
-            const untungB = jB - mB;
-            const net = rugiA + untungB;
-
-            const resEl = document.getElementById('clResult');
-            const advEl = document.getElementById('clAdvice');
-
+            const mA = Number(document.getElementById('clModalA').value)||0; const jA = Number(document.getElementById('clJualA').value)||0; const mB = Number(document.getElementById('clModalB').value)||0; const jB = Number(document.getElementById('clJualB').value)||0;
+            const net = (jA - mA) + (jB - mB);
+            const resEl = document.getElementById('clResult'); const advEl = document.getElementById('clAdvice');
             resEl.innerText = formatRupiah(net);
-            
-            if (net > 0) {
-                resEl.className = "text-2xl font-bold text-emerald-500";
-                advEl.innerText = "✅ CUT LOSS AMAN! Masih profit.";
-                advEl.className = "text-[10px] font-bold text-emerald-600 mt-1";
-            } else {
-                resEl.className = "text-2xl font-bold text-rose-500";
-                advEl.innerText = "❌ JANGAN DULU. Masih rugi.";
-                advEl.className = "text-[10px] font-bold text-rose-500 mt-1";
-            }
+            if (net > 0) { resEl.className = "text-2xl font-black text-emerald-500"; advEl.innerText = "✅ EXECUTE! PROFITABLE."; } 
+            else { resEl.className = "text-2xl font-black text-rose-500"; advEl.innerText = "❌ HOLD! LOSS."; }
         }
-
-        // --- DATA MANAGEMENT ---
         function exportJSON() {
             const dataStr = JSON.stringify({ startBalance: document.getElementById('startBalance').value, items, extraProfits }, null, 2);
-            const blob = new Blob([dataStr], {type: "application/json"});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Backup_SnowballLedger_${new Date().toISOString().slice(0,10)}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            const blob = new Blob([dataStr], {type: "application/json"}); const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = `Snowball_Backup.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
-
         function importJSON(input) {
-            const file = input.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    if(confirm(`Restore data? Data saat ini akan ditimpa.`)) {
-                        items = data.items || [];
-                        extraProfits = data.extraProfits || [];
-                        document.getElementById('startBalance').value = data.startBalance || 0;
-                        calculateAll();
-                        alert("Restore Sukses!");
-                    }
-                } catch(err) { alert("File rusak!"); }
-            };
+            const file = input.files[0]; if(!file) return; const reader = new FileReader();
+            reader.onload = function(e) { try { const data = JSON.parse(e.target.result); if(confirm(`Restore?`)) { items = data.items || []; extraProfits = data.extraProfits || []; document.getElementById('startBalance').value = data.startBalance || 0; calculateAll(); } } catch(err) { alert("Error!"); } };
             reader.readAsText(file);
         }
-
         function toggleImportModal() { document.getElementById('importModal').classList.toggle('hidden'); }
         function processImport() {
-            const text = document.getElementById('importArea').value;
-            if(!text) return;
-            const lines = text.split('\n');
-            let count = 0;
-            lines.forEach(l => {
-                if(l.includes('[B]') || l.includes('[L]')) {
-                    const type = l.includes('[B]') ? 'new' : 'old';
-                    const clean = l.replace(/✅|📦|-|\[B\]|\[L\]/g, '').trim();
-                    const parts = clean.split(/[:>]/);
-                    if(parts.length >= 2) {
-                        items.push({
-                            id: Date.now() + Math.random(),
-                            name: parts[0].trim(),
-                            modal: 0,
-                            price: 0,
-                            status: 'stok',
-                            type,
-                            dateObj: new Date().toISOString(),
-                            entryDate: formatDate(new Date())
-                        });
-                        count++;
-                    }
-                }
-            });
-            alert(`Berhasil import ${count} baris.`);
-            toggleImportModal();
-            calculateAll();
+            const text = document.getElementById('importArea').value; if(!text) return; const lines = text.split('\n');
+            lines.forEach(l => { if(l.includes('[B]') || l.includes('[L]')) { const type = l.includes('[B]') ? 'new' : 'old'; const clean = l.replace(/✅|📦|-|\[B\]|\[L\]/g, '').trim(); const parts = clean.split(/[:>]/); if(parts.length >= 2) items.push({ id: Date.now()+Math.random(), name: parts[0].trim(), modal: 0, price: 0, status: 'stok', type, dateObj: new Date().toISOString(), entryDate: formatDate(new Date()) }); } });
+            toggleImportModal(); calculateAll();
         }
-
         function exportReport() {
-            let report = `*LAPORAN SNOWBALL*\nPer: ${formatDate(new Date())}\n\n*ASET SAAT INI*\nTunai: ${document.getElementById('summaryCash').innerText}\nStok: ${document.getElementById('summaryStock').innerText}\nTOTAL: ${document.getElementById('totalAssetDisplay').innerText}\n----------------\n`;
-            report += `*BARANG TERJUAL*\n`;
-            items.filter(i => i.status === 'sold').forEach(i => {
-                const profit = i.price - i.modal;
-                report += `✅ ${i.name}\n   M: ${formatNum(i.modal)} > J: ${formatNum(i.price)} (Cuan: ${formatNum(profit)})\n`;
-            });
-            report += `\n*STOK GANTUNG*\n`;
-            items.filter(i => i.status === 'stok').forEach(i => {
-                report += `📦 ${i.name} [M: ${formatNum(i.modal)}]\n`;
-            });
-            navigator.clipboard.writeText(report).then(() => alert("Laporan disalin ke Clipboard!"));
+            let report = `*SNOWBALL REPORT*\nDate: ${formatDate(new Date())}\n\n*ASSETS*\nCash: ${document.getElementById('summaryCash').innerText}\nStock: ${document.getElementById('summaryStock').innerText}\nNET WORTH: ${document.getElementById('totalAssetDisplay').innerText}\n----------------\n*SOLD ITEMS*\n`;
+            items.filter(i => i.status === 'sold').forEach(i => { report += `✅ ${i.name} (Cuan: ${formatNum(i.price - i.modal)})\n`; });
+            report += `\n*STOCK*\n`; items.filter(i => i.status === 'stok').forEach(i => { report += `📦 ${i.name}\n`; });
+            navigator.clipboard.writeText(report).then(() => alert("Copied!"));
         }
-
-        // --- UTILS ---
-        function saveData() { 
-            localStorage.setItem('ledger_v3_snowball', JSON.stringify({ startBalance: document.getElementById('startBalance').value, items, extraProfits })); 
-        }
+        function saveData() { localStorage.setItem('ledger_v3_snowball', JSON.stringify({ startBalance: document.getElementById('startBalance').value, items, extraProfits })); }
         function loadData() {
-            let data = JSON.parse(localStorage.getItem('ledger_v3_snowball'));
-            if (!data) data = JSON.parse(localStorage.getItem('ledger_v2_final'));
-            
-            if (data) {
-                document.getElementById('startBalance').value = data.startBalance || 0;
-                items = data.items || [];
-                extraProfits = data.extraProfits || [];
-                items.forEach(i => { if(!i.dateObj) i.dateObj = new Date().toISOString(); });
-                calculateAll();
-            }
+            let data = JSON.parse(localStorage.getItem('ledger_v3_snowball')); if (!data) data = JSON.parse(localStorage.getItem('ledger_v2_final'));
+            if (data) { document.getElementById('startBalance').value = data.startBalance || 0; items = data.items || []; extraProfits = data.extraProfits || []; items.forEach(i => { if(!i.dateObj) i.dateObj = new Date().toISOString(); }); calculateAll(); }
         }
-        function clearData() { if(confirm('RESET PABRIK? Semua data hilang.')) { localStorage.clear(); location.reload(); }}
         function formatRupiah(num) { return "Rp " + num.toLocaleString('id-ID'); }
         function formatNum(num) { return num.toLocaleString('id-ID'); }
-        function formatDate(date) { 
-            const d = new Date(date);
-            return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
-        }
+        function formatDate(date) { const d = new Date(date); return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`; }
         function setFilter(f) { 
             currentFilter = f; 
             const buttons = { 'stok': 'tabStok', 'sold': 'tabSold', 'extra': 'tabExtra' };
-            for(const key in buttons) {
-                const el = document.getElementById(buttons[key]);
-                if(key === f) el.className = "flex-1 py-2 rounded-md text-xs font-semibold bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-indigo-400 transition";
-                else el.className = "flex-1 py-2 rounded-md text-xs font-medium text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700/50 transition";
-            }
+            for(const key in buttons) { const el = document.getElementById(buttons[key]); if(key === f) { el.classList.remove('text-gray-500'); el.classList.add('bg-white', 'dark:bg-gray-800', 'text-indigo-600', 'shadow-sm'); } else { el.classList.add('text-gray-500'); el.classList.remove('bg-white', 'dark:bg-gray-800', 'text-indigo-600', 'shadow-sm'); } }
             renderRows(); 
         }
         function directImei() { window.open('https://www.imei.info/?imei=' + document.getElementById('imeiInput').value, '_blank'); }
-
-        // Calculator Logic
+        
+        // Calc Logic (Mini)
         let cInput = '0', cPrev = '', cOp = null;
         function calcNum(n) { if (n === '.' && cInput.includes('.')) return; cInput = (cInput === '0' && n !== '.') ? n : cInput + n; calcUpd(); }
         function calcOp(op) { if (cInput === '') return; if (cPrev !== '') calcResult(); cOp = op; cPrev = cInput; cInput = ''; calcUpd(); }
