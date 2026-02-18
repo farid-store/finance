@@ -40,9 +40,17 @@
         .border-safe { border-left: 4px solid #10b981 !important; } 
         .border-warning { border-left: 4px solid #f59e0b !important; background: #fffbeb !important; } 
         .border-danger { border-left: 4px solid #ef4444 !important; background: #fef2f2 !important; } 
+
+        /* Loading Overlay for Cloud Sync */
+        #loadingCloud { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.9); z-index: 100; display: none; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(4px); }
     </style>
 </head>
 <body class="p-4 md:p-8 antialiased">
+
+    <div id="loadingCloud">
+        <div class="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <span id="loadingText" class="text-sm font-bold text-slate-700 uppercase tracking-widest">Menghubungkan ke Cloud...</span>
+    </div>
 
     <div id="overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-40" onclick="toggleSidebar()"></div>
 
@@ -140,9 +148,17 @@
         <div class="flex justify-between items-center mb-8">
             <button onclick="toggleSidebar()" class="lg:hidden p-2 bg-white rounded-xl shadow-sm border text-indigo-600 font-bold px-4 transition active:scale-95">☰ Menu</button>
             <div class="flex gap-2" id="admin-top-actions">
-                <button onclick="toggleImportModal()" class="px-4 py-2 bg-white border border-indigo-100 text-indigo-600 rounded-xl text-xs font-bold shadow-sm hover:bg-indigo-50 transition">📥 Import</button>
-                <button onclick="exportReport()" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-lg hover:bg-emerald-700 transition flex items-center gap-2">
-                    <span>📑</span> Laporan Investor
+                <button onclick="forceSync()" class="px-3 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold shadow-md hover:bg-blue-700 transition flex items-center gap-1">
+                    <span>☁️</span> Sync
+                </button>
+                <button onclick="backupSystem()" class="px-3 py-2 bg-slate-800 text-white rounded-xl text-xs font-bold shadow-md hover:bg-slate-900 transition flex items-center gap-1">
+                    <span>💾</span> Backup
+                </button>
+                <button onclick="toggleImportModal()" class="px-3 py-2 bg-white border border-indigo-100 text-indigo-600 rounded-xl text-xs font-bold shadow-sm hover:bg-indigo-50 transition">
+                    <span>📥</span> Import
+                </button>
+                <button onclick="exportReport()" class="px-3 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-lg hover:bg-emerald-700 transition flex items-center gap-1">
+                    <span>📑</span> Laporan
                 </button>
             </div>
         </div>
@@ -151,6 +167,7 @@
             <div>
                 <h1 class="text-2xl font-extrabold tracking-tighter text-slate-900 uppercase">DIGITAL <span class="text-indigo-600">LEDGER</span></h1>
                 <p id="currentMonth" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"></p>
+                <p id="cloudStatus" class="text-[9px] text-slate-300 font-bold mt-1">⚪ Local Mode</p>
             </div>
             <div class="text-right admin-only-view">
                 <div id="rankBadge" class="badge-rank bg-slate-200 text-slate-500 mb-1">Unranked</div>
@@ -401,9 +418,10 @@
     <div id="importModal" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="toggleImportModal()"></div>
         <div class="relative bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl">
-            <h3 class="text-xl font-black text-indigo-900 uppercase italic mb-4">📥 Import Laporan</h3>
-            <textarea id="importArea" class="input-field h-48 mb-4 text-[11px] font-mono" placeholder="Paste report WhatsApp di sini..."></textarea>
-            <button onclick="processImport()" class="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold shadow-lg">SINKRONKAN DATA SEKARANG</button>
+            <h3 class="text-xl font-black text-indigo-900 uppercase italic mb-4">📥 Import Data</h3>
+            <p class="text-xs text-slate-500 mb-2">Paste kode backup (JSON) atau data teks lama di sini.</p>
+            <textarea id="importArea" class="input-field h-48 mb-4 text-[11px] font-mono" placeholder="Paste data..."></textarea>
+            <button onclick="processImport()" class="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold shadow-lg">RESTORE DATA SEKARANG</button>
         </div>
     </div>
 
@@ -449,6 +467,13 @@
     </div>
 
     <script>
+        // ===============================================
+        // ☁️ KONFIGURASI CLOUD (WAJIB DIISI)
+        // ===============================================
+        const BIN_ID = '699644fdae596e708f3582af'; // Masukkan Bin ID dari JSONBin
+        const API_KEY = '$2a$10$tcKHEWwuz2sqRoMCKJfga.1xxTFW0RxpXUPnP.NI4YbivtlK1xxau'; // Masukkan X-Master-Key
+        // ===============================================
+
         // --- DATA VARIABLES ---
         let items = [];
         let extraProfits = [];
@@ -467,6 +492,97 @@
         let currentCostId = null;
         
         const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+        // --- CLOUD SYNC FUNCTIONS ---
+        async function loadData() {
+            // Load Local Cache first for speed
+            const localData = JSON.parse(localStorage.getItem('ledger_v2_final'));
+            if (localData) applyData(localData);
+
+            // Fetch from Cloud
+            if(BIN_ID !== 'GANTI_DENGAN_BIN_ID_ANDA') {
+                document.getElementById('loadingCloud').style.display = 'flex';
+                document.getElementById('loadingText').innerText = "MENYINKRONKAN DATA...";
+                try {
+                    const req = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                        headers: { 'X-Master-Key': API_KEY }
+                    });
+                    if(req.ok) {
+                        const res = await req.json();
+                        if(res.record) {
+                            applyData(res.record);
+                            // Update Local Cache
+                            localStorage.setItem('ledger_v2_final', JSON.stringify(res.record)); 
+                            document.getElementById('cloudStatus').innerText = "☁️ Connected";
+                            document.getElementById('cloudStatus').className = "text-[9px] text-emerald-400 font-bold mt-1";
+                        }
+                    } else {
+                        throw new Error("API Error");
+                    }
+                } catch(e) {
+                    document.getElementById('cloudStatus').innerText = "⚠️ Offline Mode";
+                    document.getElementById('cloudStatus').className = "text-[9px] text-red-400 font-bold mt-1";
+                } finally {
+                    document.getElementById('loadingCloud').style.display = 'none';
+                }
+            }
+        }
+
+        async function saveData() {
+            const dataState = { 
+                startBalance: document.getElementById('startBalance').value, 
+                items, extraProfits, targetGoal, targetName
+            };
+            
+            // Save Local
+            localStorage.setItem('ledger_v2_final', JSON.stringify(dataState));
+            
+            // Save Cloud
+            if(BIN_ID !== 'GANTI_DENGAN_BIN_ID_ANDA') {
+                document.getElementById('cloudStatus').innerText = "⏳ Saving...";
+                try {
+                    await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                        method: 'PUT',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'X-Master-Key': API_KEY
+                        },
+                        body: JSON.stringify(dataState)
+                    });
+                    document.getElementById('cloudStatus').innerText = "✅ Saved";
+                    setTimeout(() => document.getElementById('cloudStatus').innerText = "☁️ Connected", 2000);
+                } catch(e) {
+                    document.getElementById('cloudStatus').innerText = "⚠️ Save Failed";
+                }
+            }
+        }
+
+        function applyData(data) {
+            if (data) {
+                document.getElementById('startBalance').value = data.startBalance || 0;
+                items = data.items || [];
+                extraProfits = data.extraProfits || [];
+                targetGoal = data.targetGoal || 25000000;
+                targetName = data.targetName || "BEP Modal 25 Juta";
+                calculateAll(false); // False = don't save loop
+            }
+            document.getElementById('ownerNote').value = localStorage.getItem('ledger_owner_note') || "";
+        }
+
+        function forceSync() {
+            if(confirm("Tarik paksa data dari Cloud? Data lokal yang belum tersimpan akan tertimpa.")) {
+                loadData();
+            }
+        }
+
+        function backupSystem() {
+            const data = localStorage.getItem('ledger_v2_final');
+            if(data) {
+                navigator.clipboard.writeText(data).then(() => alert("KODE BACKUP (JSON) berhasil disalin!\nSimpan kode ini di tempat aman (Notes/WA)."));
+            } else {
+                alert("Data kosong.");
+            }
+        }
 
         // --- UI TOGGLES ---
         function toggleSidebar() { 
@@ -664,7 +780,6 @@
                 items[itemIndex].modal += amount;
                 
                 // Tambahkan catatan sejarah di nama barang agar terlihat di laporan
-                // Format: "Nama Barang ( +Ket 100k )"
                 const amountK = amount / 1000 + "k";
                 items[itemIndex].name += ` (+${desc} ${amountK})`;
                 
@@ -925,7 +1040,7 @@
             });
         }
 
-        function calculateAll() {
+        function calculateAll(shouldSave = true) {
             const start = Number(document.getElementById('startBalance').value) || 0;
             let belanjaBaru = 0, uangMasuk = 0, profit = 0, floatPrice = 0, floatModal = 0;
             items.forEach(i => {
@@ -954,7 +1069,8 @@
             updateRankBadge(totalProfitReal);
             renderRows();
             renderExtraProfitList();
-            saveData();
+            
+            if(shouldSave) saveData();
         }
 
         function setFilter(filter) {
@@ -1106,8 +1222,27 @@
         }
 
         function processImport() {
-            const text = document.getElementById('importArea').value;
-            if (!text.trim() || !confirm("Sinkronkan data?")) return;
+            const text = document.getElementById('importArea').value.trim();
+            if(!text) return;
+
+            // DETEKSI 1: Apakah ini KODE BACKUP JSON (Start with {)
+            if (text.startsWith('{')) {
+                try {
+                    const parsed = JSON.parse(text);
+                    if(parsed.items || parsed.startBalance !== undefined) {
+                        applyData(parsed);
+                        localStorage.setItem('ledger_v2_final', text);
+                        alert("Data System berhasil dipulihkan!");
+                        location.reload();
+                        return;
+                    }
+                } catch (e) {
+                    alert("Kode backup rusak.");
+                }
+            }
+
+            // DETEKSI 2: Format Teks Lama
+            if (!confirm("Ini sepertinya data teks manual. Data detail servis/tanggal mungkin hilang. Lanjutkan?")) return;
             const newItems = [];
             let section = "";
             let saldoAwalImport = 0;
@@ -1132,32 +1267,18 @@
                     }
                 }
             });
-            if (newItems.length > 0) { items = newItems; document.getElementById('startBalance').value = saldoAwalImport; calculateAll(); toggleImportModal(); alert("Data Berhasil Diimpor!"); }
-        }
-
-        function saveData() { 
-            localStorage.setItem('ledger_v2_final', JSON.stringify({ 
-                startBalance: document.getElementById('startBalance').value, 
-                items, extraProfits, targetGoal, targetName
-            })); 
-        }
-
-        function loadData() {
-            const data = JSON.parse(localStorage.getItem('ledger_v2_final'));
-            if (data) {
-                document.getElementById('startBalance').value = data.startBalance || 0;
-                items = data.items || [];
-                extraProfits = data.extraProfits || [];
-                targetGoal = data.targetGoal || 25000000;
-                targetName = data.targetName || "BEP Modal 25 Juta";
-                calculateAll();
+            if (newItems.length > 0) { 
+                items = newItems; 
+                document.getElementById('startBalance').value = saldoAwalImport; 
+                calculateAll(); 
+                toggleImportModal(); 
+                alert("Data Berhasil Diimpor!"); 
             }
-            document.getElementById('ownerNote').value = localStorage.getItem('ledger_owner_note') || "";
         }
-        
-        function clearData() { if(confirm('Hapus permanen?')) { localStorage.clear(); location.reload(); } }
+
         function toggleImportModal() { document.getElementById('importModal').classList.toggle('hidden'); }
-        function toggleHelpModal() { alert("Gunakan format 'Nama Unit : Modal > Harga Jual' pada Smart Input.\n[L] untuk stok lama, [B] untuk belanja baru."); }
+        function toggleHelpModal() { alert("Gunakan tombol 'Cloud Sync' untuk sinkronisasi data antar device."); }
+        function clearData() { if(confirm('Hapus permanen?')) { localStorage.clear(); location.reload(); } }
         function directImei() {
             const imei = document.getElementById('imeiInput').value;
             if(!imei) return alert("Isi IMEI dulu!");
