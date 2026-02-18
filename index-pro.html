@@ -519,21 +519,34 @@
 
         // --- NEW: OWNER FEATURES LOGIC ---
         function updateTargetBar(currentProfit) {
-            let percentage = (currentProfit / targetGoal) * 100;
-            if (percentage > 100) percentage = 100;
-            if (percentage < 0) percentage = 0;
+    // 1. Hitung persentase (cegah error jika target 0)
+    let percentage = 0;
+    if (targetGoal > 0) {
+        percentage = (currentProfit / targetGoal) * 100;
+    }
+    
+    // Batasi minimal 0% dan maksimal 100%
+    if (percentage > 100) percentage = 100;
+    if (percentage < 0) percentage = 0;
 
-            const bar = document.getElementById('progressBar');
-            bar.style.width = percentage + "%";
-            
-            // Psychology Color: Green when close to target
-            if(percentage >= 100) bar.className = "bg-emerald-500 h-3 rounded-full transition-all duration-1000 ease-out relative w-0";
-            else bar.className = "bg-indigo-600 h-3 rounded-full transition-all duration-1000 ease-out relative w-0";
+    const bar = document.getElementById('progressBar');
+    
+    // 2. Terapkan lebar bar via CSS inline
+    bar.style.width = percentage + "%";
+    
+    // 3. Atur warna (Hapus class 'w-0' disini agar tidak memaksa lebar jadi 0)
+    // Jika sudah 100% warna jadi Emerald (Hijau), jika belum warna Indigo (Ungu)
+    if(percentage >= 100) {
+        bar.className = "bg-emerald-500 h-3 rounded-full transition-all duration-1000 ease-out relative";
+    } else {
+        bar.className = "bg-indigo-600 h-3 rounded-full transition-all duration-1000 ease-out relative";
+    }
 
-            document.getElementById('targetPercentage').innerText = percentage.toFixed(0) + "%";
-            document.getElementById('targetNameDisplay').innerText = targetName;
-            document.getElementById('targetValueDisplay').innerText = "Target: Rp " + targetGoal.toLocaleString('id-ID');
-        }
+    // 4. Update teks angka
+    document.getElementById('targetPercentage').innerText = percentage.toFixed(0) + "%";
+    document.getElementById('targetNameDisplay').innerText = targetName;
+    document.getElementById('targetValueDisplay').innerText = "Target: Rp " + targetGoal.toLocaleString('id-ID');
+}
 
         function setMonthlyTarget() {
             const newName = prompt("Apa target finansialmu bulan ini? (Misal: Upgrade PC)", targetName);
