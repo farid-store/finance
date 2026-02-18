@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Digital Ledger - Finance Tracker Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root { --bg-main: #f8fafc; --sidebar-bg: #1e293b; --accent: #6366f1; }
@@ -55,6 +56,9 @@
             <nav class="space-y-2">
                 <div onclick="switchPage('main')" class="sidebar-item hover:bg-indigo-600 hover:text-white transition">
                     <span class="mr-3 text-lg">📊</span> Dashboard Utama
+                </div>
+                <div onclick="switchPage('analytics')" class="sidebar-item hover:bg-indigo-600 hover:text-white transition">
+                <span class="mr-3 text-lg">📈</span> Analisa Bisnis
                 </div>
                 <div>
                     <div onclick="toggleDropdown('dropCheck')" class="sidebar-item justify-between">
@@ -270,6 +274,38 @@
         <div id="itemRows" class="space-y-3 mb-20"></div>
     </main>
 
+    <div id="page-analytics" class="max-w-2xl mx-auto hidden">
+    <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali Dashboard</button>
+    <h1 class="text-2xl font-black italic mb-6 text-slate-800">📊 ANALISA PERFORMA TOKO</h1>
+
+    <div class="grid grid-cols-2 gap-4 mb-6">
+        <div class="card p-4 border-l-4 border-blue-500">
+            <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Kecepatan Putaran</p>
+            <h2 id="avgSellTime" class="text-2xl font-black text-slate-800">- Hari</h2>
+            <p class="text-[9px] text-slate-400 italic mt-1">Rata-rata barang laku</p>
+        </div>
+        <div class="card p-4 border-l-4 border-purple-500">
+            <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Win Rate Barang</p>
+            <h2 id="winRateStock" class="text-2xl font-black text-slate-800">0%</h2>
+            <p class="text-[9px] text-slate-400 italic mt-1">Rasio Laku vs Stok Diam</p>
+        </div>
+    </div>
+
+    <div class="card p-5 mb-6">
+        <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Dominasi Brand (Berdasarkan Unit Laku)</h3>
+        <div class="h-64">
+            <canvas id="brandChart"></canvas>
+        </div>
+    </div>
+
+    <div class="card p-5 mb-6">
+        <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Tren Profit Harian (30 Hari Terakhir)</h3>
+        <div class="h-48">
+            <canvas id="profitTrendChart"></canvas>
+        </div>
+    </div>
+</div>
+
     <div id="page-hp" class="max-w-2xl mx-auto hidden">
         <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali</button>
         <h1 class="text-2xl font-black italic mb-6">📱 Handphone Check</h1>
@@ -402,7 +438,7 @@
         }
 
         function switchPage(page) {
-            const pages = ['page-main', 'page-hp', 'page-laptop', 'page-dial'];
+            const pages = ['page-main', 'page-hp', 'page-laptop', 'page-dial', 'page-analytics'];
             pages.forEach(p => {
                 const el = document.getElementById(p);
                 if(el) el.classList.add('hidden');
@@ -412,6 +448,10 @@
             if(window.innerWidth < 1024) toggleSidebar();
             window.scrollTo(0,0);
         }
+        // --- TRIGGER PENTING: Panggil Analitik saat dibuka ---
+    if(page === 'analytics') {
+        renderAnalytics();
+    }
 
         function setView(mode) {
             const body = document.body;
@@ -900,6 +940,111 @@
             if(!imei) return alert("Isi IMEI dulu!");
             window.open(`https://www.imei.info/?imei=${imei}`, '_blank');
         }
+
+// --- LOGIC ANALISA (PERBAIKAN) ---
+let brandChartInstance = null;
+let trendChartInstance = null;
+
+function renderAnalytics() {
+    // Cek apakah ada data penjualan?
+    const soldItems = items.filter(i => i.status === 'sold');
+    
+    if (soldItems.length === 0) {
+        document.getElementById('avgSellTime').innerText = "-";
+        document.getElementById('winRateStock').innerText = "0%";
+        return; // Stop jika belum ada penjualan
+    }
+
+    // 1. Hitung Kecepatan Putaran (Velocity)
+    let totalDays = 0;
+    let validSales = 0;
+
+    soldItems.forEach(i => {
+        // PERBAIKAN: Menggunakan 'parseDateString' sesuai kode utama
+        const entry = parseDateString(i.entryDate); 
+        const sold = parseDateString(i.soldAt);
+        
+        // Hitung selisih hari
+        const diffTime = Math.abs(sold - entry);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+        
+        if(!isNaN(diffDays)) {
+            totalDays += diffDays;
+            validSales++;
+        }
+    });
+
+    const avgDays = validSales > 0 ? (totalDays / validSales).toFixed(1) : 0;
+    document.getElementById('avgSellTime').innerText = avgDays + " Hari";
+
+    // 2. Hitung Win Rate (Sold vs Total Active Stock)
+    const totalStock = items.length; // Stok + Sold (Total History)
+    const totalSold = soldItems.length;
+    const winRate = totalStock > 0 ? ((totalSold / totalStock) * 100).toFixed(0) : 0;
+    document.getElementById('winRateStock').innerText = winRate + "%";
+
+    // 3. Render Chart: Brand Dominance
+    const brands = {};
+    soldItems.forEach(i => {
+        // Ambil kata pertama sebagai nama brand (misal "iPhone 11" -> "iPhone")
+        const brandName = i.name.split(' ')[0].toUpperCase();
+        if(brands[brandName]) brands[brandName]++;
+        else brands[brandName] = 1;
+    });
+
+    const ctxBrand = document.getElementById('brandChart');
+    if (ctxBrand) {
+        if(brandChartInstance) brandChartInstance.destroy();
+        brandChartInstance = new Chart(ctxBrand, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(brands),
+                datasets: [{
+                    data: Object.values(brands),
+                    backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right', labels: { font: { size: 10 } } } }
+            }
+        });
+    }
+
+    // 4. Render Chart: Daily Profit Trend
+    // Ambil 10 transaksi terakhir
+    const lastSales = soldItems.slice(0, 10).reverse(); 
+    const labels = lastSales.map(i => i.name.substring(0, 10)); // Nama barang dipotong biar pendek
+    const profits = lastSales.map(i => i.price - i.modal);
+
+    const ctxTrend = document.getElementById('profitTrendChart');
+    if (ctxTrend) {
+        if(trendChartInstance) trendChartInstance.destroy();
+        trendChartInstance = new Chart(ctxTrend, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Profit (Rp)',
+                    data: profits,
+                    backgroundColor: '#10b981',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { display: false },
+                    x: { ticks: { font: { size: 8 } } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+}
 
         window.onload = () => {
             const now = new Date();
