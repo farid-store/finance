@@ -172,8 +172,7 @@
                 </div>
             </div>
             <div class="flex justify-between text-[10px] font-bold text-slate-400 relative z-10">
-                <span>Rp 0</span>
-                <span id="targetValueDisplay">Target: Rp 0</span>
+            <span id="currentProgressText" class="text-emerald-600">Rp 0</span> <span id="targetValueDisplay">Target: Rp 0</span>
             </div>
             <button onclick="setMonthlyTarget()" class="absolute top-2 right-2 p-1 bg-white/80 rounded hover:bg-white text-slate-400 hover:text-indigo-600 transition opacity-0 group-hover:opacity-100 z-20">⚙️</button>
         </div>
@@ -518,32 +517,41 @@
         }
 
         // --- NEW: OWNER FEATURES LOGIC ---
-        function updateTargetBar(currentProfit) {
-    // 1. Hitung persentase (cegah error jika target 0)
+       function updateTargetBar(currentProfit) {
     let percentage = 0;
+    
+    // Mencegah error pembagian nol
     if (targetGoal > 0) {
         percentage = (currentProfit / targetGoal) * 100;
     }
     
-    // Batasi minimal 0% dan maksimal 100%
+    // Batas min/max persentase
     if (percentage > 100) percentage = 100;
     if (percentage < 0) percentage = 0;
 
     const bar = document.getElementById('progressBar');
     
-    // 2. Terapkan lebar bar via CSS inline
+    // UPDATE LEBAR BAR
     bar.style.width = percentage + "%";
     
-    // 3. Atur warna (Hapus class 'w-0' disini agar tidak memaksa lebar jadi 0)
-    // Jika sudah 100% warna jadi Emerald (Hijau), jika belum warna Indigo (Ungu)
+    // UPDATE WARNA BAR
     if(percentage >= 100) {
         bar.className = "bg-emerald-500 h-3 rounded-full transition-all duration-1000 ease-out relative";
     } else {
         bar.className = "bg-indigo-600 h-3 rounded-full transition-all duration-1000 ease-out relative";
     }
 
-    // 4. Update teks angka
+    // UPDATE TEKS (INI YANG TADINYA ERROR)
+    // Update angka persen kanan atas
     document.getElementById('targetPercentage').innerText = percentage.toFixed(0) + "%";
+    
+    // Update angka kiri bawah (Profit saat ini) -> INI PERBAIKANNYA
+    const currentText = document.getElementById('currentProgressText');
+    if(currentText) {
+        currentText.innerText = "Tercapai: Rp " + currentProfit.toLocaleString('id-ID');
+    }
+
+    // Update angka kanan bawah (Target)
     document.getElementById('targetNameDisplay').innerText = targetName;
     document.getElementById('targetValueDisplay').innerText = "Target: Rp " + targetGoal.toLocaleString('id-ID');
 }
