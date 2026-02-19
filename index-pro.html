@@ -3,46 +3,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Ledger - Finance Tracker Pro</title>
+    <title>Digital Ledger - Finance Tracker Pro (Owner Edition)</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        :root { --bg-main: #f8fafc; --sidebar-bg: #1e293b; --accent: #6366f1; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: #1e293b; margin: auto; transition: max-width 0.3s ease; }
-        .card { background: white; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-        .input-field { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; transition: 0.3s; background: #fdfdfd; }
-        .input-field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
-        #sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 50; }
-        .sidebar-item { display: flex; align-items: center; padding: 12px 16px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; color: #94a3b8; transition: 0.2s; cursor: pointer; }
-        .sidebar-item:hover { background: #334155; color: white; }
-        .dropdown-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; background: #0f172a; border-radius: 8px; margin: 0 8px; }
-        .dropdown-content.show { max-height: 800px; margin-bottom: 8px; }
-        .mode-desktop { max-width: 1000px !important; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; background: white; min-height: 100vh; }
-        .hidden-panel { display: none; }
-        .badge-profit { background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; }
-        .dial-card { border-left: 4px solid var(--accent); }
-        .sidebar-calc { background: #0f172a; border-radius: 20px; padding: 15px; margin: 15px 10px; border: 1px solid #334155; }
-        .calc-display { text-align: right; margin-bottom: 10px; padding: 8px; background: #1e293b; border-radius: 10px; }
-        #calc-prev { color: #64748b; font-size: 10px; min-height: 14px; }
-        #calc-curr { color: white; font-size: 18px; font-weight: 700; }
-        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-        .calc-grid button { height: 35px; border-radius: 8px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; background: #334155; color: white; }
-        .calc-grid button:hover { background: #475569; }
+        /* =========================================
+           GLOBAL STYLES & VARIABLES
+           ========================================= */
+        :root { 
+            --bg-main: #f8fafc; 
+            --sidebar-bg: #1e293b; 
+            --accent: #6366f1; 
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-main); 
+            color: #1e293b; 
+            margin: auto; 
+            transition: max-width 0.3s ease; 
+        }
+
+        /* =========================================
+           COMPONENT STYLES
+           ========================================= */
+        .card { 
+            background: white; 
+            border-radius: 16px; 
+            border: 1px solid #e2e8f0; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); 
+        }
+
+        .input-field { 
+            width: 100%; 
+            padding: 12px; 
+            border-radius: 10px; 
+            border: 1px solid #cbd5e1; 
+            outline: none; 
+            transition: 0.3s; 
+            background: #fdfdfd; 
+        }
+
+        .input-field:focus { 
+            border-color: var(--accent); 
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); 
+        }
+
+        /* =========================================
+           SIDEBAR & NAVIGATION
+           ========================================= */
+        #sidebar { 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            z-index: 50; 
+        }
+
+        .sidebar-item { 
+            display: flex; 
+            align-items: center; 
+            padding: 12px 16px; 
+            border-radius: 10px; 
+            font-size: 0.875rem; 
+            font-weight: 500; 
+            color: #94a3b8; 
+            transition: 0.2s; 
+            cursor: pointer; 
+        }
+
+        .sidebar-item:hover { 
+            background: #334155; 
+            color: white; 
+        }
+
+        .dropdown-content { 
+            max-height: 0; 
+            overflow: hidden; 
+            transition: max-height 0.3s ease-out; 
+            background: #0f172a; 
+            border-radius: 8px; 
+            margin: 0 8px; 
+        }
+
+        .dropdown-content.show { 
+            max-height: 800px; 
+            margin-bottom: 8px; 
+        }
+
+        /* =========================================
+           UTILITIES & HELPERS
+           ========================================= */
+        .mode-desktop { 
+            max-width: 1000px !important; 
+            border-left: 1px solid #e2e8f0; 
+            border-right: 1px solid #e2e8f0; 
+            background: white; 
+            min-height: 100vh; 
+        }
+
+        .hidden-panel { 
+            display: none; 
+        }
+
+        .badge-profit { 
+            background: #dcfce7; 
+            color: #166534; 
+            padding: 4px 8px; 
+            border-radius: 6px; 
+            font-size: 10px; 
+            font-weight: 700; 
+        }
+
+        /* =========================================
+           CALCULATOR WIDGET
+           ========================================= */
+        .sidebar-calc { 
+            background: #0f172a; 
+            border-radius: 20px; 
+            padding: 15px; 
+            margin: 15px 10px; 
+            border: 1px solid #334155; 
+        }
+
+        .calc-display { 
+            text-align: right; 
+            margin-bottom: 10px; 
+            padding: 8px; 
+            background: #1e293b; 
+            border-radius: 10px; 
+        }
+
+        #calc-prev { 
+            color: #64748b; 
+            font-size: 10px; 
+            min-height: 14px; 
+        }
+
+        #calc-curr { 
+            color: white; 
+            font-size: 18px; 
+            font-weight: 700; 
+        }
+
+        .calc-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 6px; 
+        }
+
+        .calc-grid button { 
+            height: 35px; 
+            border-radius: 8px; 
+            border: none; 
+            font-size: 12px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            background: #334155; 
+            color: white; 
+        }
+
+        .calc-grid button:hover { 
+            background: #475569; 
+        }
+
         .calc-grid .btn-op { color: #818cf8; }
         .calc-grid .btn-eq { background: #6366f1 !important; grid-column: span 2; }
         .calc-grid .btn-ac { color: #f87171; }
+
+        /* =========================================
+           OWNER FEATURES & ANIMATIONS
+           ========================================= */
+        .dial-card { border-left: 4px solid var(--accent); }
         .client-item-card { border: none !important; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.04) !important; padding: 20px !important; }
         
-        .badge-rank { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; float: right;}
-        @keyframes shimmer { 100% { transform: translateX(100%); } }
-        .shimmer-effect { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent); transform: translateX(-100%); animation: shimmer 2s infinite; }
+        .badge-rank { 
+            font-size: 10px; 
+            font-weight: 800; 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            float: right;
+        }
+
+        @keyframes shimmer { 
+            100% { transform: translateX(100%); } 
+        }
+
+        .shimmer-effect { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent); 
+            transform: translateX(-100%); 
+            animation: shimmer 2s infinite; 
+        }
+
+        /* AGING INDICATORS */
         .border-safe { border-left: 4px solid #10b981 !important; } 
         .border-warning { border-left: 4px solid #f59e0b !important; background: #fffbeb !important; } 
         .border-danger { border-left: 4px solid #ef4444 !important; background: #fef2f2 !important; } 
 
-        /* Loading Overlay for Cloud Sync */
-        #loadingCloud { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.9); z-index: 100; display: none; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(4px); }
+        /* LOADING OVERLAY (CLOUD) */
+        #loadingCloud { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(255,255,255,0.9); 
+            z-index: 100; 
+            display: none; 
+            justify-content: center; 
+            align-items: center; 
+            flex-direction: column; 
+            backdrop-filter: blur(4px); 
+        }
     </style>
 </head>
 <body class="p-4 md:p-8 antialiased">
@@ -94,7 +274,9 @@
                         <a href="https://www.samsung.com/us/support/warranty/" target="_blank" class="sidebar-item text-xs pl-12">Samsung Official</a>
                     </div>
                 </div>
+                
                 <div class="border-t border-slate-700 my-4"></div>
+                
                 <div class="sidebar-calc">
                     <div class="calc-display">
                         <div id="calc-prev"></div>
@@ -122,11 +304,13 @@
                         <button class="btn-eq" onclick="calcResult()" style="grid-column: span 2;">=</button>
                     </div>
                 </div>
+
                 <div id="admin-sidebar-tools">
                     <button onclick="toggleHelpModal()" class="sidebar-item w-full bg-slate-800/50 mb-2">📖 Panduan</button>
                     <button onclick="clearData()" class="sidebar-item w-full text-red-400 hover:text-red-300 italic">🗑️ Hapus Semua Data</button>
                 </div>
             </nav>
+
             <div class="mt-8">
                 <p class="text-[10px] text-slate-500 font-bold uppercase mb-3 tracking-widest">Access Mode</p>
                 <div class="flex bg-slate-900 p-1 rounded-xl gap-1">
@@ -134,6 +318,7 @@
                     <button onclick="setAccessMode('client')" id="btnAccessClient" class="flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500">CLIENT</button>
                 </div>
             </div>
+            
             <div class="mt-4">
                 <p class="text-[10px] text-slate-500 font-bold uppercase mb-3 tracking-widest">View Mode</p>
                 <div class="flex bg-slate-900 p-1 rounded-xl gap-1">
@@ -145,18 +330,23 @@
     </aside>
 
     <main id="page-main" class="max-w-2xl mx-auto">
+        
         <div class="flex justify-between items-center mb-8">
             <button onclick="toggleSidebar()" class="lg:hidden p-2 bg-white rounded-xl shadow-sm border text-indigo-600 font-bold px-4 transition active:scale-95">☰ Menu</button>
+            
             <div class="flex gap-2" id="admin-top-actions">
+                <button onclick="emergencyRescue()" class="px-3 py-2 bg-red-600 text-white rounded-xl text-xs font-bold shadow-md hover:bg-red-700 transition flex items-center gap-1 animate-pulse">
+                    <span>🆘</span> Rescue
+                </button>
+
                 <button onclick="forceSync()" class="px-3 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold shadow-md hover:bg-blue-700 transition flex items-center gap-1">
-                    <span>☁️</span> Sync
+                    <span>☁️</span> Cloud Sync
                 </button>
-                <button onclick="backupSystem()" class="px-3 py-2 bg-slate-800 text-white rounded-xl text-xs font-bold shadow-md hover:bg-slate-900 transition flex items-center gap-1">
-                    <span>💾</span> Backup
-                </button>
+
                 <button onclick="toggleImportModal()" class="px-3 py-2 bg-white border border-indigo-100 text-indigo-600 rounded-xl text-xs font-bold shadow-sm hover:bg-indigo-50 transition">
                     <span>📥</span> Import
                 </button>
+
                 <button onclick="exportReport()" class="px-3 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-lg hover:bg-emerald-700 transition flex items-center gap-1">
                     <span>📑</span> Laporan
                 </button>
@@ -167,7 +357,7 @@
             <div>
                 <h1 class="text-2xl font-extrabold tracking-tighter text-slate-900 uppercase">DIGITAL <span class="text-indigo-600">LEDGER</span></h1>
                 <p id="currentMonth" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"></p>
-                <p id="cloudStatus" class="text-[9px] text-slate-300 font-bold mt-1">⚪ Local Mode</p>
+                <p id="cloudStatus" class="text-[9px] text-slate-400 font-bold mt-1">⚪ Local Storage Loaded</p>
             </div>
             <div class="text-right admin-only-view">
                 <div id="rankBadge" class="badge-rank bg-slate-200 text-slate-500 mb-1">Unranked</div>
@@ -193,7 +383,8 @@
                 </div>
             </div>
             <div class="flex justify-between text-[10px] font-bold text-slate-400 relative z-10">
-            <span id="currentProgressText" class="text-emerald-600">Rp 0</span> <span id="targetValueDisplay">Target: Rp 0</span>
+                <span id="currentProgressText" class="text-emerald-600">Rp 0</span> 
+                <span id="targetValueDisplay">Target: Rp 0</span>
             </div>
             <button onclick="setMonthlyTarget()" class="absolute top-2 right-2 p-1 bg-white/80 rounded hover:bg-white text-slate-400 hover:text-indigo-600 transition opacity-0 group-hover:opacity-100 z-20">⚙️</button>
         </div>
@@ -430,19 +621,10 @@
         <div class="relative bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl">
             <h3 class="text-lg font-black text-slate-800 uppercase italic mb-4">✏️ Edit Barang</h3>
             <div class="space-y-3">
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400">Nama Barang</label>
-                    <input type="text" id="editItemName" class="input-field mt-1">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400">Harga Modal</label>
-                    <input type="number" id="editItemModal" class="input-field mt-1">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400">Harga Jual</label>
-                    <input type="number" id="editItemPrice" class="input-field mt-1">
-                </div>
-                <button onclick="saveEditItem()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg mt-2">SIMPAN PERUBAHAN</button>
+                <input type="text" id="editItemName" class="input-field" placeholder="Nama">
+                <input type="number" id="editItemModal" class="input-field" placeholder="Modal">
+                <input type="number" id="editItemPrice" class="input-field" placeholder="Jual">
+                <button onclick="saveEditItem()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold mt-2">SIMPAN</button>
             </div>
         </div>
     </div>
@@ -450,31 +632,22 @@
     <div id="costModal" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeCostModal()"></div>
         <div class="relative bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl">
-            <h3 class="text-lg font-black text-slate-800 uppercase italic mb-2">🛠️ Tambah Biaya Servis</h3>
-            <p class="text-xs text-slate-500 mb-4">Biaya ini akan <b>menambah modal</b> barang secara otomatis.</p>
-            <div class="space-y-3">
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400">Keterangan (Misal: Ganti Baterai)</label>
-                    <input type="text" id="costDesc" class="input-field mt-1" placeholder="Servis...">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400">Nominal Biaya</label>
-                    <input type="number" id="costAmount" class="input-field mt-1" placeholder="0">
-                </div>
-                <button onclick="saveCost()" class="w-full py-3 bg-orange-500 text-white rounded-xl font-bold shadow-lg mt-2">TAMBAH KE MODAL</button>
-            </div>
+            <h3 class="text-lg font-black text-slate-800 uppercase italic mb-2">🛠️ Tambah Biaya</h3>
+            <input type="text" id="costDesc" class="input-field mt-1" placeholder="Keterangan (cth: Ganti LCD)">
+            <input type="number" id="costAmount" class="input-field mt-1" placeholder="Biaya (Rp)">
+            <button onclick="saveCost()" class="w-full py-3 bg-orange-500 text-white rounded-xl font-bold mt-4">TAMBAH KE MODAL</button>
         </div>
     </div>
 
     <script>
         // ===============================================
-        // ☁️ KONFIGURASI CLOUD (WAJIB DIISI)
+        // ☁️ KONFIGURASI CLOUD
         // ===============================================
         const BIN_ID = '699644fdae596e708f3582af'; // Masukkan Bin ID dari JSONBin
         const API_KEY = '$2a$10$tcKHEWwuz2sqRoMCKJfga.1xxTFW0RxpXUPnP.NI4YbivtlK1xxau'; // Masukkan X-Master-Key
         // ===============================================
 
-        // --- DATA VARIABLES ---
+        // VARIABLES
         let items = [];
         let extraProfits = [];
         let currentFilter = 'stok';
@@ -493,68 +666,80 @@
         
         const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
-        // --- CLOUD SYNC FUNCTIONS ---
-        async function loadData() {
-            // Load Local Cache first for speed
-            const localData = JSON.parse(localStorage.getItem('ledger_v2_final'));
-            if (localData) applyData(localData);
-
-            // Fetch from Cloud
-            if(BIN_ID !== 'GANTI_DENGAN_BIN_ID_ANDA') {
-                document.getElementById('loadingCloud').style.display = 'flex';
-                document.getElementById('loadingText').innerText = "MENYINKRONKAN DATA...";
-                try {
-                    const req = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-                        headers: { 'X-Master-Key': API_KEY }
-                    });
-                    if(req.ok) {
-                        const res = await req.json();
-                        if(res.record) {
-                            applyData(res.record);
-                            // Update Local Cache
-                            localStorage.setItem('ledger_v2_final', JSON.stringify(res.record)); 
-                            document.getElementById('cloudStatus').innerText = "☁️ Connected";
-                            document.getElementById('cloudStatus').className = "text-[9px] text-emerald-400 font-bold mt-1";
-                        }
-                    } else {
-                        throw new Error("API Error");
-                    }
-                } catch(e) {
-                    document.getElementById('cloudStatus').innerText = "⚠️ Offline Mode";
-                    document.getElementById('cloudStatus').className = "text-[9px] text-red-400 font-bold mt-1";
-                } finally {
-                    document.getElementById('loadingCloud').style.display = 'none';
-                }
+        // ===============================================
+        // 🆘 EMERGENCY RESCUE SYSTEM
+        // ===============================================
+        function emergencyRescue() {
+            // Coba ambil data mentah dari LocalStorage
+            const rawData = localStorage.getItem('ledger_v2_final');
+            if (rawData) {
+                // Buat file download
+                const blob = new Blob([rawData], {type: "application/json"});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = "RESCUE_DATA_FARID_STORE.json";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                alert("✅ Data berhasil diselamatkan! File JSON telah didownload. Simpan file ini baik-baik.");
+            } else {
+                alert("⚠️ Data LocalStorage Kosong! Pastikan Anda tidak menghapus cache browser.");
             }
         }
 
-        async function saveData() {
-            const dataState = { 
-                startBalance: document.getElementById('startBalance').value, 
-                items, extraProfits, targetGoal, targetName
-            };
-            
-            // Save Local
-            localStorage.setItem('ledger_v2_final', JSON.stringify(dataState));
-            
-            // Save Cloud
-            if(BIN_ID !== 'GANTI_DENGAN_BIN_ID_ANDA') {
-                document.getElementById('cloudStatus').innerText = "⏳ Saving...";
-                try {
-                    await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                        method: 'PUT',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'X-Master-Key': API_KEY
-                        },
-                        body: JSON.stringify(dataState)
-                    });
-                    document.getElementById('cloudStatus').innerText = "✅ Saved";
-                    setTimeout(() => document.getElementById('cloudStatus').innerText = "☁️ Connected", 2000);
-                } catch(e) {
-                    document.getElementById('cloudStatus').innerText = "⚠️ Save Failed";
-                }
+        // ===============================================
+        // ☁️ CLOUD SYNC & DATA LOAD
+        // ===============================================
+        async function loadData() {
+            // 1. PRIORITAS: LOAD LOCAL DATA DULU (Agar data lama muncul)
+            const localData = JSON.parse(localStorage.getItem('ledger_v2_final'));
+            if (localData) {
+                applyData(localData);
+                console.log("Local Data Loaded Successfully");
+            } else {
+                console.log("No Local Data Found");
             }
+            // Note: Cloud tidak diload otomatis untuk mencegah overwrite yang tidak diinginkan
+        }
+
+        async function forceSync() {
+            if(BIN_ID === 'GANTI_DENGAN_BIN_ID_ANDA') return alert("Harap isi BIN_ID dan API_KEY di script.");
+            
+            // Tanya user: Upload (Local -> Cloud) atau Download (Cloud -> Local)
+            const choice = prompt("Ketik 'UP' untuk Upload Data Lokal ke Cloud.\nKetik 'DOWN' untuk Tarik Data Cloud ke Lokal.\n(Hati-hati data akan tertimpa!)");
+            
+            document.getElementById('loadingCloud').style.display = 'flex';
+            
+            try {
+                if(choice && choice.toUpperCase() === 'UP') {
+                    // UPLOAD
+                    await saveDataToCloud();
+                    alert("Data Lokal berhasil di-upload ke Cloud!");
+                } else if (choice && choice.toUpperCase() === 'DOWN') {
+                    // DOWNLOAD
+                    const req = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': API_KEY } });
+                    const res = await req.json();
+                    if(res.record) {
+                        applyData(res.record);
+                        localStorage.setItem('ledger_v2_final', JSON.stringify(res.record)); 
+                        alert("Data Cloud berhasil ditarik!");
+                    }
+                }
+            } catch(e) {
+                alert("Error koneksi Cloud: " + e.message);
+            } finally {
+                document.getElementById('loadingCloud').style.display = 'none';
+            }
+        }
+
+        async function saveDataToCloud() {
+            const dataState = { startBalance: document.getElementById('startBalance').value, items, extraProfits, targetGoal, targetName };
+            await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+                body: JSON.stringify(dataState)
+            });
         }
 
         function applyData(data) {
@@ -564,27 +749,14 @@
                 extraProfits = data.extraProfits || [];
                 targetGoal = data.targetGoal || 25000000;
                 targetName = data.targetName || "BEP Modal 25 Juta";
-                calculateAll(false); // False = don't save loop
+                calculateAll(false);
             }
             document.getElementById('ownerNote').value = localStorage.getItem('ledger_owner_note') || "";
         }
 
-        function forceSync() {
-            if(confirm("Tarik paksa data dari Cloud? Data lokal yang belum tersimpan akan tertimpa.")) {
-                loadData();
-            }
-        }
-
-        function backupSystem() {
-            const data = localStorage.getItem('ledger_v2_final');
-            if(data) {
-                navigator.clipboard.writeText(data).then(() => alert("KODE BACKUP (JSON) berhasil disalin!\nSimpan kode ini di tempat aman (Notes/WA)."));
-            } else {
-                alert("Data kosong.");
-            }
-        }
-
-        // --- UI TOGGLES ---
+        // ===============================================
+        // 🛠️ UTILITY & UI FUNCTIONS
+        // ===============================================
         function toggleSidebar() { 
             const sb = document.getElementById('sidebar');
             const ov = document.getElementById('overlay');
@@ -592,281 +764,376 @@
             ov.classList.toggle('hidden');
         }
 
-        function toggleDropdown(id) { document.getElementById(id).classList.toggle('show'); }
+        function toggleDropdown(id) { 
+            document.getElementById(id).classList.toggle('show'); 
+        }
 
-        function toggleConfig(panelId, labelId, originalText) {
+        function toggleConfig(panelId, labelId, originalText) { 
             const panel = document.getElementById(panelId);
             const label = document.getElementById(labelId);
+            const allPanels = document.querySelectorAll('.hidden-panel');
+            
             panel.classList.toggle('hidden-panel');
             label.innerText = panel.classList.contains('hidden-panel') ? originalText : "✖ Tutup";
         }
 
         function switchPage(page) {
             const pages = ['page-main', 'page-hp', 'page-laptop', 'page-dial', 'page-analytics'];
-            pages.forEach(p => {
-                const el = document.getElementById(p);
-                if(el) el.classList.add('hidden');
+            pages.forEach(p => { 
+                const el = document.getElementById(p); 
+                if(el) el.classList.add('hidden'); 
             });
-            const target = document.getElementById('page-' + page);
+            const target = document.getElementById('page-' + page); 
             if(target) target.classList.remove('hidden');
-            if(window.innerWidth < 1024) toggleSidebar();
+            
+            if(window.innerWidth < 1024) toggleSidebar(); 
             window.scrollTo(0,0);
+            
+            if(page === 'analytics') renderAnalytics();
+        }
+        
+        // --- CALCULATOR FUNCTIONS ---
+        let cInput = '0', cPrev = '', cOp = null;
+        function formatDisplay(n){if(!n||n==='-')return n;const p=n.split('.');p[0]=parseFloat(p[0]).toLocaleString('id-ID');return p.length>1?p[0]+','+p[1]:p[0];}
+        function calcNum(n){if(n==='.'&&cInput.includes('.'))return;cInput=(cInput==='0'&&n!=='.')?n:cInput+n;calcUpd();}
+        function calcOp(op){if(cInput==='')return;if(cPrev!=='')calcResult();cOp=op;cPrev=cInput;cInput='';calcUpd();}
+        function calcPerc(){if(cInput==='0'||cInput==='')return;cInput=(parseFloat(cInput)/100).toString();calcUpd();}
+        function calcClear(){cInput='0';cPrev='';cOp=null;calcUpd();}
+        function calcDel(){cInput=cInput.toString().slice(0,-1)||'0';calcUpd();}
+        function calcUpd(){document.getElementById('calc-curr').innerText=formatDisplay(cInput);document.getElementById('calc-prev').innerText=cPrev?formatDisplay(cPrev)+(cOp||''):'';}
+        function calcResult(){let r;const p=parseFloat(cPrev),c=parseFloat(cInput);if(isNaN(p)||isNaN(c))return;switch(cOp){case'+':r=p+c;break;case'-':r=p-c;break;case'*':r=p*c;break;case'/':r=p/c;break;default:return;}cInput=parseFloat(r.toFixed(10)).toString();cOp=null;cPrev='';calcUpd();}
 
-            // TRIGGER ANALYTICS
-            if(page === 'analytics') {
-                renderAnalytics();
+        function getNow() { 
+            const d = new Date(); 
+            return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`; 
+        }
+        
+        function parseDateString(s) { 
+            if(!s||s==='Imported'||s==='Bulan Lalu') return new Date();
+            const p=s.split(' ');
+            const d=p[0].split('/');
+            return new Date(d[2],d[1]-1,d[0]); 
+        }
+
+        // ===============================================
+        // 💰 CORE BUSINESS LOGIC
+        // ===============================================
+        function calculateAll(shouldSave = true) {
+            const start = Number(document.getElementById('startBalance').value) || 0;
+            let belanjaBaru = 0, uangMasuk = 0, profit = 0, floatPrice = 0, floatModal = 0;
+            
+            items.forEach(i => {
+                if (i.status === 'sold') {
+                    if (i.type === 'new') belanjaBaru += i.modal; 
+                    uangMasuk += i.price; 
+                    profit += (i.price - i.modal);
+                } else {
+                    if (i.type === 'new') belanjaBaru += i.modal; 
+                    floatPrice += i.price; 
+                    floatModal += i.modal;
+                }
+            });
+            
+            const extraProfitTotal = extraProfits.reduce((sum, p) => sum + p.profit, 0);
+            const totalProfitReal = profit + extraProfitTotal;
+            const cash = start - belanjaBaru + uangMasuk;
+            
+            // DOM UPDATES
+            document.getElementById('summaryCash').innerText = "Rp " + cash.toLocaleString('id-ID');
+            document.getElementById('summaryFloating').innerText = "Rp " + floatPrice.toLocaleString('id-ID');
+            document.getElementById('summaryTotal').innerText = "Rp " + (cash + floatPrice).toLocaleString('id-ID');
+            document.getElementById('summaryProfit').innerText = "Rp " + totalProfitReal.toLocaleString('id-ID');
+            document.getElementById('previewModalStock').innerText = "Rp " + floatModal.toLocaleString('id-ID');
+            document.getElementById('previewUnrealizedProfit').innerText = "Rp " + (floatPrice - floatModal).toLocaleString('id-ID');
+            
+            updateTargetBar(totalProfitReal);
+            updateRankBadge(totalProfitReal);
+            renderRows();
+            renderExtraProfitList();
+            
+            if(shouldSave) {
+                // Save Local Always
+                localStorage.setItem('ledger_v2_final', JSON.stringify({ 
+                    startBalance: document.getElementById('startBalance').value, 
+                    items, 
+                    extraProfits, 
+                    targetGoal, 
+                    targetName 
+                }));
             }
         }
 
-        function setView(mode) {
-            const body = document.body;
-            const btnMob = document.getElementById('btnMob');
-            const btnDesk = document.getElementById('btnDesk');
-            if(mode === 'desktop') {
-                body.classList.add('mode-desktop');
-                btnDesk.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white";
-                btnMob.className = "flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500";
-            } else {
-                body.classList.remove('mode-desktop');
-                btnMob.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white";
-                btnDesk.className = "flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500";
-            }
+        function parseText(type) {
+            const rawText = document.getElementById('bulkInput').value;
+            if (!rawText.trim()) return;
+            rawText.split('\n').forEach(line => {
+                if (line.includes(':') && line.includes('>')) {
+                    const parts = line.split(/[:>]/);
+                    const name = parts[0].trim().replace(/^-\s*/, '').replace(/\[[BL]\]\s*/, '');
+                    const modal = Number(parts[1].replace(/[^0-9]/g, ''));
+                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
+                    if (name && modal) {
+                        items.unshift({ id: Date.now() + Math.random(), name, modal, price, status: 'stok', type, entryDate: getNow(), soldAt: '' });
+                    }
+                }
+            });
+            document.getElementById('bulkInput').value = '';
+            calculateAll();
+        }
+        
+        function parseExtraProfitText() {
+            const rawText = document.getElementById('exBulkInput').value;
+            if (!rawText.trim()) return;
+            rawText.split('\n').forEach(line => {
+                if (line.includes(':') && line.includes('>')) {
+                    const parts = line.split(/[:>]/);
+                    const name = parts[0].trim();
+                    const modal = Number(parts[1].replace(/[^0-9]/g, ''));
+                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
+                    if (name && modal && price) { 
+                        extraProfits.push({ id: Date.now() + Math.random(), name, modal, price, profit: price - modal }); 
+                    }
+                }
+            });
+            document.getElementById('exBulkInput').value = '';
+            calculateAll();
         }
 
-        function setAccessMode(mode) {
-            accessMode = mode;
-            const adminTop = document.getElementById('admin-top-actions');
-            const adminDash = document.getElementById('admin-dashboard-section');
-            const adminSidebar = document.getElementById('admin-sidebar-tools');
-            const adminViews = document.querySelectorAll('.admin-only-view');
-            const btnA = document.getElementById('btnAccessAdmin');
-            const btnC = document.getElementById('btnAccessClient');
+        function addExtraProfit() {
+            const name = document.getElementById('exName').value;
+            const modal = Number(document.getElementById('exModal').value);
+            const price = Number(document.getElementById('exPrice').value);
+            if(!name || !modal || !price) return alert("Mohon lengkapi data!");
+            extraProfits.push({ id: Date.now(), name, modal, price, profit: price - modal });
+            document.getElementById('exName').value = ''; 
+            document.getElementById('exModal').value = ''; 
+            document.getElementById('exPrice').value = '';
+            calculateAll();
+        }
 
-            if(mode === 'admin') {
-                btnA.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white";
-                btnC.className = "flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500";
-                adminTop.style.display = 'flex';
-                adminDash.style.display = 'block';
-                adminSidebar.style.display = 'block';
-                adminViews.forEach(v => v.style.display = 'block');
-            } else {
-                btnC.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white";
-                btnA.className = "flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500";
-                adminTop.style.display = 'none';
-                adminDash.style.display = 'none';
-                adminSidebar.style.display = 'none';
-                adminViews.forEach(v => v.style.display = 'none');
-            }
+        function removeExtraProfit(id) { 
+            extraProfits = extraProfits.filter(p => p.id !== id); 
+            calculateAll(); 
+        }
+
+        function renderExtraProfitList() {
+            const list = document.getElementById('extraProfitList');
+            list.innerHTML = '';
+            extraProfits.forEach(p => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center text-[10px] bg-white p-2 rounded-lg border border-emerald-100";
+                div.innerHTML = `<div><b class="text-slate-700">${p.name}</b><p class="text-slate-400">Profit: Rp ${p.profit.toLocaleString('id-ID')}</p></div><div class="flex gap-2"><button onclick="sendInvoice(${p.id})" class="text-emerald-500 font-bold">WA</button><button onclick="removeExtraProfit(${p.id})" class="text-red-400 font-bold">✕</button></div>`;
+                list.appendChild(div);
+            });
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.getElementById('tabStok').className = filter === 'stok' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
+            document.getElementById('tabSold').className = filter === 'sold' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
+            document.getElementById('tabExtra').className = filter === 'extra' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
             renderRows();
         }
 
-        // --- CALCULATOR LOGIC ---
-        let cInput = '0', cPrev = '', cOp = null;
-        function formatDisplay(numStr) {
-            if (!numStr || numStr === '-') return numStr;
-            const parts = numStr.split('.');
-            parts[0] = parseFloat(parts[0]).toLocaleString('id-ID');
-            return parts.length > 1 ? parts[0] + ',' + parts[1] : parts[0];
-        }
-        function calcNum(n) {
-            if (n === '.' && cInput.includes('.')) return;
-            cInput = (cInput === '0' && n !== '.') ? n : cInput + n;
-            calcUpd();
-        }
-        function calcOp(op) {
-            if (cInput === '') return;
-            if (cPrev !== '') calcResult();
-            cOp = op;
-            cPrev = cInput; cInput = ''; 
-            calcUpd();
-        }
-        function calcPerc() {
-            if (cInput === '0' || cInput === '') return;
-            cInput = (parseFloat(cInput) / 100).toString();
-            calcUpd();
-        }
-        function calcClear() { cInput = '0'; cPrev = ''; cOp = null; calcUpd(); }
-        function calcDel() { cInput = cInput.toString().slice(0, -1) || '0'; calcUpd(); }
-        function calcUpd() {
-            document.getElementById('calc-curr').innerText = formatDisplay(cInput);
-            document.getElementById('calc-prev').innerText = cPrev ? formatDisplay(cPrev) + (cOp || '') : '';
-        }
-        function calcResult() {
-            let res;
-            const p = parseFloat(cPrev), c = parseFloat(cInput);
-            if (isNaN(p) || isNaN(c)) return;
-            switch (cOp) {
-                case '+': res = p + c; break;
-                case '-': res = p - c; break;
-                case '*': res = p * c; break;
-                case '/': res = p / c; break;
-                default: return;
+        function renderRows() {
+            const container = document.getElementById('itemRows');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const now = new Date(); 
+            let display = [];
+            
+            if (currentFilter === 'extra') {
+                display = extraProfits.filter(p => p.name.toLowerCase().includes(search)).map(p => ({
+                    ...p, status: 'sold', type: 'extra', entryDate: 'Bulan Lalu', soldAt: 'Bulan Lalu'
+                }));
+            } else {
+                display = items.filter(i => i.status === currentFilter && i.name.toLowerCase().includes(search));
             }
-            cInput = parseFloat(res.toFixed(10)).toString();
-            cOp = null; cPrev = ''; calcUpd();
+            
+            container.innerHTML = '';
+            
+            if (display.length === 0) { 
+                container.innerHTML = `<div class="text-center py-10 text-slate-300 font-bold text-xs uppercase italic">Data Kosong</div>`; 
+                return; 
+            }
+            
+            display.forEach(item => {
+                const profit = item.price - item.modal;
+                const card = document.createElement('div');
+                
+                if(accessMode === 'admin') {
+                    let borderClass = 'border-slate-100';
+                    let ageWarning = '';
+                    
+                    if(item.status === 'stok') {
+                        const entry = parseDateString(item.entryDate);
+                        const diffTime = Math.abs(now - entry);
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                        
+                        if (diffDays > 30) { 
+                            borderClass = 'border-danger'; 
+                            ageWarning = `<span class="text-red-500 font-bold ml-1">⚠️ ${diffDays} Hari</span>`; 
+                        } else if (diffDays > 14) { 
+                            borderClass = 'border-warning'; 
+                            ageWarning = `<span class="text-amber-500 font-bold ml-1">⚠️ ${diffDays} Hari</span>`; 
+                        } else { 
+                            borderClass = 'border-safe'; 
+                        }
+                    } else if (item.status === 'sold') { 
+                        borderClass = 'border-emerald-500 bg-white'; 
+                    }
+                    
+                    card.className = `p-4 rounded-2xl border-2 transition-all ${borderClass}`;
+                    
+                    let typeLabel = '';
+                    if(item.type === 'old') typeLabel = 'STOK LALU [L]'; 
+                    else if(item.type === 'new') typeLabel = 'BELANJA BARU [B]'; 
+                    else typeLabel = 'PROFIT BULAN LALU';
+                    
+                    card.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="text-[7px] font-black px-1.5 py-0.5 rounded uppercase ${item.type === 'extra' ? 'bg-emerald-100 text-emerald-600' : (item.type === 'old' ? 'bg-orange-100 text-orange-600' : 'bg-indigo-100 text-indigo-600')}">${typeLabel}</span>
+                                    <h4 class="font-bold text-slate-800 text-sm">${item.name}</h4>
+                                </div>
+                                <div class="flex items-center gap-3 text-[10px] font-medium text-slate-500">
+                                    <span>M: <b class="text-slate-700">${item.modal.toLocaleString()}</b></span>
+                                    <span>J: <b class="text-slate-700">${item.price.toLocaleString()}</b></span>
+                                </div>
+                                <div class="mt-1 text-[8px] text-slate-400 font-bold uppercase italic">
+                                    📥 Masuk: ${item.entryDate || '-'} ${ageWarning}
+                                    ${item.soldAt ? `<br><span class="text-emerald-500">📤 Terjual: ${item.soldAt}</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-end gap-2">
+                                <button onclick="${item.type === 'extra' ? `removeExtraProfit(${item.id})` : `removeItem(${item.id})`}" class="text-slate-300 hover:text-red-400 text-xs transition">✕</button>
+                                ${item.status !== 'sold' ? 
+                                    `<div class="flex gap-1">
+                                        <button onclick="openEditModal(${item.id})" class="bg-yellow-400 text-white p-1.5 rounded-lg shadow-sm">✏️</button>
+                                        <button onclick="openCostModal(${item.id})" class="bg-orange-400 text-white p-1.5 rounded-lg shadow-sm">🛠️</button>
+                                        <button onclick="toggleSold(${item.id})" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg font-bold text-[10px] hover:bg-indigo-700 transition">Laku? ✓</button>
+                                     </div>` : 
+                                    `<div class="text-right">
+                                        <span class="badge-profit">+${profit.toLocaleString()}</span>
+                                        <button onclick="sendInvoice(${item.id})" class="mt-1 flex items-center justify-end gap-1 text-[8px] text-emerald-600 font-bold hover:underline"><span>📱</span> Kirim Nota</button>
+                                     </div>`
+                                }
+                            </div>
+                        </div>`;
+                } else {
+                    card.className = "client-item-card card flex justify-between items-center transition-all active:scale-[0.98]";
+                    card.innerHTML = `<div class="flex-1"><h4 class="font-extrabold text-slate-800 text-lg mb-1 tracking-tight">${item.name}</h4><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full ${item.status === 'sold' ? 'bg-red-400' : 'bg-emerald-400'} animate-pulse"></span><span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${item.status === 'sold' ? 'Out of Stock' : 'Ready Stock'}</span></div></div><div class="text-right"><p class="text-[10px] font-black text-indigo-400 uppercase tracking-tighter mb-0.5">Price</p><div class="text-indigo-600 font-black text-xl tracking-tighter">Rp ${item.price.toLocaleString('id-ID')}</div></div>`;
+                }
+                container.appendChild(card);
+            });
         }
 
-        // --- BUSINESS LOGIC ---
-        function getNow() {
-            const d = new Date();
-            return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+        // ===============================================
+        // 🔧 MODALS & ACTIONS FUNCTIONS
+        // ===============================================
+        function openEditModal(id) { 
+            const i = items.find(x => x.id === id); 
+            if(!i)return; 
+            currentEditId=id; 
+            document.getElementById('editItemName').value=i.name; 
+            document.getElementById('editItemModal').value=i.modal; 
+            document.getElementById('editItemPrice').value=i.price; 
+            document.getElementById('editModal').classList.remove('hidden'); 
         }
         
-        function parseDateString(dateStr) {
-            if(!dateStr || dateStr === 'Imported' || dateStr === 'Bulan Lalu') return new Date();
-            const parts = dateStr.split(' ');
-            const dateParts = parts[0].split('/');
-            return new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
+        function closeEditModal() { 
+            document.getElementById('editModal').classList.add('hidden'); 
+            currentEditId=null; 
         }
-
-        // --- NEW: EDIT ITEM FEATURE ---
-        function openEditModal(id) {
-            const item = items.find(i => i.id === id);
-            if (!item) return;
-            currentEditId = id;
-            document.getElementById('editItemName').value = item.name;
-            document.getElementById('editItemModal').value = item.modal;
-            document.getElementById('editItemPrice').value = item.price;
-            document.getElementById('editModal').classList.remove('hidden');
-        }
-
-        function closeEditModal() {
-            document.getElementById('editModal').classList.add('hidden');
-            currentEditId = null;
-        }
-
+        
         function saveEditItem() {
             if (!currentEditId) return;
-            const name = document.getElementById('editItemName').value;
-            const modal = Number(document.getElementById('editItemModal').value);
-            const price = Number(document.getElementById('editItemPrice').value);
-            
             const itemIndex = items.findIndex(i => i.id === currentEditId);
             if (itemIndex > -1) {
-                items[itemIndex].name = name;
-                items[itemIndex].modal = modal;
-                items[itemIndex].price = price;
+                items[itemIndex].name = document.getElementById('editItemName').value;
+                items[itemIndex].modal = Number(document.getElementById('editItemModal').value);
+                items[itemIndex].price = Number(document.getElementById('editItemPrice').value);
                 calculateAll(); 
                 closeEditModal();
-                alert("Data berhasil diupdate!");
             }
         }
-
-        // --- NEW: SMART COST FEATURE ---
-        function openCostModal(id) {
-            const item = items.find(i => i.id === id);
-            if (!item) return;
-            currentCostId = id;
-            document.getElementById('costDesc').value = '';
-            document.getElementById('costAmount').value = '';
-            document.getElementById('costModal').classList.remove('hidden');
+        
+        function openCostModal(id) { 
+            currentCostId = id; 
+            document.getElementById('costDesc').value=''; 
+            document.getElementById('costAmount').value=''; 
+            document.getElementById('costModal').classList.remove('hidden'); 
         }
-
-        function closeCostModal() {
-            document.getElementById('costModal').classList.add('hidden');
-            currentCostId = null;
+        
+        function closeCostModal() { 
+            document.getElementById('costModal').classList.add('hidden'); 
+            currentCostId = null; 
         }
-
+        
         function saveCost() {
-            if (!currentCostId) return;
-            const desc = document.getElementById('costDesc').value;
+            if(!currentCostId) return;
             const amount = Number(document.getElementById('costAmount').value);
-            
-            if(!desc || !amount) return alert("Isi keterangan dan nominal!");
-
-            const itemIndex = items.findIndex(i => i.id === currentCostId);
-            if (itemIndex > -1) {
-                // Update Modal
-                items[itemIndex].modal += amount;
-                
-                // Tambahkan catatan sejarah di nama barang agar terlihat di laporan
-                const amountK = amount / 1000 + "k";
-                items[itemIndex].name += ` (+${desc} ${amountK})`;
-                
+            const desc = document.getElementById('costDesc').value;
+            const idx = items.findIndex(x => x.id === currentCostId);
+            if(idx > -1 && amount && desc) {
+                items[idx].modal += amount;
+                items[idx].name += ` (+${desc} ${amount/1000}k)`;
                 calculateAll(); 
                 closeCostModal();
-                alert(`Biaya servis Rp ${amount.toLocaleString()} ditambahkan ke modal!`);
             }
         }
-
-        // --- OWNER FEATURES LOGIC ---
-        function updateTargetBar(currentProfit) {
-            let percentage = 0;
-            if (targetGoal > 0) percentage = (currentProfit / targetGoal) * 100;
-            if (percentage > 100) percentage = 100;
-            if (percentage < 0) percentage = 0;
+        
+        function toggleSold(id) { 
+            const i = items.find(x => x.id === id); 
+            if(i){ i.status='sold'; i.soldAt=getNow(); calculateAll(); }
+        }
+        
+        function removeItem(id) { 
+            if(confirm('Hapus unit ini permanen?')) { 
+                items = items.filter(x => x.id !== id); 
+                calculateAll(); 
+            }
+        }
+        
+        function updateTargetBar(profit) {
+            let p = 0;
+            if (targetGoal > 0) {
+                p = (profit / targetGoal) * 100;
+            }
+            if (p > 100) p = 100;
+            if (p < 0) p = 0;
 
             const bar = document.getElementById('progressBar');
-            bar.style.width = percentage + "%";
-            if(percentage >= 100) {
-                bar.className = "bg-emerald-500 h-3 rounded-full transition-all duration-1000 ease-out relative";
+            bar.style.width = p + "%";
+            
+            if(p >= 100) {
+                bar.className = "bg-emerald-500 h-3 rounded-full relative transition-all duration-1000";
             } else {
-                bar.className = "bg-indigo-600 h-3 rounded-full transition-all duration-1000 ease-out relative";
+                bar.className = "bg-indigo-600 h-3 rounded-full relative transition-all duration-1000";
             }
-            document.getElementById('targetPercentage').innerText = percentage.toFixed(0) + "%";
+
+            document.getElementById('targetPercentage').innerText = p.toFixed(0) + "%";
+            
             const currentText = document.getElementById('currentProgressText');
-            if(currentText) currentText.innerText = "Tercapai: Rp " + currentProfit.toLocaleString('id-ID');
+            if(currentText) {
+                currentText.innerText = "Tercapai: Rp " + profit.toLocaleString('id-ID');
+            }
+
             document.getElementById('targetNameDisplay').innerText = targetName;
             document.getElementById('targetValueDisplay').innerText = "Target: Rp " + targetGoal.toLocaleString('id-ID');
         }
 
-        function setMonthlyTarget() {
-            const newName = prompt("Apa target finansialmu bulan ini? (Misal: Upgrade PC)", targetName);
-            const newAmount = prompt("Berapa nominal target profit?", targetGoal);
-            if (newName && newAmount) {
-                targetName = newName;
-                targetGoal = Number(newAmount);
-                calculateAll();
-            }
-        }
-
         function updateRankBadge(profit) {
-            const badge = document.getElementById('rankBadge');
-            let rank = "Pedagang Pemula";
-            let color = "bg-slate-200 text-slate-500";
-            if (profit >= 50000000) { rank = "👑 SULTAN GADGET"; color = "bg-yellow-100 text-yellow-600 border border-yellow-300"; }
-            else if (profit >= 25000000) { rank = "💎 JURAGAN PRO"; color = "bg-indigo-100 text-indigo-600 border border-indigo-300"; }
-            else if (profit >= 10000000) { rank = "🔥 STARTUP OWNER"; color = "bg-emerald-100 text-emerald-600"; }
-            else if (profit >= 5000000) { rank = "🚀 RISING STAR"; color = "bg-blue-100 text-blue-600"; }
-            badge.innerText = rank;
-            badge.className = `badge-rank ${color} mb-1`;
+            let r="Pedagang Pemula", c="bg-slate-200 text-slate-500";
+            if(profit>=50000000){r="👑 SULTAN GADGET";c="bg-yellow-100 text-yellow-600 border-yellow-300";}
+            else if(profit>=25000000){r="💎 JURAGAN PRO";c="bg-indigo-100 text-indigo-600 border-indigo-300";}
+            else if(profit>=10000000){r="🔥 STARTUP OWNER";c="bg-emerald-100 text-emerald-600";}
+            else if(profit>=5000000){r="🚀 RISING STAR";c="bg-blue-100 text-blue-600";}
+            document.getElementById('rankBadge').className = `badge-rank ${c} mb-1`;
+            document.getElementById('rankBadge').innerText = r;
         }
         
-        function saveNote() {
-            localStorage.setItem('ledger_owner_note', document.getElementById('ownerNote').value);
-        }
-
-        function sendInvoice(id) {
-            let item;
-            if (currentFilter === 'extra') {
-                 item = extraProfits.find(p => p.id === id);
-                 if(item) item = { name: item.name, price: item.price, soldAt: 'Bulan Lalu' };
-            } else {
-                 item = items.find(i => i.id === id);
-            }
-            if(!item) return;
-            const text = `*NOTA PEMBELIAN - FARID STORE* %0A%0A📦 Unit: ${item.name}%0A💰 Harga: Rp ${item.price.toLocaleString('id-ID')}%0A📅 Tanggal: ${item.soldAt}%0A%0A_Terima kasih sudah berbelanja! Garansi fungsi personal 3 hari (bukan human error/kena air)._ %0A%0ASimpan nomor ini untuk klaim garansi.`;
-            window.open(`https://wa.me/?text=${text}`, '_blank');
-        }
-
-        // --- INTELLIGENT BRAND DETECTOR ---
-        function getBrandCategory(itemName) {
-            const lower = itemName.toLowerCase();
-            if (lower.includes('iphone') || lower.includes('apple') || lower.includes('ipad') || lower.includes('ip ')) return 'APPLE';
-            if (lower.includes('samsung') || lower.includes('galaxy') || lower.includes('sein') || lower.includes('z flip') || lower.includes('z fold')) return 'SAMSUNG';
-            if (lower.includes('xiaomi') || lower.includes('note') || lower.includes('redmi') || lower.includes('poco') || lower.includes('mi ')) return 'XIAOMI/POCO';
-            if (lower.includes('oppo') || lower.includes('reno')) return 'OPPO';
-            if (lower.includes('vivo') || lower.includes('iqoo')) return 'VIVO';
-            if (lower.includes('realme')) return 'REALME';
-            if (lower.includes('infinix')) return 'INFINIX';
-            if (lower.includes('tecno')) return 'TECNO';
-            if (lower.includes('itel')) return 'ITEL';
-            if (lower.includes('asus') || lower.includes('rog')) return 'ASUS';
-            if (lower.includes('google') || lower.includes('pixel')) return 'GOOGLE';
-            return itemName.split(' ')[0].replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-        }
-
-        // --- ANALYTICS RENDER LOGIC ---
+        // --- ANALYTICS VISUALIZATION ---
         function renderAnalytics() {
             const soldItems = items.filter(i => i.status === 'sold');
             if (soldItems.length === 0) {
@@ -876,7 +1143,7 @@
             }
 
             // 1. Kecepatan Putaran
-            let totalDays = 0;
+            let totalDays = 0; 
             let validSales = 0;
             soldItems.forEach(i => {
                 const entry = parseDateString(i.entryDate); 
@@ -894,7 +1161,7 @@
             const winRate = totalStock > 0 ? ((totalSold / totalStock) * 100).toFixed(0) : 0;
             document.getElementById('winRateStock').innerText = winRate + "%";
 
-            // 3. Brand Dominance Chart (WITH SMART LOGIC)
+            // 3. Brand Dominance Chart
             const brands = {};
             soldItems.forEach(i => {
                 const brandName = getBrandCategory(i.name);
@@ -946,7 +1213,6 @@
                 else if (month >= 6 && month <= 8) quarters["Q3 (Jul-Sep)"] += profit;
                 else quarters["Q4 (Oct-Dec)"] += profit;
             });
-            
             const ctxQuarter = document.getElementById('quarterlyChart');
             if (ctxQuarter) {
                 if(quarterlyChartInstance) quarterlyChartInstance.destroy();
@@ -971,218 +1237,45 @@
             }
         }
 
-        // --- MAIN FUNCTIONS ---
-        function parseText(type) {
-            const rawText = document.getElementById('bulkInput').value;
-            if (!rawText.trim()) return;
-            rawText.split('\n').forEach(line => {
-                if (line.includes(':') && line.includes('>')) {
-                    const parts = line.split(/[:>]/);
-                    const name = parts[0].trim().replace(/^-\s*/, '').replace(/\[[BL]\]\s*/, '');
-                    const modal = Number(parts[1].replace(/[^0-9]/g, ''));
-                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
-                    if (name && modal) {
-                        items.unshift({ id: Date.now() + Math.random(), name, modal, price, status: 'stok', type, entryDate: getNow(), soldAt: '' });
-                    }
-                }
-            });
-            document.getElementById('bulkInput').value = '';
-            calculateAll();
+        function getBrandCategory(itemName) {
+            const lower = itemName.toLowerCase();
+            if (lower.includes('iphone') || lower.includes('apple') || lower.includes('ipad') || lower.includes('ip ')) return 'APPLE';
+            if (lower.includes('samsung') || lower.includes('galaxy') || lower.includes('sein') || lower.includes('z flip') || lower.includes('z fold')) return 'SAMSUNG';
+            if (lower.includes('xiaomi') || lower.includes('redmi') || lower.includes('poco') || lower.includes('mi ')) return 'XIAOMI/POCO';
+            if (lower.includes('oppo') || lower.includes('reno')) return 'OPPO';
+            if (lower.includes('vivo') || lower.includes('iqoo')) return 'VIVO';
+            if (lower.includes('realme')) return 'REALME';
+            if (lower.includes('infinix')) return 'INFINIX';
+            if (lower.includes('tecno')) return 'TECNO';
+            if (lower.includes('itel')) return 'ITEL';
+            if (lower.includes('asus') || lower.includes('rog')) return 'ASUS';
+            if (lower.includes('google') || lower.includes('pixel')) return 'GOOGLE';
+            return itemName.split(' ')[0].replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
         }
 
-        function parseExtraProfitText() {
-            const rawText = document.getElementById('exBulkInput').value;
-            if (!rawText.trim()) return;
-            rawText.split('\n').forEach(line => {
-                if (line.includes(':') && line.includes('>')) {
-                    const parts = line.split(/[:>]/);
-                    const name = parts[0].trim();
-                    const modal = Number(parts[1].replace(/[^0-9]/g, ''));
-                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
-                    if (name && modal && price) {
-                        extraProfits.push({ id: Date.now() + Math.random(), name, modal, price, profit: price - modal });
-                    }
-                }
-            });
-            document.getElementById('exBulkInput').value = '';
-            calculateAll();
+        function setMonthlyTarget() {
+            const newName = prompt("Nama Target?", targetName);
+            const newAmount = prompt("Nominal Target?", targetGoal);
+            if(newName && newAmount) { 
+                targetName = newName; 
+                targetGoal = Number(newAmount); 
+                calculateAll(); 
+            }
         }
-
-        function addExtraProfit() {
-            const name = document.getElementById('exName').value;
-            const modal = Number(document.getElementById('exModal').value);
-            const price = Number(document.getElementById('exPrice').value);
-            if(!name || !modal || !price) return alert("Mohon lengkapi data!");
-            extraProfits.push({ id: Date.now(), name, modal, price, profit: price - modal });
-            document.getElementById('exName').value = '';
-            document.getElementById('exModal').value = '';
-            document.getElementById('exPrice').value = '';
-            calculateAll();
+        
+        function saveNote() { 
+            localStorage.setItem('ledger_owner_note', document.getElementById('ownerNote').value); 
         }
-
-        function removeExtraProfit(id) {
-            extraProfits = extraProfits.filter(p => p.id !== id);
-            calculateAll();
-        }
-
-        function renderExtraProfitList() {
-            const list = document.getElementById('extraProfitList');
-            list.innerHTML = '';
-            extraProfits.forEach(p => {
-                const div = document.createElement('div');
-                div.className = "flex justify-between items-center text-[10px] bg-white p-2 rounded-lg border border-emerald-100";
-                div.innerHTML = `<div><b class="text-slate-700">${p.name}</b><p class="text-slate-400">Profit: Rp ${p.profit.toLocaleString('id-ID')}</p></div>
-                <div class="flex gap-2">
-                    <button onclick="sendInvoice(${p.id})" class="text-emerald-500 font-bold">WA</button>
-                    <button onclick="removeExtraProfit(${p.id})" class="text-red-400 font-bold">✕</button>
-                </div>`;
-                list.appendChild(div);
-            });
-        }
-
-        function calculateAll(shouldSave = true) {
-            const start = Number(document.getElementById('startBalance').value) || 0;
-            let belanjaBaru = 0, uangMasuk = 0, profit = 0, floatPrice = 0, floatModal = 0;
-            items.forEach(i => {
-                if (i.status === 'sold') {
-                    if (i.type === 'new') belanjaBaru += i.modal;
-                    uangMasuk += i.price;
-                    profit += (i.price - i.modal);
-                } else {
-                    if (i.type === 'new') belanjaBaru += i.modal;
-                    floatPrice += i.price;
-                    floatModal += i.modal;
-                }
-            });
-            const extraProfitTotal = extraProfits.reduce((sum, p) => sum + p.profit, 0);
-            const totalProfitReal = profit + extraProfitTotal;
-
-            const cash = start - belanjaBaru + uangMasuk;
-            document.getElementById('summaryCash').innerText = "Rp " + cash.toLocaleString('id-ID');
-            document.getElementById('summaryFloating').innerText = "Rp " + floatPrice.toLocaleString('id-ID');
-            document.getElementById('summaryTotal').innerText = "Rp " + (cash + floatPrice).toLocaleString('id-ID');
-            document.getElementById('summaryProfit').innerText = "Rp " + totalProfitReal.toLocaleString('id-ID');
-            document.getElementById('previewModalStock').innerText = "Rp " + floatModal.toLocaleString('id-ID');
-            document.getElementById('previewUnrealizedProfit').innerText = "Rp " + (floatPrice - floatModal).toLocaleString('id-ID');
-            
-            updateTargetBar(totalProfitReal);
-            updateRankBadge(totalProfitReal);
-            renderRows();
-            renderExtraProfitList();
-            
-            if(shouldSave) saveData();
-        }
-
-        function setFilter(filter) {
-            currentFilter = filter;
-            document.getElementById('tabStok').className = filter === 'stok' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
-            document.getElementById('tabSold').className = filter === 'sold' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
-            document.getElementById('tabExtra').className = filter === 'extra' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
-            renderRows();
-        }
-
-        function renderRows() {
-            const container = document.getElementById('itemRows');
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            const now = new Date(); 
-
-            let display = [];
-            if (currentFilter === 'extra') {
-                display = extraProfits.filter(p => p.name.toLowerCase().includes(search)).map(p => ({
-                    ...p, status: 'sold', type: 'extra', entryDate: 'Bulan Lalu', soldAt: 'Bulan Lalu'
-                }));
+        
+        function backupSystem() {
+            const data = localStorage.getItem('ledger_v2_final');
+            if(data) {
+                navigator.clipboard.writeText(data).then(() => alert("KODE BACKUP berhasil disalin!\nSimpan kode ini di Note HP/WA Pribadi agar data aman 100%."));
             } else {
-                display = items.filter(i => i.status === currentFilter && i.name.toLowerCase().includes(search));
+                alert("Data kosong.");
             }
-
-            container.innerHTML = '';
-            
-            if (display.length === 0) {
-                 container.innerHTML = `<div class="text-center py-10 text-slate-300 font-bold text-xs uppercase italic">Data Kosong</div>`;
-                 return;
-            }
-
-            display.forEach(item => {
-                const profit = item.price - item.modal;
-                const card = document.createElement('div');
-                
-                if(accessMode === 'admin') {
-                    let borderClass = 'border-slate-100';
-                    let ageWarning = '';
-                    
-                    if(item.status === 'stok') {
-                        const entry = parseDateString(item.entryDate);
-                        const diffTime = Math.abs(now - entry);
-                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                        
-                        if (diffDays > 30) {
-                            borderClass = 'border-danger';
-                            ageWarning = `<span class="text-red-500 font-bold ml-1">⚠️ ${diffDays} Hari</span>`;
-                        } else if (diffDays > 14) {
-                            borderClass = 'border-warning';
-                            ageWarning = `<span class="text-amber-500 font-bold ml-1">⚠️ ${diffDays} Hari</span>`;
-                        } else {
-                            borderClass = 'border-safe'; 
-                        }
-                    } else if (item.status === 'sold') {
-                        borderClass = 'border-emerald-500 bg-white';
-                    }
-
-                    card.className = `p-4 rounded-2xl border-2 transition-all ${borderClass}`;
-                    
-                    let typeLabel = '';
-                    if(item.type === 'old') typeLabel = 'STOK LALU [L]';
-                    else if(item.type === 'new') typeLabel = 'BELANJA BARU [B]';
-                    else typeLabel = 'PROFIT BULAN LALU';
-
-                    card.innerHTML = `
-                        <div class="flex justify-between items-center">
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="text-[7px] font-black px-1.5 py-0.5 rounded uppercase ${item.type === 'extra' ? 'bg-emerald-100 text-emerald-600' : (item.type === 'old' ? 'bg-orange-100 text-orange-600' : 'bg-indigo-100 text-indigo-600')}">${typeLabel}</span>
-                                    <h4 class="font-bold text-slate-800 text-sm">${item.name}</h4>
-                                </div>
-                                <div class="flex items-center gap-3 text-[10px] font-medium text-slate-500">
-                                    <span>M: <b class="text-slate-700">${item.modal.toLocaleString()}</b></span>
-                                    <span>J: <b class="text-slate-700">${item.price.toLocaleString()}</b></span>
-                                </div>
-                                <div class="mt-1 text-[8px] text-slate-400 font-bold uppercase italic">
-                                    📥 Masuk: ${item.entryDate || '-'} ${ageWarning}
-                                    ${item.soldAt ? `<br><span class="text-emerald-500">📤 Terjual: ${item.soldAt}</span>` : ''}
-                                </div>
-                            </div>
-                            <div class="flex flex-col items-end gap-2">
-                                <button onclick="${item.type === 'extra' ? `removeExtraProfit(${item.id})` : `removeItem(${item.id})`}" class="text-slate-300 hover:text-red-400 text-xs transition">✕</button>
-                                ${item.status !== 'sold' ? 
-                                    `<div class="flex gap-1">
-                                        <button onclick="openEditModal(${item.id})" class="bg-yellow-400 text-white p-1.5 rounded-lg shadow-sm">✏️</button>
-                                        <button onclick="openCostModal(${item.id})" class="bg-orange-400 text-white p-1.5 rounded-lg shadow-sm">🛠️</button>
-                                        <button onclick="toggleSold(${item.id})" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg font-bold text-[10px] hover:bg-indigo-700 transition">Laku? ✓</button>
-                                     </div>` : 
-                                    `<div class="text-right">
-                                        <span class="badge-profit">+${profit.toLocaleString()}</span>
-                                        <button onclick="sendInvoice(${item.id})" class="mt-1 flex items-center justify-end gap-1 text-[8px] text-emerald-600 font-bold hover:underline">
-                                           <span>📱</span> Kirim Nota
-                                        </button>
-                                     </div>`
-                                }
-                            </div>
-                        </div>`;
-                } else {
-                    card.className = "client-item-card card flex justify-between items-center transition-all active:scale-[0.98]";
-                    card.innerHTML = `<div class="flex-1"><h4 class="font-extrabold text-slate-800 text-lg mb-1 tracking-tight">${item.name}</h4><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full ${item.status === 'sold' ? 'bg-red-400' : 'bg-emerald-400'} animate-pulse"></span><span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${item.status === 'sold' ? 'Out of Stock' : 'Ready Stock'}</span></div></div><div class="text-right"><p class="text-[10px] font-black text-indigo-400 uppercase tracking-tighter mb-0.5">Price</p><div class="text-indigo-600 font-black text-xl tracking-tighter">Rp ${item.price.toLocaleString('id-ID')}</div></div>`;
-                }
-                container.appendChild(card);
-            });
         }
-
-        function toggleSold(id) {
-            const item = items.find(i => i.id === id);
-            if (item) { item.status = 'sold'; item.soldAt = getNow(); calculateAll(); }
-        }
-
-        function removeItem(id) { if(confirm('Hapus unit ini?')) { items = items.filter(i => i.id !== id); calculateAll(); } }
-
+        
         function exportReport() {
             const cash = document.getElementById('summaryCash').innerText;
             const stokVal = document.getElementById('previewModalStock').innerText;
@@ -1192,40 +1285,35 @@
             
             let report = `📊 *LAPORAN KEUANGAN FARID STORE*\n`;
             report += `🗓️ Periode: ${currentMonthString}\n\n`;
+            report += `💰 *RINGKASAN*\n💵 Saldo Tunai: ${cash}\n📦 Nilai Stok: ${stokVal}\n📈 Total Aset: Rp ${totalAsset.toLocaleString('id-ID')}\n🔥 Profit Bersih: ${profit}\n\n✅ *PENJUALAN*\n`;
             
-            report += `💰 *RINGKASAN EKSEKUTIF*\n━━━━━━━━━━━━━━━━━━━\n`;
-            report += `💵 *Saldo Tunai:* ${cash}\n`;
-            report += `📦 *Nilai Stok:* ${stokVal}\n`;
-            report += `📈 *Total Aset:* Rp ${totalAsset.toLocaleString('id-ID')}\n`;
-            report += `🔥 *Profit Bersih:* ${profit}\n\n`;
-            
-            report += `✅ *RINCIAN PENJUALAN (SOLD)*\n━━━━━━━━━━━━━━━━━━━\n`;
             let soldCount = 0;
             items.filter(i => i.status === 'sold').forEach((i, index) => {
                 soldCount++;
                 const p = i.price - i.modal;
-                report += `${index + 1}. *${i.name}*\n   (M: ${i.modal/1000}k → J: ${i.price/1000}k) ✅ Profit: *+${p.toLocaleString()}*\n`;
+                report += `${index + 1}. *${i.name}* (Profit: +${p.toLocaleString()})\n`;
             });
-            if(soldCount === 0) report += `(Belum ada penjualan)\n`;
+            if(soldCount === 0) report += `(Nihil)\n`;
             
-            report += `\n🛑 *STOK GUDANG (AVAILABLE)*\n━━━━━━━━━━━━━━━━━━━\n`;
+            report += `\n🛑 *STOK GUDANG*\n`;
             let stokCount = 0;
             items.filter(i => i.status === 'stok').forEach((i, index) => {
                 stokCount++;
-                report += `${index + 1}. ${i.name} (M: ${i.modal/1000}k)\n`;
+                report += `${index + 1}. ${i.name} (M: ${i.modal.toLocaleString()})\n`;
             });
-            if(stokCount === 0) report += `(Stok Kosong)\n`;
+            if(stokCount === 0) report += `(Kosong)\n`;
 
             report += `\n_Generated by Farid Store System_`;
-            
             navigator.clipboard.writeText(report).then(() => alert("Laporan Investor berhasil disalin!"));
         }
-
+        
+        function toggleImportModal() { document.getElementById('importModal').classList.toggle('hidden'); }
+        
         function processImport() {
             const text = document.getElementById('importArea').value.trim();
             if(!text) return;
 
-            // DETEKSI 1: Apakah ini KODE BACKUP JSON (Start with {)
+            // DETEKSI 1: KODE BACKUP JSON
             if (text.startsWith('{')) {
                 try {
                     const parsed = JSON.parse(text);
@@ -1239,52 +1327,16 @@
                 } catch (e) {
                     alert("Kode backup rusak.");
                 }
-            }
-
-            // DETEKSI 2: Format Teks Lama
-            if (!confirm("Ini sepertinya data teks manual. Data detail servis/tanggal mungkin hilang. Lanjutkan?")) return;
-            const newItems = [];
-            let section = "";
-            let saldoAwalImport = 0;
-            text.split('\n').forEach(line => {
-                const clean = line.trim();
-                if (clean.includes("Report Bulanan")) section = "sold";
-                else if (clean.includes("Unit Belum Terjual")) section = "stok";
-                else if (clean.includes("Saldo Awal")) {
-                    const m = clean.match(/Rp\s*([\d.]+)/);
-                    if (m) saldoAwalImport = Number(m[1].replace(/\./g, ''));
-                }
-                else if (clean.startsWith("-")) {
-                    const isNew = clean.includes("[B]");
-                    const parts = clean.split(/[:>]/);
-                    if (parts.length >= 3) {
-                        const name = parts[0].replace(/-|\[B\]|\[L\]/g, '').trim();
-                        const modal = Number(parts[1].replace(/[^0-9]/g, ''));
-                        const price = Number(parts[2].split('(')[0].replace(/[^0-9]/g, ''));
-                        if (name && modal) {
-                            newItems.push({ id: Date.now() + Math.random(), name, modal, price, status: section, type: isNew ? 'new' : 'old', entryDate: 'Imported', soldAt: section === 'sold' ? 'Imported' : '' });
-                        }
-                    }
-                }
-            });
-            if (newItems.length > 0) { 
-                items = newItems; 
-                document.getElementById('startBalance').value = saldoAwalImport; 
-                calculateAll(); 
-                toggleImportModal(); 
-                alert("Data Berhasil Diimpor!"); 
+            } else {
+                alert("Gunakan format JSON untuk restore penuh.");
             }
         }
-
-        function toggleImportModal() { document.getElementById('importModal').classList.toggle('hidden'); }
+        
         function toggleHelpModal() { alert("Gunakan tombol 'Cloud Sync' untuk sinkronisasi data antar device."); }
         function clearData() { if(confirm('Hapus permanen?')) { localStorage.clear(); location.reload(); } }
-        function directImei() {
-            const imei = document.getElementById('imeiInput').value;
-            if(!imei) return alert("Isi IMEI dulu!");
-            window.open(`https://www.imei.info/?imei=${imei}`, '_blank');
-        }
+        function directImei() { const i=document.getElementById('imeiInput').value; if(i)window.open(`https://www.imei.info/?imei=${i}`, '_blank'); }
 
+        // --- INIT ---
         window.onload = () => {
             const now = new Date();
             currentMonthString = monthNames[now.getMonth()] + " " + now.getFullYear();
