@@ -1312,28 +1312,37 @@
         // 🔧 MODALS & ACTIONS FUNCTIONS
         // ===============================================
         function openEditModal(id) { 
-            const i = items.find(x => x.id === id); 
-            if(!i)return; 
-            currentEditId=id; 
-            document.getElementById('editItemName').value=i.name; 
-            document.getElementById('editItemModal').value=i.modal; 
-            document.getElementById('editItemPrice').value=i.price; 
-            
-            // --- NEW: Handle Date Edit ---
-            try {
-                const entryStr = i.entryDate.split(' ')[0]; 
-                const parts = entryStr.split('/');
-                if(parts.length === 3) {
-                    const isoDate = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
-                    document.getElementById('editEntryDate').value = isoDate;
-                }
-            } catch(e) {
-                console.log("Date parsing error", e);
-            }
+    // Cari di array items dulu, jika tidak ada cari di extraProfits
+    let i = items.find(x => x.id === id); 
+    if (!i) {
+        i = extraProfits.find(x => x.id === id);
+    }
 
-            // Using style display instead of class to ensure it shows
-            document.getElementById('editModal').style.display = 'flex';
+    if(!i) return; 
+
+    currentEditId = id; 
+    document.getElementById('editItemName').value = i.name; 
+    // Gunakan 0 jika properti modal tidak ada (untuk data extraProfit lama)
+    document.getElementById('editItemModal').value = i.modal || 0; 
+    document.getElementById('editItemPrice').value = i.price; 
+    
+    try {
+        if (i.entryDate && i.entryDate.includes('/')) {
+            const entryStr = i.entryDate.split(' ')[0]; 
+            const parts = entryStr.split('/');
+            if(parts.length === 3) {
+                const isoDate = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+                document.getElementById('editEntryDate').value = isoDate;
+            }
+        } else {
+            document.getElementById('editEntryDate').value = "";
         }
+    } catch(e) {
+        console.log("Date parsing error", e);
+    }
+
+    document.getElementById('editModal').style.display = 'flex';
+}
         
         function closeEditModal() { 
             document.getElementById('editModal').style.display = 'none';
@@ -1341,23 +1350,47 @@
         }
         
         function saveEditItem() {
-            if (!currentEditId) return;
-            const itemIndex = items.findIndex(i => i.id === currentEditId);
-            if (itemIndex > -1) {
-                items[itemIndex].name = document.getElementById('editItemName').value;
-                items[itemIndex].modal = Number(document.getElementById('editItemModal').value);
-                items[itemIndex].price = Number(document.getElementById('editItemPrice').value);
-                
-                const dateInput = document.getElementById('editEntryDate').value;
-                if(dateInput) {
-                    const d = new Date(dateInput);
-                    items[itemIndex].entryDate = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} 00:00`;
-                }
+    if (!currentEditId) return;
 
-                calculateAll(); 
-                closeEditModal();
+    // Cek apakah data yang diedit ada di array items
+    let itemIndex = items.findIndex(i => i.id === currentEditId);
+    let isExtra = false;
+
+    if (itemIndex === -1) {
+        // Jika tidak ada di items, cek di extraProfits
+        itemIndex = extraProfits.findIndex(i => i.id === currentEditId);
+        isExtra = true;
+    }
+
+    if (itemIndex > -1) {
+        const newName = document.getElementById('editItemName').value;
+        const newModal = Number(document.getElementById('editItemModal').value);
+        const newPrice = Number(document.getElementById('editItemPrice').value);
+        const dateInput = document.getElementById('editEntryDate').value;
+
+        if (isExtra) {
+            // Update array extraProfits
+            extraProfits[itemIndex].name = newName;
+            extraProfits[itemIndex].modal = newModal;
+            extraProfits[itemIndex].price = newPrice;
+            extraProfits[itemIndex].profit = newPrice - newModal;
+        } else {
+            // Update array items
+            items[itemIndex].name = newName;
+            items[itemIndex].modal = newModal;
+            items[itemIndex].price = newPrice;
+            
+            if(dateInput) {
+                const d = new Date(dateInput);
+                items[itemIndex].entryDate = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} 00:00`;
             }
         }
+
+        calculateAll(); 
+        closeEditModal();
+        alert("Data berhasil diperbarui!");
+    }
+}
         
         function openCostModal(id) { 
             currentCostId = id; 
