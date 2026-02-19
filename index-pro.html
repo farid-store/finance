@@ -2,8 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Ledger - Finance Tracker Pro (Owner Edition)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Digital Ledger - Finance Tracker Pro</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -24,7 +24,18 @@
             background-color: var(--bg-main); 
             color: #1e293b; 
             margin: auto; 
-            transition: max-width 0.3s ease; 
+            transition: max-width 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
         }
 
         /* =========================================
@@ -58,6 +69,7 @@
         #sidebar { 
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
             z-index: 50; 
+            height: 100dvh; /* Dynamic Height for mobile browsers */
         }
 
         .sidebar-item { 
@@ -225,16 +237,24 @@
         }
 
         /* =========================================
-           NEW: SECURITY PIN MODAL STYLES
+           MODAL STYLES (CENTERED MOBILE)
            ========================================= */
-        #authModal {
+        #authModal, #importModal, #editModal, #costModal {
             position: fixed;
             inset: 0;
-            z-index: 999;
-            background: #0f172a;
+            z-index: 60; /* Higher than sidebar */
+            background: rgba(15, 23, 42, 0.8);
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 1rem;
+        }
+        
+        .modal-content {
+            width: 100%;
+            max-width: 24rem;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
         .blur-sensitive {
@@ -244,15 +264,15 @@
         }
     </style>
 </head>
-<body class="p-4 md:p-8 antialiased">
+<body class="p-3 md:p-8 antialiased min-h-screen bg-slate-50 pb-24 lg:pb-8">
 
     <div id="authModal">
-        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-sm text-center relative overflow-hidden">
+        <div class="bg-white p-6 md:p-8 rounded-3xl shadow-2xl w-full max-w-sm text-center relative overflow-hidden modal-content">
             <div class="absolute top-0 left-0 w-full h-2 bg-indigo-600"></div>
-            <h2 class="text-2xl font-black text-slate-800 mb-2 uppercase italic">Security Check</h2>
+            <h2 class="text-xl md:text-2xl font-black text-slate-800 mb-2 uppercase italic">Security Check</h2>
             <p class="text-xs text-slate-500 mb-6">Masukkan PIN Owner untuk akses penuh & sinkronisasi.</p>
             
-            <input type="password" id="pinInput" class="input-field text-center text-2xl font-black tracking-[10px] mb-4" placeholder="••••••" maxlength="6">
+            <input type="tel" id="pinInput" class="input-field text-center text-2xl font-black tracking-[10px] mb-4" placeholder="••••••" maxlength="6">
             
             <button onclick="checkPin()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold uppercase shadow-lg hover:bg-indigo-700 transition mb-3">
                 Buka Akses Owner
@@ -277,11 +297,15 @@
 
     <div id="overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-40" onclick="toggleSidebar()"></div>
 
-    <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#1e293b] text-white shadow-2xl flex flex-col -translate-x-full lg:translate-x-0">
-        <div class="p-6 overflow-y-auto">
-            <h2 class="text-xl font-extrabold mb-8 flex items-center gap-3 italic tracking-tight">
-                <span class="bg-indigo-600 p-2 rounded-lg not-italic">📱</span> MENU
-            </h2>
+    <aside id="sidebar" class="fixed top-0 left-0 w-72 bg-[#1e293b] text-white shadow-2xl flex flex-col -translate-x-full lg:translate-x-0 overflow-y-auto">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-xl font-extrabold flex items-center gap-3 italic tracking-tight">
+                    <span class="bg-indigo-600 p-2 rounded-lg not-italic">📱</span> MENU
+                </h2>
+                <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white">✕</button>
+            </div>
+
             <nav class="space-y-2">
                 <div onclick="switchPage('main')" class="sidebar-item hover:bg-indigo-600 hover:text-white transition">
                     <span class="mr-3 text-lg">📊</span> Dashboard Utama
@@ -310,10 +334,7 @@
                         <a href="https://www.realme.com/sa-en/support/phonecheck" target="_blank" class="sidebar-item text-xs pl-12">Realme Official</a>
                         <a href="https://www.vivo.com/en/support/IMEI" target="_blank" class="sidebar-item text-xs pl-12">Vivo Official</a>
                         <a href="https://support.oppo.com/en/warranty-check/" target="_blank" class="sidebar-item text-xs pl-12">OPPO Official</a>
-                        <a href="https://wap.id.infinixmobility.com/care/imei-authentication" target="_blank" class="sidebar-item text-xs pl-12">Infinix Official</a>
                         <a href="https://checkcoverage.apple.com/" target="_blank" class="sidebar-item text-xs pl-12 font-bold text-indigo-400">Apple Official</a>
-                        <a href="https://www.iqoo.com/in/support/IMEI" target="_blank" class="sidebar-item text-xs pl-12">Iqoo Official</a>
-                        <a href="https://www.tecno-mobile.com/warranty/" target="_blank" class="sidebar-item text-xs pl-12">Tecno Official</a>
                         <a href="https://www.samsung.com/us/support/warranty/" target="_blank" class="sidebar-item text-xs pl-12">Samsung Official</a>
                     </div>
                 </div>
@@ -354,73 +375,77 @@
                 </div>
             </nav>
 
-            <div class="mt-8">
+            <div class="mt-8 pb-8">
                 <p class="text-[10px] text-slate-500 font-bold uppercase mb-3 tracking-widest">Access Mode</p>
                 <div class="flex bg-slate-900 p-1 rounded-xl gap-1">
                     <button id="btnAccessIndicator" class="flex-1 py-2 rounded-lg text-[10px] font-black bg-slate-700 text-slate-400 cursor-default">
                         LOCKED
                     </button>
                 </div>
-            </div>
-            
-            <div class="mt-4">
-                <p class="text-[10px] text-slate-500 font-bold uppercase mb-3 tracking-widest">View Mode</p>
-                <div class="flex bg-slate-900 p-1 rounded-xl gap-1">
-                    <button onclick="setView('mobile')" id="btnMob" class="flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white">MOBILE</button>
-                    <button onclick="setView('desktop')" id="btnDesk" class="flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500">DESKTOP</button>
+                <div class="mt-4">
+                    <p class="text-[10px] text-slate-500 font-bold uppercase mb-3 tracking-widest">View Mode</p>
+                    <div class="flex bg-slate-900 p-1 rounded-xl gap-1">
+                        <button onclick="setView('mobile')" id="btnMob" class="flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white">MOBILE</button>
+                        <button onclick="setView('desktop')" id="btnDesk" class="flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500">DESKTOP</button>
+                    </div>
                 </div>
             </div>
         </div>
     </aside>
 
-    <main id="page-main" class="max-w-2xl mx-auto">
+    <main id="page-main" class="max-w-3xl mx-auto w-full">
         
-    <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4 bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-    
-    <div class="flex items-center gap-3">
-        <button onclick="toggleSidebar()" class="lg:hidden p-2 bg-white rounded-xl shadow-sm border text-indigo-600 font-bold px-3 transition active:scale-95">☰</button>
-        <div>
-            <h1 class="text-xl md:text-2xl font-extrabold tracking-tighter text-slate-900 uppercase leading-none">
-                DIGITAL <span class="text-indigo-600">LEDGER</span>
-            </h1>
-            <div class="flex items-center gap-2 mt-1">
-                <p id="currentMonth" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest"></p>
-                <p id="cloudStatus" class="text-[9px] text-slate-400 font-bold">⚪ Local</p>
+        <div class="flex flex-col gap-4 bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-slate-200 mb-6">
+            
+            <div class="flex items-center justify-between w-full">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebar()" class="lg:hidden p-2 bg-slate-50 rounded-xl border border-slate-200 text-indigo-600 font-bold px-3 transition active:scale-95">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-extrabold tracking-tighter text-slate-900 uppercase leading-none">
+                            DIGITAL <span class="text-indigo-600">LEDGER</span>
+                        </h1>
+                        <div class="flex items-center gap-2 mt-1">
+                            <p id="currentMonth" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"></p>
+                            <p id="cloudStatus" class="text-[10px] text-slate-400 font-bold">⚪ Local</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-right flex flex-col items-end">
+                    <div id="rankBadge" class="badge-rank bg-slate-200 text-slate-500 mb-1 scale-90 origin-right">Unranked</div>
+                    <p class="text-[9px] text-slate-400 uppercase font-black tracking-widest">Realized Profit</p>
+                    <h2 id="summaryProfit" class="text-xl md:text-2xl font-black text-emerald-600 leading-none">Rp 0</h2>
+                </div>
+            </div>
+
+            <div class="w-full overflow-x-auto no-scrollbar admin-only-view border-t border-slate-100 pt-3">
+                <div class="flex gap-2 min-w-max">
+                    <button onclick="emergencyRescue()" class="px-3 py-2 bg-red-600 text-white rounded-lg text-[10px] font-bold shadow-md hover:bg-red-700 transition flex items-center gap-1 animate-pulse">
+                        <span>🆘</span> Rescue
+                    </button>
+                    <button onclick="forceSync()" class="px-3 py-2 bg-blue-600 text-white rounded-lg text-[10px] font-bold shadow-md hover:bg-blue-700 transition flex items-center gap-1">
+                        <span>☁️</span> Sync
+                    </button>
+                    <button onclick="toggleImportModal()" class="px-3 py-2 bg-white border border-indigo-100 text-indigo-600 rounded-lg text-[10px] font-bold shadow-sm hover:bg-indigo-50 transition flex items-center gap-1">
+                        <span>📥</span> Import
+                    </button>
+                    <button onclick="exportReport()" class="px-3 py-2 bg-emerald-600 text-white rounded-lg text-[10px] font-bold shadow-lg hover:bg-emerald-700 transition flex items-center gap-1">
+                        <span>📑</span> Laporan
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="flex gap-2 overflow-x-auto pb-1 w-full md:w-auto admin-only-view no-scrollbar">
-        <button onclick="emergencyRescue()" class="px-3 py-2 bg-red-600 text-white rounded-lg text-[10px] font-bold shadow-md hover:bg-red-700 transition flex items-center gap-1 animate-pulse flex-shrink-0">
-            <span>🆘</span> Rescue
-        </button>
-        <button onclick="forceSync()" class="px-3 py-2 bg-blue-600 text-white rounded-lg text-[10px] font-bold shadow-md hover:bg-blue-700 transition flex items-center gap-1 flex-shrink-0">
-            <span>☁️</span> Sync
-        </button>
-        <button onclick="toggleImportModal()" class="px-3 py-2 bg-white border border-indigo-100 text-indigo-600 rounded-lg text-[10px] font-bold shadow-sm hover:bg-indigo-50 transition flex items-center gap-1 flex-shrink-0">
-            <span>📥</span> Import
-        </button>
-        <button onclick="exportReport()" class="px-3 py-2 bg-emerald-600 text-white rounded-lg text-[10px] font-bold shadow-lg hover:bg-emerald-700 transition flex items-center gap-1 flex-shrink-0">
-            <span>📑</span> Laporan
-        </button>
-    </div>
-
-    <div class="text-right flex flex-col items-end border-l pl-4 border-slate-100">
-        <div id="rankBadge" class="badge-rank bg-slate-200 text-slate-500 mb-1 scale-90 origin-right">Unranked</div>
-        <p class="text-[8px] text-slate-400 uppercase font-black tracking-widest">Realized Profit</p>
-        <h2 id="summaryProfit" class="text-xl font-black text-emerald-600 leading-none">Rp 0</h2>
-    </div>
-
-</div>
-
-        <div class="card p-4 mb-6 border-l-4 border-indigo-600 relative overflow-hidden group admin-only-view">
+        <div class="card p-4 mb-4 border-l-4 border-indigo-600 relative overflow-hidden group admin-only-view">
             <div class="flex justify-between items-end mb-2 relative z-10">
                 <div>
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Target Bulan Ini</p>
-                    <h3 id="targetNameDisplay" class="font-black text-slate-800 text-sm cursor-pointer hover:text-indigo-600" onclick="setMonthlyTarget()">Set Your Goal 🎯</h3>
+                    <h3 id="targetNameDisplay" class="font-black text-slate-800 text-sm cursor-pointer hover:text-indigo-600 truncate max-w-[200px]" onclick="setMonthlyTarget()">Set Your Goal 🎯</h3>
                 </div>
                 <div class="text-right">
-                    <span id="targetPercentage" class="text-2xl font-black text-indigo-600">0%</span>
+                    <span id="targetPercentage" class="text-xl md:text-2xl font-black text-indigo-600">0%</span>
                 </div>
             </div>
             <div class="w-full bg-slate-200 rounded-full h-3 mb-2 relative z-10 overflow-hidden">
@@ -432,164 +457,153 @@
                 <span id="currentProgressText" class="text-emerald-600">Rp 0</span> 
                 <span id="targetValueDisplay">Target: Rp 0</span>
             </div>
-            <button onclick="setMonthlyTarget()" class="absolute top-2 right-2 p-1 bg-white/80 rounded hover:bg-white text-slate-400 hover:text-indigo-600 transition opacity-0 group-hover:opacity-100 z-20">⚙️</button>
+            <button onclick="setMonthlyTarget()" class="absolute top-2 right-2 p-1 bg-white/80 rounded hover:bg-white text-slate-400 hover:text-indigo-600 transition z-20">⚙️</button>
         </div>
 
         <div id="clientBanner" class="hidden mb-6 bg-slate-800 text-white p-6 rounded-2xl shadow-xl border border-slate-700">
             <h2 class="text-xl font-black text-white mb-1 uppercase">Mode Tamu (Client)</h2>
-            <p class="text-slate-400 text-xs mb-4">Anda hanya dapat melihat stok yang tersedia. Modal dan profit disembunyikan.</p>
+            <p class="text-slate-400 text-xs mb-4">Anda hanya dapat melihat stok yang tersedia.</p>
             <div class="p-3 bg-slate-900 rounded-xl border border-dashed border-slate-600 text-[10px] text-slate-400">
-                <strong class="text-orange-400 block mb-1">TIPS:</strong>
-                Ingin mencoba fitur admin? Gunakan mode "Admin Sandbox" di menu. Data sandbox tidak akan disimpan ke cloud owner.
-                <br>
-                <button onclick="enableSandboxMode()" class="mt-2 text-indigo-400 underline font-bold cursor-pointer">Masuk Mode Sandbox (Demo)</button>
+                <button onclick="enableSandboxMode()" class="text-indigo-400 underline font-bold cursor-pointer">Masuk Mode Sandbox (Demo)</button>
             </div>
         </div>
 
         <div id="sandboxBanner" class="hidden mb-6 bg-orange-100 border-l-4 border-orange-500 text-orange-900 p-4 rounded-xl">
              <h3 class="font-bold text-xs uppercase flex items-center gap-2">⚠️ SANDBOX MODE</h3>
-             <p class="text-[10px]">Anda bebas mengedit/menambah data untuk tes. Data <b>TIDAK</b> akan disinkronkan ke Cloud Owner.</p>
+             <p class="text-[10px]">Data <b>TIDAK</b> akan disinkronkan ke Cloud Owner.</p>
         </div>
 
         <div id="admin-dashboard-section" class="admin-only-view">
-            <div class="grid grid-cols-2 gap-4 mb-6">
-                <div class="card p-5 border-b-4 border-indigo-500">
-                    <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Uang Tunai (Cash)</p>
-                    <h2 id="summaryCash" class="text-lg font-bold text-slate-800">Rp 0</h2>
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="card p-4 border-b-4 border-indigo-500">
+                    <p class="text-[9px] text-slate-400 uppercase font-bold mb-1">Uang Tunai</p>
+                    <h2 id="summaryCash" class="text-base md:text-lg font-bold text-slate-800">Rp 0</h2>
                 </div>
-                <div class="card p-5 border-b-4 border-emerald-500">
-                    <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Total Floating</p>
-                    <h2 id="summaryFloating" class="text-lg font-bold text-slate-800">Rp 0</h2>
+                <div class="card p-4 border-b-4 border-emerald-500">
+                    <p class="text-[9px] text-slate-400 uppercase font-bold mb-1">Total Floating</p>
+                    <h2 id="summaryFloating" class="text-base md:text-lg font-bold text-slate-800">Rp 0</h2>
                 </div>
-                <div class="card p-6 col-span-2 text-center bg-slate-900 text-white border-none shadow-xl">
-                    <p class="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-widest opacity-80">Unrealized Balance (Total Aset)</p>
-                    <h2 id="summaryTotal" class="text-3xl font-black">Rp 0</h2>
+                <div class="card p-4 col-span-2 text-center bg-slate-900 text-white border-none shadow-xl">
+                    <p class="text-[9px] text-slate-400 uppercase font-bold mb-1 tracking-widest opacity-80">Total Aset (Unrealized)</p>
+                    <h2 id="summaryTotal" class="text-2xl md:text-3xl font-black">Rp 0</h2>
                 </div>
             </div>
 
-            <div class="card p-6 mb-4">
-                <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2 text-xs uppercase tracking-wider"><span>📝</span> Smart Input Teks</h3>
-                <textarea id="bulkInput" class="input-field h-24 mb-4 text-sm border-dashed" placeholder="Contoh: Poco M3 : 500.000 > 600.000"></textarea>
+            <div class="card p-4 mb-4">
+                <h3 class="font-bold text-slate-800 mb-2 flex items-center gap-2 text-xs uppercase tracking-wider"><span>📝</span> Smart Input Teks</h3>
+                <textarea id="bulkInput" class="input-field h-24 mb-3 text-sm border-dashed font-mono" placeholder="Format: Nama : Modal > Jual&#10;Contoh: Poco M3 : 500000 > 600000"></textarea>
                 <div class="grid grid-cols-2 gap-3">
                     <button onclick="parseText('old')" class="py-3 bg-slate-700 text-white rounded-xl font-bold text-[10px] uppercase hover:bg-slate-800 transition">Stok Lalu [L]</button>
                     <button onclick="parseText('new')" class="py-3 bg-emerald-600 text-white rounded-xl font-bold text-[10px] uppercase hover:bg-emerald-700 transition">Belanja Baru [B]</button>
                 </div>
             </div>
 
-            <div class="mb-6 space-y-2">
-                <div class="flex gap-2 overflow-x-auto pb-2">
-                    <button onclick="toggleConfig('configPanel', 'configLabel', '⚙️ Saldo Awal')" id="configLabel" class="flex-shrink-0 text-[10px] font-bold text-indigo-600 bg-indigo-50 px-3 py-2 rounded-lg uppercase tracking-widest">⚙️ Saldo Awal</button>
-                    <button onclick="toggleConfig('extraProfitPanel', 'extraProfitLabel', '📈 Tambah Profit')" id="extraProfitLabel" class="flex-shrink-0 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-3 py-2 rounded-lg uppercase tracking-widest">📈 Tambah Profit</button>
-                    <button onclick="toggleConfig('journalPanel', 'journalLabel', '📓 Owner Journal')" id="journalLabel" class="flex-shrink-0 text-[10px] font-bold text-yellow-600 bg-yellow-50 px-3 py-2 rounded-lg uppercase tracking-widest">📓 Owner Journal</button>
+            <div class="mb-6">
+                <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+                    <button onclick="toggleConfig('configPanel', 'configLabel', '⚙️ Saldo Awal')" id="configLabel" class="flex-shrink-0 text-[10px] font-bold text-indigo-600 bg-indigo-50 px-4 py-3 rounded-lg uppercase tracking-widest border border-indigo-100">⚙️ Saldo Awal</button>
+                    <button onclick="toggleConfig('extraProfitPanel', 'extraProfitLabel', '📈 Tambah Profit')" id="extraProfitLabel" class="flex-shrink-0 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-4 py-3 rounded-lg uppercase tracking-widest border border-emerald-100">📈 Tambah Profit</button>
+                    <button onclick="toggleConfig('journalPanel', 'journalLabel', '📓 Owner Journal')" id="journalLabel" class="flex-shrink-0 text-[10px] font-bold text-yellow-600 bg-yellow-50 px-4 py-3 rounded-lg uppercase tracking-widest border border-yellow-100">📓 Journal</button>
                 </div>
 
                 <div id="configPanel" class="hidden-panel mt-2">
-                    <div class="card p-5 bg-indigo-50/50 border-indigo-100 mb-4">
-                        <h3 class="font-bold text-indigo-900 text-[10px] uppercase mb-2">Modal Tunai di Tangan (Awal Bulan)</h3>
+                    <div class="card p-4 bg-indigo-50/50 border-indigo-100 mb-4">
+                        <h3 class="font-bold text-indigo-900 text-[10px] uppercase mb-2">Modal Tunai Awal Bulan</h3>
                         <input type="number" id="startBalance" class="input-field font-black text-lg text-indigo-700" value="0" onchange="calculateAll()">
                     </div>
                 </div>
 
                 <div id="extraProfitPanel" class="hidden-panel mt-2">
-                    <div class="card p-5 bg-emerald-50 border-emerald-100 mb-4">
+                    <div class="card p-4 bg-emerald-50 border-emerald-100 mb-4">
                         <h3 class="font-bold text-emerald-900 text-[10px] uppercase mb-3">Input Barang Terjual Bulan Lalu</h3>
                         <textarea id="exBulkInput" class="input-field h-20 mb-3 text-xs border-dashed" placeholder="Smart Input: Nama : Modal > Jual (Per baris)"></textarea>
                         <button onclick="parseExtraProfitText()" class="w-full py-2 bg-indigo-600 text-white rounded-lg font-bold text-[10px] uppercase mb-4">Smart Input Profit</button>
-                        <div class="space-y-3">
-                            <input type="text" id="exName" class="input-field text-xs" placeholder="Nama Barang (Manual)">
-                            <div class="grid grid-cols-2 gap-2">
-                                <input type="number" id="exModal" class="input-field text-xs" placeholder="Harga Beli">
-                                <input type="number" id="exPrice" class="input-field text-xs" placeholder="Harga Jual">
-                            </div>
-                            <button onclick="addExtraProfit()" class="w-full py-2 bg-emerald-600 text-white rounded-lg font-bold text-[10px] uppercase">Simpan Profit Manual</button>
-                        </div>
-                        <div id="extraProfitList" class="mt-4 space-y-2 border-t pt-3 border-emerald-200"></div>
+                        <div id="extraProfitList" class="mt-2 space-y-2 border-t pt-3 border-emerald-200"></div>
                     </div>
                 </div>
 
                 <div id="journalPanel" class="hidden-panel mt-2">
-                    <div class="card p-5 bg-yellow-50 border-yellow-200 mb-4">
-                        <h3 class="font-bold text-yellow-900 text-[10px] uppercase mb-2">Refleksi & Catatan Harian</h3>
-                        <textarea id="ownerNote" class="w-full h-24 bg-white text-sm text-slate-700 outline-none p-3 rounded-xl border border-yellow-300 resize-none placeholder-slate-400" placeholder="Apa pelajaran bisnis hari ini, Farid? Tulis di sini..." oninput="saveNote()"></textarea>
+                    <div class="card p-4 bg-yellow-50 border-yellow-200 mb-4">
+                        <textarea id="ownerNote" class="w-full h-24 bg-white text-sm text-slate-700 outline-none p-3 rounded-xl border border-yellow-300 resize-none placeholder-slate-400" placeholder="Apa pelajaran bisnis hari ini, Farid?" oninput="saveNote()"></textarea>
                     </div>
                 </div>
             </div>
 
-            <div class="card p-5 bg-slate-800 border-l-4 border-indigo-500 text-white flex justify-between items-center mb-8 shadow-lg">
+            <div class="card p-4 bg-slate-800 border-l-4 border-indigo-500 text-white flex justify-between items-center mb-6 shadow-lg">
                 <div>
-                    <h3 class="font-bold text-indigo-300 text-[9px] uppercase tracking-widest opacity-80">Modal Stok Berjalan</h3>
-                    <h2 id="previewModalStock" class="text-xl font-black">Rp 0</h2>
+                    <h3 class="font-bold text-indigo-300 text-[9px] uppercase tracking-widest opacity-80">Stok Berjalan</h3>
+                    <h2 id="previewModalStock" class="text-lg font-black">Rp 0</h2>
                 </div>
                 <div class="text-right">
                     <h3 class="font-bold text-emerald-400 text-[9px] uppercase tracking-widest opacity-80">Potensi Untung</h3>
-                    <h2 id="previewUnrealizedProfit" class="text-xl font-black">Rp 0</h2>
+                    <h2 id="previewUnrealizedProfit" class="text-lg font-black">Rp 0</h2>
                 </div>
             </div>
         </div>
 
-        <div class="mb-6 space-y-4">
+        <div class="mb-6 space-y-3 sticky top-0 z-30 bg-slate-50 py-2">
             <div class="relative">
-                <input type="text" id="searchInput" onkeyup="renderRows()" placeholder="Cari unit..." class="input-field pl-10 text-sm">
+                <input type="text" id="searchInput" onkeyup="renderRows()" placeholder="Cari unit..." class="input-field pl-10 text-sm shadow-sm">
                 <span class="absolute left-3 top-3.5 opacity-30 text-lg">🔍</span>
             </div>
             <div class="flex bg-slate-200 p-1 rounded-xl gap-1">
-                <button onclick="setFilter('stok')" id="tabStok" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all bg-white text-indigo-600 shadow-sm">Unit Stok</button>
-                <button onclick="setFilter('sold')" id="tabSold" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500">History Terjual</button>
-                <button onclick="setFilter('extra')" id="tabExtra" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500">History Bulan Lalu</button>
+                <button onclick="setFilter('stok')" id="tabStok" class="flex-1 py-2 rounded-lg text-[10px] font-black uppercase transition-all bg-white text-indigo-600 shadow-sm">Stok</button>
+                <button onclick="setFilter('sold')" id="tabSold" class="flex-1 py-2 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500">Terjual</button>
+                <button onclick="setFilter('extra')" id="tabExtra" class="flex-1 py-2 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500">History</button>
             </div>
         </div>
         
-        <div id="itemRows" class="space-y-3 mb-20"></div>
+        <div id="itemRows" class="space-y-3 mb-24"></div>
     </main>
 
-    <div id="page-analytics" class="max-w-2xl mx-auto hidden">
-        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali Dashboard</button>
-        <h1 class="text-2xl font-black italic mb-6 text-slate-800">📊 ANALISA PERFORMA TOKO</h1>
+    <div id="page-analytics" class="max-w-2xl mx-auto hidden pt-20 px-4 md:px-0">
+        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase flex items-center gap-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            Kembali
+        </button>
+        <h1 class="text-2xl font-black italic mb-6 text-slate-800">📊 ANALISA TOKO</h1>
     
         <div class="grid grid-cols-2 gap-4 mb-6">
             <div class="card p-4 border-l-4 border-blue-500">
-                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Kecepatan Putaran</p>
-                <h2 id="avgSellTime" class="text-2xl font-black text-slate-800">- Hari</h2>
-                <p class="text-[9px] text-slate-400 italic mt-1">Rata-rata barang laku</p>
+                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Putaran</p>
+                <h2 id="avgSellTime" class="text-xl font-black text-slate-800">- Hari</h2>
             </div>
             <div class="card p-4 border-l-4 border-purple-500">
-                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Win Rate Barang</p>
-                <h2 id="winRateStock" class="text-2xl font-black text-slate-800">0%</h2>
-                <p class="text-[9px] text-slate-400 italic mt-1">Rasio Laku vs Stok Diam</p>
+                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Win Rate</p>
+                <h2 id="winRateStock" class="text-xl font-black text-slate-800">0%</h2>
             </div>
         </div>
     
-        <div class="card p-5 mb-6">
-            <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Dominasi Brand (Smart Grouping)</h3>
-            <div class="h-64">
+        <div class="card p-4 mb-6">
+            <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Dominasi Brand</h3>
+            <div class="h-64 relative">
                 <canvas id="brandChart"></canvas>
             </div>
         </div>
     
-        <div class="card p-5 mb-6">
+        <div class="card p-4 mb-6">
             <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Tren Profit Harian</h3>
-            <div class="h-48">
+            <div class="h-48 relative">
                 <canvas id="profitTrendChart"></canvas>
             </div>
         </div>
 
-        <div class="card p-5 mb-6">
-            <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Performa Profit Per Kuartal</h3>
-            <div class="h-48">
+        <div class="card p-4 mb-6">
+            <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Profit Per Kuartal</h3>
+            <div class="h-48 relative">
                 <canvas id="quarterlyChart"></canvas>
             </div>
         </div>
     </div>
 
-    <div id="page-hp" class="max-w-2xl mx-auto hidden">
+    <div id="page-hp" class="max-w-2xl mx-auto hidden pt-20 px-4">
         <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali</button>
         <h1 class="text-2xl font-black italic mb-6">📱 Handphone Check</h1>
         <div class="card p-6 space-y-4">
             <div class="bg-slate-50 p-4 rounded-xl border">
                 <label class="text-[10px] font-bold text-slate-400 uppercase block mb-2 italic">Cek IMEI (imei.info)</label>
                 <div class="flex gap-2">
-                    <input type="number" id="imeiInput" class="input-field text-sm" placeholder="Masukkan 15 digit IMEI...">
-                    <button onclick="directImei()" class="bg-indigo-600 text-white px-6 rounded-xl font-bold text-[10px]">CEK</button>
+                    <input type="number" id="imeiInput" class="input-field text-sm" placeholder="15 digit IMEI...">
+                    <button onclick="directImei()" class="bg-indigo-600 text-white px-4 rounded-xl font-bold text-[10px]">CEK</button>
                 </div>
             </div>
             <div class="grid grid-cols-1 gap-2">
@@ -600,108 +614,80 @@
         </div>
     </div>
 
-    <div id="page-dial" class="max-w-2xl mx-auto hidden">
+    <div id="page-dial" class="max-w-2xl mx-auto hidden pt-20 px-4">
         <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali</button>
         <h1 class="text-2xl font-black italic mb-6">🔍 Kode Dial Rahasia</h1>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">SAMSUNG</h3>
-                <p class="text-lg font-mono font-bold">*#0*#</p>
-                <p class="text-[10px] text-slate-500 uppercase">General Test Mode</p>
-            </div>
-            <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">XIAOMI / POCO</h3>
-                <p class="text-lg font-mono font-bold">*#*#64663#*#*</p>
-                <p class="text-[10px] text-slate-500 uppercase">CIT (Hardware Test)</p>
-            </div>
-            <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">OPPO / REALME</h3>
-                <p class="text-lg font-mono font-bold">*#899#</p>
-                <p class="text-[10px] text-slate-500 uppercase">Engineer Mode</p>
-            </div>
-            <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">VIVO / IQOO</h3>
-                <p class="text-lg font-mono font-bold">*#558#</p>
-                <p class="text-[10px] text-slate-500 uppercase">Factory Test</p>
-            </div>
-            <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">IPHONE</h3>
-                <p class="text-lg font-mono font-bold">*3001#12345#*</p>
-                <p class="text-[10px] text-slate-500 uppercase">Field Test</p>
-            </div>
-            <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">UNIVERSAL</h3>
-                <p class="text-lg font-mono font-bold">*#06#</p>
-                <p class="text-[10px] text-slate-500 uppercase">Cek IMEI</p>
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div class="card p-4 dial-card"><h3 class="font-black text-xs text-indigo-600 uppercase mb-1">SAMSUNG</h3><p class="text-lg font-mono font-bold">*#0*#</p></div>
+            <div class="card p-4 dial-card"><h3 class="font-black text-xs text-indigo-600 uppercase mb-1">XIAOMI</h3><p class="text-lg font-mono font-bold">*#*#64663#*#*</p></div>
+            <div class="card p-4 dial-card"><h3 class="font-black text-xs text-indigo-600 uppercase mb-1">OPPO</h3><p class="text-lg font-mono font-bold">*#899#</p></div>
+            <div class="card p-4 dial-card"><h3 class="font-black text-xs text-indigo-600 uppercase mb-1">VIVO</h3><p class="text-lg font-mono font-bold">*#558#</p></div>
+            <div class="card p-4 dial-card"><h3 class="font-black text-xs text-indigo-600 uppercase mb-1">IPHONE</h3><p class="text-lg font-mono font-bold">*3001#12345#*</p></div>
         </div>
     </div>
 
-    <div id="page-laptop" class="max-w-2xl mx-auto hidden">
+    <div id="page-laptop" class="max-w-2xl mx-auto hidden pt-20 px-4">
         <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali</button>
-        <h1 class="text-2xl font-black italic mb-6">💻 Laptop Check List</h1>
+        <h1 class="text-2xl font-black italic mb-6">💻 Laptop Check</h1>
         <div class="space-y-4">
-            <div class="card p-5">
-                <h3 class="font-bold text-sm mb-3 text-slate-800">1. Pengecekan Fisik & Layar</h3>
+            <div class="card p-4">
+                <h3 class="font-bold text-sm mb-3 text-slate-800">1. Pengecekan Fisik</h3>
                 <ul class="text-[11px] space-y-2 text-slate-600 uppercase font-bold">
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Cek Engsel & Baut (Pastikan rapat)</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Dead Pixel Test (Buka browser: deadpixeltest.org)</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> White Spot / Jamur pada LCD</li>
+                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Engsel & Baut</li>
+                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Dead Pixel / Whitespot</li>
                 </ul>
             </div>
-            <div class="card p-5">
-                <h3 class="font-bold text-sm mb-3 text-slate-800">2. Performa & Baterai</h3>
+            <div class="card p-4">
+                <h3 class="font-bold text-sm mb-3 text-slate-800">2. Software Check</h3>
                 <ul class="text-[11px] space-y-2 text-slate-600 uppercase font-bold">
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> CMD: <code class="bg-slate-100 px-1 lowercase">powercfg /batteryreport</code></li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Cek Kesehatan SSD (Gunakan CrystalDiskInfo)</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Keyboard Test (Buka: keyboardtester.com)</li>
-                </ul>
-            </div>
-            <div class="card p-5">
-                <h3 class="font-bold text-sm mb-3 text-slate-800">3. Konektivitas & Suara</h3>
-                <ul class="text-[11px] space-y-2 text-slate-600 uppercase font-bold">
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Tes Semua Port USB, HDMI, Audio Jack</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Tes Webcam & Mic</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Cek Speaker (Pastikan tidak sember)</li>
+                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Battery Report (CMD)</li>
+                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Keyboard Tester</li>
                 </ul>
             </div>
         </div>
     </div>
 
-    <div id="importModal" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="toggleImportModal()"></div>
-        <div class="relative bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl">
+    <div id="importModal" class="hidden">
+        <div class="relative bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl modal-content">
             <h3 class="text-xl font-black text-indigo-900 uppercase italic mb-4">📥 Import Data</h3>
-            <p class="text-xs text-slate-500 mb-2">Paste kode backup (JSON) atau data teks lama di sini.</p>
-            <textarea id="importArea" class="input-field h-48 mb-4 text-[11px] font-mono" placeholder="Paste data..."></textarea>
-            <button onclick="processImport()" class="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold shadow-lg">RESTORE DATA SEKARANG</button>
+            <textarea id="importArea" class="input-field h-40 mb-4 text-[11px] font-mono" placeholder="Paste data JSON..."></textarea>
+            <div class="flex gap-2">
+                <button onclick="toggleImportModal()" class="flex-1 py-3 bg-slate-200 text-slate-600 rounded-xl font-bold">BATAL</button>
+                <button onclick="processImport()" class="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-bold">RESTORE</button>
+            </div>
         </div>
     </div>
 
-    <div id="editModal" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeEditModal()"></div>
-        <div class="relative bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl">
+    <div id="editModal" class="hidden">
+        <div class="relative bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl modal-content">
             <h3 class="text-lg font-black text-slate-800 uppercase italic mb-4">✏️ Edit Barang</h3>
             <div class="space-y-3">
                 <input type="text" id="editItemName" class="input-field" placeholder="Nama">
-                <input type="number" id="editItemModal" class="input-field" placeholder="Modal">
-                <input type="number" id="editItemPrice" class="input-field" placeholder="Jual">
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="number" id="editItemModal" class="input-field" placeholder="Modal">
+                    <input type="number" id="editItemPrice" class="input-field" placeholder="Jual">
+                </div>
                 <div class="bg-slate-50 p-2 rounded-lg border border-slate-200">
-                    <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Tanggal Masuk (Manual)</label>
+                    <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Tanggal Masuk</label>
                     <input type="date" id="editEntryDate" class="input-field mt-1 text-sm">
                 </div>
-                <button onclick="saveEditItem()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold mt-2">SIMPAN</button>
+                <div class="flex gap-2 mt-4">
+                    <button onclick="closeEditModal()" class="flex-1 py-3 bg-slate-200 text-slate-600 rounded-xl font-bold">BATAL</button>
+                    <button onclick="saveEditItem()" class="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-bold">SIMPAN</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="costModal" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeCostModal()"></div>
-        <div class="relative bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl">
+    <div id="costModal" class="hidden">
+        <div class="relative bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl modal-content">
             <h3 class="text-lg font-black text-slate-800 uppercase italic mb-2">🛠️ Tambah Biaya</h3>
-            <input type="text" id="costDesc" class="input-field mt-1" placeholder="Keterangan (cth: Ganti LCD)">
-            <input type="number" id="costAmount" class="input-field mt-1" placeholder="Biaya (Rp)">
-            <button onclick="saveCost()" class="w-full py-3 bg-orange-500 text-white rounded-xl font-bold mt-4">TAMBAH KE MODAL</button>
+            <input type="text" id="costDesc" class="input-field mt-1 mb-2" placeholder="Ket (cth: Ganti LCD)">
+            <input type="number" id="costAmount" class="input-field mt-1 mb-4" placeholder="Biaya (Rp)">
+            <div class="flex gap-2">
+                <button onclick="closeCostModal()" class="flex-1 py-3 bg-slate-200 text-slate-600 rounded-xl font-bold">BATAL</button>
+                <button onclick="saveCost()" class="flex-1 py-3 bg-orange-500 text-white rounded-xl font-bold">TAMBAH</button>
+            </div>
         </div>
     </div>
 
@@ -709,59 +695,37 @@
         // ===============================================
         // ☁️ KONFIGURASI CLOUD & SECURITY
         // ===============================================
-        const BIN_ID = '699644fdae596e708f3582af'; // Masukkan Bin ID dari JSONBin
-        const API_KEY = '$2a$10$tcKHEWwuz2sqRoMCKJfga.1xxTFW0RxpXUPnP.NI4YbivtlK1xxau'; // Masukkan X-Master-Key
+        const BIN_ID = '699644fdae596e708f3582af'; 
+        const API_KEY = '$2a$10$tcKHEWwuz2sqRoMCKJfga.1xxTFW0RxpXUPnP.NI4YbivtlK1xxau'; 
         const OWNER_PIN = '011204';
         
-        // ===============================================
-        // VARIABLES
-        // ===============================================
         let items = [];
         let extraProfits = [];
         let currentFilter = 'stok';
         let currentMonthString = '';
-        
-        // ACCESS CONTROL STATE
-        // 'owner' = full access + cloud
-        // 'client_view' = read only + no modal + no secrets
-        // 'client_demo' = full access UI + NO cloud (local storage sandbox)
         let currentUserMode = 'client_view'; 
-        
-        // OWNER FEATURE VARIABLES
         let targetGoal = 25000000; 
         let targetName = "BEP Modal 25 Juta";
         
-        // ANALYTICS VARIABLES
         let brandChartInstance = null;
         let trendChartInstance = null;
         let quarterlyChartInstance = null;
-        
-        // EDIT & COST VARIABLES
         let currentEditId = null;
         let currentCostId = null;
         
         const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
-        // ===============================================
-        // 🔐 SECURITY & AUTH LOGIC (NEW)
-        // ===============================================
-        
         function checkPin() {
             const input = document.getElementById('pinInput').value;
             if (input === OWNER_PIN) {
-                // SUCCESS
                 currentUserMode = 'owner';
                 document.getElementById('authModal').style.display = 'none';
-                
-                // Update Sidebar Indicator
                 const btnInd = document.getElementById('btnAccessIndicator');
                 btnInd.innerText = "OWNER MODE";
                 btnInd.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white cursor-default";
-                
                 document.getElementById('cloudStatus').innerText = "⚪ Owner Mode";
-                
                 updateUIForMode();
-                loadData(); // Load Real Data
+                loadData(); 
             } else {
                 alert("PIN Salah! Akses ditolak.");
                 document.getElementById('pinInput').value = '';
@@ -771,29 +735,22 @@
         function enterClientMode() {
             currentUserMode = 'client_view';
             document.getElementById('authModal').style.display = 'none';
-            
-            // Update Sidebar Indicator
             const btnInd = document.getElementById('btnAccessIndicator');
             btnInd.innerText = "CLIENT MODE";
             btnInd.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-slate-600 text-white cursor-default";
-
             updateUIForMode();
-            loadData(); // Load data but filter secrets in UI
+            loadData();
         }
 
         function enableSandboxMode() {
-            if(confirm("Masuk Mode Demo Admin?\n\nAnda bisa edit/tambah data, tapi TIDAK AKAN DISIMPAN KE CLOUD OWNER.\nIni hanya simulasi di browser Anda.")) {
+            if(confirm("Masuk Mode Demo Admin?\n\nAnda bisa edit/tambah data, tapi TIDAK AKAN DISIMPAN KE CLOUD OWNER.")) {
                 currentUserMode = 'client_demo';
                 document.getElementById('clientBanner').classList.add('hidden');
                 document.getElementById('sandboxBanner').classList.remove('hidden');
-                
-                // Update Sidebar Indicator
                 const btnInd = document.getElementById('btnAccessIndicator');
                 btnInd.innerText = "SANDBOX ADMIN";
                 btnInd.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-orange-500 text-white cursor-default";
-                
-                document.getElementById('cloudStatus').innerText = "⚪ Local Sandbox Only";
-                
+                document.getElementById('cloudStatus').innerText = "⚪ Local Sandbox";
                 updateUIForMode();
             }
         }
@@ -803,25 +760,18 @@
             const clientBanner = document.getElementById('clientBanner');
             
             if (currentUserMode === 'client_view') {
-                // HIDE Inputs & Financial Summaries
                 adminContent.forEach(el => el.classList.add('hidden'));
                 clientBanner.classList.remove('hidden');
             } else {
-                // SHOW for Owner or Demo
                 adminContent.forEach(el => el.classList.remove('hidden'));
                 clientBanner.classList.add('hidden');
             }
-            renderRows(); // Re-render to show/hide edit buttons & mask data
+            renderRows();
         }
 
-        // ===============================================
-        // 🆘 EMERGENCY RESCUE SYSTEM
-        // ===============================================
         function emergencyRescue() {
-            // Coba ambil data mentah dari LocalStorage
             const rawData = localStorage.getItem('ledger_v2_final');
             if (rawData) {
-                // Buat file download
                 const blob = new Blob([rawData], {type: "application/json"});
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -830,46 +780,30 @@
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-                alert("✅ Data berhasil diselamatkan! File JSON telah didownload. Simpan file ini baik-baik.");
+                alert("✅ Data berhasil diselamatkan!");
             } else {
-                alert("⚠️ Data LocalStorage Kosong! Pastikan Anda tidak menghapus cache browser.");
+                alert("⚠️ Data LocalStorage Kosong!");
             }
         }
 
-        // ===============================================
-        // ☁️ CLOUD SYNC & DATA LOAD
-        // ===============================================
         async function loadData() {
-            // 1. PRIORITAS: LOAD LOCAL DATA DULU (Agar data lama muncul)
             const localData = JSON.parse(localStorage.getItem('ledger_v2_final'));
             if (localData) {
                 applyData(localData);
-                console.log("Local Data Loaded Successfully");
-            } else {
-                console.log("No Local Data Found");
             }
-            // Note: Cloud tidak diload otomatis untuk mencegah overwrite yang tidak diinginkan
         }
 
         async function forceSync() {
-            if (currentUserMode !== 'owner') {
-                return alert("⛔ AKSES DITOLAK: Fitur Cloud Sync hanya untuk Owner dengan PIN.");
-            }
+            if (currentUserMode !== 'owner') return alert("⛔ AKSES DITOLAK: Hanya untuk Owner.");
             
-            if(BIN_ID === 'GANTI_DENGAN_BIN_ID_ANDA') return alert("Harap isi BIN_ID dan API_KEY di script.");
-            
-            // Tanya user: Upload (Local -> Cloud) atau Download (Cloud -> Local)
-            const choice = prompt("Ketik 'UP' untuk Upload Data Lokal ke Cloud.\nKetik 'DOWN' untuk Tarik Data Cloud ke Lokal.\n(Hati-hati data akan tertimpa!)");
-            
+            const choice = prompt("Ketik 'UP' untuk Upload Data Lokal ke Cloud.\nKetik 'DOWN' untuk Tarik Data Cloud ke Lokal.");
             document.getElementById('loadingCloud').style.display = 'flex';
             
             try {
                 if(choice && choice.toUpperCase() === 'UP') {
-                    // UPLOAD
                     await saveDataToCloud();
                     alert("Data Lokal berhasil di-upload ke Cloud!");
                 } else if (choice && choice.toUpperCase() === 'DOWN') {
-                    // DOWNLOAD
                     const req = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': API_KEY } });
                     const res = await req.json();
                     if(res.record) {
@@ -886,8 +820,7 @@
         }
 
         async function saveDataToCloud() {
-            if (currentUserMode !== 'owner') return; // Silent block for sandbox
-
+            if (currentUserMode !== 'owner') return; 
             const dataState = { startBalance: document.getElementById('startBalance').value, items, extraProfits, targetGoal, targetName };
             await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                 method: 'PUT',
@@ -908,9 +841,6 @@
             document.getElementById('ownerNote').value = localStorage.getItem('ledger_owner_note') || "";
         }
 
-        // ===============================================
-        // 🛠️ UTILITY & UI FUNCTIONS
-        // ===============================================
         function toggleSidebar() { 
             const sb = document.getElementById('sidebar');
             const ov = document.getElementById('overlay');
@@ -918,124 +848,56 @@
             ov.classList.toggle('hidden');
         }
 
-        function toggleDropdown(id) { 
-            document.getElementById(id).classList.toggle('show'); 
-        }
+        function toggleDropdown(id) { document.getElementById(id).classList.toggle('show'); }
 
         function toggleConfig(panelId, labelId, originalText) { 
             const panel = document.getElementById(panelId);
             const label = document.getElementById(labelId);
-            
             panel.classList.toggle('hidden-panel');
             label.innerText = panel.classList.contains('hidden-panel') ? originalText : "✖ Tutup";
         }
 
         function switchPage(page) {
             const pages = ['page-main', 'page-hp', 'page-laptop', 'page-dial', 'page-analytics'];
-            pages.forEach(p => { 
-                const el = document.getElementById(p); 
-                if(el) el.classList.add('hidden'); 
-            });
+            pages.forEach(p => { const el = document.getElementById(p); if(el) el.classList.add('hidden'); });
             const target = document.getElementById('page-' + page); 
             if(target) target.classList.remove('hidden');
-            
-            if(window.innerWidth < 1024) toggleSidebar(); 
+            if(window.innerWidth < 1024) {
+                 const sb = document.getElementById('sidebar');
+                 if(!sb.classList.contains('-translate-x-full')) toggleSidebar(); 
+            }
             window.scrollTo(0,0);
-            
             if(page === 'analytics') renderAnalytics();
         }
         
-        // --- CALCULATOR FUNCTIONS (EXPANDED TO FULL FORMAT) ---
-        let cInput = '0';
-        let cPrev = '';
-        let cOp = null;
-
+        let cInput = '0', cPrev = '', cOp = null;
         function formatDisplay(n) {
             if (!n || n === '-') return n;
             const p = n.split('.');
             p[0] = parseFloat(p[0]).toLocaleString('id-ID');
             return p.length > 1 ? p[0] + ',' + p[1] : p[0];
         }
-
-        function calcNum(n) {
-            if (n === '.' && cInput.includes('.')) return;
-            cInput = (cInput === '0' && n !== '.') ? n : cInput + n;
-            calcUpd();
-        }
-
-        function calcOp(op) {
-            if (cInput === '') return;
-            if (cPrev !== '') calcResult();
-            cOp = op;
-            cPrev = cInput;
-            cInput = '';
-            calcUpd();
-        }
-
-        function calcPerc() {
-            if (cInput === '0' || cInput === '') return;
-            cInput = (parseFloat(cInput) / 100).toString();
-            calcUpd();
-        }
-
-        function calcClear() {
-            cInput = '0';
-            cPrev = '';
-            cOp = null;
-            calcUpd();
-        }
-
-        function calcDel() {
-            cInput = cInput.toString().slice(0, -1) || '0';
-            calcUpd();
-        }
-
-        function calcUpd() {
-            document.getElementById('calc-curr').innerText = formatDisplay(cInput);
-            document.getElementById('calc-prev').innerText = cPrev ? formatDisplay(cPrev) + (cOp || '') : '';
-        }
-
+        function calcNum(n) { if (n === '.' && cInput.includes('.')) return; cInput = (cInput === '0' && n !== '.') ? n : cInput + n; calcUpd(); }
+        function calcOp(op) { if (cInput === '') return; if (cPrev !== '') calcResult(); cOp = op; cPrev = cInput; cInput = ''; calcUpd(); }
+        function calcPerc() { if (cInput === '0' || cInput === '') return; cInput = (parseFloat(cInput) / 100).toString(); calcUpd(); }
+        function calcClear() { cInput = '0'; cPrev = ''; cOp = null; calcUpd(); }
+        function calcDel() { cInput = cInput.toString().slice(0, -1) || '0'; calcUpd(); }
+        function calcUpd() { document.getElementById('calc-curr').innerText = formatDisplay(cInput); document.getElementById('calc-prev').innerText = cPrev ? formatDisplay(cPrev) + (cOp || '') : ''; }
         function calcResult() {
-            let r;
-            const p = parseFloat(cPrev);
-            const c = parseFloat(cInput);
+            let r; const p = parseFloat(cPrev); const c = parseFloat(cInput);
             if (isNaN(p) || isNaN(c)) return;
-            
-            switch (cOp) {
-                case '+': r = p + c; break;
-                case '-': r = p - c; break;
-                case '*': r = p * c; break;
-                case '/': r = p / c; break;
-                default: return;
-            }
-            cInput = parseFloat(r.toFixed(10)).toString();
-            cOp = null;
-            cPrev = '';
-            calcUpd();
+            switch (cOp) { case '+': r = p + c; break; case '-': r = p - c; break; case '*': r = p * c; break; case '/': r = p / c; break; default: return; }
+            cInput = parseFloat(r.toFixed(10)).toString(); cOp = null; cPrev = ''; calcUpd();
         }
 
-        function getNow() { 
-            const d = new Date(); 
-            return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`; 
-        }
-        
+        function getNow() { const d = new Date(); return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`; }
         function parseDateString(s) { 
             if(!s||s==='Imported'||s==='Bulan Lalu') return new Date();
             const p=s.split(' ');
-            
-            // Handle ISO string from date input (YYYY-MM-DD)
-            if (p[0].includes('-')) {
-                return new Date(p[0]);
-            }
-
-            // Handle DD/MM/YYYY
-            const d=p[0].split('/');
-            return new Date(d[2],d[1]-1,d[0]); 
+            if (p[0].includes('-')) return new Date(p[0]);
+            const d=p[0].split('/'); return new Date(d[2],d[1]-1,d[0]); 
         }
 
-        // ===============================================
-        // 💰 CORE BUSINESS LOGIC
-        // ===============================================
         function calculateAll(shouldSave = true) {
             const start = Number(document.getElementById('startBalance').value) || 0;
             let belanjaBaru = 0, uangMasuk = 0, profit = 0, floatPrice = 0, floatModal = 0;
@@ -1056,7 +918,6 @@
             const totalProfitReal = profit + extraProfitTotal;
             const cash = start - belanjaBaru + uangMasuk;
             
-            // DOM UPDATES
             document.getElementById('summaryCash').innerText = "Rp " + cash.toLocaleString('id-ID');
             document.getElementById('summaryFloating').innerText = "Rp " + floatPrice.toLocaleString('id-ID');
             document.getElementById('summaryTotal').innerText = "Rp " + (cash + floatPrice).toLocaleString('id-ID');
@@ -1070,13 +931,9 @@
             renderExtraProfitList();
             
             if(shouldSave) {
-                // Save Local Always
                 localStorage.setItem('ledger_v2_final', JSON.stringify({ 
                     startBalance: document.getElementById('startBalance').value, 
-                    items, 
-                    extraProfits, 
-                    targetGoal, 
-                    targetName 
+                    items, extraProfits, targetGoal, targetName 
                 }));
             }
         }
@@ -1108,48 +965,30 @@
                     const name = parts[0].trim();
                     const modal = Number(parts[1].replace(/[^0-9]/g, ''));
                     const price = Number(parts[2].replace(/[^0-9]/g, ''));
-                    if (name && modal && price) { 
-                        extraProfits.push({ id: Date.now() + Math.random(), name, modal, price, profit: price - modal }); 
-                    }
+                    if (name && modal && price) extraProfits.push({ id: Date.now() + Math.random(), name, modal, price, profit: price - modal }); 
                 }
             });
             document.getElementById('exBulkInput').value = '';
             calculateAll();
         }
 
-        function addExtraProfit() {
-            const name = document.getElementById('exName').value;
-            const modal = Number(document.getElementById('exModal').value);
-            const price = Number(document.getElementById('exPrice').value);
-            if(!name || !modal || !price) return alert("Mohon lengkapi data!");
-            extraProfits.push({ id: Date.now(), name, modal, price, profit: price - modal });
-            document.getElementById('exName').value = ''; 
-            document.getElementById('exModal').value = ''; 
-            document.getElementById('exPrice').value = '';
-            calculateAll();
-        }
-
-        function removeExtraProfit(id) { 
-            extraProfits = extraProfits.filter(p => p.id !== id); 
-            calculateAll(); 
-        }
-
+        function removeExtraProfit(id) { extraProfits = extraProfits.filter(p => p.id !== id); calculateAll(); }
         function renderExtraProfitList() {
             const list = document.getElementById('extraProfitList');
             list.innerHTML = '';
             extraProfits.forEach(p => {
                 const div = document.createElement('div');
                 div.className = "flex justify-between items-center text-[10px] bg-white p-2 rounded-lg border border-emerald-100";
-                div.innerHTML = `<div><b class="text-slate-700">${p.name}</b><p class="text-slate-400">Profit: Rp ${p.profit.toLocaleString('id-ID')}</p></div><div class="flex gap-2"><button onclick="sendInvoice(${p.id})" class="text-emerald-500 font-bold">WA</button><button onclick="removeExtraProfit(${p.id})" class="text-red-400 font-bold">✕</button></div>`;
+                div.innerHTML = `<div><b class="text-slate-700">${p.name}</b><p class="text-slate-400">Profit: Rp ${p.profit.toLocaleString('id-ID')}</p></div><button onclick="removeExtraProfit(${p.id})" class="text-red-400 font-bold px-2">✕</button>`;
                 list.appendChild(div);
             });
         }
 
         function setFilter(filter) {
             currentFilter = filter;
-            document.getElementById('tabStok').className = filter === 'stok' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
-            document.getElementById('tabSold').className = filter === 'sold' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
-            document.getElementById('tabExtra').className = filter === 'extra' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
+            document.getElementById('tabStok').className = filter === 'stok' ? "flex-1 py-2 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2 rounded-lg text-[10px] font-black uppercase text-slate-500";
+            document.getElementById('tabSold').className = filter === 'sold' ? "flex-1 py-2 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2 rounded-lg text-[10px] font-black uppercase text-slate-500";
+            document.getElementById('tabExtra').className = filter === 'extra' ? "flex-1 py-2 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2 rounded-lg text-[10px] font-black uppercase text-slate-500";
             renderRows();
         }
 
@@ -1168,136 +1007,93 @@
             }
             
             container.innerHTML = '';
-            
-            if (display.length === 0) { 
-                container.innerHTML = `<div class="text-center py-10 text-slate-300 font-bold text-xs uppercase italic">Data Kosong</div>`; 
-                return; 
-            }
+            if (display.length === 0) { container.innerHTML = `<div class="text-center py-10 text-slate-300 font-bold text-xs uppercase italic">Data Kosong</div>`; return; }
             
             display.forEach(item => {
                 const profit = item.price - item.modal;
                 const card = document.createElement('div');
-                
-                // LOGIC: Show Full Card if Owner OR Demo OR Client View (but Client View hides specific data)
                 let showModalPrice = (currentUserMode === 'owner' || currentUserMode === 'client_demo');
                 let showActions = (currentUserMode === 'owner' || currentUserMode === 'client_demo');
-                
                 let borderClass = 'border-slate-100';
                 let ageWarning = '';
                 
                 if(item.status === 'stok') {
                     const entry = parseDateString(item.entryDate);
-                    const diffTime = Math.abs(now - entry);
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                    
-                    if (diffDays > 30) { 
-                        borderClass = 'border-danger'; 
-                        ageWarning = `<span class="text-red-500 font-bold ml-1">⚠️ ${diffDays} Hari</span>`; 
-                    } else if (diffDays > 14) { 
-                        borderClass = 'border-warning'; 
-                        ageWarning = `<span class="text-amber-500 font-bold ml-1">⚠️ ${diffDays} Hari</span>`; 
-                    } else { 
-                        borderClass = 'border-safe'; 
-                    }
+                    const diffDays = Math.ceil(Math.abs(now - entry) / (1000 * 60 * 60 * 24)); 
+                    if (diffDays > 30) { borderClass = 'border-danger'; ageWarning = `⚠️ ${diffDays} Hari`; } 
+                    else if (diffDays > 14) { borderClass = 'border-warning'; ageWarning = `⚠️ ${diffDays} Hari`; } 
+                    else borderClass = 'border-safe';
                 } else if (item.status === 'sold') { 
                     borderClass = 'border-emerald-500 bg-white'; 
                 }
                 
-                card.className = `p-4 rounded-2xl border-2 transition-all ${borderClass}`;
+                card.className = `p-3 md:p-4 rounded-xl border-2 transition-all ${borderClass} bg-white`;
                 
-                let typeLabel = '';
-                if(item.type === 'old') typeLabel = 'STOK LALU [L]'; 
-                else if(item.type === 'new') typeLabel = 'BELANJA BARU [B]'; 
-                else typeLabel = 'PROFIT BULAN LALU';
-                
-                // MASKING MODAL FOR CLIENT VIEW
+                let typeLabel = item.type === 'old' ? 'STOK LALU [L]' : (item.type === 'new' ? 'BELANJA BARU [B]' : 'PROFIT BULAN LALU');
                 const modalDisplay = showModalPrice ? item.modal.toLocaleString() : "🔒 LOCKED";
                 const modalClass = showModalPrice ? "text-slate-700" : "text-slate-300 blur-[2px]";
                 
-                // ACTIONS BUTTONS
                 let actionButtons = '';
                 if (showActions) {
                      if (item.status !== 'sold') {
                         actionButtons = `
-                        <div class="flex gap-1 mt-2 justify-end">
-                            <button onclick="openEditModal(${item.id})" class="bg-yellow-400 text-white p-1.5 rounded-lg shadow-sm">✏️</button>
-                            <button onclick="openCostModal(${item.id})" class="bg-orange-400 text-white p-1.5 rounded-lg shadow-sm">🛠️</button>
-                            <button onclick="toggleSold(${item.id})" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg font-bold text-[10px] hover:bg-indigo-700 transition">Laku? ✓</button>
+                        <div class="flex gap-2 mt-3 w-full border-t pt-2 border-dashed border-slate-200">
+                            <button onclick="openEditModal(${item.id})" class="flex-1 bg-yellow-100 text-yellow-700 py-2 rounded-lg text-xs font-bold text-center">Edit</button>
+                            <button onclick="openCostModal(${item.id})" class="flex-1 bg-orange-100 text-orange-700 py-2 rounded-lg text-xs font-bold text-center">Biaya</button>
+                            <button onclick="toggleSold(${item.id})" class="flex-1 bg-indigo-600 text-white py-2 rounded-lg font-bold text-xs text-center">Laku ✓</button>
                         </div>`;
                      } else {
-                        actionButtons = `
-                        <div class="text-right">
-                            <span class="badge-profit">+${profit.toLocaleString()}</span>
-                            <button onclick="sendInvoice(${item.id})" class="mt-1 flex items-center justify-end gap-1 text-[8px] text-emerald-600 font-bold hover:underline"><span>📱</span> Kirim Nota</button>
-                        </div>`;
+                        actionButtons = `<div class="mt-2 text-right w-full"><span class="badge-profit text-xs">+${profit.toLocaleString()}</span></div>`;
                      }
-                } else {
-                    // Client View - No actions, maybe simple "Ask Admin" or nothing
                 }
 
-                // DELETE BUTTON (Only Owner/Demo)
-                const deleteBtn = showActions ? `<button onclick="${item.type === 'extra' ? `removeExtraProfit(${item.id})` : `removeItem(${item.id})`}" class="text-slate-300 hover:text-red-400 text-xs transition">✕</button>` : '';
+                const deleteBtn = showActions ? `<button onclick="${item.type === 'extra' ? `removeExtraProfit(${item.id})` : `removeItem(${item.id})`}" class="text-slate-300 hover:text-red-400 p-1">✕</button>` : '';
 
                 card.innerHTML = `
                     <div class="flex justify-between items-start">
                         <div class="flex-1">
                             <div class="flex items-center gap-2 mb-1">
                                 <span class="text-[7px] font-black px-1.5 py-0.5 rounded uppercase ${item.type === 'extra' ? 'bg-emerald-100 text-emerald-600' : (item.type === 'old' ? 'bg-orange-100 text-orange-600' : 'bg-indigo-100 text-indigo-600')}">${typeLabel}</span>
-                                <h4 class="font-bold text-slate-800 text-sm">${item.name}</h4>
                             </div>
-                            <div class="flex items-center gap-3 text-[10px] font-medium text-slate-500">
-                                <span>M: <b class="${modalClass}">${modalDisplay}</b></span>
-                                <span>J: <b class="text-slate-700">${item.price.toLocaleString()}</b></span>
+                            <h4 class="font-bold text-slate-800 text-sm md:text-base leading-tight mb-1">${item.name}</h4>
+                            <div class="text-[11px] font-medium text-slate-500">
+                                <div class="flex justify-between w-full max-w-[200px]">
+                                    <span>M: <b class="${modalClass}">${modalDisplay}</b></span>
+                                    <span>J: <b class="text-slate-700">${item.price.toLocaleString()}</b></span>
+                                </div>
                             </div>
-                            <div class="mt-1 text-[8px] text-slate-400 font-bold uppercase italic">
-                                📥 Masuk: ${item.entryDate || '-'} ${ageWarning}
-                                ${item.soldAt ? `<br><span class="text-emerald-500">📤 Terjual: ${item.soldAt}</span>` : ''}
+                            <div class="mt-1 text-[9px] text-slate-400 font-bold uppercase italic">
+                                📥 ${item.entryDate || '-'} <span class="text-red-500 ml-1">${ageWarning}</span>
+                                ${item.soldAt ? `<br><span class="text-emerald-500">📤 ${item.soldAt}</span>` : ''}
                             </div>
                         </div>
-                        <div class="flex flex-col items-end gap-1 pl-2">
-                            ${deleteBtn}
-                            ${actionButtons}
-                        </div>
-                    </div>`;
-                
+                        ${deleteBtn}
+                    </div>
+                    ${actionButtons}
+                `;
                 container.appendChild(card);
             });
         }
 
-        // ===============================================
-        // 🔧 MODALS & ACTIONS FUNCTIONS
-        // ===============================================
         function openEditModal(id) { 
-            const i = items.find(x => x.id === id); 
-            if(!i)return; 
+            const i = items.find(x => x.id === id); if(!i)return; 
             currentEditId=id; 
             document.getElementById('editItemName').value=i.name; 
             document.getElementById('editItemModal').value=i.modal; 
             document.getElementById('editItemPrice').value=i.price; 
             
-            // --- NEW: Handle Date Edit ---
-            // Convert existing date string to YYYY-MM-DD for input type="date"
             try {
-                // assume format DD/MM/YYYY HH:MM or similar
-                const entryStr = i.entryDate.split(' ')[0]; // get date part
+                const entryStr = i.entryDate.split(' ')[0]; 
                 const parts = entryStr.split('/');
                 if(parts.length === 3) {
-                     // YYYY-MM-DD
                     const isoDate = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
                     document.getElementById('editEntryDate').value = isoDate;
                 }
-            } catch(e) {
-                console.log("Date parsing error", e);
-            }
+            } catch(e) {}
 
             document.getElementById('editModal').classList.remove('hidden'); 
         }
-        
-        function closeEditModal() { 
-            document.getElementById('editModal').classList.add('hidden'); 
-            currentEditId=null; 
-        }
-        
+        function closeEditModal() { document.getElementById('editModal').classList.add('hidden'); currentEditId=null; }
         function saveEditItem() {
             if (!currentEditId) return;
             const itemIndex = items.findIndex(i => i.id === currentEditId);
@@ -1305,82 +1101,31 @@
                 items[itemIndex].name = document.getElementById('editItemName').value;
                 items[itemIndex].modal = Number(document.getElementById('editItemModal').value);
                 items[itemIndex].price = Number(document.getElementById('editItemPrice').value);
-                
-                // --- NEW: Save Date Edit ---
                 const dateInput = document.getElementById('editEntryDate').value;
-                if(dateInput) {
-                    const d = new Date(dateInput);
-                    // Format back to DD/MM/YYYY 00:00 (Reset time to avoid confusion, or keep time if you prefer complex logic)
-                    // Simple approach:
-                    items[itemIndex].entryDate = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} 00:00`;
-                }
-
-                calculateAll(); 
-                closeEditModal();
+                if(dateInput) { const d = new Date(dateInput); items[itemIndex].entryDate = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} 00:00`; }
+                calculateAll(); closeEditModal();
             }
         }
-        
-        function openCostModal(id) { 
-            currentCostId = id; 
-            document.getElementById('costDesc').value=''; 
-            document.getElementById('costAmount').value=''; 
-            document.getElementById('costModal').classList.remove('hidden'); 
-        }
-        
-        function closeCostModal() { 
-            document.getElementById('costModal').classList.add('hidden'); 
-            currentCostId = null; 
-        }
-        
+        function openCostModal(id) { currentCostId = id; document.getElementById('costDesc').value=''; document.getElementById('costAmount').value=''; document.getElementById('costModal').classList.remove('hidden'); }
+        function closeCostModal() { document.getElementById('costModal').classList.add('hidden'); currentCostId = null; }
         function saveCost() {
             if(!currentCostId) return;
             const amount = Number(document.getElementById('costAmount').value);
             const desc = document.getElementById('costDesc').value;
             const idx = items.findIndex(x => x.id === currentCostId);
-            if(idx > -1 && amount && desc) {
-                items[idx].modal += amount;
-                items[idx].name += ` (+${desc} ${amount/1000}k)`;
-                calculateAll(); 
-                closeCostModal();
-            }
+            if(idx > -1 && amount && desc) { items[idx].modal += amount; items[idx].name += ` (+${desc})`; calculateAll(); closeCostModal(); }
         }
-        
-        function toggleSold(id) { 
-            const i = items.find(x => x.id === id); 
-            if(i){ i.status='sold'; i.soldAt=getNow(); calculateAll(); }
-        }
-        
-        function removeItem(id) { 
-            if(confirm('Hapus unit ini permanen?')) { 
-                items = items.filter(x => x.id !== id); 
-                calculateAll(); 
-            }
-        }
+        function toggleSold(id) { const i = items.find(x => x.id === id); if(i){ i.status='sold'; i.soldAt=getNow(); calculateAll(); } }
+        function removeItem(id) { if(confirm('Hapus unit ini permanen?')) { items = items.filter(x => x.id !== id); calculateAll(); } }
         
         function updateTargetBar(profit) {
-            let p = 0;
-            if (targetGoal > 0) {
-                p = (profit / targetGoal) * 100;
-            }
-            if (p > 100) p = 100;
-            if (p < 0) p = 0;
-
+            let p = targetGoal > 0 ? (profit / targetGoal) * 100 : 0;
+            if (p > 100) p = 100; if (p < 0) p = 0;
             const bar = document.getElementById('progressBar');
             bar.style.width = p + "%";
-            
-            if(p >= 100) {
-                bar.className = "bg-emerald-500 h-3 rounded-full relative transition-all duration-1000";
-            } else {
-                bar.className = "bg-indigo-600 h-3 rounded-full relative transition-all duration-1000";
-            }
-
+            bar.className = p >= 100 ? "bg-emerald-500 h-3 rounded-full relative transition-all duration-1000" : "bg-indigo-600 h-3 rounded-full relative transition-all duration-1000";
             document.getElementById('targetPercentage').innerText = p.toFixed(0) + "%";
-            
-            const currentText = document.getElementById('currentProgressText');
-            if(currentText) {
-                currentText.innerText = "Tercapai: Rp " + profit.toLocaleString('id-ID');
-            }
-
+            if(document.getElementById('currentProgressText')) document.getElementById('currentProgressText').innerText = "Tercapai: Rp " + profit.toLocaleString('id-ID');
             document.getElementById('targetNameDisplay').innerText = targetName;
             document.getElementById('targetValueDisplay').innerText = "Target: Rp " + targetGoal.toLocaleString('id-ID');
         }
@@ -1395,150 +1140,63 @@
             document.getElementById('rankBadge').innerText = r;
         }
         
-        // --- ANALYTICS VISUALIZATION (EXPANDED) ---
         function renderAnalytics() {
             const soldItems = items.filter(i => i.status === 'sold');
-            if (soldItems.length === 0) {
-                document.getElementById('avgSellTime').innerText = "-";
-                document.getElementById('winRateStock').innerText = "0%";
-                return; 
-            }
-
-            // 1. Kecepatan Putaran
-            let totalDays = 0; 
-            let validSales = 0;
+            if (soldItems.length === 0) return;
+            let totalDays = 0, validSales = 0;
             soldItems.forEach(i => {
-                const entry = parseDateString(i.entryDate); 
-                const sold = parseDateString(i.soldAt);
-                const diffTime = Math.abs(sold - entry);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                const entry = parseDateString(i.entryDate); const sold = parseDateString(i.soldAt);
+                const diffDays = Math.ceil(Math.abs(sold - entry) / (1000 * 60 * 60 * 24));
                 if(!isNaN(diffDays)) { totalDays += diffDays; validSales++; }
             });
-            const avgDays = validSales > 0 ? (totalDays / validSales).toFixed(1) : 0;
-            document.getElementById('avgSellTime').innerText = avgDays + " Hari";
+            document.getElementById('avgSellTime').innerText = (validSales > 0 ? (totalDays / validSales).toFixed(1) : 0) + " Hari";
+            document.getElementById('winRateStock').innerText = (items.length > 0 ? ((soldItems.length / items.length) * 100).toFixed(0) : 0) + "%";
 
-            // 2. Win Rate
-            const totalStock = items.length; 
-            const totalSold = soldItems.length;
-            const winRate = totalStock > 0 ? ((totalSold / totalStock) * 100).toFixed(0) : 0;
-            document.getElementById('winRateStock').innerText = winRate + "%";
-
-            // 3. Brand Dominance Chart
             const brands = {};
             soldItems.forEach(i => {
-                const brandName = getBrandCategory(i.name);
-                if(brands[brandName]) brands[brandName]++; else brands[brandName] = 1;
+                const lower = i.name.toLowerCase();
+                let b = i.name.split(' ')[0].toUpperCase();
+                if (lower.includes('iphone') || lower.includes('apple')) b = 'APPLE';
+                if (lower.includes('samsung') || lower.includes('galaxy')) b = 'SAMSUNG';
+                if (lower.includes('xiaomi') || lower.includes('redmi') || lower.includes('poco')) b = 'XIAOMI';
+                if (lower.includes('oppo')) b = 'OPPO'; if (lower.includes('vivo')) b = 'VIVO';
+                if(brands[b]) brands[b]++; else brands[b] = 1;
             });
-            const ctxBrand = document.getElementById('brandChart');
-            if (ctxBrand) {
-                if(brandChartInstance) brandChartInstance.destroy();
-                brandChartInstance = new Chart(ctxBrand, {
-                    type: 'doughnut',
-                    data: {
-                        labels: Object.keys(brands),
-                        datasets: [{
-                            data: Object.values(brands),
-                            backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'],
-                            borderWidth: 0
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { size: 10 } } } } }
-                });
-            }
 
-            // 4. Daily Profit Trend
+            if(brandChartInstance) brandChartInstance.destroy();
+            brandChartInstance = new Chart(document.getElementById('brandChart'), {
+                type: 'doughnut',
+                data: { labels: Object.keys(brands), datasets: [{ data: Object.values(brands), backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { size: 10 } } } } }
+            });
+
             const lastSales = soldItems.slice(0, 10).reverse(); 
-            const labels = lastSales.map(i => i.name.substring(0, 10)); 
-            const profits = lastSales.map(i => i.price - i.modal);
-            const ctxTrend = document.getElementById('profitTrendChart');
-            if (ctxTrend) {
-                if(trendChartInstance) trendChartInstance.destroy();
-                trendChartInstance = new Chart(ctxTrend, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{ label: 'Profit (Rp)', data: profits, backgroundColor: '#10b981', borderRadius: 4 }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { ticks: { font: { size: 8 } } } }, plugins: { legend: { display: false } } }
-                });
-            }
-
-            // 5. Quarterly Profit Chart
-            const quarters = { "Q1 (Jan-Mar)": 0, "Q2 (Apr-Jun)": 0, "Q3 (Jul-Sep)": 0, "Q4 (Oct-Dec)": 0 };
-            soldItems.forEach(i => {
-                const date = parseDateString(i.soldAt);
-                const month = date.getMonth(); 
-                const profit = i.price - i.modal;
-                
-                if (month >= 0 && month <= 2) quarters["Q1 (Jan-Mar)"] += profit;
-                else if (month >= 3 && month <= 5) quarters["Q2 (Apr-Jun)"] += profit;
-                else if (month >= 6 && month <= 8) quarters["Q3 (Jul-Sep)"] += profit;
-                else quarters["Q4 (Oct-Dec)"] += profit;
+            if(trendChartInstance) trendChartInstance.destroy();
+            trendChartInstance = new Chart(document.getElementById('profitTrendChart'), {
+                type: 'bar',
+                data: { labels: lastSales.map(i => i.name.substring(0, 8)), datasets: [{ label: 'Profit', data: lastSales.map(i => i.price - i.modal), backgroundColor: '#10b981', borderRadius: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { ticks: { font: { size: 8 } } } }, plugins: { legend: { display: false } } }
             });
-            const ctxQuarter = document.getElementById('quarterlyChart');
-            if (ctxQuarter) {
-                if(quarterlyChartInstance) quarterlyChartInstance.destroy();
-                quarterlyChartInstance = new Chart(ctxQuarter, {
-                    type: 'bar',
-                    data: {
-                        labels: Object.keys(quarters),
-                        datasets: [{
-                            label: 'Total Profit',
-                            data: Object.values(quarters),
-                            backgroundColor: ['#3b82f6', '#8b5cf6', '#eab308', '#f43f5e'],
-                            borderRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: true, ticks: { callback: function(value) { return 'Rp ' + value/1000 + 'k'; } } } }
-                    }
-                });
-            }
-        }
-
-        function getBrandCategory(itemName) {
-            const lower = itemName.toLowerCase();
-            if (lower.includes('iphone') || lower.includes('apple') || lower.includes('ipad') || lower.includes('ip ')) return 'APPLE';
-            if (lower.includes('samsung') || lower.includes('galaxy') || lower.includes('sein') || lower.includes('z flip') || lower.includes('z fold')) return 'SAMSUNG';
-            if (lower.includes('xiaomi') || lower.includes('note') || lower.includes('redmi') || lower.includes('poco') || lower.includes('mi ')) return 'XIAOMI/POCO';
-            if (lower.includes('oppo') || lower.includes('reno')) return 'OPPO';
-            if (lower.includes('vivo') || lower.includes('iqoo')) return 'VIVO';
-            if (lower.includes('realme')) return 'REALME';
-            if (lower.includes('infinix')) return 'INFINIX';
-            if (lower.includes('tecno')) return 'TECNO';
-            if (lower.includes('itel')) return 'ITEL';
-            if (lower.includes('asus') || lower.includes('rog')) return 'ASUS';
-            if (lower.includes('google') || lower.includes('pixel')) return 'GOOGLE';
-            return itemName.split(' ')[0].replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+            
+            const quarters = { "Q1": 0, "Q2": 0, "Q3": 0, "Q4": 0 };
+            soldItems.forEach(i => {
+                const m = parseDateString(i.soldAt).getMonth(); const p = i.price - i.modal;
+                if (m <= 2) quarters["Q1"] += p; else if (m <= 5) quarters["Q2"] += p; else if (m <= 8) quarters["Q3"] += p; else quarters["Q4"] += p;
+            });
+            if(quarterlyChartInstance) quarterlyChartInstance.destroy();
+            quarterlyChartInstance = new Chart(document.getElementById('quarterlyChart'), {
+                type: 'bar',
+                data: { labels: Object.keys(quarters), datasets: [{ data: Object.values(quarters), backgroundColor: ['#3b82f6', '#8b5cf6', '#eab308', '#f43f5e'], borderRadius: 6 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
         }
 
         function setMonthlyTarget() {
             if(currentUserMode!=='owner') return alert("Hanya Owner yang bisa set target.");
-            const newName = prompt("Nama Target?", targetName);
-            const newAmount = prompt("Nominal Target?", targetGoal);
-            if(newName && newAmount) { 
-                targetName = newName; 
-                targetGoal = Number(newAmount); 
-                calculateAll(); 
-            }
+            const newName = prompt("Nama Target?", targetName); const newAmount = prompt("Nominal Target?", targetGoal);
+            if(newName && newAmount) { targetName = newName; targetGoal = Number(newAmount); calculateAll(); }
         }
-        
-        function saveNote() { 
-            localStorage.setItem('ledger_owner_note', document.getElementById('ownerNote').value); 
-        }
-        
-        function backupSystem() {
-            const data = localStorage.getItem('ledger_v2_final');
-            if(data) {
-                navigator.clipboard.writeText(data).then(() => alert("KODE BACKUP berhasil disalin!\nSimpan kode ini di Note HP/WA Pribadi agar data aman 100%."));
-            } else {
-                alert("Data kosong.");
-            }
-        }
-        
+        function saveNote() { localStorage.setItem('ledger_owner_note', document.getElementById('ownerNote').value); }
         function exportReport() {
             const cash = document.getElementById('summaryCash').innerText;
             const stokVal = document.getElementById('previewModalStock').innerText;
@@ -1546,65 +1204,32 @@
             const startBal = Number(document.getElementById('startBalance').value);
             const totalAsset = Number(cash.replace(/[^0-9]/g,'')) + Number(stokVal.replace(/[^0-9]/g,''));
             
-            let report = `📊 *LAPORAN KEUANGAN FARID STORE*\n`;
-            report += `🗓️ Periode: ${currentMonthString}\n\n`;
-            report += `💰 *RINGKASAN*\n💵 Saldo Tunai: ${cash}\n📦 Nilai Stok: ${stokVal}\n📈 Total Aset: Rp ${totalAsset.toLocaleString('id-ID')}\n🔥 Profit Bersih: ${profit}\n\n✅ *PENJUALAN*\n`;
-            
-            let soldCount = 0;
-            items.filter(i => i.status === 'sold').forEach((i, index) => {
-                soldCount++;
-                const p = i.price - i.modal;
-                report += `${index + 1}. *${i.name}* (Profit: +${p.toLocaleString()})\n`;
-            });
-            if(soldCount === 0) report += `(Nihil)\n`;
-            
+            let report = `📊 *LAPORAN ${currentMonthString}*\n💵 Saldo Tunai: ${cash}\n📦 Nilai Stok: ${stokVal}\n📈 Total Aset: Rp ${totalAsset.toLocaleString('id-ID')}\n🔥 Profit: ${profit}\n\n✅ *PENJUALAN*\n`;
+            items.filter(i => i.status === 'sold').forEach((i, index) => { report += `${index + 1}. ${i.name} (Profit: +${(i.price - i.modal).toLocaleString()})\n`; });
             report += `\n🛑 *STOK GUDANG*\n`;
-            let stokCount = 0;
-            items.filter(i => i.status === 'stok').forEach((i, index) => {
-                stokCount++;
-                report += `${index + 1}. ${i.name} (M: ${i.modal.toLocaleString()})\n`;
-            });
-            if(stokCount === 0) report += `(Kosong)\n`;
-
-            report += `\n_Generated by Farid Store System_`;
-            navigator.clipboard.writeText(report).then(() => alert("Laporan Investor berhasil disalin!"));
+            items.filter(i => i.status === 'stok').forEach((i, index) => { report += `${index + 1}. ${i.name} (M: ${i.modal.toLocaleString()})\n`; });
+            navigator.clipboard.writeText(report).then(() => alert("Laporan disalin!"));
         }
-        
         function toggleImportModal() { document.getElementById('importModal').classList.toggle('hidden'); }
-        
         function processImport() {
             const text = document.getElementById('importArea').value.trim();
             if(!text) return;
-
-            // DETEKSI 1: KODE BACKUP JSON
-            if (text.startsWith('{')) {
-                try {
-                    const parsed = JSON.parse(text);
-                    if(parsed.items || parsed.startBalance !== undefined) {
-                        applyData(parsed);
-                        localStorage.setItem('ledger_v2_final', text);
-                        alert("Data System berhasil dipulihkan!");
-                        location.reload();
-                        return;
-                    }
-                } catch (e) {
-                    alert("Kode backup rusak.");
+            try {
+                const parsed = JSON.parse(text);
+                if(parsed.items || parsed.startBalance !== undefined) {
+                    applyData(parsed); localStorage.setItem('ledger_v2_final', text);
+                    alert("Data System berhasil dipulihkan!"); location.reload();
                 }
-            } else {
-                alert("Gunakan format JSON untuk restore penuh.");
-            }
+            } catch (e) { alert("Format JSON Salah."); }
         }
-        
         function toggleHelpModal() { alert("Gunakan tombol 'Cloud Sync' untuk sinkronisasi data antar device."); }
         function clearData() { if(confirm('Hapus permanen?')) { localStorage.clear(); location.reload(); } }
         function directImei() { const i=document.getElementById('imeiInput').value; if(i)window.open(`https://www.imei.info/?imei=${i}`, '_blank'); }
 
-        // --- INIT ---
         window.onload = () => {
             const now = new Date();
             currentMonthString = monthNames[now.getMonth()] + " " + now.getFullYear();
             document.getElementById('currentMonth').innerText = currentMonthString;
-            // Wait for Auth to load data fully
         };
     </script>
 </body>
