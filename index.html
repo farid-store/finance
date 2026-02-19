@@ -23,10 +23,8 @@
             font-family: 'Inter', sans-serif; 
             background-color: var(--bg-main); 
             color: #1e293b; 
-            margin: auto; 
-            transition: max-width 0.3s ease;
+            margin: 0; 
             -webkit-tap-highlight-color: transparent;
-            padding-bottom: 80px; /* Space for bottom content on mobile */
         }
 
         /* Hide scrollbar */
@@ -69,11 +67,6 @@
         #sidebar { 
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
             z-index: 50; 
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            overflow-y: auto;
         }
 
         .sidebar-item { 
@@ -150,17 +143,8 @@
             border-radius: 10px; 
         }
 
-        #calc-prev { 
-            color: #64748b; 
-            font-size: 10px; 
-            min-height: 14px; 
-        }
-
-        #calc-curr { 
-            color: white; 
-            font-size: 18px; 
-            font-weight: 700; 
-        }
+        #calc-prev { color: #64748b; font-size: 10px; min-height: 14px; }
+        #calc-curr { color: white; font-size: 18px; font-weight: 700; }
 
         .calc-grid { 
             display: grid; 
@@ -169,21 +153,12 @@
         }
 
         .calc-grid button { 
-            height: 35px; 
-            border-radius: 8px; 
-            border: none; 
-            font-size: 12px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            transition: 0.2s; 
-            background: #334155; 
-            color: white; 
+            height: 35px; border-radius: 8px; border: none; font-size: 12px; 
+            font-weight: 600; cursor: pointer; transition: 0.2s; 
+            background: #334155; color: white; 
         }
 
-        .calc-grid button:hover { 
-            background: #475569; 
-        }
-
+        .calc-grid button:hover { background: #475569; }
         .calc-grid .btn-op { color: #818cf8; }
         .calc-grid .btn-eq { background: #6366f1 !important; grid-column: span 2; }
         .calc-grid .btn-ac { color: #f87171; }
@@ -195,28 +170,17 @@
         .client-item-card { border: none !important; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.04) !important; padding: 20px !important; }
         
         .badge-rank { 
-            font-size: 10px; 
-            font-weight: 800; 
-            padding: 2px 8px; 
-            border-radius: 4px; 
-            text-transform: uppercase; 
-            letter-spacing: 1px; 
-            float: right;
+            font-size: 10px; font-weight: 800; padding: 2px 8px; 
+            border-radius: 4px; text-transform: uppercase; 
+            letter-spacing: 1px; float: right;
         }
 
-        @keyframes shimmer { 
-            100% { transform: translateX(100%); } 
-        }
+        @keyframes shimmer { 100% { transform: translateX(100%); } }
 
         .shimmer-effect { 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent); 
-            transform: translateX(-100%); 
-            animation: shimmer 2s infinite; 
+            transform: translateX(-100%); animation: shimmer 2s infinite; 
         }
 
         /* AGING INDICATORS */
@@ -226,41 +190,24 @@
 
         /* LOADING OVERLAY (CLOUD) */
         #loadingCloud { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(255,255,255,0.9); 
-            z-index: 100; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            flex-direction: column; 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(255,255,255,0.9); z-index: 100; display: flex; 
+            justify-content: center; align-items: center; flex-direction: column; 
             backdrop-filter: blur(4px); 
         }
 
-        /* =========================================
-           UPDATED SECURITY PIN MODAL STYLES (WHITE)
-           ========================================= */
+        /* SECURITY PIN MODAL */
         #authModal {
-            position: fixed;
-            inset: 0;
-            z-index: 999;
-            background: #f8fafc; /* WHITE BACKGROUND */
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            position: fixed; inset: 0; z-index: 999; background: #f8fafc; 
+            display: flex; justify-content: center; align-items: center;
         }
         
         .blur-sensitive {
-            filter: blur(4px);
-            user-select: none;
-            pointer-events: none;
+            filter: blur(4px); user-select: none; pointer-events: none;
         }
     </style>
 </head>
-<body class="p-4 md:p-8 antialiased">
+<body class="antialiased lg:overflow-hidden">
 
     <div id="authModal">
         <div class="max-w-sm w-full text-center p-8">
@@ -291,397 +238,406 @@
         <span id="loadingText" class="text-sm font-bold text-slate-700 uppercase tracking-widest">Menghubungkan ke Cloud...</span>
     </div>
 
-    <div id="overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-40" onclick="toggleSidebar()"></div>
+    <div class="flex flex-col lg:flex-row min-h-screen w-full lg:h-screen lg:overflow-hidden">
+        
+        <div id="overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-40 lg:hidden" onclick="toggleSidebar()"></div>
 
-    <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#1e293b] text-white shadow-2xl flex flex-col -translate-x-full lg:translate-x-0">
-        <div class="p-6 overflow-y-auto">
-            <h2 class="text-xl font-extrabold mb-8 flex items-center gap-3 italic tracking-tight">
-                <span class="bg-indigo-600 p-2 rounded-lg not-italic">📱</span> MENU
-            </h2>
-            <nav class="space-y-2">
-                <div onclick="switchPage('main')" class="sidebar-item hover:bg-indigo-600 hover:text-white transition">
-                    <span class="mr-3 text-lg">📊</span> Dashboard Utama
-                </div>
-                <div onclick="switchPage('analytics')" class="sidebar-item hover:bg-indigo-600 hover:text-white transition">
-                    <span class="mr-3 text-lg">📈</span> Analisa Bisnis
-                </div>
-                <div>
-                    <div onclick="toggleDropdown('dropCheck')" class="sidebar-item justify-between">
-                        <span class="flex items-center"><span class="mr-3 text-lg">🔍</span> Gadget Check</span>
-                        <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        <aside id="sidebar" class="fixed lg:static top-0 left-0 h-full w-64 bg-[#1e293b] text-white shadow-2xl flex flex-col -translate-x-full lg:translate-x-0 overflow-y-auto flex-shrink-0">
+            <div class="p-6">
+                <h2 class="text-xl font-extrabold mb-8 flex items-center gap-3 italic tracking-tight">
+                    <span class="bg-indigo-600 p-2 rounded-lg not-italic">📱</span> MENU
+                </h2>
+                <nav class="space-y-2">
+                    <div onclick="switchPage('main')" class="sidebar-item hover:bg-indigo-600 hover:text-white transition">
+                        <span class="mr-3 text-lg">📊</span> Dashboard Utama
                     </div>
-                    <div id="dropCheck" class="dropdown-content">
-                        <div onclick="switchPage('hp')" class="sidebar-item text-xs pl-12">Handphone Check</div>
-                        <div onclick="switchPage('dial')" class="sidebar-item text-xs pl-12">Dial Check (Kode)</div>
-                        <div onclick="switchPage('laptop')" class="sidebar-item text-xs pl-12">Laptop Check</div>
+                    <div onclick="switchPage('analytics')" class="sidebar-item hover:bg-indigo-600 hover:text-white transition">
+                        <span class="mr-3 text-lg">📈</span> Analisa Bisnis
                     </div>
-                </div>
-                <div>
-                    <div onclick="toggleDropdown('dropWarranty')" class="sidebar-item justify-between">
-                        <span class="flex items-center"><span class="mr-3 text-lg">🛡️</span> Cek Garansi Resmi</span>
-                        <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    <div>
+                        <div onclick="toggleDropdown('dropCheck')" class="sidebar-item justify-between">
+                            <span class="flex items-center"><span class="mr-3 text-lg">🔍</span> Gadget Check</span>
+                            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div id="dropCheck" class="dropdown-content">
+                            <div onclick="switchPage('hp')" class="sidebar-item text-xs pl-12">Handphone Check</div>
+                            <div onclick="switchPage('dial')" class="sidebar-item text-xs pl-12">Dial Check (Kode)</div>
+                            <div onclick="switchPage('laptop')" class="sidebar-item text-xs pl-12">Laptop Check</div>
+                        </div>
                     </div>
-                    <div id="dropWarranty" class="dropdown-content">
-                        <a href="https://www.mi.com/global/verify/#/en/tab/imei" target="_blank" class="sidebar-item text-xs pl-12">Xiaomi Official</a>
-                        <a href="https://www.realme.com/sa-en/support/phonecheck" target="_blank" class="sidebar-item text-xs pl-12">Realme Official</a>
-                        <a href="https://www.vivo.com/en/support/IMEI" target="_blank" class="sidebar-item text-xs pl-12">Vivo Official</a>
-                        <a href="https://support.oppo.com/en/warranty-check/" target="_blank" class="sidebar-item text-xs pl-12">OPPO Official</a>
-                        <a href="https://wap.id.infinixmobility.com/care/imei-authentication" target="_blank" class="sidebar-item text-xs pl-12">Infinix Official</a>
-                        <a href="https://checkcoverage.apple.com/" target="_blank" class="sidebar-item text-xs pl-12 font-bold text-indigo-400">Apple Official</a>
-                        <a href="https://www.samsung.com/us/support/warranty/" target="_blank" class="sidebar-item text-xs pl-12">Samsung Official</a>
+                    <div>
+                        <div onclick="toggleDropdown('dropWarranty')" class="sidebar-item justify-between">
+                            <span class="flex items-center"><span class="mr-3 text-lg">🛡️</span> Cek Garansi Resmi</span>
+                            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div id="dropWarranty" class="dropdown-content">
+                            <a href="https://www.mi.com/global/verify/#/en/tab/imei" target="_blank" class="sidebar-item text-xs pl-12">Xiaomi Official</a>
+                            <a href="https://www.realme.com/sa-en/support/phonecheck" target="_blank" class="sidebar-item text-xs pl-12">Realme Official</a>
+                            <a href="https://www.vivo.com/en/support/IMEI" target="_blank" class="sidebar-item text-xs pl-12">Vivo Official</a>
+                            <a href="https://support.oppo.com/en/warranty-check/" target="_blank" class="sidebar-item text-xs pl-12">OPPO Official</a>
+                            <a href="https://wap.id.infinixmobility.com/care/imei-authentication" target="_blank" class="sidebar-item text-xs pl-12">Infinix Official</a>
+                            <a href="https://checkcoverage.apple.com/" target="_blank" class="sidebar-item text-xs pl-12 font-bold text-indigo-400">Apple Official</a>
+                            <a href="https://www.samsung.com/us/support/warranty/" target="_blank" class="sidebar-item text-xs pl-12">Samsung Official</a>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-slate-700 my-4"></div>
+                    
+                    <div class="sidebar-calc">
+                        <div class="calc-display">
+                            <div id="calc-prev"></div>
+                            <div id="calc-curr">0</div>
+                        </div>
+                        <div class="calc-grid">
+                            <button class="btn-ac" onclick="calcClear()">AC</button>
+                            <button onclick="calcDel()">DEL</button>
+                            <button onclick="calcPerc()">%</button> 
+                            <button class="btn-op" onclick="calcOp('/')">÷</button>
+                            <button onclick="calcNum('7')">7</button>
+                            <button onclick="calcNum('8')">8</button>
+                            <button onclick="calcNum('9')">9</button>
+                            <button class="btn-op" onclick="calcOp('*')">×</button>
+                            <button onclick="calcNum('4')">4</button>
+                            <button onclick="calcNum('5')">5</button>
+                            <button onclick="calcNum('6')">6</button>
+                            <button class="btn-op" onclick="calcOp('-')">-</button>
+                            <button onclick="calcNum('1')">1</button>
+                            <button onclick="calcNum('2')">2</button>
+                            <button onclick="calcNum('3')">3</button>
+                            <button class="btn-op" onclick="calcOp('+')">+</button>
+                            <button onclick="calcNum('0')">0</button>
+                            <button onclick="calcNum('.')">.</button>
+                            <button class="btn-eq" onclick="calcResult()" style="grid-column: span 2;">=</button>
+                        </div>
+                    </div>
+
+                    <div id="admin-sidebar-tools">
+                        <button onclick="toggleHelpModal()" class="sidebar-item w-full bg-slate-800/50 mb-2">📖 Panduan</button>
+                        <button onclick="clearData()" class="sidebar-item w-full text-red-400 hover:text-red-300 italic">🗑️ Hapus Semua Data</button>
+                    </div>
+                </nav>
+
+                <div class="mt-8">
+                    <p class="text-[10px] text-slate-500 font-bold uppercase mb-3 tracking-widest">Access Mode</p>
+                    <div class="flex bg-slate-900 p-1 rounded-xl gap-1">
+                        <button id="btnAccessIndicator" class="flex-1 py-2 rounded-lg text-[10px] font-black bg-slate-700 text-slate-400 cursor-default">
+                            LOCKED
+                        </button>
                     </div>
                 </div>
                 
-                <div class="border-t border-slate-700 my-4"></div>
+                <div class="mt-4 pb-8">
+                    <p class="text-[10px] text-slate-500 font-bold uppercase mb-3 tracking-widest">View Mode</p>
+                    <div class="flex bg-slate-900 p-1 rounded-xl gap-1">
+                        <button onclick="setView('mobile')" id="btnMob" class="flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white">MOBILE</button>
+                        <button onclick="setView('desktop')" id="btnDesk" class="flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500">DESKTOP</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="flex-1 flex flex-col w-full h-full lg:overflow-hidden relative">
+            
+            <main id="page-main" class="flex-1 flex flex-col lg:flex-row w-full h-full lg:overflow-hidden">
                 
-                <div class="sidebar-calc">
-                    <div class="calc-display">
-                        <div id="calc-prev"></div>
-                        <div id="calc-curr">0</div>
+                <div class="flex-1 lg:overflow-y-auto p-4 md:p-8 w-full">
+                    
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-6">
+                        <div class="flex items-center gap-3 mb-4 w-full">
+                            <button onclick="toggleSidebar()" class="lg:hidden p-2.5 bg-slate-50 rounded-xl shadow-sm border text-indigo-600 font-bold transition active:scale-95 flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+                                </svg>
+                            </button>
+
+                            <div class="flex gap-2 overflow-x-auto no-scrollbar w-full admin-only-view">
+                                <button onclick="emergencyRescue()" class="px-3 py-2 bg-red-600 text-white rounded-lg text-[10px] font-bold shadow-md hover:bg-red-700 transition flex items-center gap-1 flex-shrink-0 animate-pulse">
+                                    <span>🆘</span> 
+                                </button>
+                                <button onclick="forceSync()" class="px-3 py-2 bg-blue-600 text-white rounded-lg text-[10px] font-bold shadow-md hover:bg-blue-700 transition flex items-center gap-1 flex-shrink-0">
+                                    <span>☁️</span> Sync
+                                </button>
+                                <button onclick="toggleImportModal()" class="px-3 py-2 bg-white border border-indigo-100 text-indigo-600 rounded-lg text-[10px] font-bold shadow-sm hover:bg-indigo-50 transition flex items-center gap-1 flex-shrink-0">
+                                    <span>📥</span> Import
+                                </button>
+                                <button onclick="exportReport()" class="px-3 py-2 bg-emerald-600 text-white rounded-lg text-[10px] font-bold shadow-lg hover:bg-emerald-700 transition flex items-center gap-1 flex-shrink-0">
+                                    <span>📑</span> Laporan
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-end border-t border-slate-100 pt-4">
+                            <div class="flex flex-col">
+                                <h1 class="text-lg md:text-2xl font-extrabold tracking-tighter text-slate-900 uppercase leading-none">
+                                    DIGITAL <span class="text-indigo-600">LEDGER</span>
+                                </h1>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <p id="currentMonth" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest"></p>
+                                    <p id="cloudStatus" class="text-[9px] text-slate-400 font-bold">⚪ Local</p>
+                                </div>
+                            </div>
+                            
+                            <div class="text-right flex flex-col items-end">
+                                <div id="rankBadge" class="badge-rank bg-slate-200 text-slate-500 mb-1 scale-90 origin-right">Unranked</div>
+                                <p class="text-[8px] text-slate-400 uppercase font-black tracking-widest">Realized Profit</p>
+                                <h2 id="summaryProfit" class="text-xl font-black text-emerald-600 leading-none">Rp 0</h2>
+                            </div>
+                        </div>
                     </div>
-                    <div class="calc-grid">
-                        <button class="btn-ac" onclick="calcClear()">AC</button>
-                        <button onclick="calcDel()">DEL</button>
-                        <button onclick="calcPerc()">%</button> 
-                        <button class="btn-op" onclick="calcOp('/')">÷</button>
-                        <button onclick="calcNum('7')">7</button>
-                        <button onclick="calcNum('8')">8</button>
-                        <button onclick="calcNum('9')">9</button>
-                        <button class="btn-op" onclick="calcOp('*')">×</button>
-                        <button onclick="calcNum('4')">4</button>
-                        <button onclick="calcNum('5')">5</button>
-                        <button onclick="calcNum('6')">6</button>
-                        <button class="btn-op" onclick="calcOp('-')">-</button>
-                        <button onclick="calcNum('1')">1</button>
-                        <button onclick="calcNum('2')">2</button>
-                        <button onclick="calcNum('3')">3</button>
-                        <button class="btn-op" onclick="calcOp('+')">+</button>
-                        <button onclick="calcNum('0')">0</button>
-                        <button onclick="calcNum('.')">.</button>
-                        <button class="btn-eq" onclick="calcResult()" style="grid-column: span 2;">=</button>
+
+                    <div class="card p-4 mb-6 border-l-4 border-indigo-600 relative overflow-hidden group admin-only-view">
+                        <div class="flex justify-between items-end mb-2 relative z-10">
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Target Bulan Ini</p>
+                                <h3 id="targetNameDisplay" class="font-black text-slate-800 text-sm cursor-pointer hover:text-indigo-600" onclick="setMonthlyTarget()">Set Your Goal 🎯</h3>
+                            </div>
+                            <div class="text-right">
+                                <span id="targetPercentage" class="text-2xl font-black text-indigo-600">0%</span>
+                            </div>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-3 mb-2 relative z-10 overflow-hidden">
+                            <div id="progressBar" class="bg-indigo-600 h-3 rounded-full transition-all duration-1000 ease-out relative w-0">
+                                 <div class="shimmer-effect"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between text-[10px] font-bold text-slate-400 relative z-10">
+                            <span id="currentProgressText" class="text-emerald-600">Rp 0</span> 
+                            <span id="targetValueDisplay">Target: Rp 0</span>
+                        </div>
+                        <button onclick="setMonthlyTarget()" class="absolute top-2 right-2 p-1 bg-white/80 rounded hover:bg-white text-slate-400 hover:text-indigo-600 transition opacity-0 group-hover:opacity-100 z-20">⚙️</button>
+                    </div>
+
+                    <div id="clientBanner" class="hidden mb-6 bg-slate-800 text-white p-6 rounded-2xl shadow-xl border border-slate-700">
+                        <h2 class="text-xl font-black text-white mb-1 uppercase">Mode Tamu (Client)</h2>
+                        <p class="text-slate-400 text-xs mb-4">Anda hanya dapat melihat stok yang tersedia. Modal dan profit disembunyikan.</p>
+                        <div class="p-3 bg-slate-900 rounded-xl border border-dashed border-slate-600 text-[10px] text-slate-400">
+                            <strong class="text-orange-400 block mb-1">TIPS:</strong>
+                            Ingin mencoba fitur admin? Gunakan mode "Admin Sandbox" di menu. Data sandbox tidak akan disimpan ke cloud owner.
+                            <br>
+                            <button onclick="enableSandboxMode()" class="mt-2 text-indigo-400 underline font-bold cursor-pointer">Masuk Mode Sandbox (Demo)</button>
+                        </div>
+                    </div>
+
+                    <div id="sandboxBanner" class="hidden mb-6 bg-orange-100 border-l-4 border-orange-500 text-orange-900 p-4 rounded-xl">
+                         <h3 class="font-bold text-xs uppercase flex items-center gap-2">⚠️ SANDBOX MODE</h3>
+                         <p class="text-[10px]">Anda bebas mengedit/menambah data untuk tes. Data <b>TIDAK</b> akan disinkronkan ke Cloud Owner.</p>
+                    </div>
+
+                    <div id="admin-dashboard-section" class="admin-only-view">
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="card p-5 border-b-4 border-indigo-500">
+                                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Uang Tunai (Cash)</p>
+                                <h2 id="summaryCash" class="text-lg font-bold text-slate-800">Rp 0</h2>
+                            </div>
+                            <div class="card p-5 border-b-4 border-emerald-500">
+                                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Total Floating</p>
+                                <h2 id="summaryFloating" class="text-lg font-bold text-slate-800">Rp 0</h2>
+                            </div>
+                            <div class="card p-6 col-span-2 text-center bg-slate-900 text-white border-none shadow-xl">
+                                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-widest opacity-80">Unrealized Balance (Total Aset)</p>
+                                <h2 id="summaryTotal" class="text-3xl font-black">Rp 0</h2>
+                            </div>
+                        </div>
+
+                        <div class="card p-6 mb-4">
+                            <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2 text-xs uppercase tracking-wider"><span>📝</span> Smart Input Teks</h3>
+                            <textarea id="bulkInput" class="input-field h-24 mb-4 text-sm border-dashed" placeholder="Contoh: Poco M3 : 500.000 > 600.000"></textarea>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button onclick="parseText('old')" class="py-3 bg-slate-700 text-white rounded-xl font-bold text-[10px] uppercase hover:bg-slate-800 transition">Stok Lalu [L]</button>
+                                <button onclick="parseText('new')" class="py-3 bg-emerald-600 text-white rounded-xl font-bold text-[10px] uppercase hover:bg-emerald-700 transition">Belanja Baru [B]</button>
+                            </div>
+                        </div>
+
+                        <div class="mb-6 space-y-2">
+                            <div class="flex gap-2 overflow-x-auto pb-2">
+                                <button onclick="toggleConfig('configPanel', 'configLabel', '⚙️ Saldo Awal')" id="configLabel" class="flex-shrink-0 text-[10px] font-bold text-indigo-600 bg-indigo-50 px-3 py-2 rounded-lg uppercase tracking-widest">⚙️ Saldo Awal</button>
+                                <button onclick="toggleConfig('extraProfitPanel', 'extraProfitLabel', '📈 Tambah Profit')" id="extraProfitLabel" class="flex-shrink-0 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-3 py-2 rounded-lg uppercase tracking-widest">📈 Tambah Profit</button>
+                                <button onclick="toggleConfig('journalPanel', 'journalLabel', '📓 Owner Journal')" id="journalLabel" class="flex-shrink-0 text-[10px] font-bold text-yellow-600 bg-yellow-50 px-3 py-2 rounded-lg uppercase tracking-widest">📓 Owner Journal</button>
+                            </div>
+
+                            <div id="configPanel" class="hidden-panel mt-2">
+                                <div class="card p-5 bg-indigo-50/50 border-indigo-100 mb-4">
+                                    <h3 class="font-bold text-indigo-900 text-[10px] uppercase mb-2">Modal Tunai di Tangan (Awal Bulan)</h3>
+                                    <input type="number" id="startBalance" class="input-field font-black text-lg text-indigo-700" value="0" onchange="calculateAll()">
+                                </div>
+                            </div>
+
+                            <div id="extraProfitPanel" class="hidden-panel mt-2">
+                                <div class="card p-5 bg-emerald-50 border-emerald-100 mb-4">
+                                    <h3 class="font-bold text-emerald-900 text-[10px] uppercase mb-3">Input Barang Terjual Bulan Lalu</h3>
+                                    <textarea id="exBulkInput" class="input-field h-20 mb-3 text-xs border-dashed" placeholder="Smart Input: Nama : Modal > Jual (Per baris)"></textarea>
+                                    <button onclick="parseExtraProfitText()" class="w-full py-2 bg-indigo-600 text-white rounded-lg font-bold text-[10px] uppercase mb-4">Smart Input Profit</button>
+                                    <div id="extraProfitList" class="mt-4 space-y-2 border-t pt-3 border-emerald-200"></div>
+                                </div>
+                            </div>
+
+                            <div id="journalPanel" class="hidden-panel mt-2">
+                                <div class="card p-5 bg-yellow-50 border-yellow-200 mb-4">
+                                    <h3 class="font-bold text-yellow-900 text-[10px] uppercase mb-2">Refleksi & Catatan Harian</h3>
+                                    <textarea id="ownerNote" class="w-full h-24 bg-white text-sm text-slate-700 outline-none p-3 rounded-xl border border-yellow-300 resize-none placeholder-slate-400" placeholder="Apa pelajaran bisnis hari ini, Farid? Tulis di sini..." oninput="saveNote()"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card p-5 bg-slate-800 border-l-4 border-indigo-500 text-white flex justify-between items-center mb-8 shadow-lg">
+                            <div>
+                                <h3 class="font-bold text-indigo-300 text-[9px] uppercase tracking-widest opacity-80">Modal Stok Berjalan</h3>
+                                <h2 id="previewModalStock" class="text-xl font-black">Rp 0</h2>
+                            </div>
+                            <div class="text-right">
+                                <h3 class="font-bold text-emerald-400 text-[9px] uppercase tracking-widest opacity-80">Potensi Untung</h3>
+                                <h2 id="previewUnrealizedProfit" class="text-xl font-black">Rp 0</h2>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div id="admin-sidebar-tools">
-                    <button onclick="toggleHelpModal()" class="sidebar-item w-full bg-slate-800/50 mb-2">📖 Panduan</button>
-                    <button onclick="clearData()" class="sidebar-item w-full text-red-400 hover:text-red-300 italic">🗑️ Hapus Semua Data</button>
-                </div>
-            </nav>
+                <div class="w-full lg:w-[400px] xl:w-[450px] flex-shrink-0 bg-slate-50 lg:bg-white lg:border-l border-slate-200 lg:overflow-y-auto p-4 md:p-6 pb-24">
+                    
+                    <div class="mb-6 space-y-4 sticky top-0 bg-slate-50 lg:bg-white z-10 pt-2 pb-2">
+                        <div class="relative">
+                            <input type="text" id="searchInput" onkeyup="renderRows()" placeholder="Cari unit..." class="input-field pl-10 text-sm bg-white shadow-sm border-slate-200">
+                            <span class="absolute left-3 top-3.5 opacity-30 text-lg">🔍</span>
+                        </div>
+                        <div class="flex bg-slate-200 p-1 rounded-xl gap-1">
+                            <button onclick="setFilter('stok')" id="tabStok" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all bg-white text-indigo-600 shadow-sm">Unit Stok</button>
+                            <button onclick="setFilter('sold')" id="tabSold" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500">History Terjual</button>
+                            <button onclick="setFilter('extra')" id="tabExtra" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500">History Bulan Lalu</button>
+                        </div>
+                    </div>
+                    
+                    <div id="itemRows" class="space-y-3 mb-20"></div>
 
-            <div class="mt-8">
-                <p class="text-[10px] text-slate-500 font-bold uppercase mb-3 tracking-widest">Access Mode</p>
-                <div class="flex bg-slate-900 p-1 rounded-xl gap-1">
-                    <button id="btnAccessIndicator" class="flex-1 py-2 rounded-lg text-[10px] font-black bg-slate-700 text-slate-400 cursor-default">
-                        LOCKED
-                    </button>
+                </div>
+            </main>
+
+            <div id="page-analytics" class="max-w-4xl w-full mx-auto hidden flex-1 lg:overflow-y-auto pt-8 px-4 md:px-8">
+                <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali Dashboard</button>
+                <h1 class="text-2xl font-black italic mb-6 text-slate-800">📊 ANALISA PERFORMA TOKO</h1>
+            
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="card p-4 border-l-4 border-blue-500">
+                        <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Kecepatan Putaran</p>
+                        <h2 id="avgSellTime" class="text-2xl font-black text-slate-800">- Hari</h2>
+                        <p class="text-[9px] text-slate-400 italic mt-1">Rata-rata barang laku</p>
+                    </div>
+                    <div class="card p-4 border-l-4 border-purple-500">
+                        <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Win Rate Barang</p>
+                        <h2 id="winRateStock" class="text-2xl font-black text-slate-800">0%</h2>
+                        <p class="text-[9px] text-slate-400 italic mt-1">Rasio Laku vs Stok Diam</p>
+                    </div>
+                </div>
+            
+                <div class="card p-5 mb-6">
+                    <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Dominasi Brand (Smart Grouping)</h3>
+                    <div class="h-64">
+                        <canvas id="brandChart"></canvas>
+                    </div>
+                </div>
+            
+                <div class="card p-5 mb-6">
+                    <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Tren Profit Harian</h3>
+                    <div class="h-48">
+                        <canvas id="profitTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card p-5 mb-6">
+                    <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Performa Profit Per Kuartal</h3>
+                    <div class="h-48">
+                        <canvas id="quarterlyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-hp" class="max-w-3xl w-full mx-auto hidden flex-1 lg:overflow-y-auto pt-8 px-4 md:px-8">
+                <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali</button>
+                <h1 class="text-2xl font-black italic mb-6">📱 Handphone Check</h1>
+                <div class="card p-6 space-y-4">
+                    <div class="bg-slate-50 p-4 rounded-xl border">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase block mb-2 italic">Cek IMEI (imei.info)</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="imeiInput" class="input-field text-sm bg-white" placeholder="Masukkan 15 digit IMEI...">
+                            <button onclick="directImei()" class="bg-indigo-600 text-white px-6 rounded-xl font-bold text-[10px]">CEK</button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 gap-2">
+                        <button onclick="window.open('https://old.beacukai.go.id/websitenewV2/cek-imei.html')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">Cek IMEI Beacukai <span>🌐</span></button>
+                        <button onclick="window.open('https://sickw.com/')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">SICKSW (SN/IMEI) <span>🌐</span></button>
+                        <button onclick="window.open('https://www.touchscreentest.com/')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">Touchscreen Test <span>🌐</span></button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-dial" class="max-w-3xl w-full mx-auto hidden flex-1 lg:overflow-y-auto pt-8 px-4 md:px-8">
+                <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali</button>
+                <h1 class="text-2xl font-black italic mb-6">🔍 Kode Dial Rahasia</h1>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="card p-4 dial-card">
+                        <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">SAMSUNG</h3>
+                        <p class="text-lg font-mono font-bold">*#0*#</p>
+                        <p class="text-[10px] text-slate-500 uppercase">General Test Mode</p>
+                    </div>
+                    <div class="card p-4 dial-card">
+                        <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">XIAOMI / POCO</h3>
+                        <p class="text-lg font-mono font-bold">*#*#64663#*#*</p>
+                        <p class="text-[10px] text-slate-500 uppercase">CIT (Hardware Test)</p>
+                    </div>
+                    <div class="card p-4 dial-card">
+                        <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">OPPO / REALME</h3>
+                        <p class="text-lg font-mono font-bold">*#899#</p>
+                        <p class="text-[10px] text-slate-500 uppercase">Engineer Mode</p>
+                    </div>
+                    <div class="card p-4 dial-card">
+                        <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">VIVO / IQOO</h3>
+                        <p class="text-lg font-mono font-bold">*#558#</p>
+                        <p class="text-[10px] text-slate-500 uppercase">Factory Test</p>
+                    </div>
+                    <div class="card p-4 dial-card">
+                        <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">IPHONE</h3>
+                        <p class="text-lg font-mono font-bold">*3001#12345#*</p>
+                        <p class="text-[10px] text-slate-500 uppercase">Field Test</p>
+                    </div>
+                    <div class="card p-4 dial-card">
+                        <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">UNIVERSAL</h3>
+                        <p class="text-lg font-mono font-bold">*#06#</p>
+                        <p class="text-[10px] text-slate-500 uppercase">Cek IMEI</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-laptop" class="max-w-3xl w-full mx-auto hidden flex-1 lg:overflow-y-auto pt-8 px-4 md:px-8">
+                <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali</button>
+                <h1 class="text-2xl font-black italic mb-6">💻 Laptop Check List</h1>
+                <div class="space-y-4">
+                    <div class="card p-5">
+                        <h3 class="font-bold text-sm mb-3 text-slate-800">1. Pengecekan Fisik & Layar</h3>
+                        <ul class="text-[11px] space-y-2 text-slate-600 uppercase font-bold">
+                            <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Cek Engsel & Baut (Pastikan rapat)</li>
+                            <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Dead Pixel Test (Buka browser: deadpixeltest.org)</li>
+                            <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> White Spot / Jamur pada LCD</li>
+                        </ul>
+                    </div>
+                    <div class="card p-5">
+                        <h3 class="font-bold text-sm mb-3 text-slate-800">2. Performa & Baterai</h3>
+                        <ul class="text-[11px] space-y-2 text-slate-600 uppercase font-bold">
+                            <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> CMD: <code class="bg-slate-100 px-1 lowercase">powercfg /batteryreport</code></li>
+                            <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Cek Kesehatan SSD (Gunakan CrystalDiskInfo)</li>
+                            <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Keyboard Test (Buka: keyboardtester.com)</li>
+                        </ul>
+                    </div>
+                    <div class="card p-5">
+                        <h3 class="font-bold text-sm mb-3 text-slate-800">3. Konektivitas & Suara</h3>
+                        <ul class="text-[11px] space-y-2 text-slate-600 uppercase font-bold">
+                            <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Tes Semua Port USB, HDMI, Audio Jack</li>
+                            <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Tes Webcam & Mic</li>
+                            <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Cek Speaker (Pastikan tidak sember)</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
             
-            <div class="mt-4">
-                <p class="text-[10px] text-slate-500 font-bold uppercase mb-3 tracking-widest">View Mode</p>
-                <div class="flex bg-slate-900 p-1 rounded-xl gap-1">
-                    <button onclick="setView('mobile')" id="btnMob" class="flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white">MOBILE</button>
-                    <button onclick="setView('desktop')" id="btnDesk" class="flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500">DESKTOP</button>
-                </div>
-            </div>
-        </div>
-    </aside>
-
-    <main id="page-main" class="max-w-2xl mx-auto">
-        
-        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-6">
-            
-            <div class="flex items-center gap-3 mb-4 w-full">
-                <button onclick="toggleSidebar()" class="lg:hidden p-2.5 bg-slate-50 rounded-xl shadow-sm border text-indigo-600 font-bold transition active:scale-95 flex-shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
-                    </svg>
-                </button>
-
-                <div class="flex gap-2 overflow-x-auto no-scrollbar w-full admin-only-view">
-                    <button onclick="emergencyRescue()" class="px-3 py-2 bg-red-600 text-white rounded-lg text-[10px] font-bold shadow-md hover:bg-red-700 transition flex items-center gap-1 flex-shrink-0 animate-pulse">
-                        <span>🆘</span> 
-                    </button>
-                    <button onclick="forceSync()" class="px-3 py-2 bg-blue-600 text-white rounded-lg text-[10px] font-bold shadow-md hover:bg-blue-700 transition flex items-center gap-1 flex-shrink-0">
-                        <span>☁️</span> Sync
-                    </button>
-                    <button onclick="toggleImportModal()" class="px-3 py-2 bg-white border border-indigo-100 text-indigo-600 rounded-lg text-[10px] font-bold shadow-sm hover:bg-indigo-50 transition flex items-center gap-1 flex-shrink-0">
-                        <span>📥</span> Import
-                    </button>
-                    <button onclick="exportReport()" class="px-3 py-2 bg-emerald-600 text-white rounded-lg text-[10px] font-bold shadow-lg hover:bg-emerald-700 transition flex items-center gap-1 flex-shrink-0">
-                        <span>📑</span> Laporan
-                    </button>
-                </div>
-            </div>
-
-            <div class="flex justify-between items-end border-t border-slate-100 pt-4">
-                <div class="flex flex-col">
-                    <h1 class="text-lg md:text-2xl font-extrabold tracking-tighter text-slate-900 uppercase leading-none">
-                        DIGITAL <span class="text-indigo-600">LEDGER</span>
-                    </h1>
-                    <div class="flex items-center gap-2 mt-1">
-                        <p id="currentMonth" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest"></p>
-                        <p id="cloudStatus" class="text-[9px] text-slate-400 font-bold">⚪ Local</p>
-                    </div>
-                </div>
-                
-                <div class="text-right flex flex-col items-end">
-                    <div id="rankBadge" class="badge-rank bg-slate-200 text-slate-500 mb-1 scale-90 origin-right">Unranked</div>
-                    <p class="text-[8px] text-slate-400 uppercase font-black tracking-widest">Realized Profit</p>
-                    <h2 id="summaryProfit" class="text-xl font-black text-emerald-600 leading-none">Rp 0</h2>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="card p-4 mb-6 border-l-4 border-indigo-600 relative overflow-hidden group admin-only-view">
-            <div class="flex justify-between items-end mb-2 relative z-10">
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Target Bulan Ini</p>
-                    <h3 id="targetNameDisplay" class="font-black text-slate-800 text-sm cursor-pointer hover:text-indigo-600" onclick="setMonthlyTarget()">Set Your Goal 🎯</h3>
-                </div>
-                <div class="text-right">
-                    <span id="targetPercentage" class="text-2xl font-black text-indigo-600">0%</span>
-                </div>
-            </div>
-            <div class="w-full bg-slate-200 rounded-full h-3 mb-2 relative z-10 overflow-hidden">
-                <div id="progressBar" class="bg-indigo-600 h-3 rounded-full transition-all duration-1000 ease-out relative w-0">
-                     <div class="shimmer-effect"></div>
-                </div>
-            </div>
-            <div class="flex justify-between text-[10px] font-bold text-slate-400 relative z-10">
-                <span id="currentProgressText" class="text-emerald-600">Rp 0</span> 
-                <span id="targetValueDisplay">Target: Rp 0</span>
-            </div>
-            <button onclick="setMonthlyTarget()" class="absolute top-2 right-2 p-1 bg-white/80 rounded hover:bg-white text-slate-400 hover:text-indigo-600 transition opacity-0 group-hover:opacity-100 z-20">⚙️</button>
-        </div>
-
-        <div id="clientBanner" class="hidden mb-6 bg-slate-800 text-white p-6 rounded-2xl shadow-xl border border-slate-700">
-            <h2 class="text-xl font-black text-white mb-1 uppercase">Mode Tamu (Client)</h2>
-            <p class="text-slate-400 text-xs mb-4">Anda hanya dapat melihat stok yang tersedia. Modal dan profit disembunyikan.</p>
-            <div class="p-3 bg-slate-900 rounded-xl border border-dashed border-slate-600 text-[10px] text-slate-400">
-                <strong class="text-orange-400 block mb-1">TIPS:</strong>
-                Ingin mencoba fitur admin? Gunakan mode "Admin Sandbox" di menu. Data sandbox tidak akan disimpan ke cloud owner.
-                <br>
-                <button onclick="enableSandboxMode()" class="mt-2 text-indigo-400 underline font-bold cursor-pointer">Masuk Mode Sandbox (Demo)</button>
-            </div>
-        </div>
-
-        <div id="sandboxBanner" class="hidden mb-6 bg-orange-100 border-l-4 border-orange-500 text-orange-900 p-4 rounded-xl">
-             <h3 class="font-bold text-xs uppercase flex items-center gap-2">⚠️ SANDBOX MODE</h3>
-             <p class="text-[10px]">Anda bebas mengedit/menambah data untuk tes. Data <b>TIDAK</b> akan disinkronkan ke Cloud Owner.</p>
-        </div>
-
-        <div id="admin-dashboard-section" class="admin-only-view">
-            <div class="grid grid-cols-2 gap-4 mb-6">
-                <div class="card p-5 border-b-4 border-indigo-500">
-                    <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Uang Tunai (Cash)</p>
-                    <h2 id="summaryCash" class="text-lg font-bold text-slate-800">Rp 0</h2>
-                </div>
-                <div class="card p-5 border-b-4 border-emerald-500">
-                    <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Total Floating</p>
-                    <h2 id="summaryFloating" class="text-lg font-bold text-slate-800">Rp 0</h2>
-                </div>
-                <div class="card p-6 col-span-2 text-center bg-slate-900 text-white border-none shadow-xl">
-                    <p class="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-widest opacity-80">Unrealized Balance (Total Aset)</p>
-                    <h2 id="summaryTotal" class="text-3xl font-black">Rp 0</h2>
-                </div>
-            </div>
-
-            <div class="card p-6 mb-4">
-                <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2 text-xs uppercase tracking-wider"><span>📝</span> Smart Input Teks</h3>
-                <textarea id="bulkInput" class="input-field h-24 mb-4 text-sm border-dashed" placeholder="Contoh: Poco M3 : 500.000 > 600.000"></textarea>
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="parseText('old')" class="py-3 bg-slate-700 text-white rounded-xl font-bold text-[10px] uppercase hover:bg-slate-800 transition">Stok Lalu [L]</button>
-                    <button onclick="parseText('new')" class="py-3 bg-emerald-600 text-white rounded-xl font-bold text-[10px] uppercase hover:bg-emerald-700 transition">Belanja Baru [B]</button>
-                </div>
-            </div>
-
-            <div class="mb-6 space-y-2">
-                <div class="flex gap-2 overflow-x-auto pb-2">
-                    <button onclick="toggleConfig('configPanel', 'configLabel', '⚙️ Saldo Awal')" id="configLabel" class="flex-shrink-0 text-[10px] font-bold text-indigo-600 bg-indigo-50 px-3 py-2 rounded-lg uppercase tracking-widest">⚙️ Saldo Awal</button>
-                    <button onclick="toggleConfig('extraProfitPanel', 'extraProfitLabel', '📈 Tambah Profit')" id="extraProfitLabel" class="flex-shrink-0 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-3 py-2 rounded-lg uppercase tracking-widest">📈 Tambah Profit</button>
-                    <button onclick="toggleConfig('journalPanel', 'journalLabel', '📓 Owner Journal')" id="journalLabel" class="flex-shrink-0 text-[10px] font-bold text-yellow-600 bg-yellow-50 px-3 py-2 rounded-lg uppercase tracking-widest">📓 Owner Journal</button>
-                </div>
-
-                <div id="configPanel" class="hidden-panel mt-2">
-                    <div class="card p-5 bg-indigo-50/50 border-indigo-100 mb-4">
-                        <h3 class="font-bold text-indigo-900 text-[10px] uppercase mb-2">Modal Tunai di Tangan (Awal Bulan)</h3>
-                        <input type="number" id="startBalance" class="input-field font-black text-lg text-indigo-700" value="0" onchange="calculateAll()">
-                    </div>
-                </div>
-
-                <div id="extraProfitPanel" class="hidden-panel mt-2">
-                    <div class="card p-5 bg-emerald-50 border-emerald-100 mb-4">
-                        <h3 class="font-bold text-emerald-900 text-[10px] uppercase mb-3">Input Barang Terjual Bulan Lalu</h3>
-                        <textarea id="exBulkInput" class="input-field h-20 mb-3 text-xs border-dashed" placeholder="Smart Input: Nama : Modal > Jual (Per baris)"></textarea>
-                        <button onclick="parseExtraProfitText()" class="w-full py-2 bg-indigo-600 text-white rounded-lg font-bold text-[10px] uppercase mb-4">Smart Input Profit</button>
-                        <div id="extraProfitList" class="mt-4 space-y-2 border-t pt-3 border-emerald-200"></div>
-                    </div>
-                </div>
-
-                <div id="journalPanel" class="hidden-panel mt-2">
-                    <div class="card p-5 bg-yellow-50 border-yellow-200 mb-4">
-                        <h3 class="font-bold text-yellow-900 text-[10px] uppercase mb-2">Refleksi & Catatan Harian</h3>
-                        <textarea id="ownerNote" class="w-full h-24 bg-white text-sm text-slate-700 outline-none p-3 rounded-xl border border-yellow-300 resize-none placeholder-slate-400" placeholder="Apa pelajaran bisnis hari ini, Farid? Tulis di sini..." oninput="saveNote()"></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card p-5 bg-slate-800 border-l-4 border-indigo-500 text-white flex justify-between items-center mb-8 shadow-lg">
-                <div>
-                    <h3 class="font-bold text-indigo-300 text-[9px] uppercase tracking-widest opacity-80">Modal Stok Berjalan</h3>
-                    <h2 id="previewModalStock" class="text-xl font-black">Rp 0</h2>
-                </div>
-                <div class="text-right">
-                    <h3 class="font-bold text-emerald-400 text-[9px] uppercase tracking-widest opacity-80">Potensi Untung</h3>
-                    <h2 id="previewUnrealizedProfit" class="text-xl font-black">Rp 0</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="mb-6 space-y-4">
-            <div class="relative">
-                <input type="text" id="searchInput" onkeyup="renderRows()" placeholder="Cari unit..." class="input-field pl-10 text-sm">
-                <span class="absolute left-3 top-3.5 opacity-30 text-lg">🔍</span>
-            </div>
-            <div class="flex bg-slate-200 p-1 rounded-xl gap-1">
-                <button onclick="setFilter('stok')" id="tabStok" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all bg-white text-indigo-600 shadow-sm">Unit Stok</button>
-                <button onclick="setFilter('sold')" id="tabSold" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500">History Terjual</button>
-                <button onclick="setFilter('extra')" id="tabExtra" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500">History Bulan Lalu</button>
-            </div>
-        </div>
-        
-        <div id="itemRows" class="space-y-3 mb-20"></div>
-    </main>
-
-    <div id="page-analytics" class="max-w-2xl mx-auto hidden pt-4 px-4">
-        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali Dashboard</button>
-        <h1 class="text-2xl font-black italic mb-6 text-slate-800">📊 ANALISA PERFORMA TOKO</h1>
-    
-        <div class="grid grid-cols-2 gap-4 mb-6">
-            <div class="card p-4 border-l-4 border-blue-500">
-                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Kecepatan Putaran</p>
-                <h2 id="avgSellTime" class="text-2xl font-black text-slate-800">- Hari</h2>
-                <p class="text-[9px] text-slate-400 italic mt-1">Rata-rata barang laku</p>
-            </div>
-            <div class="card p-4 border-l-4 border-purple-500">
-                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Win Rate Barang</p>
-                <h2 id="winRateStock" class="text-2xl font-black text-slate-800">0%</h2>
-                <p class="text-[9px] text-slate-400 italic mt-1">Rasio Laku vs Stok Diam</p>
-            </div>
-        </div>
-    
-        <div class="card p-5 mb-6">
-            <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Dominasi Brand (Smart Grouping)</h3>
-            <div class="h-64">
-                <canvas id="brandChart"></canvas>
-            </div>
-        </div>
-    
-        <div class="card p-5 mb-6">
-            <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Tren Profit Harian</h3>
-            <div class="h-48">
-                <canvas id="profitTrendChart"></canvas>
-            </div>
-        </div>
-
-        <div class="card p-5 mb-6">
-            <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Performa Profit Per Kuartal</h3>
-            <div class="h-48">
-                <canvas id="quarterlyChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <div id="page-hp" class="max-w-2xl mx-auto hidden pt-4 px-4">
-        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali</button>
-        <h1 class="text-2xl font-black italic mb-6">📱 Handphone Check</h1>
-        <div class="card p-6 space-y-4">
-            <div class="bg-slate-50 p-4 rounded-xl border">
-                <label class="text-[10px] font-bold text-slate-400 uppercase block mb-2 italic">Cek IMEI (imei.info)</label>
-                <div class="flex gap-2">
-                    <input type="number" id="imeiInput" class="input-field text-sm" placeholder="Masukkan 15 digit IMEI...">
-                    <button onclick="directImei()" class="bg-indigo-600 text-white px-6 rounded-xl font-bold text-[10px]">CEK</button>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 gap-2">
-                <button onclick="window.open('https://old.beacukai.go.id/websitenewV2/cek-imei.html')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">Cek IMEI Beacukai <span>🌐</span></button>
-                <button onclick="window.open('https://sickw.com/')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">SICKSW (SN/IMEI) <span>🌐</span></button>
-                <button onclick="window.open('https://www.touchscreentest.com/')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">Touchscreen Test <span>🌐</span></button>
-            </div>
-        </div>
-    </div>
-
-    <div id="page-dial" class="max-w-2xl mx-auto hidden pt-4 px-4">
-        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali</button>
-        <h1 class="text-2xl font-black italic mb-6">🔍 Kode Dial Rahasia</h1>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">SAMSUNG</h3>
-                <p class="text-lg font-mono font-bold">*#0*#</p>
-                <p class="text-[10px] text-slate-500 uppercase">General Test Mode</p>
-            </div>
-            <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">XIAOMI / POCO</h3>
-                <p class="text-lg font-mono font-bold">*#*#64663#*#*</p>
-                <p class="text-[10px] text-slate-500 uppercase">CIT (Hardware Test)</p>
-            </div>
-            <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">OPPO / REALME</h3>
-                <p class="text-lg font-mono font-bold">*#899#</p>
-                <p class="text-[10px] text-slate-500 uppercase">Engineer Mode</p>
-            </div>
-            <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">VIVO / IQOO</h3>
-                <p class="text-lg font-mono font-bold">*#558#</p>
-                <p class="text-[10px] text-slate-500 uppercase">Factory Test</p>
-            </div>
-            <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">IPHONE</h3>
-                <p class="text-lg font-mono font-bold">*3001#12345#*</p>
-                <p class="text-[10px] text-slate-500 uppercase">Field Test</p>
-            </div>
-            <div class="card p-4 dial-card">
-                <h3 class="font-black text-xs text-indigo-600 uppercase mb-2">UNIVERSAL</h3>
-                <p class="text-lg font-mono font-bold">*#06#</p>
-                <p class="text-[10px] text-slate-500 uppercase">Cek IMEI</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="page-laptop" class="max-w-2xl mx-auto hidden pt-4 px-4">
-        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali</button>
-        <h1 class="text-2xl font-black italic mb-6">💻 Laptop Check List</h1>
-        <div class="space-y-4">
-            <div class="card p-5">
-                <h3 class="font-bold text-sm mb-3 text-slate-800">1. Pengecekan Fisik & Layar</h3>
-                <ul class="text-[11px] space-y-2 text-slate-600 uppercase font-bold">
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Cek Engsel & Baut (Pastikan rapat)</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Dead Pixel Test (Buka browser: deadpixeltest.org)</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> White Spot / Jamur pada LCD</li>
-                </ul>
-            </div>
-            <div class="card p-5">
-                <h3 class="font-bold text-sm mb-3 text-slate-800">2. Performa & Baterai</h3>
-                <ul class="text-[11px] space-y-2 text-slate-600 uppercase font-bold">
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> CMD: <code class="bg-slate-100 px-1 lowercase">powercfg /batteryreport</code></li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Cek Kesehatan SSD (Gunakan CrystalDiskInfo)</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Keyboard Test (Buka: keyboardtester.com)</li>
-                </ul>
-            </div>
-            <div class="card p-5">
-                <h3 class="font-bold text-sm mb-3 text-slate-800">3. Konektivitas & Suara</h3>
-                <ul class="text-[11px] space-y-2 text-slate-600 uppercase font-bold">
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Tes Semua Port USB, HDMI, Audio Jack</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Tes Webcam & Mic</li>
-                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Cek Speaker (Pastikan tidak sember)</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <div id="importModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="display: none;">
+        </div> </div> <div id="importModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="display: none;">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="toggleImportModal()"></div>
         <div class="relative bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl">
             <h3 class="text-xl font-black text-indigo-900 uppercase italic mb-4">📥 Import Data</h3>
@@ -701,7 +657,7 @@
                 <input type="number" id="editItemPrice" class="input-field" placeholder="Jual">
                 <div class="bg-slate-50 p-2 rounded-lg border border-slate-200">
                     <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Tanggal Masuk (Manual)</label>
-                    <input type="date" id="editEntryDate" class="input-field mt-1 text-sm">
+                    <input type="date" id="editEntryDate" class="input-field mt-1 text-sm bg-white">
                 </div>
                 <button onclick="saveEditItem()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold mt-2">SIMPAN</button>
             </div>
@@ -735,9 +691,6 @@
         let currentMonthString = '';
         
         // ACCESS CONTROL STATE
-        // 'owner' = full access + cloud
-        // 'client_view' = read only + no modal + no secrets
-        // 'client_demo' = full access UI + NO cloud (local storage sandbox)
         let currentUserMode = 'client_view'; 
         
         // OWNER FEATURE VARIABLES
@@ -1312,37 +1265,37 @@
         // 🔧 MODALS & ACTIONS FUNCTIONS
         // ===============================================
         function openEditModal(id) { 
-    // Cari di array items dulu, jika tidak ada cari di extraProfits
-    let i = items.find(x => x.id === id); 
-    if (!i) {
-        i = extraProfits.find(x => x.id === id);
-    }
-
-    if(!i) return; 
-
-    currentEditId = id; 
-    document.getElementById('editItemName').value = i.name; 
-    // Gunakan 0 jika properti modal tidak ada (untuk data extraProfit lama)
-    document.getElementById('editItemModal').value = i.modal || 0; 
-    document.getElementById('editItemPrice').value = i.price; 
-    
-    try {
-        if (i.entryDate && i.entryDate.includes('/')) {
-            const entryStr = i.entryDate.split(' ')[0]; 
-            const parts = entryStr.split('/');
-            if(parts.length === 3) {
-                const isoDate = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
-                document.getElementById('editEntryDate').value = isoDate;
+            // Cari di array items dulu, jika tidak ada cari di extraProfits
+            let i = items.find(x => x.id === id); 
+            if (!i) {
+                i = extraProfits.find(x => x.id === id);
             }
-        } else {
-            document.getElementById('editEntryDate').value = "";
-        }
-    } catch(e) {
-        console.log("Date parsing error", e);
-    }
 
-    document.getElementById('editModal').style.display = 'flex';
-}
+            if(!i) return; 
+
+            currentEditId = id; 
+            document.getElementById('editItemName').value = i.name; 
+            // Gunakan 0 jika properti modal tidak ada (untuk data extraProfit lama)
+            document.getElementById('editItemModal').value = i.modal || 0; 
+            document.getElementById('editItemPrice').value = i.price; 
+            
+            try {
+                if (i.entryDate && i.entryDate.includes('/')) {
+                    const entryStr = i.entryDate.split(' ')[0]; 
+                    const parts = entryStr.split('/');
+                    if(parts.length === 3) {
+                        const isoDate = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+                        document.getElementById('editEntryDate').value = isoDate;
+                    }
+                } else {
+                    document.getElementById('editEntryDate').value = "";
+                }
+            } catch(e) {
+                console.log("Date parsing error", e);
+            }
+
+            document.getElementById('editModal').style.display = 'flex';
+        }
         
         function closeEditModal() { 
             document.getElementById('editModal').style.display = 'none';
@@ -1350,47 +1303,47 @@
         }
         
         function saveEditItem() {
-    if (!currentEditId) return;
+            if (!currentEditId) return;
 
-    // Cek apakah data yang diedit ada di array items
-    let itemIndex = items.findIndex(i => i.id === currentEditId);
-    let isExtra = false;
+            // Cek apakah data yang diedit ada di array items
+            let itemIndex = items.findIndex(i => i.id === currentEditId);
+            let isExtra = false;
 
-    if (itemIndex === -1) {
-        // Jika tidak ada di items, cek di extraProfits
-        itemIndex = extraProfits.findIndex(i => i.id === currentEditId);
-        isExtra = true;
-    }
+            if (itemIndex === -1) {
+                // Jika tidak ada di items, cek di extraProfits
+                itemIndex = extraProfits.findIndex(i => i.id === currentEditId);
+                isExtra = true;
+            }
 
-    if (itemIndex > -1) {
-        const newName = document.getElementById('editItemName').value;
-        const newModal = Number(document.getElementById('editItemModal').value);
-        const newPrice = Number(document.getElementById('editItemPrice').value);
-        const dateInput = document.getElementById('editEntryDate').value;
+            if (itemIndex > -1) {
+                const newName = document.getElementById('editItemName').value;
+                const newModal = Number(document.getElementById('editItemModal').value);
+                const newPrice = Number(document.getElementById('editItemPrice').value);
+                const dateInput = document.getElementById('editEntryDate').value;
 
-        if (isExtra) {
-            // Update array extraProfits
-            extraProfits[itemIndex].name = newName;
-            extraProfits[itemIndex].modal = newModal;
-            extraProfits[itemIndex].price = newPrice;
-            extraProfits[itemIndex].profit = newPrice - newModal;
-        } else {
-            // Update array items
-            items[itemIndex].name = newName;
-            items[itemIndex].modal = newModal;
-            items[itemIndex].price = newPrice;
-            
-            if(dateInput) {
-                const d = new Date(dateInput);
-                items[itemIndex].entryDate = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} 00:00`;
+                if (isExtra) {
+                    // Update array extraProfits
+                    extraProfits[itemIndex].name = newName;
+                    extraProfits[itemIndex].modal = newModal;
+                    extraProfits[itemIndex].price = newPrice;
+                    extraProfits[itemIndex].profit = newPrice - newModal;
+                } else {
+                    // Update array items
+                    items[itemIndex].name = newName;
+                    items[itemIndex].modal = newModal;
+                    items[itemIndex].price = newPrice;
+                    
+                    if(dateInput) {
+                        const d = new Date(dateInput);
+                        items[itemIndex].entryDate = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} 00:00`;
+                    }
+                }
+
+                calculateAll(); 
+                closeEditModal();
+                alert("Data berhasil diperbarui!");
             }
         }
-
-        calculateAll(); 
-        closeEditModal();
-        alert("Data berhasil diperbarui!");
-    }
-}
         
         function openCostModal(id) { 
             currentCostId = id; 
