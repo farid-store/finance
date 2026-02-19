@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Digital Ledger - Finance Tracker Pro</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* =========================================
+           GLOBAL STYLES & VARIABLES
+           ========================================= */
+        :root { 
+            --bg-main: #f8fafc; 
+            --sidebar-bg: #1e293b; 
+            --accent: #6366f1; 
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-main); 
+            color: #1e293b; 
+            margin: auto; 
+            transition: max-width 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+        /* =========================================
+           COMPONENT STYLES
+           ========================================= */
+        .card { 
+            background: white; 
+            border-radius: 16px; 
+            border: 1px solid #e2e8f0; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); 
+        }
+
+        .input-field { 
+            width: 100%; 
+            padding: 12px; 
+            border-radius: 10px; 
+            border: 1px solid #cbd5e1; 
+            outline: none; 
+            transition: 0.3s; 
+            background: #fdfdfd; 
+        }
+
+        .input-field:focus { 
+            border-color: var(--accent); 
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); 
+        }
+
+        /* =========================================
+           SIDEBAR & NAVIGATION
+           ========================================= */
+        #sidebar { 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            z-index: 50; 
+            height: 100dvh; /* Dynamic Height for mobile browsers */
+        }
+
+        .sidebar-item { 
+            display: flex; 
+            align-items: center; 
+            padding: 12px 16px; 
+            border-radius: 10px; 
+            font-size: 0.875rem; 
+            font-weight: 500; 
+            color: #94a3b8; 
+            transition: 0.2s; 
+            cursor: pointer; 
+        }
+
+        .sidebar-item:hover { 
+            background: #334155; 
+            color: white; 
+        }
+
+        .dropdown-content { 
+            max-height: 0; 
+            overflow: hidden; 
+            transition: max-height 0.3s ease-out; 
+            background: #0f172a; 
+            border-radius: 8px; 
+            margin: 0 8px; 
+        }
+
+        .dropdown-content.show { 
+            max-height: 800px; 
+            margin-bottom: 8px; 
+        }
+
+        /* =========================================
+           UTILITIES & HELPERS
+           ========================================= */
+        .mode-desktop { 
+            max-width: 1000px !important; 
+            border-left: 1px solid #e2e8f0; 
+            border-right: 1px solid #e2e8f0; 
+            background: white; 
+            min-height: 100vh; 
+        }
+
+        .hidden-panel { 
+            display: none; 
+        }
+
+        .badge-profit { 
+            background: #dcfce7; 
+            color: #166534; 
+            padding: 4px 8px; 
+            border-radius: 6px; 
+            font-size: 10px; 
+            font-weight: 700; 
+        }
+
+        /* =========================================
+           CALCULATOR WIDGET
+           ========================================= */
+        .sidebar-calc { 
+            background: #0f172a; 
+            border-radius: 20px; 
+            padding: 15px; 
+            margin: 15px 10px; 
+            border: 1px solid #334155; 
+        }
+
+        .calc-display { 
+            text-align: right; 
+            margin-bottom: 10px; 
+            padding: 8px; 
+            background: #1e293b; 
+            border-radius: 10px; 
+        }
+
+        #calc-prev { 
+            color: #64748b; 
+            font-size: 10px; 
+            min-height: 14px; 
+        }
+
+        #calc-curr { 
+            color: white; 
+            font-size: 18px; 
+            font-weight: 700; 
+        }
+
+        .calc-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 6px; 
+        }
+
+        .calc-grid button { 
+            height: 35px; 
+            border-radius: 8px; 
+            border: none; 
+            font-size: 12px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            background: #334155; 
+            color: white; 
+        }
+
+        .calc-grid button:hover { 
+            background: #475569; 
+        }
+
+        .calc-grid .btn-op { color: #818cf8; }
+        .calc-grid .btn-eq { background: #6366f1 !important; grid-column: span 2; }
+        .calc-grid .btn-ac { color: #f87171; }
+
+        /* =========================================
+           OWNER FEATURES & ANIMATIONS
+           ========================================= */
+        .dial-card { border-left: 4px solid var(--accent); }
+        .client-item-card { border: none !important; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.04) !important; padding: 20px !important; }
+        
+        .badge-rank { 
+            font-size: 10px; 
+            font-weight: 800; 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            float: right;
+        }
+
+        @keyframes shimmer { 
+            100% { transform: translateX(100%); } 
+        }
+
+        .shimmer-effect { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent); 
+            transform: translateX(-100%); 
+            animation: shimmer 2s infinite; 
+        }
+
+        /* AGING INDICATORS */
+        .border-safe { border-left: 4px solid #10b981 !important; } 
+        .border-warning { border-left: 4px solid #f59e0b !important; background: #fffbeb !important; } 
+        .border-danger { border-left: 4px solid #ef4444 !important; background: #fef2f2 !important; } 
+
+        /* LOADING OVERLAY (CLOUD) */
+        #loadingCloud { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(255,255,255,0.9); 
+            z-index: 100; 
+            display: none; 
+            justify-content: center; 
+            align-items: center; 
+            flex-direction: column; 
+            backdrop-filter: blur(4px); 
+        }
+
+        /* =========================================
+           MODAL STYLES (CENTERED MOBILE)
+           ========================================= */
+        #authModal, #importModal, #editModal, #costModal {
+            position: fixed;
+            inset: 0;
+            z-index: 60; /* Higher than sidebar */
+            background: rgba(15, 23, 42, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        
+        .modal-content {
+            width: 100%;
+            max-width: 24rem;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .blur-sensitive {
+            filter: blur(4px);
+            user-select: none;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="p-3 md:p-8 antialiased min-h-screen bg-slate-50 pb-24 lg:pb-8">
+
+    <div id="authModal">
+        <div class="bg-white p-6 md:p-8 rounded-3xl shadow-2xl w-full max-w-sm text-center relative overflow-hidden modal-content">
+            <div class="absolute top-0 left-0 w-full h-2 bg-indigo-600"></div>
+            <h2 class="text-xl md:text-2xl font-black text-slate-800 mb-2 uppercase italic">Security Check</h2>
+            <p class="text-xs text-slate-500 mb-6">Masukkan PIN Owner untuk akses penuh & sinkronisasi.</p>
+            
+            <input type="tel" id="pinInput" class="input-field text-center text-2xl font-black tracking-[10px] mb-4" placeholder="••••••" maxlength="6">
+            
+            <button onclick="checkPin()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold uppercase shadow-lg hover:bg-indigo-700 transition mb-3">
+                Buka Akses Owner
+            </button>
+            
+            <div class="relative flex py-2 items-center">
+                <div class="flex-grow border-t border-gray-200"></div>
+                <span class="flex-shrink-0 mx-4 text-gray-300 text-[10px] uppercase">Atau</span>
+                <div class="flex-grow border-t border-gray-200"></div>
+            </div>
+
+            <button onclick="enterClientMode()" class="w-full py-2 bg-slate-100 text-slate-500 rounded-xl font-bold text-xs hover:bg-slate-200 transition">
+                Masuk sebagai Client / Tamu
+            </button>
+        </div>
+    </div>
+
+    <div id="loadingCloud">
+        <div class="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <span id="loadingText" class="text-sm font-bold text-slate-700 uppercase tracking-widest">Menghubungkan ke Cloud...</span>
+    </div>
+
+    <div id="overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-40" onclick="toggleSidebar()"></div>
+
+    <aside id="sidebar" class="fixed top-0 left-0 w-72 bg-[#1e293b] text-white shadow-2xl flex flex-col -translate-x-full lg:translate-x-0 overflow-y-auto">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-xl font-extrabold flex items-center gap-3 italic tracking-tight">
+                    <span class="bg-indigo-600 p-2 rounded-lg not-italic">📱</span> MENU
+                </h2>
+                <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white">✕</button>
+            </div>
+
+            <nav class="space-y-2">
+                <div onclick="switchPage('main')" class="sidebar-item hover:bg-indigo-600 hover:text-white transition">
+                    <span class="mr-3 text-lg">📊</span> Dashboard Utama
+                </div>
+                <div onclick="switchPage('analytics')" class="sidebar-item hover:bg-indigo-600 hover:text-white transition">
+                    <span class="mr-3 text-lg">📈</span> Analisa Bisnis
+                </div>
+                <div>
+                    <div onclick="toggleDropdown('dropCheck')" class="sidebar-item justify-between">
+                        <span class="flex items-center"><span class="mr-3 text-lg">🔍</span> Gadget Check</span>
+                        <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                    <div id="dropCheck" class="dropdown-content">
+                        <div onclick="switchPage('hp')" class="sidebar-item text-xs pl-12">Handphone Check</div>
+                        <div onclick="switchPage('dial')" class="sidebar-item text-xs pl-12">Dial Check (Kode)</div>
+                        <div onclick="switchPage('laptop')" class="sidebar-item text-xs pl-12">Laptop Check</div>
+                    </div>
+                </div>
+                <div>
+                    <div onclick="toggleDropdown('dropWarranty')" class="sidebar-item justify-between">
+                        <span class="flex items-center"><span class="mr-3 text-lg">🛡️</span> Cek Garansi Resmi</span>
+                        <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                    <div id="dropWarranty" class="dropdown-content">
+                        <a href="https://www.mi.com/global/verify/#/en/tab/imei" target="_blank" class="sidebar-item text-xs pl-12">Xiaomi Official</a>
+                        <a href="https://www.realme.com/sa-en/support/phonecheck" target="_blank" class="sidebar-item text-xs pl-12">Realme Official</a>
+                        <a href="https://www.vivo.com/en/support/IMEI" target="_blank" class="sidebar-item text-xs pl-12">Vivo Official</a>
+                        <a href="https://support.oppo.com/en/warranty-check/" target="_blank" class="sidebar-item text-xs pl-12">OPPO Official</a>
+                        <a href="https://checkcoverage.apple.com/" target="_blank" class="sidebar-item text-xs pl-12 font-bold text-indigo-400">Apple Official</a>
+                        <a href="https://www.samsung.com/us/support/warranty/" target="_blank" class="sidebar-item text-xs pl-12">Samsung Official</a>
+                    </div>
+                </div>
+                
+                <div class="border-t border-slate-700 my-4"></div>
+                
+                <div class="sidebar-calc">
+                    <div class="calc-display">
+                        <div id="calc-prev"></div>
+                        <div id="calc-curr">0</div>
+                    </div>
+                    <div class="calc-grid">
+                        <button class="btn-ac" onclick="calcClear()">AC</button>
+                        <button onclick="calcDel()">DEL</button>
+                        <button onclick="calcPerc()">%</button> 
+                        <button class="btn-op" onclick="calcOp('/')">÷</button>
+                        <button onclick="calcNum('7')">7</button>
+                        <button onclick="calcNum('8')">8</button>
+                        <button onclick="calcNum('9')">9</button>
+                        <button class="btn-op" onclick="calcOp('*')">×</button>
+                        <button onclick="calcNum('4')">4</button>
+                        <button onclick="calcNum('5')">5</button>
+                        <button onclick="calcNum('6')">6</button>
+                        <button class="btn-op" onclick="calcOp('-')">-</button>
+                        <button onclick="calcNum('1')">1</button>
+                        <button onclick="calcNum('2')">2</button>
+                        <button onclick="calcNum('3')">3</button>
+                        <button class="btn-op" onclick="calcOp('+')">+</button>
+                        <button onclick="calcNum('0')">0</button>
+                        <button onclick="calcNum('.')">.</button>
+                        <button class="btn-eq" onclick="calcResult()" style="grid-column: span 2;">=</button>
+                    </div>
+                </div>
+
+                <div id="admin-sidebar-tools">
+                    <button onclick="toggleHelpModal()" class="sidebar-item w-full bg-slate-800/50 mb-2">📖 Panduan</button>
+                    <button onclick="clearData()" class="sidebar-item w-full text-red-400 hover:text-red-300 italic">🗑️ Hapus Semua Data</button>
+                </div>
+            </nav>
+
+            <div class="mt-8 pb-8">
+                <p class="text-[10px] text-slate-500 font-bold uppercase mb-3 tracking-widest">Access Mode</p>
+                <div class="flex bg-slate-900 p-1 rounded-xl gap-1">
+                    <button id="btnAccessIndicator" class="flex-1 py-2 rounded-lg text-[10px] font-black bg-slate-700 text-slate-400 cursor-default">
+                        LOCKED
+                    </button>
+                </div>
+                <div class="mt-4">
+                    <p class="text-[10px] text-slate-500 font-bold uppercase mb-3 tracking-widest">View Mode</p>
+                    <div class="flex bg-slate-900 p-1 rounded-xl gap-1">
+                        <button onclick="setView('mobile')" id="btnMob" class="flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white">MOBILE</button>
+                        <button onclick="setView('desktop')" id="btnDesk" class="flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500">DESKTOP</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main id="page-main" class="max-w-3xl mx-auto w-full">
+        
+        <div class="flex flex-col gap-4 bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-slate-200 mb-6">
+            
+            <div class="flex items-center justify-between w-full">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebar()" class="lg:hidden p-2 bg-slate-50 rounded-xl border border-slate-200 text-indigo-600 font-bold px-3 transition active:scale-95">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-extrabold tracking-tighter text-slate-900 uppercase leading-none">
+                            DIGITAL <span class="text-indigo-600">LEDGER</span>
+                        </h1>
+                        <div class="flex items-center gap-2 mt-1">
+                            <p id="currentMonth" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"></p>
+                            <p id="cloudStatus" class="text-[10px] text-slate-400 font-bold">⚪ Local</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-right flex flex-col items-end">
+                    <div id="rankBadge" class="badge-rank bg-slate-200 text-slate-500 mb-1 scale-90 origin-right">Unranked</div>
+                    <p class="text-[9px] text-slate-400 uppercase font-black tracking-widest">Realized Profit</p>
+                    <h2 id="summaryProfit" class="text-xl md:text-2xl font-black text-emerald-600 leading-none">Rp 0</h2>
+                </div>
+            </div>
+
+            <div class="w-full overflow-x-auto no-scrollbar admin-only-view border-t border-slate-100 pt-3">
+                <div class="flex gap-2 min-w-max">
+                    <button onclick="emergencyRescue()" class="px-3 py-2 bg-red-600 text-white rounded-lg text-[10px] font-bold shadow-md hover:bg-red-700 transition flex items-center gap-1 animate-pulse">
+                        <span>🆘</span> Rescue
+                    </button>
+                    <button onclick="forceSync()" class="px-3 py-2 bg-blue-600 text-white rounded-lg text-[10px] font-bold shadow-md hover:bg-blue-700 transition flex items-center gap-1">
+                        <span>☁️</span> Sync
+                    </button>
+                    <button onclick="toggleImportModal()" class="px-3 py-2 bg-white border border-indigo-100 text-indigo-600 rounded-lg text-[10px] font-bold shadow-sm hover:bg-indigo-50 transition flex items-center gap-1">
+                        <span>📥</span> Import
+                    </button>
+                    <button onclick="exportReport()" class="px-3 py-2 bg-emerald-600 text-white rounded-lg text-[10px] font-bold shadow-lg hover:bg-emerald-700 transition flex items-center gap-1">
+                        <span>📑</span> Laporan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4 border-l-4 border-indigo-600 relative overflow-hidden group admin-only-view">
+            <div class="flex justify-between items-end mb-2 relative z-10">
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Target Bulan Ini</p>
+                    <h3 id="targetNameDisplay" class="font-black text-slate-800 text-sm cursor-pointer hover:text-indigo-600 truncate max-w-[200px]" onclick="setMonthlyTarget()">Set Your Goal 🎯</h3>
+                </div>
+                <div class="text-right">
+                    <span id="targetPercentage" class="text-xl md:text-2xl font-black text-indigo-600">0%</span>
+                </div>
+            </div>
+            <div class="w-full bg-slate-200 rounded-full h-3 mb-2 relative z-10 overflow-hidden">
+                <div id="progressBar" class="bg-indigo-600 h-3 rounded-full transition-all duration-1000 ease-out relative w-0">
+                     <div class="shimmer-effect"></div>
+                </div>
+            </div>
+            <div class="flex justify-between text-[10px] font-bold text-slate-400 relative z-10">
+                <span id="currentProgressText" class="text-emerald-600">Rp 0</span> 
+                <span id="targetValueDisplay">Target: Rp 0</span>
+            </div>
+            <button onclick="setMonthlyTarget()" class="absolute top-2 right-2 p-1 bg-white/80 rounded hover:bg-white text-slate-400 hover:text-indigo-600 transition z-20">⚙️</button>
+        </div>
+
+        <div id="clientBanner" class="hidden mb-6 bg-slate-800 text-white p-6 rounded-2xl shadow-xl border border-slate-700">
+            <h2 class="text-xl font-black text-white mb-1 uppercase">Mode Tamu (Client)</h2>
+            <p class="text-slate-400 text-xs mb-4">Anda hanya dapat melihat stok yang tersedia.</p>
+            <div class="p-3 bg-slate-900 rounded-xl border border-dashed border-slate-600 text-[10px] text-slate-400">
+                <button onclick="enableSandboxMode()" class="text-indigo-400 underline font-bold cursor-pointer">Masuk Mode Sandbox (Demo)</button>
+            </div>
+        </div>
+
+        <div id="sandboxBanner" class="hidden mb-6 bg-orange-100 border-l-4 border-orange-500 text-orange-900 p-4 rounded-xl">
+             <h3 class="font-bold text-xs uppercase flex items-center gap-2">⚠️ SANDBOX MODE</h3>
+             <p class="text-[10px]">Data <b>TIDAK</b> akan disinkronkan ke Cloud Owner.</p>
+        </div>
+
+        <div id="admin-dashboard-section" class="admin-only-view">
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="card p-4 border-b-4 border-indigo-500">
+                    <p class="text-[9px] text-slate-400 uppercase font-bold mb-1">Uang Tunai</p>
+                    <h2 id="summaryCash" class="text-base md:text-lg font-bold text-slate-800">Rp 0</h2>
+                </div>
+                <div class="card p-4 border-b-4 border-emerald-500">
+                    <p class="text-[9px] text-slate-400 uppercase font-bold mb-1">Total Floating</p>
+                    <h2 id="summaryFloating" class="text-base md:text-lg font-bold text-slate-800">Rp 0</h2>
+                </div>
+                <div class="card p-4 col-span-2 text-center bg-slate-900 text-white border-none shadow-xl">
+                    <p class="text-[9px] text-slate-400 uppercase font-bold mb-1 tracking-widest opacity-80">Total Aset (Unrealized)</p>
+                    <h2 id="summaryTotal" class="text-2xl md:text-3xl font-black">Rp 0</h2>
+                </div>
+            </div>
+
+            <div class="card p-4 mb-4">
+                <h3 class="font-bold text-slate-800 mb-2 flex items-center gap-2 text-xs uppercase tracking-wider"><span>📝</span> Smart Input Teks</h3>
+                <textarea id="bulkInput" class="input-field h-24 mb-3 text-sm border-dashed font-mono" placeholder="Format: Nama : Modal > Jual&#10;Contoh: Poco M3 : 500000 > 600000"></textarea>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="parseText('old')" class="py-3 bg-slate-700 text-white rounded-xl font-bold text-[10px] uppercase hover:bg-slate-800 transition">Stok Lalu [L]</button>
+                    <button onclick="parseText('new')" class="py-3 bg-emerald-600 text-white rounded-xl font-bold text-[10px] uppercase hover:bg-emerald-700 transition">Belanja Baru [B]</button>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+                    <button onclick="toggleConfig('configPanel', 'configLabel', '⚙️ Saldo Awal')" id="configLabel" class="flex-shrink-0 text-[10px] font-bold text-indigo-600 bg-indigo-50 px-4 py-3 rounded-lg uppercase tracking-widest border border-indigo-100">⚙️ Saldo Awal</button>
+                    <button onclick="toggleConfig('extraProfitPanel', 'extraProfitLabel', '📈 Tambah Profit')" id="extraProfitLabel" class="flex-shrink-0 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-4 py-3 rounded-lg uppercase tracking-widest border border-emerald-100">📈 Tambah Profit</button>
+                    <button onclick="toggleConfig('journalPanel', 'journalLabel', '📓 Owner Journal')" id="journalLabel" class="flex-shrink-0 text-[10px] font-bold text-yellow-600 bg-yellow-50 px-4 py-3 rounded-lg uppercase tracking-widest border border-yellow-100">📓 Journal</button>
+                </div>
+
+                <div id="configPanel" class="hidden-panel mt-2">
+                    <div class="card p-4 bg-indigo-50/50 border-indigo-100 mb-4">
+                        <h3 class="font-bold text-indigo-900 text-[10px] uppercase mb-2">Modal Tunai Awal Bulan</h3>
+                        <input type="number" id="startBalance" class="input-field font-black text-lg text-indigo-700" value="0" onchange="calculateAll()">
+                    </div>
+                </div>
+
+                <div id="extraProfitPanel" class="hidden-panel mt-2">
+                    <div class="card p-4 bg-emerald-50 border-emerald-100 mb-4">
+                        <h3 class="font-bold text-emerald-900 text-[10px] uppercase mb-3">Input Barang Terjual Bulan Lalu</h3>
+                        <textarea id="exBulkInput" class="input-field h-20 mb-3 text-xs border-dashed" placeholder="Smart Input: Nama : Modal > Jual (Per baris)"></textarea>
+                        <button onclick="parseExtraProfitText()" class="w-full py-2 bg-indigo-600 text-white rounded-lg font-bold text-[10px] uppercase mb-4">Smart Input Profit</button>
+                        <div id="extraProfitList" class="mt-2 space-y-2 border-t pt-3 border-emerald-200"></div>
+                    </div>
+                </div>
+
+                <div id="journalPanel" class="hidden-panel mt-2">
+                    <div class="card p-4 bg-yellow-50 border-yellow-200 mb-4">
+                        <textarea id="ownerNote" class="w-full h-24 bg-white text-sm text-slate-700 outline-none p-3 rounded-xl border border-yellow-300 resize-none placeholder-slate-400" placeholder="Apa pelajaran bisnis hari ini, Farid?" oninput="saveNote()"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-4 bg-slate-800 border-l-4 border-indigo-500 text-white flex justify-between items-center mb-6 shadow-lg">
+                <div>
+                    <h3 class="font-bold text-indigo-300 text-[9px] uppercase tracking-widest opacity-80">Stok Berjalan</h3>
+                    <h2 id="previewModalStock" class="text-lg font-black">Rp 0</h2>
+                </div>
+                <div class="text-right">
+                    <h3 class="font-bold text-emerald-400 text-[9px] uppercase tracking-widest opacity-80">Potensi Untung</h3>
+                    <h2 id="previewUnrealizedProfit" class="text-lg font-black">Rp 0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-6 space-y-3 sticky top-0 z-30 bg-slate-50 py-2">
+            <div class="relative">
+                <input type="text" id="searchInput" onkeyup="renderRows()" placeholder="Cari unit..." class="input-field pl-10 text-sm shadow-sm">
+                <span class="absolute left-3 top-3.5 opacity-30 text-lg">🔍</span>
+            </div>
+            <div class="flex bg-slate-200 p-1 rounded-xl gap-1">
+                <button onclick="setFilter('stok')" id="tabStok" class="flex-1 py-2 rounded-lg text-[10px] font-black uppercase transition-all bg-white text-indigo-600 shadow-sm">Stok</button>
+                <button onclick="setFilter('sold')" id="tabSold" class="flex-1 py-2 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500">Terjual</button>
+                <button onclick="setFilter('extra')" id="tabExtra" class="flex-1 py-2 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500">History</button>
+            </div>
+        </div>
+        
+        <div id="itemRows" class="space-y-3 mb-24"></div>
+    </main>
+
+    <div id="page-analytics" class="max-w-2xl mx-auto hidden pt-20 px-4 md:px-0">
+        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase flex items-center gap-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            Kembali
+        </button>
+        <h1 class="text-2xl font-black italic mb-6 text-slate-800">📊 ANALISA TOKO</h1>
+    
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="card p-4 border-l-4 border-blue-500">
+                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Putaran</p>
+                <h2 id="avgSellTime" class="text-xl font-black text-slate-800">- Hari</h2>
+            </div>
+            <div class="card p-4 border-l-4 border-purple-500">
+                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Win Rate</p>
+                <h2 id="winRateStock" class="text-xl font-black text-slate-800">0%</h2>
+            </div>
+        </div>
+    
+        <div class="card p-4 mb-6">
+            <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Dominasi Brand</h3>
+            <div class="h-64 relative">
+                <canvas id="brandChart"></canvas>
+            </div>
+        </div>
+    
+        <div class="card p-4 mb-6">
+            <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Tren Profit Harian</h3>
+            <div class="h-48 relative">
+                <canvas id="profitTrendChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-6">
+            <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Profit Per Kuartal</h3>
+            <div class="h-48 relative">
+                <canvas id="quarterlyChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-hp" class="max-w-2xl mx-auto hidden pt-20 px-4">
+        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali</button>
+        <h1 class="text-2xl font-black italic mb-6">📱 Handphone Check</h1>
+        <div class="card p-6 space-y-4">
+            <div class="bg-slate-50 p-4 rounded-xl border">
+                <label class="text-[10px] font-bold text-slate-400 uppercase block mb-2 italic">Cek IMEI (imei.info)</label>
+                <div class="flex gap-2">
+                    <input type="number" id="imeiInput" class="input-field text-sm" placeholder="15 digit IMEI...">
+                    <button onclick="directImei()" class="bg-indigo-600 text-white px-4 rounded-xl font-bold text-[10px]">CEK</button>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-2">
+                <button onclick="window.open('https://old.beacukai.go.id/websitenewV2/cek-imei.html')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">Cek IMEI Beacukai <span>🌐</span></button>
+                <button onclick="window.open('https://sickw.com/')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">SICKSW (SN/IMEI) <span>🌐</span></button>
+                <button onclick="window.open('https://www.touchscreentest.com/')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">Touchscreen Test <span>🌐</span></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-dial" class="max-w-2xl mx-auto hidden pt-20 px-4">
+        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali</button>
+        <h1 class="text-2xl font-black italic mb-6">🔍 Kode Dial Rahasia</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div class="card p-4 dial-card"><h3 class="font-black text-xs text-indigo-600 uppercase mb-1">SAMSUNG</h3><p class="text-lg font-mono font-bold">*#0*#</p></div>
+            <div class="card p-4 dial-card"><h3 class="font-black text-xs text-indigo-600 uppercase mb-1">XIAOMI</h3><p class="text-lg font-mono font-bold">*#*#64663#*#*</p></div>
+            <div class="card p-4 dial-card"><h3 class="font-black text-xs text-indigo-600 uppercase mb-1">OPPO</h3><p class="text-lg font-mono font-bold">*#899#</p></div>
+            <div class="card p-4 dial-card"><h3 class="font-black text-xs text-indigo-600 uppercase mb-1">VIVO</h3><p class="text-lg font-mono font-bold">*#558#</p></div>
+            <div class="card p-4 dial-card"><h3 class="font-black text-xs text-indigo-600 uppercase mb-1">IPHONE</h3><p class="text-lg font-mono font-bold">*3001#12345#*</p></div>
+        </div>
+    </div>
+
+    <div id="page-laptop" class="max-w-2xl mx-auto hidden pt-20 px-4">
+        <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali</button>
+        <h1 class="text-2xl font-black italic mb-6">💻 Laptop Check</h1>
+        <div class="space-y-4">
+            <div class="card p-4">
+                <h3 class="font-bold text-sm mb-3 text-slate-800">1. Pengecekan Fisik</h3>
+                <ul class="text-[11px] space-y-2 text-slate-600 uppercase font-bold">
+                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Engsel & Baut</li>
+                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Dead Pixel / Whitespot</li>
+                </ul>
+            </div>
+            <div class="card p-4">
+                <h3 class="font-bold text-sm mb-3 text-slate-800">2. Software Check</h3>
+                <ul class="text-[11px] space-y-2 text-slate-600 uppercase font-bold">
+                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Battery Report (CMD)</li>
+                    <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Keyboard Tester</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="importModal" class="hidden">
+        <div class="relative bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl modal-content">
+            <h3 class="text-xl font-black text-indigo-900 uppercase italic mb-4">📥 Import Data</h3>
+            <textarea id="importArea" class="input-field h-40 mb-4 text-[11px] font-mono" placeholder="Paste data JSON..."></textarea>
+            <div class="flex gap-2">
+                <button onclick="toggleImportModal()" class="flex-1 py-3 bg-slate-200 text-slate-600 rounded-xl font-bold">BATAL</button>
+                <button onclick="processImport()" class="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-bold">RESTORE</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="editModal" class="hidden">
+        <div class="relative bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl modal-content">
+            <h3 class="text-lg font-black text-slate-800 uppercase italic mb-4">✏️ Edit Barang</h3>
+            <div class="space-y-3">
+                <input type="text" id="editItemName" class="input-field" placeholder="Nama">
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="number" id="editItemModal" class="input-field" placeholder="Modal">
+                    <input type="number" id="editItemPrice" class="input-field" placeholder="Jual">
+                </div>
+                <div class="bg-slate-50 p-2 rounded-lg border border-slate-200">
+                    <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Tanggal Masuk</label>
+                    <input type="date" id="editEntryDate" class="input-field mt-1 text-sm">
+                </div>
+                <div class="flex gap-2 mt-4">
+                    <button onclick="closeEditModal()" class="flex-1 py-3 bg-slate-200 text-slate-600 rounded-xl font-bold">BATAL</button>
+                    <button onclick="saveEditItem()" class="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-bold">SIMPAN</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="costModal" class="hidden">
+        <div class="relative bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl modal-content">
+            <h3 class="text-lg font-black text-slate-800 uppercase italic mb-2">🛠️ Tambah Biaya</h3>
+            <input type="text" id="costDesc" class="input-field mt-1 mb-2" placeholder="Ket (cth: Ganti LCD)">
+            <input type="number" id="costAmount" class="input-field mt-1 mb-4" placeholder="Biaya (Rp)">
+            <div class="flex gap-2">
+                <button onclick="closeCostModal()" class="flex-1 py-3 bg-slate-200 text-slate-600 rounded-xl font-bold">BATAL</button>
+                <button onclick="saveCost()" class="flex-1 py-3 bg-orange-500 text-white rounded-xl font-bold">TAMBAH</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===============================================
+        // ☁️ KONFIGURASI CLOUD & SECURITY
+        // ===============================================
+        const BIN_ID = '699644fdae596e708f3582af'; 
+        const API_KEY = '$2a$10$tcKHEWwuz2sqRoMCKJfga.1xxTFW0RxpXUPnP.NI4YbivtlK1xxau'; 
+        const OWNER_PIN = '011204';
+        
+        let items = [];
+        let extraProfits = [];
+        let currentFilter = 'stok';
+        let currentMonthString = '';
+        let currentUserMode = 'client_view'; 
+        let targetGoal = 25000000; 
+        let targetName = "BEP Modal 25 Juta";
+        
+        let brandChartInstance = null;
+        let trendChartInstance = null;
+        let quarterlyChartInstance = null;
+        let currentEditId = null;
+        let currentCostId = null;
+        
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+        function checkPin() {
+            const input = document.getElementById('pinInput').value;
+            if (input === OWNER_PIN) {
+                currentUserMode = 'owner';
+                document.getElementById('authModal').style.display = 'none';
+                const btnInd = document.getElementById('btnAccessIndicator');
+                btnInd.innerText = "OWNER MODE";
+                btnInd.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white cursor-default";
+                document.getElementById('cloudStatus').innerText = "⚪ Owner Mode";
+                updateUIForMode();
+                loadData(); 
+            } else {
+                alert("PIN Salah! Akses ditolak.");
+                document.getElementById('pinInput').value = '';
+            }
+        }
+
+        function enterClientMode() {
+            currentUserMode = 'client_view';
+            document.getElementById('authModal').style.display = 'none';
+            const btnInd = document.getElementById('btnAccessIndicator');
+            btnInd.innerText = "CLIENT MODE";
+            btnInd.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-slate-600 text-white cursor-default";
+            updateUIForMode();
+            loadData();
+        }
+
+        function enableSandboxMode() {
+            if(confirm("Masuk Mode Demo Admin?\n\nAnda bisa edit/tambah data, tapi TIDAK AKAN DISIMPAN KE CLOUD OWNER.")) {
+                currentUserMode = 'client_demo';
+                document.getElementById('clientBanner').classList.add('hidden');
+                document.getElementById('sandboxBanner').classList.remove('hidden');
+                const btnInd = document.getElementById('btnAccessIndicator');
+                btnInd.innerText = "SANDBOX ADMIN";
+                btnInd.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-orange-500 text-white cursor-default";
+                document.getElementById('cloudStatus').innerText = "⚪ Local Sandbox";
+                updateUIForMode();
+            }
+        }
+
+        function updateUIForMode() {
+            const adminContent = document.querySelectorAll('.admin-only-view');
+            const clientBanner = document.getElementById('clientBanner');
+            
+            if (currentUserMode === 'client_view') {
+                adminContent.forEach(el => el.classList.add('hidden'));
+                clientBanner.classList.remove('hidden');
+            } else {
+                adminContent.forEach(el => el.classList.remove('hidden'));
+                clientBanner.classList.add('hidden');
+            }
+            renderRows();
+        }
+
+        function emergencyRescue() {
+            const rawData = localStorage.getItem('ledger_v2_final');
+            if (rawData) {
+                const blob = new Blob([rawData], {type: "application/json"});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = "RESCUE_DATA_FARID_STORE.json";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                alert("✅ Data berhasil diselamatkan!");
+            } else {
+                alert("⚠️ Data LocalStorage Kosong!");
+            }
+        }
+
+        async function loadData() {
+            const localData = JSON.parse(localStorage.getItem('ledger_v2_final'));
+            if (localData) {
+                applyData(localData);
+            }
+        }
+
+        async function forceSync() {
+            if (currentUserMode !== 'owner') return alert("⛔ AKSES DITOLAK: Hanya untuk Owner.");
+            
+            const choice = prompt("Ketik 'UP' untuk Upload Data Lokal ke Cloud.\nKetik 'DOWN' untuk Tarik Data Cloud ke Lokal.");
+            document.getElementById('loadingCloud').style.display = 'flex';
+            
+            try {
+                if(choice && choice.toUpperCase() === 'UP') {
+                    await saveDataToCloud();
+                    alert("Data Lokal berhasil di-upload ke Cloud!");
+                } else if (choice && choice.toUpperCase() === 'DOWN') {
+                    const req = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': API_KEY } });
+                    const res = await req.json();
+                    if(res.record) {
+                        applyData(res.record);
+                        localStorage.setItem('ledger_v2_final', JSON.stringify(res.record)); 
+                        alert("Data Cloud berhasil ditarik!");
+                    }
+                }
+            } catch(e) {
+                alert("Error koneksi Cloud: " + e.message);
+            } finally {
+                document.getElementById('loadingCloud').style.display = 'none';
+            }
+        }
+
+        async function saveDataToCloud() {
+            if (currentUserMode !== 'owner') return; 
+            const dataState = { startBalance: document.getElementById('startBalance').value, items, extraProfits, targetGoal, targetName };
+            await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+                body: JSON.stringify(dataState)
+            });
+        }
+
+        function applyData(data) {
+            if (data) {
+                document.getElementById('startBalance').value = data.startBalance || 0;
+                items = data.items || [];
+                extraProfits = data.extraProfits || [];
+                targetGoal = data.targetGoal || 25000000;
+                targetName = data.targetName || "BEP Modal 25 Juta";
+                calculateAll(false);
+            }
+            document.getElementById('ownerNote').value = localStorage.getItem('ledger_owner_note') || "";
+        }
+
+        function toggleSidebar() { 
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('overlay');
+            sb.classList.toggle('-translate-x-full');
+            ov.classList.toggle('hidden');
+        }
+
+        function toggleDropdown(id) { document.getElementById(id).classList.toggle('show'); }
+
+        function toggleConfig(panelId, labelId, originalText) { 
+            const panel = document.getElementById(panelId);
+            const label = document.getElementById(labelId);
+            panel.classList.toggle('hidden-panel');
+            label.innerText = panel.classList.contains('hidden-panel') ? originalText : "✖ Tutup";
+        }
+
+        function switchPage(page) {
+            const pages = ['page-main', 'page-hp', 'page-laptop', 'page-dial', 'page-analytics'];
+            pages.forEach(p => { const el = document.getElementById(p); if(el) el.classList.add('hidden'); });
+            const target = document.getElementById('page-' + page); 
+            if(target) target.classList.remove('hidden');
+            if(window.innerWidth < 1024) {
+                 const sb = document.getElementById('sidebar');
+                 if(!sb.classList.contains('-translate-x-full')) toggleSidebar(); 
+            }
+            window.scrollTo(0,0);
+            if(page === 'analytics') renderAnalytics();
+        }
+        
+        let cInput = '0', cPrev = '', cOp = null;
+        function formatDisplay(n) {
+            if (!n || n === '-') return n;
+            const p = n.split('.');
+            p[0] = parseFloat(p[0]).toLocaleString('id-ID');
+            return p.length > 1 ? p[0] + ',' + p[1] : p[0];
+        }
+        function calcNum(n) { if (n === '.' && cInput.includes('.')) return; cInput = (cInput === '0' && n !== '.') ? n : cInput + n; calcUpd(); }
+        function calcOp(op) { if (cInput === '') return; if (cPrev !== '') calcResult(); cOp = op; cPrev = cInput; cInput = ''; calcUpd(); }
+        function calcPerc() { if (cInput === '0' || cInput === '') return; cInput = (parseFloat(cInput) / 100).toString(); calcUpd(); }
+        function calcClear() { cInput = '0'; cPrev = ''; cOp = null; calcUpd(); }
+        function calcDel() { cInput = cInput.toString().slice(0, -1) || '0'; calcUpd(); }
+        function calcUpd() { document.getElementById('calc-curr').innerText = formatDisplay(cInput); document.getElementById('calc-prev').innerText = cPrev ? formatDisplay(cPrev) + (cOp || '') : ''; }
+        function calcResult() {
+            let r; const p = parseFloat(cPrev); const c = parseFloat(cInput);
+            if (isNaN(p) || isNaN(c)) return;
+            switch (cOp) { case '+': r = p + c; break; case '-': r = p - c; break; case '*': r = p * c; break; case '/': r = p / c; break; default: return; }
+            cInput = parseFloat(r.toFixed(10)).toString(); cOp = null; cPrev = ''; calcUpd();
+        }
+
+        function getNow() { const d = new Date(); return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`; }
+        function parseDateString(s) { 
+            if(!s||s==='Imported'||s==='Bulan Lalu') return new Date();
+            const p=s.split(' ');
+            if (p[0].includes('-')) return new Date(p[0]);
+            const d=p[0].split('/'); return new Date(d[2],d[1]-1,d[0]); 
+        }
+
+        function calculateAll(shouldSave = true) {
+            const start = Number(document.getElementById('startBalance').value) || 0;
+            let belanjaBaru = 0, uangMasuk = 0, profit = 0, floatPrice = 0, floatModal = 0;
+            
+            items.forEach(i => {
+                if (i.status === 'sold') {
+                    if (i.type === 'new') belanjaBaru += i.modal; 
+                    uangMasuk += i.price; 
+                    profit += (i.price - i.modal);
+                } else {
+                    if (i.type === 'new') belanjaBaru += i.modal; 
+                    floatPrice += i.price; 
+                    floatModal += i.modal;
+                }
+            });
+            
+            const extraProfitTotal = extraProfits.reduce((sum, p) => sum + p.profit, 0);
+            const totalProfitReal = profit + extraProfitTotal;
+            const cash = start - belanjaBaru + uangMasuk;
+            
+            document.getElementById('summaryCash').innerText = "Rp " + cash.toLocaleString('id-ID');
+            document.getElementById('summaryFloating').innerText = "Rp " + floatPrice.toLocaleString('id-ID');
+            document.getElementById('summaryTotal').innerText = "Rp " + (cash + floatPrice).toLocaleString('id-ID');
+            document.getElementById('summaryProfit').innerText = "Rp " + totalProfitReal.toLocaleString('id-ID');
+            document.getElementById('previewModalStock').innerText = "Rp " + floatModal.toLocaleString('id-ID');
+            document.getElementById('previewUnrealizedProfit').innerText = "Rp " + (floatPrice - floatModal).toLocaleString('id-ID');
+            
+            updateTargetBar(totalProfitReal);
+            updateRankBadge(totalProfitReal);
+            renderRows();
+            renderExtraProfitList();
+            
+            if(shouldSave) {
+                localStorage.setItem('ledger_v2_final', JSON.stringify({ 
+                    startBalance: document.getElementById('startBalance').value, 
+                    items, extraProfits, targetGoal, targetName 
+                }));
+            }
+        }
+
+        function parseText(type) {
+            const rawText = document.getElementById('bulkInput').value;
+            if (!rawText.trim()) return;
+            rawText.split('\n').forEach(line => {
+                if (line.includes(':') && line.includes('>')) {
+                    const parts = line.split(/[:>]/);
+                    const name = parts[0].trim().replace(/^-\s*/, '').replace(/\[[BL]\]\s*/, '');
+                    const modal = Number(parts[1].replace(/[^0-9]/g, ''));
+                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
+                    if (name && modal) {
+                        items.unshift({ id: Date.now() + Math.random(), name, modal, price, status: 'stok', type, entryDate: getNow(), soldAt: '' });
+                    }
+                }
+            });
+            document.getElementById('bulkInput').value = '';
+            calculateAll();
+        }
+        
+        function parseExtraProfitText() {
+            const rawText = document.getElementById('exBulkInput').value;
+            if (!rawText.trim()) return;
+            rawText.split('\n').forEach(line => {
+                if (line.includes(':') && line.includes('>')) {
+                    const parts = line.split(/[:>]/);
+                    const name = parts[0].trim();
+                    const modal = Number(parts[1].replace(/[^0-9]/g, ''));
+                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
+                    if (name && modal && price) extraProfits.push({ id: Date.now() + Math.random(), name, modal, price, profit: price - modal }); 
+                }
+            });
+            document.getElementById('exBulkInput').value = '';
+            calculateAll();
+        }
+
+        function removeExtraProfit(id) { extraProfits = extraProfits.filter(p => p.id !== id); calculateAll(); }
+        function renderExtraProfitList() {
+            const list = document.getElementById('extraProfitList');
+            list.innerHTML = '';
+            extraProfits.forEach(p => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center text-[10px] bg-white p-2 rounded-lg border border-emerald-100";
+                div.innerHTML = `<div><b class="text-slate-700">${p.name}</b><p class="text-slate-400">Profit: Rp ${p.profit.toLocaleString('id-ID')}</p></div><button onclick="removeExtraProfit(${p.id})" class="text-red-400 font-bold px-2">✕</button>`;
+                list.appendChild(div);
+            });
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.getElementById('tabStok').className = filter === 'stok' ? "flex-1 py-2 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2 rounded-lg text-[10px] font-black uppercase text-slate-500";
+            document.getElementById('tabSold').className = filter === 'sold' ? "flex-1 py-2 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2 rounded-lg text-[10px] font-black uppercase text-slate-500";
+            document.getElementById('tabExtra').className = filter === 'extra' ? "flex-1 py-2 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2 rounded-lg text-[10px] font-black uppercase text-slate-500";
+            renderRows();
+        }
+
+        function renderRows() {
+            const container = document.getElementById('itemRows');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const now = new Date(); 
+            let display = [];
+            
+            if (currentFilter === 'extra') {
+                display = extraProfits.filter(p => p.name.toLowerCase().includes(search)).map(p => ({
+                    ...p, status: 'sold', type: 'extra', entryDate: 'Bulan Lalu', soldAt: 'Bulan Lalu'
+                }));
+            } else {
+                display = items.filter(i => i.status === currentFilter && i.name.toLowerCase().includes(search));
+            }
+            
+            container.innerHTML = '';
+            if (display.length === 0) { container.innerHTML = `<div class="text-center py-10 text-slate-300 font-bold text-xs uppercase italic">Data Kosong</div>`; return; }
+            
+            display.forEach(item => {
+                const profit = item.price - item.modal;
+                const card = document.createElement('div');
+                let showModalPrice = (currentUserMode === 'owner' || currentUserMode === 'client_demo');
+                let showActions = (currentUserMode === 'owner' || currentUserMode === 'client_demo');
+                let borderClass = 'border-slate-100';
+                let ageWarning = '';
+                
+                if(item.status === 'stok') {
+                    const entry = parseDateString(item.entryDate);
+                    const diffDays = Math.ceil(Math.abs(now - entry) / (1000 * 60 * 60 * 24)); 
+                    if (diffDays > 30) { borderClass = 'border-danger'; ageWarning = `⚠️ ${diffDays} Hari`; } 
+                    else if (diffDays > 14) { borderClass = 'border-warning'; ageWarning = `⚠️ ${diffDays} Hari`; } 
+                    else borderClass = 'border-safe';
+                } else if (item.status === 'sold') { 
+                    borderClass = 'border-emerald-500 bg-white'; 
+                }
+                
+                card.className = `p-3 md:p-4 rounded-xl border-2 transition-all ${borderClass} bg-white`;
+                
+                let typeLabel = item.type === 'old' ? 'STOK LALU [L]' : (item.type === 'new' ? 'BELANJA BARU [B]' : 'PROFIT BULAN LALU');
+                const modalDisplay = showModalPrice ? item.modal.toLocaleString() : "🔒 LOCKED";
+                const modalClass = showModalPrice ? "text-slate-700" : "text-slate-300 blur-[2px]";
+                
+                let actionButtons = '';
+                if (showActions) {
+                     if (item.status !== 'sold') {
+                        actionButtons = `
+                        <div class="flex gap-2 mt-3 w-full border-t pt-2 border-dashed border-slate-200">
+                            <button onclick="openEditModal(${item.id})" class="flex-1 bg-yellow-100 text-yellow-700 py-2 rounded-lg text-xs font-bold text-center">Edit</button>
+                            <button onclick="openCostModal(${item.id})" class="flex-1 bg-orange-100 text-orange-700 py-2 rounded-lg text-xs font-bold text-center">Biaya</button>
+                            <button onclick="toggleSold(${item.id})" class="flex-1 bg-indigo-600 text-white py-2 rounded-lg font-bold text-xs text-center">Laku ✓</button>
+                        </div>`;
+                     } else {
+                        actionButtons = `<div class="mt-2 text-right w-full"><span class="badge-profit text-xs">+${profit.toLocaleString()}</span></div>`;
+                     }
+                }
+
+                const deleteBtn = showActions ? `<button onclick="${item.type === 'extra' ? `removeExtraProfit(${item.id})` : `removeItem(${item.id})`}" class="text-slate-300 hover:text-red-400 p-1">✕</button>` : '';
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-[7px] font-black px-1.5 py-0.5 rounded uppercase ${item.type === 'extra' ? 'bg-emerald-100 text-emerald-600' : (item.type === 'old' ? 'bg-orange-100 text-orange-600' : 'bg-indigo-100 text-indigo-600')}">${typeLabel}</span>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-sm md:text-base leading-tight mb-1">${item.name}</h4>
+                            <div class="text-[11px] font-medium text-slate-500">
+                                <div class="flex justify-between w-full max-w-[200px]">
+                                    <span>M: <b class="${modalClass}">${modalDisplay}</b></span>
+                                    <span>J: <b class="text-slate-700">${item.price.toLocaleString()}</b></span>
+                                </div>
+                            </div>
+                            <div class="mt-1 text-[9px] text-slate-400 font-bold uppercase italic">
+                                📥 ${item.entryDate || '-'} <span class="text-red-500 ml-1">${ageWarning}</span>
+                                ${item.soldAt ? `<br><span class="text-emerald-500">📤 ${item.soldAt}</span>` : ''}
+                            </div>
+                        </div>
+                        ${deleteBtn}
+                    </div>
+                    ${actionButtons}
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function openEditModal(id) { 
+            const i = items.find(x => x.id === id); if(!i)return; 
+            currentEditId=id; 
+            document.getElementById('editItemName').value=i.name; 
+            document.getElementById('editItemModal').value=i.modal; 
+            document.getElementById('editItemPrice').value=i.price; 
+            
+            try {
+                const entryStr = i.entryDate.split(' ')[0]; 
+                const parts = entryStr.split('/');
+                if(parts.length === 3) {
+                    const isoDate = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+                    document.getElementById('editEntryDate').value = isoDate;
+                }
+            } catch(e) {}
+
+            document.getElementById('editModal').classList.remove('hidden'); 
+        }
+        function closeEditModal() { document.getElementById('editModal').classList.add('hidden'); currentEditId=null; }
+        function saveEditItem() {
+            if (!currentEditId) return;
+            const itemIndex = items.findIndex(i => i.id === currentEditId);
+            if (itemIndex > -1) {
+                items[itemIndex].name = document.getElementById('editItemName').value;
+                items[itemIndex].modal = Number(document.getElementById('editItemModal').value);
+                items[itemIndex].price = Number(document.getElementById('editItemPrice').value);
+                const dateInput = document.getElementById('editEntryDate').value;
+                if(dateInput) { const d = new Date(dateInput); items[itemIndex].entryDate = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} 00:00`; }
+                calculateAll(); closeEditModal();
+            }
+        }
+        function openCostModal(id) { currentCostId = id; document.getElementById('costDesc').value=''; document.getElementById('costAmount').value=''; document.getElementById('costModal').classList.remove('hidden'); }
+        function closeCostModal() { document.getElementById('costModal').classList.add('hidden'); currentCostId = null; }
+        function saveCost() {
+            if(!currentCostId) return;
+            const amount = Number(document.getElementById('costAmount').value);
+            const desc = document.getElementById('costDesc').value;
+            const idx = items.findIndex(x => x.id === currentCostId);
+            if(idx > -1 && amount && desc) { items[idx].modal += amount; items[idx].name += ` (+${desc})`; calculateAll(); closeCostModal(); }
+        }
+        function toggleSold(id) { const i = items.find(x => x.id === id); if(i){ i.status='sold'; i.soldAt=getNow(); calculateAll(); } }
+        function removeItem(id) { if(confirm('Hapus unit ini permanen?')) { items = items.filter(x => x.id !== id); calculateAll(); } }
+        
+        function updateTargetBar(profit) {
+            let p = targetGoal > 0 ? (profit / targetGoal) * 100 : 0;
+            if (p > 100) p = 100; if (p < 0) p = 0;
+            const bar = document.getElementById('progressBar');
+            bar.style.width = p + "%";
+            bar.className = p >= 100 ? "bg-emerald-500 h-3 rounded-full relative transition-all duration-1000" : "bg-indigo-600 h-3 rounded-full relative transition-all duration-1000";
+            document.getElementById('targetPercentage').innerText = p.toFixed(0) + "%";
+            if(document.getElementById('currentProgressText')) document.getElementById('currentProgressText').innerText = "Tercapai: Rp " + profit.toLocaleString('id-ID');
+            document.getElementById('targetNameDisplay').innerText = targetName;
+            document.getElementById('targetValueDisplay').innerText = "Target: Rp " + targetGoal.toLocaleString('id-ID');
+        }
+
+        function updateRankBadge(profit) {
+            let r="Pedagang Pemula", c="bg-slate-200 text-slate-500";
+            if(profit>=50000000){r="👑 SULTAN GADGET";c="bg-yellow-100 text-yellow-600 border-yellow-300";}
+            else if(profit>=25000000){r="💎 JURAGAN PRO";c="bg-indigo-100 text-indigo-600 border-indigo-300";}
+            else if(profit>=10000000){r="🔥 STARTUP OWNER";c="bg-emerald-100 text-emerald-600";}
+            else if(profit>=5000000){r="🚀 RISING STAR";c="bg-blue-100 text-blue-600";}
+            document.getElementById('rankBadge').className = `badge-rank ${c} mb-1`;
+            document.getElementById('rankBadge').innerText = r;
+        }
+        
+        function renderAnalytics() {
+            const soldItems = items.filter(i => i.status === 'sold');
+            if (soldItems.length === 0) return;
+            let totalDays = 0, validSales = 0;
+            soldItems.forEach(i => {
+                const entry = parseDateString(i.entryDate); const sold = parseDateString(i.soldAt);
+                const diffDays = Math.ceil(Math.abs(sold - entry) / (1000 * 60 * 60 * 24));
+                if(!isNaN(diffDays)) { totalDays += diffDays; validSales++; }
+            });
+            document.getElementById('avgSellTime').innerText = (validSales > 0 ? (totalDays / validSales).toFixed(1) : 0) + " Hari";
+            document.getElementById('winRateStock').innerText = (items.length > 0 ? ((soldItems.length / items.length) * 100).toFixed(0) : 0) + "%";
+
+            const brands = {};
+            soldItems.forEach(i => {
+                const lower = i.name.toLowerCase();
+                let b = i.name.split(' ')[0].toUpperCase();
+                if (lower.includes('iphone') || lower.includes('apple')) b = 'APPLE';
+                if (lower.includes('samsung') || lower.includes('galaxy')) b = 'SAMSUNG';
+                if (lower.includes('xiaomi') || lower.includes('redmi') || lower.includes('poco')) b = 'XIAOMI';
+                if (lower.includes('oppo')) b = 'OPPO'; if (lower.includes('vivo')) b = 'VIVO';
+                if(brands[b]) brands[b]++; else brands[b] = 1;
+            });
+
+            if(brandChartInstance) brandChartInstance.destroy();
+            brandChartInstance = new Chart(document.getElementById('brandChart'), {
+                type: 'doughnut',
+                data: { labels: Object.keys(brands), datasets: [{ data: Object.values(brands), backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { size: 10 } } } } }
+            });
+
+            const lastSales = soldItems.slice(0, 10).reverse(); 
+            if(trendChartInstance) trendChartInstance.destroy();
+            trendChartInstance = new Chart(document.getElementById('profitTrendChart'), {
+                type: 'bar',
+                data: { labels: lastSales.map(i => i.name.substring(0, 8)), datasets: [{ label: 'Profit', data: lastSales.map(i => i.price - i.modal), backgroundColor: '#10b981', borderRadius: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { ticks: { font: { size: 8 } } } }, plugins: { legend: { display: false } } }
+            });
+            
+            const quarters = { "Q1": 0, "Q2": 0, "Q3": 0, "Q4": 0 };
+            soldItems.forEach(i => {
+                const m = parseDateString(i.soldAt).getMonth(); const p = i.price - i.modal;
+                if (m <= 2) quarters["Q1"] += p; else if (m <= 5) quarters["Q2"] += p; else if (m <= 8) quarters["Q3"] += p; else quarters["Q4"] += p;
+            });
+            if(quarterlyChartInstance) quarterlyChartInstance.destroy();
+            quarterlyChartInstance = new Chart(document.getElementById('quarterlyChart'), {
+                type: 'bar',
+                data: { labels: Object.keys(quarters), datasets: [{ data: Object.values(quarters), backgroundColor: ['#3b82f6', '#8b5cf6', '#eab308', '#f43f5e'], borderRadius: 6 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+        }
+
+        function setMonthlyTarget() {
+            if(currentUserMode!=='owner') return alert("Hanya Owner yang bisa set target.");
+            const newName = prompt("Nama Target?", targetName); const newAmount = prompt("Nominal Target?", targetGoal);
+            if(newName && newAmount) { targetName = newName; targetGoal = Number(newAmount); calculateAll(); }
+        }
+        function saveNote() { localStorage.setItem('ledger_owner_note', document.getElementById('ownerNote').value); }
+        function exportReport() {
+            const cash = document.getElementById('summaryCash').innerText;
+            const stokVal = document.getElementById('previewModalStock').innerText;
+            const profit = document.getElementById('summaryProfit').innerText;
+            const startBal = Number(document.getElementById('startBalance').value);
+            const totalAsset = Number(cash.replace(/[^0-9]/g,'')) + Number(stokVal.replace(/[^0-9]/g,''));
+            
+            let report = `📊 *LAPORAN ${currentMonthString}*\n💵 Saldo Tunai: ${cash}\n📦 Nilai Stok: ${stokVal}\n📈 Total Aset: Rp ${totalAsset.toLocaleString('id-ID')}\n🔥 Profit: ${profit}\n\n✅ *PENJUALAN*\n`;
+            items.filter(i => i.status === 'sold').forEach((i, index) => { report += `${index + 1}. ${i.name} (Profit: +${(i.price - i.modal).toLocaleString()})\n`; });
+            report += `\n🛑 *STOK GUDANG*\n`;
+            items.filter(i => i.status === 'stok').forEach((i, index) => { report += `${index + 1}. ${i.name} (M: ${i.modal.toLocaleString()})\n`; });
+            navigator.clipboard.writeText(report).then(() => alert("Laporan disalin!"));
+        }
+        function toggleImportModal() { document.getElementById('importModal').classList.toggle('hidden'); }
+        function processImport() {
+            const text = document.getElementById('importArea').value.trim();
+            if(!text) return;
+            try {
+                const parsed = JSON.parse(text);
+                if(parsed.items || parsed.startBalance !== undefined) {
+                    applyData(parsed); localStorage.setItem('ledger_v2_final', text);
+                    alert("Data System berhasil dipulihkan!"); location.reload();
+                }
+            } catch (e) { alert("Format JSON Salah."); }
+        }
+        function toggleHelpModal() { alert("Gunakan tombol 'Cloud Sync' untuk sinkronisasi data antar device."); }
+        function clearData() { if(confirm('Hapus permanen?')) { localStorage.clear(); location.reload(); } }
+        function directImei() { const i=document.getElementById('imeiInput').value; if(i)window.open(`https://www.imei.info/?imei=${i}`, '_blank'); }
+
+        window.onload = () => {
+            const now = new Date();
+            currentMonthString = monthNames[now.getMonth()] + " " + now.getFullYear();
+            document.getElementById('currentMonth').innerText = currentMonthString;
+        };
+    </script>
+</body>
+</html>
