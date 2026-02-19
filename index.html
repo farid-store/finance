@@ -124,6 +124,15 @@
             font-weight: 700; 
         }
 
+        /* PRIVACY BLUR */
+        .blur-sensitive {
+            filter: blur(5px); 
+            user-select: none; 
+            pointer-events: none;
+            opacity: 0.7;
+            transition: filter 0.3s ease;
+        }
+
         /* =========================================
            CALCULATOR WIDGET
            ========================================= */
@@ -201,10 +210,6 @@
             position: fixed; inset: 0; z-index: 999; background: #f8fafc; 
             display: flex; justify-content: center; align-items: center;
         }
-        
-        .blur-sensitive {
-            filter: blur(4px); user-select: none; pointer-events: none;
-        }
     </style>
 </head>
 <body class="antialiased lg:overflow-hidden">
@@ -267,7 +272,7 @@
                     </div>
                     <div>
                         <div onclick="toggleDropdown('dropWarranty')" class="sidebar-item justify-between">
-                            <span class="flex items-center"><span class="mr-3 text-lg">🛡️</span> Cek Garansi</span>
+                            <span class="flex items-center"><span class="mr-3 text-lg">🛡️</span> Cek Garansi Resmi</span>
                             <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </div>
                         <div id="dropWarranty" class="dropdown-content">
@@ -328,11 +333,10 @@
                     </div>
                 </div>
                 
-                <div class="mt-4 pb-8">
-                    <p class="text-[10px] text-slate-500 font-bold uppercase mb-3 tracking-widest">View Mode</p>
+                <div class="mt-4 pb-8 admin-only-view">
+                    <p class="text-[10px] text-slate-500 font-bold uppercase mb-3 tracking-widest">Privacy Mode</p>
                     <div class="flex bg-slate-900 p-1 rounded-xl gap-1">
-                        <button onclick="setView('mobile')" id="btnMob" class="flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white">MOBILE</button>
-                        <button onclick="setView('desktop')" id="btnDesk" class="flex-1 py-2 rounded-lg text-[10px] font-black text-slate-500">DESKTOP</button>
+                        <button onclick="toggleBlur()" id="btnBlur" class="w-full py-2 rounded-lg text-[10px] font-black text-slate-500 hover:text-white transition">👁️ MODE BLUR: OFF</button>
                     </div>
                 </div>
             </div>
@@ -382,7 +386,7 @@
                             <div class="text-right flex flex-col items-end">
                                 <div id="rankBadge" class="badge-rank bg-slate-200 text-slate-500 mb-1 scale-90 origin-right">Unranked</div>
                                 <p class="text-[8px] text-slate-400 uppercase font-black tracking-widest">Realized Profit</p>
-                                <h2 id="summaryProfit" class="text-xl font-black text-emerald-600 leading-none">Rp 0</h2>
+                                <h2 id="summaryProfit" class="text-xl font-black text-emerald-600 leading-none sensitive-data">Rp 0</h2>
                             </div>
                         </div>
                     </div>
@@ -394,7 +398,7 @@
                                 <h3 id="targetNameDisplay" class="font-black text-slate-800 text-sm cursor-pointer hover:text-indigo-600" onclick="setMonthlyTarget()">Set Your Goal 🎯</h3>
                             </div>
                             <div class="text-right">
-                                <span id="targetPercentage" class="text-2xl font-black text-indigo-600">0%</span>
+                                <span id="targetPercentage" class="text-2xl font-black text-indigo-600 sensitive-data">0%</span>
                             </div>
                         </div>
                         <div class="w-full bg-slate-200 rounded-full h-3 mb-2 relative z-10 overflow-hidden">
@@ -403,8 +407,8 @@
                             </div>
                         </div>
                         <div class="flex justify-between text-[10px] font-bold text-slate-400 relative z-10">
-                            <span id="currentProgressText" class="text-emerald-600">Rp 0</span> 
-                            <span id="targetValueDisplay">Target: Rp 0</span>
+                            <span id="currentProgressText" class="text-emerald-600 sensitive-data">Rp 0</span> 
+                            <span id="targetValueDisplay" class="sensitive-data">Target: Rp 0</span>
                         </div>
                         <button onclick="setMonthlyTarget()" class="absolute top-2 right-2 p-1 bg-white/80 rounded hover:bg-white text-slate-400 hover:text-indigo-600 transition opacity-0 group-hover:opacity-100 z-20">⚙️</button>
                     </div>
@@ -429,15 +433,15 @@
                         <div class="grid grid-cols-2 gap-4 mb-6">
                             <div class="card p-5 border-b-4 border-indigo-500">
                                 <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Uang Tunai (Cash)</p>
-                                <h2 id="summaryCash" class="text-lg font-bold text-slate-800">Rp 0</h2>
+                                <h2 id="summaryCash" class="text-lg font-bold text-slate-800 sensitive-data">Rp 0</h2>
                             </div>
                             <div class="card p-5 border-b-4 border-emerald-500">
                                 <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Total Floating</p>
-                                <h2 id="summaryFloating" class="text-lg font-bold text-slate-800">Rp 0</h2>
+                                <h2 id="summaryFloating" class="text-lg font-bold text-slate-800 sensitive-data">Rp 0</h2>
                             </div>
                             <div class="card p-6 col-span-2 text-center bg-slate-900 text-white border-none shadow-xl">
                                 <p class="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-widest opacity-80">Unrealized Balance (Total Aset)</p>
-                                <h2 id="summaryTotal" class="text-3xl font-black">Rp 0</h2>
+                                <h2 id="summaryTotal" class="text-3xl font-black sensitive-data">Rp 0</h2>
                             </div>
                         </div>
 
@@ -484,11 +488,11 @@
                         <div class="card p-5 bg-slate-800 border-l-4 border-indigo-500 text-white flex justify-between items-center mb-8 shadow-lg">
                             <div>
                                 <h3 class="font-bold text-indigo-300 text-[9px] uppercase tracking-widest opacity-80">Modal Stok Berjalan</h3>
-                                <h2 id="previewModalStock" class="text-xl font-black">Rp 0</h2>
+                                <h2 id="previewModalStock" class="text-xl font-black sensitive-data">Rp 0</h2>
                             </div>
                             <div class="text-right">
                                 <h3 class="font-bold text-emerald-400 text-[9px] uppercase tracking-widest opacity-80">Potensi Untung</h3>
-                                <h2 id="previewUnrealizedProfit" class="text-xl font-black">Rp 0</h2>
+                                <h2 id="previewUnrealizedProfit" class="text-xl font-black sensitive-data">Rp 0</h2>
                             </div>
                         </div>
                     </div>
@@ -540,14 +544,14 @@
                 <div class="card p-5 mb-6">
                     <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Tren Profit Harian</h3>
                     <div class="h-48">
-                        <canvas id="profitTrendChart"></canvas>
+                        <canvas id="profitTrendChart" class="sensitive-data"></canvas>
                     </div>
                 </div>
 
                 <div class="card p-5 mb-6">
                     <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Performa Profit Per Kuartal</h3>
                     <div class="h-48">
-                        <canvas id="quarterlyChart"></canvas>
+                        <canvas id="quarterlyChart" class="sensitive-data"></canvas>
                     </div>
                 </div>
             </div>
@@ -694,6 +698,7 @@
         
         // ACCESS CONTROL STATE
         let currentUserMode = 'client_view'; 
+        let isBlurMode = false; // BLUR STATE
         
         // OWNER FEATURE VARIABLES
         let targetGoal = 25000000; 
@@ -711,23 +716,21 @@
         const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
         // ===============================================
-        // 🔐 SECURITY & AUTH LOGIC (REVISED)
+        // 🔐 SECURITY & AUTH LOGIC
         // ===============================================
         
         function checkAutoPin(el) {
             if (el.value.length === 6) {
-                checkPin(); // Auto submit
+                checkPin();
             }
         }
 
         function checkPin() {
             const input = document.getElementById('pinInput').value;
             if (input === OWNER_PIN) {
-                // SUCCESS
                 currentUserMode = 'owner';
                 document.getElementById('authModal').style.display = 'none';
                 
-                // Update Sidebar Indicator
                 const btnInd = document.getElementById('btnAccessIndicator');
                 btnInd.innerText = "OWNER MODE";
                 btnInd.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white cursor-default";
@@ -735,7 +738,7 @@
                 document.getElementById('cloudStatus').innerText = "⚪ Owner Mode";
                 
                 updateUIForMode();
-                loadData(); // Load Real Data
+                loadData(); 
             } else {
                 if(input.length === 6) {
                     alert("PIN Salah! Akses ditolak.");
@@ -748,13 +751,12 @@
             currentUserMode = 'client_view';
             document.getElementById('authModal').style.display = 'none';
             
-            // Update Sidebar Indicator
             const btnInd = document.getElementById('btnAccessIndicator');
             btnInd.innerText = "CLIENT MODE";
             btnInd.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-slate-600 text-white cursor-default";
 
             updateUIForMode();
-            loadData(); // Load data but filter secrets in UI
+            loadData(); 
         }
 
         function enableSandboxMode() {
@@ -763,7 +765,6 @@
                 document.getElementById('clientBanner').classList.add('hidden');
                 document.getElementById('sandboxBanner').classList.remove('hidden');
                 
-                // Update Sidebar Indicator
                 const btnInd = document.getElementById('btnAccessIndicator');
                 btnInd.innerText = "SANDBOX ADMIN";
                 btnInd.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-orange-500 text-white cursor-default";
@@ -779,25 +780,53 @@
             const clientBanner = document.getElementById('clientBanner');
             
             if (currentUserMode === 'client_view') {
-                // HIDE Inputs & Financial Summaries
                 adminContent.forEach(el => el.classList.add('hidden'));
                 clientBanner.classList.remove('hidden');
             } else {
-                // SHOW for Owner or Demo
                 adminContent.forEach(el => el.classList.remove('hidden'));
                 clientBanner.classList.add('hidden');
             }
-            renderRows(); // Re-render to show/hide edit buttons & mask data
+            renderRows(); 
+        }
+
+        // ===============================================
+        // 👁️ PRIVACY (BLUR) MODE
+        // ===============================================
+        function toggleBlur() {
+            isBlurMode = !isBlurMode;
+            const btn = document.getElementById('btnBlur');
+            
+            if(isBlurMode) {
+                btn.innerHTML = "🙈 MODE BLUR: ON";
+                btn.className = "w-full py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white transition shadow-lg";
+            } else {
+                btn.innerHTML = "👁️ MODE BLUR: OFF";
+                btn.className = "w-full py-2 rounded-lg text-[10px] font-black text-slate-500 bg-transparent hover:bg-slate-800 transition";
+            }
+            
+            applyBlurClass();
+        }
+
+        function applyBlurClass() {
+            // Static elements
+            document.querySelectorAll('.sensitive-data').forEach(el => {
+                if(isBlurMode) {
+                    el.classList.add('blur-sensitive');
+                } else {
+                    el.classList.remove('blur-sensitive');
+                }
+            });
+            // Re-render Dynamic elements
+            renderRows();
+            renderExtraProfitList();
         }
 
         // ===============================================
         // 🆘 EMERGENCY RESCUE SYSTEM
         // ===============================================
         function emergencyRescue() {
-            // Coba ambil data mentah dari LocalStorage
             const rawData = localStorage.getItem('ledger_v2_final');
             if (rawData) {
-                // Buat file download
                 const blob = new Blob([rawData], {type: "application/json"});
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -816,7 +845,6 @@
         // ☁️ CLOUD SYNC & DATA LOAD
         // ===============================================
         async function loadData() {
-            // 1. PRIORITAS: LOAD LOCAL DATA DULU (Agar data lama muncul)
             const localData = JSON.parse(localStorage.getItem('ledger_v2_final'));
             if (localData) {
                 applyData(localData);
@@ -824,7 +852,6 @@
             } else {
                 console.log("No Local Data Found");
             }
-            // Note: Cloud tidak diload otomatis untuk mencegah overwrite yang tidak diinginkan
         }
 
         async function forceSync() {
@@ -834,18 +861,15 @@
             
             if(BIN_ID === 'GANTI_DENGAN_BIN_ID_ANDA') return alert("Harap isi BIN_ID dan API_KEY di script.");
             
-            // Tanya user: Upload (Local -> Cloud) atau Download (Cloud -> Local)
             const choice = prompt("Ketik 'UP' untuk Upload Data Lokal ke Cloud.\nKetik 'DOWN' untuk Tarik Data Cloud ke Lokal.\n(Hati-hati data akan tertimpa!)");
             
             document.getElementById('loadingCloud').style.display = 'flex';
             
             try {
                 if(choice && choice.toUpperCase() === 'UP') {
-                    // UPLOAD
                     await saveDataToCloud();
                     alert("Data Lokal berhasil di-upload ke Cloud!");
                 } else if (choice && choice.toUpperCase() === 'DOWN') {
-                    // DOWNLOAD
                     const req = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': API_KEY } });
                     const res = await req.json();
                     if(res.record) {
@@ -862,7 +886,7 @@
         }
 
         async function saveDataToCloud() {
-            if (currentUserMode !== 'owner') return; // Silent block for sandbox
+            if (currentUserMode !== 'owner') return; 
 
             const dataState = { startBalance: document.getElementById('startBalance').value, items, extraProfits, targetGoal, targetName };
             await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
@@ -1009,12 +1033,10 @@
             if(!s||s==='Imported'||s==='Bulan Lalu') return new Date();
             const p=s.split(' ');
             
-            // Handle ISO string from date input (YYYY-MM-DD)
             if (p[0].includes('-')) {
                 return new Date(p[0]);
             }
 
-            // Handle DD/MM/YYYY
             const d=p[0].split('/');
             return new Date(d[2],d[1]-1,d[0]); 
         }
@@ -1050,13 +1072,18 @@
             document.getElementById('previewModalStock').innerText = "Rp " + floatModal.toLocaleString('id-ID');
             document.getElementById('previewUnrealizedProfit').innerText = "Rp " + (floatPrice - floatModal).toLocaleString('id-ID');
             
+            // Re-apply blur to newly updated text dynamically
+            document.querySelectorAll('.sensitive-data').forEach(el => {
+                if(isBlurMode) el.classList.add('blur-sensitive');
+                else el.classList.remove('blur-sensitive');
+            });
+            
             updateTargetBar(totalProfitReal);
             updateRankBadge(totalProfitReal);
             renderRows();
             renderExtraProfitList();
             
             if(shouldSave) {
-                // Save Local Always
                 localStorage.setItem('ledger_v2_final', JSON.stringify({ 
                     startBalance: document.getElementById('startBalance').value, 
                     items, 
@@ -1103,10 +1130,6 @@
             calculateAll();
         }
 
-        function addExtraProfit() {
-            // (Removed manual fields in favor of smart input, function kept for logic structure compatibility)
-        }
-
         function removeExtraProfit(id) { 
             extraProfits = extraProfits.filter(p => p.id !== id); 
             calculateAll(); 
@@ -1115,10 +1138,14 @@
         function renderExtraProfitList() {
             const list = document.getElementById('extraProfitList');
             list.innerHTML = '';
+            
+            // Assign blur class state
+            const bClass = isBlurMode ? "blur-sensitive" : "";
+            
             extraProfits.forEach(p => {
                 const div = document.createElement('div');
                 div.className = "flex justify-between items-center text-[10px] bg-white p-2 rounded-lg border border-emerald-100";
-                div.innerHTML = `<div><b class="text-slate-700">${p.name}</b><p class="text-slate-400">Profit: Rp ${p.profit.toLocaleString('id-ID')}</p></div><div class="flex gap-2"><button onclick="removeExtraProfit(${p.id})" class="text-red-400 font-bold">✕</button></div>`;
+                div.innerHTML = `<div><b class="text-slate-700">${p.name}</b><p class="text-slate-400 ${bClass}">Profit: Rp ${p.profit.toLocaleString('id-ID')}</p></div><div class="flex gap-2"><button onclick="removeExtraProfit(${p.id})" class="text-red-400 font-bold">✕</button></div>`;
                 list.appendChild(div);
             });
         }
@@ -1132,7 +1159,7 @@
         }
 
         // ===============================================
-        // 🔥 NEW: UPDATED RENDER ROWS (MINIMALIST & ICON BASED)
+        // 🔥 NEW: UPDATED RENDER ROWS
         // ===============================================
         function renderRows() {
             const container = document.getElementById('itemRows');
@@ -1155,15 +1182,16 @@
                 return; 
             }
             
+            // Check blur state
+            const bClass = isBlurMode ? "blur-sensitive" : "";
+            
             display.forEach(item => {
                 const profit = item.price - item.modal;
                 const card = document.createElement('div');
                 
-                // Permission Checks
                 let showModalPrice = (currentUserMode === 'owner' || currentUserMode === 'client_demo');
                 let showActions = (currentUserMode === 'owner' || currentUserMode === 'client_demo');
                 
-                // Styling Logic
                 let borderClass = 'border-l-4 border-l-indigo-500';
                 let bgClass = 'bg-white';
                 let opacityClass = '';
@@ -1188,18 +1216,14 @@
                 
                 card.className = `p-4 rounded-xl shadow-sm border border-slate-100 ${borderClass} ${bgClass} ${opacityClass} relative group`;
                 
-                // Label Logic
                 let typeLabel = item.type === 'old' ? 'L' : (item.type === 'new' ? 'B' : 'X');
                 let typeColor = item.type === 'old' ? 'bg-orange-100 text-orange-600' : (item.type === 'new' ? 'bg-indigo-100 text-indigo-600' : 'bg-emerald-100 text-emerald-600');
 
-                // Masking
                 const modalDisplay = showModalPrice ? item.modal.toLocaleString() : "🔒";
                 const modalClass = showModalPrice ? "text-slate-600" : "text-slate-300";
 
-                // --- ICON ACTIONS GENERATOR ---
                 let actionIcons = '';
                 if (showActions) {
-                    // 1. Edit Button (MUNCUL DI SEMUA STATUS)
                     const editBtn = `
                         <button onclick="openEditModal(${item.id})" class="p-2 rounded-lg hover:bg-yellow-100 text-slate-400 hover:text-yellow-600 transition" title="Edit Data">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1207,7 +1231,6 @@
                             </svg>
                         </button>`;
 
-                    // 2. Cost Button (Hanya Stok)
                     const costBtn = item.status === 'stok' ? `
                         <button onclick="openCostModal(${item.id})" class="p-2 rounded-lg hover:bg-orange-100 text-slate-400 hover:text-orange-600 transition" title="Tambah Biaya">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1216,7 +1239,6 @@
                             </svg>
                         </button>` : '';
 
-                    // 3. Sold Button (Hanya Stok)
                     const soldBtn = item.status === 'stok' ? `
                         <button onclick="toggleSold(${item.id})" class="p-2 rounded-lg hover:bg-emerald-100 text-slate-400 hover:text-emerald-600 transition" title="Tandai Terjual">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1224,7 +1246,6 @@
                             </svg>
                         </button>` : '';
 
-                    // 4. Delete Button (MUNCUL DI SEMUA)
                     const deleteAction = item.type === 'extra' ? `removeExtraProfit(${item.id})` : `removeItem(${item.id})`;
                     const delBtn = `
                         <button onclick="${deleteAction}" class="p-2 rounded-lg hover:bg-red-100 text-slate-300 hover:text-red-500 transition" title="Hapus">
@@ -1236,22 +1257,22 @@
                     actionIcons = `<div class="flex items-center gap-1 border-l border-slate-100 pl-2 ml-2">${editBtn}${costBtn}${soldBtn}${delBtn}</div>`;
                 }
 
-                // Layout Kartu Baru
+                // Layout Kartu dengan Blur class
                 card.innerHTML = `
                     <div class="flex justify-between items-center mb-2">
                         <div class="flex items-center gap-2">
                             <span class="text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full ${typeColor}">${typeLabel}</span>
                             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${item.entryDate}</span>
                         </div>
-                        ${item.status === 'sold' ? `<span class="badge-profit text-[10px]">+${profit.toLocaleString()}</span>` : ''}
+                        ${item.status === 'sold' ? `<span class="badge-profit text-[10px] ${bClass}">+${profit.toLocaleString()}</span>` : ''}
                     </div>
                     
                     <div class="flex justify-between items-end">
                         <div>
                             <h4 class="font-bold text-slate-800 text-sm leading-tight mb-1">${item.name}</h4>
                             <div class="flex flex-col text-[11px]">
-                                <span class="${modalClass}">M: ${modalDisplay}</span>
-                                <span class="font-bold text-indigo-900">J: ${item.price.toLocaleString()}</span>
+                                <span class="${modalClass} ${bClass}">M: ${modalDisplay}</span>
+                                <span class="font-bold text-indigo-900 ${bClass}">J: ${item.price.toLocaleString()}</span>
                             </div>
                         </div>
                         
@@ -1267,17 +1288,12 @@
         // 🔧 MODALS & ACTIONS FUNCTIONS
         // ===============================================
         function openEditModal(id) { 
-            // Cari di array items dulu, jika tidak ada cari di extraProfits
             let i = items.find(x => x.id === id); 
-            if (!i) {
-                i = extraProfits.find(x => x.id === id);
-            }
-
+            if (!i) i = extraProfits.find(x => x.id === id);
             if(!i) return; 
 
             currentEditId = id; 
             document.getElementById('editItemName').value = i.name; 
-            // Gunakan 0 jika properti modal tidak ada (untuk data extraProfit lama)
             document.getElementById('editItemModal').value = i.modal || 0; 
             document.getElementById('editItemPrice').value = i.price; 
             
@@ -1292,9 +1308,7 @@
                 } else {
                     document.getElementById('editEntryDate').value = "";
                 }
-            } catch(e) {
-                console.log("Date parsing error", e);
-            }
+            } catch(e) { console.log(e); }
 
             document.getElementById('editModal').style.display = 'flex';
         }
@@ -1307,12 +1321,10 @@
         function saveEditItem() {
             if (!currentEditId) return;
 
-            // Cek apakah data yang diedit ada di array items
             let itemIndex = items.findIndex(i => i.id === currentEditId);
             let isExtra = false;
 
             if (itemIndex === -1) {
-                // Jika tidak ada di items, cek di extraProfits
                 itemIndex = extraProfits.findIndex(i => i.id === currentEditId);
                 isExtra = true;
             }
@@ -1324,13 +1336,11 @@
                 const dateInput = document.getElementById('editEntryDate').value;
 
                 if (isExtra) {
-                    // Update array extraProfits
                     extraProfits[itemIndex].name = newName;
                     extraProfits[itemIndex].modal = newModal;
                     extraProfits[itemIndex].price = newPrice;
                     extraProfits[itemIndex].profit = newPrice - newModal;
                 } else {
-                    // Update array items
                     items[itemIndex].name = newName;
                     items[itemIndex].modal = newModal;
                     items[itemIndex].price = newPrice;
@@ -1431,7 +1441,6 @@
                 return; 
             }
 
-            // 1. Kecepatan Putaran
             let totalDays = 0; 
             let validSales = 0;
             soldItems.forEach(i => {
@@ -1444,13 +1453,11 @@
             const avgDays = validSales > 0 ? (totalDays / validSales).toFixed(1) : 0;
             document.getElementById('avgSellTime').innerText = avgDays + " Hari";
 
-            // 2. Win Rate
             const totalStock = items.length; 
             const totalSold = soldItems.length;
             const winRate = totalStock > 0 ? ((totalSold / totalStock) * 100).toFixed(0) : 0;
             document.getElementById('winRateStock').innerText = winRate + "%";
 
-            // 3. Brand Dominance Chart
             const brands = {};
             soldItems.forEach(i => {
                 const brandName = getBrandCategory(i.name);
@@ -1473,7 +1480,6 @@
                 });
             }
 
-            // 4. Daily Profit Trend
             const lastSales = soldItems.slice(0, 10).reverse(); 
             const labels = lastSales.map(i => i.name.substring(0, 10)); 
             const profits = lastSales.map(i => i.price - i.modal);
@@ -1490,7 +1496,6 @@
                 });
             }
 
-            // 5. Quarterly Profit Chart
             const quarters = { "Q1 (Jan-Mar)": 0, "Q2 (Apr-Jun)": 0, "Q3 (Jul-Sep)": 0, "Q4 (Oct-Dec)": 0 };
             soldItems.forEach(i => {
                 const date = parseDateString(i.soldAt);
@@ -1597,7 +1602,6 @@
             const text = document.getElementById('importArea').value.trim();
             if(!text) return;
 
-            // DETEKSI 1: KODE BACKUP JSON
             if (text.startsWith('{')) {
                 try {
                     const parsed = JSON.parse(text);
@@ -1625,7 +1629,6 @@
             const now = new Date();
             currentMonthString = monthNames[now.getMonth()] + " " + now.getFullYear();
             document.getElementById('currentMonth').innerText = currentMonthString;
-            // Wait for Auth to load data fully
         };
     </script>
 </body>
