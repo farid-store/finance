@@ -241,13 +241,13 @@
         }
 
         /* =========================================
-           SECURITY PIN MODAL STYLES
+           UPDATED SECURITY PIN MODAL STYLES (WHITE)
            ========================================= */
         #authModal {
             position: fixed;
             inset: 0;
             z-index: 999;
-            background: #0f172a;
+            background: #f8fafc; /* WHITE BACKGROUND */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -263,25 +263,25 @@
 <body class="p-4 md:p-8 antialiased">
 
     <div id="authModal">
-        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-sm text-center relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-2 bg-indigo-600"></div>
-            <h2 class="text-2xl font-black text-slate-800 mb-2 uppercase italic">Security Check</h2>
-            <p class="text-xs text-slate-500 mb-6">Masukkan PIN Owner untuk akses penuh & sinkronisasi.</p>
+        <div class="max-w-sm w-full text-center p-8">
+            <div class="mb-6">
+                <div class="w-16 h-16 bg-indigo-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-indigo-200 mb-4">
+                    <span class="text-3xl">🔐</span>
+                </div>
+                <h2 class="text-2xl font-black text-slate-800 mb-1">OWNER ACCESS</h2>
+                <p class="text-slate-500 text-xs">Masukkan 6 digit PIN keamanan.</p>
+            </div>
             
-            <input type="tel" id="pinInput" class="input-field text-center text-2xl font-black tracking-[10px] mb-4" placeholder="••••••" maxlength="6">
+            <input type="tel" id="pinInput" 
+                   class="w-full text-center text-3xl font-black tracking-[10px] py-4 border-b-2 border-slate-200 focus:border-indigo-600 outline-none bg-transparent transition text-slate-800 mb-8 placeholder-slate-300" 
+                   placeholder="••••••" maxlength="6" oninput="checkAutoPin(this)">
             
-            <button onclick="checkPin()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold uppercase shadow-lg hover:bg-indigo-700 transition mb-3">
-                Buka Akses Owner
+            <button onclick="checkPin()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold uppercase shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition mb-4 text-sm hidden">
+                Masuk Dashboard
             </button>
             
-            <div class="relative flex py-2 items-center">
-                <div class="flex-grow border-t border-gray-200"></div>
-                <span class="flex-shrink-0 mx-4 text-gray-300 text-[10px] uppercase">Atau</span>
-                <div class="flex-grow border-t border-gray-200"></div>
-            </div>
-
-            <button onclick="enterClientMode()" class="w-full py-2 bg-slate-100 text-slate-500 rounded-xl font-bold text-xs hover:bg-slate-200 transition">
-                Masuk sebagai Client / Tamu
+            <button onclick="enterClientMode()" class="text-slate-400 text-xs font-bold hover:text-slate-600 transition uppercase tracking-wider">
+                Masuk sebagai Tamu (View Only)
             </button>
         </div>
     </div>
@@ -756,9 +756,15 @@
         const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
         // ===============================================
-        // 🔐 SECURITY & AUTH LOGIC
+        // 🔐 SECURITY & AUTH LOGIC (REVISED)
         // ===============================================
         
+        function checkAutoPin(el) {
+            if (el.value.length === 6) {
+                checkPin(); // Auto submit
+            }
+        }
+
         function checkPin() {
             const input = document.getElementById('pinInput').value;
             if (input === OWNER_PIN) {
@@ -776,8 +782,10 @@
                 updateUIForMode();
                 loadData(); // Load Real Data
             } else {
-                alert("PIN Salah! Akses ditolak.");
-                document.getElementById('pinInput').value = '';
+                if(input.length === 6) {
+                    alert("PIN Salah! Akses ditolak.");
+                    document.getElementById('pinInput').value = '';
+                }
             }
         }
 
@@ -1168,6 +1176,9 @@
             renderRows();
         }
 
+        // ===============================================
+        // 🔥 NEW: UPDATED RENDER ROWS (MINIMALIST & ICON BASED)
+        // ===============================================
         function renderRows() {
             const container = document.getElementById('itemRows');
             const search = document.getElementById('searchInput').value.toLowerCase();
@@ -1193,12 +1204,14 @@
                 const profit = item.price - item.modal;
                 const card = document.createElement('div');
                 
-                // LOGIC: Show Full Card if Owner OR Demo OR Client View (but Client View hides specific data)
+                // Permission Checks
                 let showModalPrice = (currentUserMode === 'owner' || currentUserMode === 'client_demo');
                 let showActions = (currentUserMode === 'owner' || currentUserMode === 'client_demo');
                 
-                let borderClass = 'border-slate-100';
-                let ageWarning = '';
+                // Styling Logic
+                let borderClass = 'border-l-4 border-l-indigo-500';
+                let bgClass = 'bg-white';
+                let opacityClass = '';
                 
                 if(item.status === 'stok') {
                     const entry = parseDateString(item.entryDate);
@@ -1206,73 +1219,90 @@
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
                     
                     if (diffDays > 30) { 
-                        borderClass = 'border-danger'; 
-                        ageWarning = `<span class="text-red-500 font-bold ml-1">⚠️ ${diffDays} Hari</span>`; 
+                        borderClass = 'border-l-4 border-l-red-500'; 
+                        bgClass = 'bg-red-50';
                     } else if (diffDays > 14) { 
-                        borderClass = 'border-warning'; 
-                        ageWarning = `<span class="text-amber-500 font-bold ml-1">⚠️ ${diffDays} Hari</span>`; 
-                    } else { 
-                        borderClass = 'border-safe'; 
+                        borderClass = 'border-l-4 border-l-amber-500'; 
+                        bgClass = 'bg-amber-50';
                     }
                 } else if (item.status === 'sold') { 
-                    borderClass = 'border-emerald-500 bg-white'; 
+                    borderClass = 'border-l-4 border-l-emerald-500';
+                    bgClass = 'bg-slate-50';
+                    opacityClass = 'opacity-75 hover:opacity-100 transition';
                 }
                 
-                card.className = `p-4 rounded-2xl border-2 transition-all ${borderClass} bg-white`;
+                card.className = `p-4 rounded-xl shadow-sm border border-slate-100 ${borderClass} ${bgClass} ${opacityClass} relative group`;
                 
-                let typeLabel = '';
-                if(item.type === 'old') typeLabel = 'STOK LALU [L]'; 
-                else if(item.type === 'new') typeLabel = 'BELANJA BARU [B]'; 
-                else typeLabel = 'PROFIT BULAN LALU';
-                
-                // MASKING MODAL FOR CLIENT VIEW
-                const modalDisplay = showModalPrice ? item.modal.toLocaleString() : "🔒 LOCKED";
-                const modalClass = showModalPrice ? "text-slate-700" : "text-slate-300 blur-[2px]";
-                
-                // ACTIONS BUTTONS
-                let actionButtons = '';
+                // Label Logic
+                let typeLabel = item.type === 'old' ? 'L' : (item.type === 'new' ? 'B' : 'X');
+                let typeColor = item.type === 'old' ? 'bg-orange-100 text-orange-600' : (item.type === 'new' ? 'bg-indigo-100 text-indigo-600' : 'bg-emerald-100 text-emerald-600');
+
+                // Masking
+                const modalDisplay = showModalPrice ? item.modal.toLocaleString() : "🔒";
+                const modalClass = showModalPrice ? "text-slate-600" : "text-slate-300";
+
+                // --- ICON ACTIONS GENERATOR ---
+                let actionIcons = '';
                 if (showActions) {
-                     if (item.status !== 'sold') {
-                        actionButtons = `
-                        <div class="flex gap-1 mt-2 justify-end border-t border-dashed pt-2 w-full">
-                            <button onclick="openEditModal(${item.id})" class="bg-yellow-100 text-yellow-700 py-1 px-3 rounded-lg text-xs font-bold mr-1">Edit</button>
-                            <button onclick="openCostModal(${item.id})" class="bg-orange-100 text-orange-700 py-1 px-3 rounded-lg text-xs font-bold mr-1">Biaya</button>
-                            <button onclick="toggleSold(${item.id})" class="bg-indigo-600 text-white px-3 py-1 rounded-lg font-bold text-xs hover:bg-indigo-700 transition flex-1">Laku? ✓</button>
-                        </div>`;
-                     } else {
-                        actionButtons = `
-                        <div class="text-right w-full mt-2 border-t border-dashed pt-1">
-                            <span class="badge-profit">+${profit.toLocaleString()}</span>
-                        </div>`;
-                     }
-                } else {
-                    // Client View
+                    // 1. Edit Button (MUNCUL DI SEMUA STATUS)
+                    const editBtn = `
+                        <button onclick="openEditModal(${item.id})" class="p-2 rounded-lg hover:bg-yellow-100 text-slate-400 hover:text-yellow-600 transition" title="Edit Data">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                        </button>`;
+
+                    // 2. Cost Button (Hanya Stok)
+                    const costBtn = item.status === 'stok' ? `
+                        <button onclick="openCostModal(${item.id})" class="p-2 rounded-lg hover:bg-orange-100 text-slate-400 hover:text-orange-600 transition" title="Tambah Biaya">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </button>` : '';
+
+                    // 3. Sold Button (Hanya Stok)
+                    const soldBtn = item.status === 'stok' ? `
+                        <button onclick="toggleSold(${item.id})" class="p-2 rounded-lg hover:bg-emerald-100 text-slate-400 hover:text-emerald-600 transition" title="Tandai Terjual">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </button>` : '';
+
+                    // 4. Delete Button (MUNCUL DI SEMUA)
+                    const deleteAction = item.type === 'extra' ? `removeExtraProfit(${item.id})` : `removeItem(${item.id})`;
+                    const delBtn = `
+                        <button onclick="${deleteAction}" class="p-2 rounded-lg hover:bg-red-100 text-slate-300 hover:text-red-500 transition" title="Hapus">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>`;
+                    
+                    actionIcons = `<div class="flex items-center gap-1 border-l border-slate-100 pl-2 ml-2">${editBtn}${costBtn}${soldBtn}${delBtn}</div>`;
                 }
 
-                // DELETE BUTTON (Only Owner/Demo)
-                const deleteBtn = showActions ? `<button onclick="${item.type === 'extra' ? `removeExtraProfit(${item.id})` : `removeItem(${item.id})`}" class="text-slate-300 hover:text-red-400 text-xs transition">✕</button>` : '';
-
+                // Layout Kartu Baru
                 card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="text-[7px] font-black px-1.5 py-0.5 rounded uppercase ${item.type === 'extra' ? 'bg-emerald-100 text-emerald-600' : (item.type === 'old' ? 'bg-orange-100 text-orange-600' : 'bg-indigo-100 text-indigo-600')}">${typeLabel}</span>
-                            </div>
-                            <h4 class="font-bold text-slate-800 text-sm">${item.name}</h4>
-                            <div class="flex items-center gap-3 text-[10px] font-medium text-slate-500 mt-1">
-                                <span>M: <b class="${modalClass}">${modalDisplay}</b></span>
-                                <span>J: <b class="text-slate-700">${item.price.toLocaleString()}</b></span>
-                            </div>
-                            <div class="mt-1 text-[8px] text-slate-400 font-bold uppercase italic">
-                                📥 ${item.entryDate || '-'} ${ageWarning}
-                                ${item.soldAt ? `<br><span class="text-emerald-500">📤 ${item.soldAt}</span>` : ''}
-                            </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full ${typeColor}">${typeLabel}</span>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${item.entryDate}</span>
                         </div>
-                        <div class="flex flex-col items-end gap-1 pl-2">
-                            ${deleteBtn}
-                        </div>
+                        ${item.status === 'sold' ? `<span class="badge-profit text-[10px]">+${profit.toLocaleString()}</span>` : ''}
                     </div>
-                    ${actionButtons}`;
+                    
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-sm leading-tight mb-1">${item.name}</h4>
+                            <div class="flex flex-col text-[11px]">
+                                <span class="${modalClass}">M: ${modalDisplay}</span>
+                                <span class="font-bold text-indigo-900">J: ${item.price.toLocaleString()}</span>
+                            </div>
+                        </div>
+                        
+                        ${actionIcons}
+                    </div>
+                `;
                 
                 container.appendChild(card);
             });
