@@ -224,9 +224,9 @@
                 <p class="text-slate-500 text-xs">Masukkan 6 digit PIN keamanan.</p>
             </div>
             
-            <input type="tel" id="pinInput" 
-                   class="w-full text-center text-3xl font-black tracking-[10px] py-4 border-b-2 border-slate-200 focus:border-indigo-600 outline-none bg-transparent transition text-slate-800 mb-8 placeholder-slate-300" 
-                   placeholder="••••••" maxlength="6" oninput="checkAutoPin(this)">
+            <input type="password" inputmode="numeric" id="pinInput" 
+       class="w-full text-center text-3xl font-black tracking-[10px] py-4 border-b-2 border-slate-200 focus:border-indigo-600 outline-none bg-transparent transition text-slate-800 mb-8 placeholder-slate-300" 
+       placeholder="••••••" maxlength="6" oninput="checkAutoPin(this)">
             
             <button onclick="checkPin()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold uppercase shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition mb-4 text-sm hidden">
                 Masuk Dashboard
