@@ -491,14 +491,14 @@
                     <div class="mb-6 space-y-4 sticky top-0 bg-slate-50 lg:bg-white z-10 pt-2 pb-2">
                         
                         <div class="flex gap-2 mb-1">
-                             <select id="sortSelect" onchange="setSort(this.value)" class="w-full bg-white border border-slate-200 text-slate-600 text-[11px] font-bold uppercase rounded-lg p-2 outline-none cursor-pointer hover:border-indigo-400 transition">
-                                <option value="date_desc">📅 Tanggal (Terbaru)</option>
-                                <option value="date_asc">📅 Tanggal (Terlama)</option>
-                                <option value="name_asc">🔤 Nama Barang (A-Z)</option>
-                                <option value="price_asc">💰 Harga (Termurah)</option>
-                                <option value="price_desc">💰 Harga (Termahal)</option>
-                             </select>
-                        </div>
+    <select id="sortSelect" onchange="setSort(this.value)" class="w-full bg-white border border-slate-200 text-slate-700 text-sm rounded-xl px-4 py-2.5 shadow-sm outline-none cursor-pointer hover:bg-slate-50 hover:border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200 appearance-none">
+        <option value="date_desc">📅 Tanggal (Terbaru)</option>
+        <option value="date_asc">📅 Tanggal (Terlama)</option>
+        <option value="name_asc">🔤 Nama Barang (A-Z)</option>
+        <option value="price_asc">💰 Harga (Termurah)</option>
+        <option value="price_desc">💰 Harga (Termahal)</option>
+    </select>
+</div>
 
                         <div class="relative">
                             <input type="text" id="searchInput" onkeyup="renderRows()" placeholder="Cari unit..." class="input-field pl-10 text-sm bg-white shadow-sm border-slate-200">
