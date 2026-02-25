@@ -1,0 +1,1756 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Digital Ledger - Finance Tracker Pro (Farid Store)</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* =========================================
+           GLOBAL STYLES & VARIABLES
+           ========================================= */
+        :root { 
+            --bg-main: #f8fafc; 
+            --sidebar-bg: #1e293b; 
+            --accent: #6366f1; 
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-main); 
+            color: #1e293b; 
+            margin: 0; 
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Hide scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* =========================================
+           COMPONENT STYLES
+           ========================================= */
+        .card { 
+            background: white; 
+            border-radius: 16px; 
+            border: 1px solid #e2e8f0; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); 
+        }
+
+        .input-field { 
+            width: 100%; 
+            padding: 12px; 
+            border-radius: 10px; 
+            border: 1px solid #cbd5e1; 
+            outline: none; 
+            transition: 0.3s; 
+            background: #fdfdfd; 
+        }
+
+        .input-field:focus { 
+            border-color: var(--accent); 
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); 
+        }
+
+        /* =========================================
+           SIDEBAR & NAVIGATION
+           ========================================= */
+        #sidebar { 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            z-index: 50; 
+        }
+
+        .sidebar-item { 
+            display: flex; 
+            align-items: center; 
+            padding: 12px 16px; 
+            border-radius: 10px; 
+            font-size: 0.875rem; 
+            font-weight: 500; 
+            color: #94a3b8; 
+            transition: 0.2s; 
+            cursor: pointer; 
+        }
+
+        .sidebar-item:hover { 
+            background: #334155; 
+            color: white; 
+        }
+
+        .dropdown-content { 
+            max-height: 0; 
+            overflow: hidden; 
+            transition: max-height 0.3s ease-out; 
+            background: #0f172a; 
+            border-radius: 8px; 
+            margin: 0 8px; 
+        }
+
+        .dropdown-content.show { 
+            max-height: 800px; 
+            margin-bottom: 8px; 
+        }
+
+        /* =========================================
+           UTILITIES & HELPERS
+           ========================================= */
+        .hidden-panel { display: none !important; }
+
+        .badge-profit { 
+            background: #dcfce7; 
+            color: #166534; 
+            padding: 4px 8px; 
+            border-radius: 6px; 
+            font-size: 10px; 
+            font-weight: 700; 
+        }
+
+        /* PRIVACY BLUR */
+        .blur-sensitive {
+            filter: blur(5px); 
+            user-select: none; 
+            pointer-events: none;
+            opacity: 0.7;
+            transition: filter 0.3s ease;
+        }
+
+        /* =========================================
+           CALCULATOR WIDGET
+           ========================================= */
+        .sidebar-calc { 
+            background: #0f172a; 
+            border-radius: 20px; 
+            padding: 15px; 
+            margin: 15px 10px; 
+            border: 1px solid #334155; 
+        }
+
+        .calc-display { 
+            text-align: right; 
+            margin-bottom: 10px; 
+            padding: 8px; 
+            background: #1e293b; 
+            border-radius: 10px; 
+        }
+
+        #calc-prev { color: #64748b; font-size: 10px; min-height: 14px; }
+        #calc-curr { color: white; font-size: 18px; font-weight: 700; }
+
+        .calc-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 6px; 
+        }
+
+        .calc-grid button { 
+            height: 35px; border-radius: 8px; border: none; font-size: 12px; 
+            font-weight: 600; cursor: pointer; transition: 0.2s; 
+            background: #334155; color: white; 
+        }
+
+        .calc-grid button:hover { background: #475569; }
+        .calc-grid .btn-op { color: #818cf8; }
+        .calc-grid .btn-eq { background: #6366f1 !important; grid-column: span 2; }
+        .calc-grid .btn-ac { color: #f87171; }
+
+        /* =========================================
+           OWNER FEATURES & ANIMATIONS
+           ========================================= */
+        .dial-card { border-left: 4px solid var(--accent); }
+        .client-item-card { border: none !important; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.04) !important; padding: 20px !important; }
+        
+        .badge-rank { 
+            font-size: 10px; font-weight: 800; padding: 2px 8px; 
+            border-radius: 4px; text-transform: uppercase; 
+            letter-spacing: 1px; float: right;
+        }
+
+        @keyframes shimmer { 100% { transform: translateX(100%); } }
+
+        .shimmer-effect { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent); 
+            transform: translateX(-100%); animation: shimmer 2s infinite; 
+        }
+
+        /* AGING INDICATORS */
+        .border-safe { border-left: 4px solid #10b981 !important; } 
+        .border-warning { border-left: 4px solid #f59e0b !important; background: #fffbeb !important; } 
+        .border-danger { border-left: 4px solid #ef4444 !important; background: #fef2f2 !important; } 
+
+        /* LOADING OVERLAY (CLOUD) */
+        #loadingCloud { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(255,255,255,0.9); z-index: 100; display: flex; 
+            justify-content: center; align-items: center; flex-direction: column; 
+            backdrop-filter: blur(4px); 
+        }
+
+        /* SECURITY PIN MODAL */
+        #authModal {
+            position: fixed; inset: 0; z-index: 999; background: #f8fafc; 
+            display: flex; justify-content: center; align-items: center;
+        }
+    </style>
+</head>
+<body class="antialiased lg:overflow-hidden">
+
+    <div id="authModal">
+        <div class="max-w-sm w-full text-center p-8">
+            <div class="mb-6">
+                <div class="w-16 h-16 bg-indigo-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-indigo-200 mb-4">
+                    <span class="text-3xl">🔐</span>
+                </div>
+                <h2 class="text-2xl font-black text-slate-800 mb-1">OWNER ACCESS</h2>
+                <p class="text-slate-500 text-xs">Masukkan 6 digit PIN keamanan.</p>
+            </div>
+            
+            <input type="password" inputmode="numeric" id="pinInput" 
+       class="w-full text-center text-3xl font-black tracking-[10px] py-4 border-b-2 border-slate-200 focus:border-indigo-600 outline-none bg-transparent transition text-slate-800 mb-8 placeholder-slate-300" 
+       placeholder="••••••" maxlength="6" oninput="checkAutoPin(this)">
+            
+            <button onclick="checkPin()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold uppercase shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition mb-4 text-sm hidden">
+                Masuk Dashboard
+            </button>
+            
+            <button onclick="enterClientMode()" class="text-slate-400 text-xs font-bold hover:text-slate-600 transition uppercase tracking-wider">
+                Masuk sebagai Tamu (View Only)
+            </button>
+        </div>
+    </div>
+
+    <div id="loadingCloud" style="display: none;">
+        <div class="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <span id="loadingText" class="text-sm font-bold text-slate-700 uppercase tracking-widest">Menghubungkan ke Cloud...</span>
+    </div>
+
+    <div class="flex flex-col lg:flex-row min-h-screen w-full lg:h-screen lg:overflow-hidden">
+        
+        <div id="overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-40 lg:hidden" onclick="toggleSidebar()"></div>
+
+        <aside id="sidebar" class="fixed lg:static top-0 left-0 h-full w-64 bg-[#1e293b] text-white shadow-2xl flex flex-col -translate-x-full lg:translate-x-0 overflow-y-auto flex-shrink-0">
+            <div class="p-6">
+                <h2 class="text-xl font-extrabold mb-8 flex items-center gap-3 italic tracking-tight">
+                    <span class="bg-indigo-600 p-2 rounded-lg not-italic">📱</span> MENU
+                </h2>
+                <nav class="space-y-2">
+                    <div onclick="switchPage('main')" class="sidebar-item hover:bg-indigo-600 hover:text-white transition">
+                        <span class="mr-3 text-lg">📊</span> Dashboard Utama
+                    </div>
+                    <div class="admin-only-view">
+                        <div onclick="switchPage('analytics')" class="sidebar-item hover:bg-indigo-600 hover:text-white transition">
+                            <span class="mr-3 text-lg">📈</span> Analisa Bisnis
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div onclick="toggleDropdown('dropCheck')" class="sidebar-item justify-between">
+                            <span class="flex items-center"><span class="mr-3 text-lg">🔍</span> Gadget Check</span>
+                            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div id="dropCheck" class="dropdown-content">
+                            <div onclick="switchPage('hp')" class="sidebar-item text-xs pl-12">Handphone Check</div>
+                            <div onclick="switchPage('dial')" class="sidebar-item text-xs pl-12">Dial Check (Kode)</div>
+                            <div onclick="switchPage('laptop')" class="sidebar-item text-xs pl-12">Laptop Check</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div onclick="toggleDropdown('dropWarranty')" class="sidebar-item justify-between">
+                            <span class="flex items-center"><span class="mr-3 text-lg">🛡️</span> Cek Garansi</span>
+                            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div id="dropWarranty" class="dropdown-content">
+                        <a href="https://www.mi.com/global/verify/#/en/tab/imei" target="_blank" class="sidebar-item text-xs pl-12">Xiaomi Official</a>
+                        <a href="https://www.realme.com/sa-en/support/phonecheck" target="_blank" class="sidebar-item text-xs pl-12">Realme Official</a>
+                        <a href="https://www.vivo.com/en/support/IMEI" target="_blank" class="sidebar-item text-xs pl-12">Vivo Official</a>
+                        <a href="https://support.oppo.com/en/warranty-check/" target="_blank" class="sidebar-item text-xs pl-12">OPPO Official</a>
+                        <a href="https://wap.id.infinixmobility.com/care/imei-authentication" target="_blank" class="sidebar-item text-xs pl-12">Infinix Official</a>
+                        <a href="https://checkcoverage.apple.com/" target="_blank" class="sidebar-item text-xs pl-12 font-bold text-indigo-400">Apple Official</a>
+                        <a href="https://www.iqoo.com/in/support/IMEI" target="_blank" class="sidebar-item text-xs pl-12">Iqoo Official</a>
+                        <a href="https://www.tecno-mobile.com/warranty/" target="_blank" class="sidebar-item text-xs pl-12">Tecno Official</a>
+                        <a href="https://www.samsung.com/us/support/warranty/" target="_blank" class="sidebar-item text-xs pl-12">Samsung Official</a>
+                    </div>
+                    </div>
+                    
+                    <div class="border-t border-slate-700 my-4"></div>
+                    
+                    <div class="sidebar-calc admin-only-view">
+                        <div class="calc-display">
+                            <div id="calc-prev"></div>
+                            <div id="calc-curr">0</div>
+                        </div>
+                        <div class="calc-grid">
+                            <button class="btn-ac" onclick="calcClear()">AC</button>
+                            <button onclick="calcDel()">DEL</button>
+                            <button onclick="calcPerc()">%</button> 
+                            <button class="btn-op" onclick="calcOp('/')">÷</button>
+                            <button onclick="calcNum('7')">7</button>
+                            <button onclick="calcNum('8')">8</button>
+                            <button onclick="calcNum('9')">9</button>
+                            <button class="btn-op" onclick="calcOp('*')">×</button>
+                            <button onclick="calcNum('4')">4</button>
+                            <button onclick="calcNum('5')">5</button>
+                            <button onclick="calcNum('6')">6</button>
+                            <button class="btn-op" onclick="calcOp('-')">-</button>
+                            <button onclick="calcNum('1')">1</button>
+                            <button onclick="calcNum('2')">2</button>
+                            <button onclick="calcNum('3')">3</button>
+                            <button class="btn-op" onclick="calcOp('+')">+</button>
+                            <button onclick="calcNum('0')">0</button>
+                            <button onclick="calcNum('.')">.</button>
+                            <button class="btn-eq" onclick="calcResult()" style="grid-column: span 2;">=</button>
+                        </div>
+                    </div>
+
+                    <div id="admin-sidebar-tools" class="admin-only-view">
+                        <button onclick="toggleHelpModal()" class="sidebar-item w-full bg-slate-800/50 mb-2">📖 Panduan</button>
+                        <button onclick="clearData()" class="sidebar-item w-full text-red-400 hover:text-red-300 italic">🗑️ Hapus Semua Data</button>
+                    </div>
+                </nav>
+
+                <div class="mt-8">
+                    <p class="text-[10px] text-slate-500 font-bold uppercase mb-3 tracking-widest">Access Mode</p>
+                    <div class="flex bg-slate-900 p-1 rounded-xl gap-1">
+                        <button id="btnAccessIndicator" class="flex-1 py-2 rounded-lg text-[10px] font-black bg-slate-700 text-slate-400 cursor-default">
+                            LOCKED
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mt-4 pb-8 admin-only-view">
+                    <p class="text-[10px] text-slate-500 font-bold uppercase mb-3 tracking-widest">Privacy Mode</p>
+                    <div class="flex bg-slate-900 p-1 rounded-xl gap-1">
+                        <button onclick="toggleBlur()" id="btnBlur" class="w-full py-2 rounded-lg text-[10px] font-black text-slate-500 hover:text-white transition">👁️ MODE BLUR: OFF</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="flex-1 flex flex-col w-full h-full lg:overflow-hidden relative">
+            
+            <main id="page-main" class="flex-1 flex flex-col lg:flex-row w-full h-full lg:overflow-hidden">
+                
+                <div class="flex-1 lg:overflow-y-auto p-4 md:p-8 w-full">
+                    
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-6">
+                        <div class="flex items-center gap-3 mb-4 w-full">
+                            <button onclick="toggleSidebar()" class="lg:hidden p-2.5 bg-slate-50 rounded-xl shadow-sm border text-indigo-600 font-bold transition active:scale-95 flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+                                </svg>
+                            </button>
+
+                            <div class="flex gap-2 overflow-x-auto no-scrollbar w-full admin-only-view">
+                                <button onclick="emergencyRescue()" class="px-3 py-2 bg-red-600 text-white rounded-lg text-[10px] font-bold shadow-md hover:bg-red-700 transition flex items-center gap-1 flex-shrink-0 animate-pulse">
+                                    <span>🆘</span> 
+                                </button>
+                                <button onclick="forceSync()" class="px-3 py-2 bg-blue-600 text-white rounded-lg text-[10px] font-bold shadow-md hover:bg-blue-700 transition flex items-center gap-1 flex-shrink-0">
+                                    <span>☁️</span> Sync
+                                </button>
+                                <button onclick="toggleImportModal()" class="px-3 py-2 bg-white border border-indigo-100 text-indigo-600 rounded-lg text-[10px] font-bold shadow-sm hover:bg-indigo-50 transition flex items-center gap-1 flex-shrink-0">
+                                    <span>📥</span> Import
+                                </button>
+                                <button onclick="exportReport()" class="px-3 py-2 bg-emerald-600 text-white rounded-lg text-[10px] font-bold shadow-lg hover:bg-emerald-700 transition flex items-center gap-1 flex-shrink-0">
+                                    <span>📑</span> Laporan
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-end border-t border-slate-100 pt-4">
+                            <div class="flex flex-col">
+                                <h1 class="text-lg md:text-2xl font-extrabold tracking-tighter text-slate-900 uppercase leading-none">
+                                    DIGITAL <span class="text-indigo-600">LEDGER</span>
+                                </h1>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <p id="currentMonth" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest"></p>
+                                    <p id="cloudStatus" class="text-[9px] text-slate-400 font-bold">⚪ Local</p>
+                                </div>
+                            </div>
+                            
+                            <div class="text-right flex flex-col items-end admin-only-view">
+                                <div id="rankBadge" class="badge-rank bg-slate-200 text-slate-500 mb-1 scale-90 origin-right">Unranked</div>
+                                <p class="text-[8px] text-slate-400 uppercase font-black tracking-widest">Realized Profit</p>
+                                <h2 id="summaryProfit" class="text-xl font-black text-emerald-600 leading-none sensitive-data">Rp 0</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card p-4 mb-6 border-l-4 border-indigo-600 relative overflow-hidden group admin-only-view">
+                        <div class="flex justify-between items-end mb-2 relative z-10">
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Target Bulan Ini</p>
+                                <h3 id="targetNameDisplay" class="font-black text-slate-800 text-sm cursor-pointer hover:text-indigo-600" onclick="setMonthlyTarget()">Set Your Goal 🎯</h3>
+                            </div>
+                            <div class="text-right">
+                                <span id="targetPercentage" class="text-2xl font-black text-indigo-600 sensitive-data">0%</span>
+                            </div>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-3 mb-2 relative z-10 overflow-hidden">
+                            <div id="progressBar" class="bg-indigo-600 h-3 rounded-full transition-all duration-1000 ease-out relative w-0">
+                                 <div class="shimmer-effect"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between text-[10px] font-bold text-slate-400 relative z-10">
+                            <span id="currentProgressText" class="text-emerald-600 sensitive-data">Rp 0</span> 
+                            <span id="targetValueDisplay" class="sensitive-data">Target: Rp 0</span>
+                        </div>
+                        <button onclick="setMonthlyTarget()" class="absolute top-2 right-2 p-1 bg-white/80 rounded hover:bg-white text-slate-400 hover:text-indigo-600 transition opacity-0 group-hover:opacity-100 z-20">⚙️</button>
+                    </div>
+
+                    <div id="clientBanner" class="hidden mb-6 bg-slate-800 text-white p-6 rounded-2xl shadow-xl border border-slate-700">
+                        <h2 class="text-xl font-black text-white mb-1 uppercase">Mode Tamu (Guest)</h2>
+                        <p class="text-slate-400 text-xs mb-4">Melihat ketersediaan stok dan harga jual secara Live dari Server.</p>
+                        <div class="p-3 bg-slate-900 rounded-xl border border-dashed border-slate-600 text-[10px] text-slate-400">
+                            <strong class="text-orange-400 block mb-1">TIPS:</strong>
+                            Ingin mencoba fitur admin? Gunakan mode "Admin Sandbox" di menu. Data sandbox tidak akan disimpan ke cloud owner.
+                            <br>
+                            <button onclick="enableSandboxMode()" class="mt-2 text-indigo-400 underline font-bold cursor-pointer">Masuk Mode Sandbox (Demo)</button>
+                        </div>
+                    </div>
+
+                    <div id="sandboxBanner" class="hidden mb-6 bg-orange-100 border-l-4 border-orange-500 text-orange-900 p-4 rounded-xl">
+                         <h3 class="font-bold text-xs uppercase flex items-center gap-2">⚠️ SANDBOX MODE</h3>
+                         <p class="text-[10px]">Anda bebas mengedit/menambah data untuk tes. Data <b>TIDAK</b> akan disinkronkan ke Cloud Owner.</p>
+                    </div>
+
+                    <div id="admin-dashboard-section" class="admin-only-view">
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="card p-5 border-b-4 border-indigo-500">
+                                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Uang Tunai (Cash)</p>
+                                <h2 id="summaryCash" class="text-lg font-bold text-slate-800 sensitive-data">Rp 0</h2>
+                            </div>
+                            <div class="card p-5 border-b-4 border-emerald-500">
+                                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Total Floating</p>
+                                <h2 id="summaryFloating" class="text-lg font-bold text-slate-800 sensitive-data">Rp 0</h2>
+                            </div>
+                            <div class="card p-6 col-span-2 text-center bg-slate-900 text-white border-none shadow-xl">
+                                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-widest opacity-80">Unrealized Balance (Total Aset)</p>
+                                <h2 id="summaryTotal" class="text-3xl font-black sensitive-data">Rp 0</h2>
+                            </div>
+                        </div>
+
+                        <div class="card p-6 mb-4">
+                            <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2 text-xs uppercase tracking-wider"><span>📝</span> Smart Input Teks</h3>
+                            <textarea id="bulkInput" class="input-field h-24 mb-4 text-sm border-dashed" placeholder="Contoh: Poco M3 : 500.000 > 600.000"></textarea>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button onclick="parseText('old')" class="py-3 bg-slate-700 text-white rounded-xl font-bold text-[10px] uppercase hover:bg-slate-800 transition">Stok Lalu [L]</button>
+                                <button onclick="parseText('new')" class="py-3 bg-emerald-600 text-white rounded-xl font-bold text-[10px] uppercase hover:bg-emerald-700 transition">Belanja Baru [B]</button>
+                            </div>
+                        </div>
+
+                        <div class="mb-6 space-y-2">
+                            <div class="flex gap-2 overflow-x-auto pb-2">
+                                <button onclick="toggleConfig('configPanel', 'configLabel', '⚙️ Saldo Awal')" id="configLabel" class="flex-shrink-0 text-[10px] font-bold text-indigo-600 bg-indigo-50 px-3 py-2 rounded-lg uppercase tracking-widest">⚙️ Saldo Awal</button>
+                                <button onclick="toggleConfig('extraProfitPanel', 'extraProfitLabel', '📈 Tambah Profit')" id="extraProfitLabel" class="flex-shrink-0 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-3 py-2 rounded-lg uppercase tracking-widest">📈 Tambah Profit</button>
+                                <button onclick="toggleConfig('journalPanel', 'journalLabel', '📓 Owner Journal')" id="journalLabel" class="flex-shrink-0 text-[10px] font-bold text-yellow-600 bg-yellow-50 px-3 py-2 rounded-lg uppercase tracking-widest">📓 Owner Journal</button>
+                            </div>
+
+                            <div id="configPanel" class="hidden-panel mt-2">
+                                <div class="card p-5 bg-indigo-50/50 border-indigo-100 mb-4">
+                                    <h3 class="font-bold text-indigo-900 text-[10px] uppercase mb-2">Modal Tunai di Tangan (Awal Bulan)</h3>
+                                    <input type="number" id="startBalance" class="input-field font-black text-lg text-indigo-700" value="0" onchange="calculateAll()">
+                                </div>
+                            </div>
+
+                            <div id="extraProfitPanel" class="hidden-panel mt-2">
+                                <div class="card p-5 bg-emerald-50 border-emerald-100 mb-4">
+                                    <h3 class="font-bold text-emerald-900 text-[10px] uppercase mb-3">Input Barang Terjual Bulan Lalu</h3>
+                                    <textarea id="exBulkInput" class="input-field h-20 mb-3 text-xs border-dashed" placeholder="Smart Input: Nama : Modal > Jual (Per baris)"></textarea>
+                                    <button onclick="parseExtraProfitText()" class="w-full py-2 bg-indigo-600 text-white rounded-lg font-bold text-[10px] uppercase mb-4">Smart Input Profit</button>
+                                    <div id="extraProfitList" class="mt-4 space-y-2 border-t pt-3 border-emerald-200"></div>
+                                </div>
+                            </div>
+
+                            <div id="journalPanel" class="hidden-panel mt-2">
+                                <div class="card p-5 bg-yellow-50 border-yellow-200 mb-4">
+                                    <h3 class="font-bold text-yellow-900 text-[10px] uppercase mb-2">Refleksi & Catatan Harian</h3>
+                                    <textarea id="ownerNote" class="w-full h-24 bg-white text-sm text-slate-700 outline-none p-3 rounded-xl border border-yellow-300 resize-none placeholder-slate-400" placeholder="Apa pelajaran bisnis hari ini, Farid? Tulis di sini..." oninput="saveNote()"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card p-5 bg-slate-800 border-l-4 border-indigo-500 text-white flex justify-between items-center mb-8 shadow-lg">
+                            <div>
+                                <h3 class="font-bold text-indigo-300 text-[9px] uppercase tracking-widest opacity-80">Modal Stok Berjalan</h3>
+                                <h2 id="previewModalStock" class="text-xl font-black sensitive-data">Rp 0</h2>
+                            </div>
+                            <div class="text-right">
+                                <h3 class="font-bold text-emerald-400 text-[9px] uppercase tracking-widest opacity-80">Potensi Untung</h3>
+                                <h2 id="previewUnrealizedProfit" class="text-xl font-black sensitive-data">Rp 0</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full lg:w-[400px] xl:w-[450px] flex-shrink-0 bg-slate-50 lg:bg-white lg:border-l border-slate-200 lg:overflow-y-auto p-4 md:p-6 pb-24">
+                    
+                    <div class="mb-6 space-y-4 sticky top-0 bg-slate-50 lg:bg-white z-10 pt-2 pb-2">
+                        
+                        <div class="flex gap-2 mb-1">
+                             <select id="sortSelect" onchange="setSort(this.value)" class="w-full bg-white border border-slate-200 text-slate-600 text-[11px] font-bold uppercase rounded-lg p-2 outline-none cursor-pointer hover:border-indigo-400 transition">
+                                <option value="date_desc">📅 Tanggal (Terbaru)</option>
+                                <option value="date_asc">📅 Tanggal (Terlama)</option>
+                                <option value="name_asc">🔤 Nama Barang (A-Z)</option>
+                                <option value="price_asc">💰 Harga (Termurah)</option>
+                                <option value="price_desc">💰 Harga (Termahal)</option>
+                             </select>
+                        </div>
+
+                        <div class="relative">
+                            <input type="text" id="searchInput" onkeyup="renderRows()" placeholder="Cari unit..." class="input-field pl-10 text-sm bg-white shadow-sm border-slate-200">
+                            <span class="absolute left-3 top-3.5 opacity-30 text-lg">🔍</span>
+                        </div>
+                        <div class="flex bg-slate-200 p-1 rounded-xl gap-1">
+                            <button onclick="setFilter('stok')" id="tabStok" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all bg-white text-indigo-600 shadow-sm">Unit Stok</button>
+                            <button onclick="setFilter('sold')" id="tabSold" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500">History Terjual</button>
+                            <button onclick="setFilter('extra')" id="tabExtra" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500">History Bulan Lalu</button>
+                        </div>
+                    </div>
+                    
+                    <div id="itemRows" class="space-y-3 mb-20"></div>
+
+                </div>
+            </main>
+
+            <div id="page-analytics" class="max-w-4xl w-full mx-auto hidden flex-1 lg:overflow-y-auto pt-8 px-4 md:px-8">
+                <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali Dashboard</button>
+                <h1 class="text-2xl font-black italic mb-6 text-slate-800">📊 PERFORMA TOKO</h1>
+            
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="card p-4 border-l-4 border-blue-500">
+                        <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Kecepatan Putaran</p>
+                        <h2 id="avgSellTime" class="text-2xl font-black text-slate-800">- Hari</h2>
+                        <p class="text-[9px] text-slate-400 italic mt-1">Rata-rata barang laku</p>
+                    </div>
+                    <div class="card p-4 border-l-4 border-purple-500">
+                        <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Win Rate Barang</p>
+                        <h2 id="winRateStock" class="text-2xl font-black text-slate-800">0%</h2>
+                        <p class="text-[9px] text-slate-400 italic mt-1">Rasio Laku vs Stok Diam</p>
+                    </div>
+                </div>
+            
+                <div class="card p-5 mb-6">
+                    <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Dominasi Brand (Smart Grouping)</h3>
+                    <div class="h-64">
+                        <canvas id="brandChart"></canvas>
+                    </div>
+                </div>
+            
+                <div class="card p-5 mb-6">
+                    <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Tren Profit Harian</h3>
+                    <div class="h-48">
+                        <canvas id="profitTrendChart" class="sensitive-data"></canvas>
+                    </div>
+                </div>
+
+                <div class="card p-5 mb-6">
+                    <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Performa Profit Per Kuartal</h3>
+                    <div class="h-48">
+                        <canvas id="quarterlyChart" class="sensitive-data"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-hp" class="max-w-3xl w-full mx-auto hidden flex-1 lg:overflow-y-auto pt-8 px-4 md:px-8">
+                <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali</button>
+                <h1 class="text-2xl font-black italic mb-6">📱 Handphone Check</h1>
+                <div class="card p-6 space-y-4">
+                    <div class="bg-slate-50 p-4 rounded-xl border">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase block mb-2 italic">Cek IMEI (imei.info)</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="imeiInput" class="input-field text-sm bg-white" placeholder="Masukkan 15 digit IMEI...">
+                            <button onclick="directImei()" class="bg-indigo-600 text-white px-6 rounded-xl font-bold text-[10px]">CEK</button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 gap-2">
+                        <button onclick="window.open('https://old.beacukai.go.id/websitenewV2/cek-imei.html')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">Cek IMEI Beacukai <span>🌐</span></button>
+                        <button onclick="window.open('https://sickw.com/')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">SICKSW (SN/IMEI) <span>🌐</span></button>
+                        <button onclick="window.open('https://www.touchscreentest.com/')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">Touchscreen Test <span>🌐</span></button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-dial" class="max-w-3xl w-full mx-auto hidden flex-1 lg:overflow-y-auto pt-8 px-4 md:px-8 pb-12">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <button onclick="switchPage('main')" class="mb-2 text-indigo-600 font-bold text-xs uppercase flex items-center gap-1 hover:underline">
+                <span>←</span> Kembali
+            </button>
+            <h1 class="text-2xl font-black italic text-slate-800">🔍 KODE DIAL CHECKER</h1>
+            <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Farid Store Technician Tools</p>
+        </div>
+        <div class="bg-indigo-50 p-2 rounded-lg">
+             <span class="text-2xl">📱</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <div onclick="copyToClipboard('*#06#')" class="card p-4 border-2 border-dashed border-indigo-200 bg-indigo-50/30 cursor-pointer hover:bg-indigo-50 transition group">
+            <h3 class="font-black text-[10px] text-indigo-600 uppercase mb-1">UNIVERSAL (WAJIB)</h3>
+            <div class="flex justify-between items-center">
+                <p class="text-xl font-mono font-bold text-slate-800">*#06#</p>
+                <span class="text-[9px] font-bold bg-indigo-600 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">SALIN</span>
+            </div>
+            <p class="text-[10px] text-slate-500 uppercase font-medium mt-1">Cek IMEI & Serial Number</p>
+        </div>
+        <div onclick="copyToClipboard('*#*#4636#*#*')" class="card p-4 border-2 border-dashed border-slate-200 cursor-pointer hover:bg-slate-50 transition group">
+            <h3 class="font-black text-[10px] text-slate-400 uppercase mb-1">ALL ANDROID</h3>
+            <div class="flex justify-between items-center">
+                <p class="text-xl font-mono font-bold text-slate-800">*#*#4636#*#*</p>
+                <span class="text-[9px] font-bold bg-slate-800 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">SALIN</span>
+            </div>
+            <p class="text-[10px] text-slate-500 uppercase font-medium mt-1">Info Sinyal & Statistik Baterai</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div onclick="copyToClipboard('*#0*#')" class="card p-4 dial-card cursor-pointer hover:shadow-md transition active:scale-95 border border-slate-100">
+            <h3 class="font-black text-[10px] text-blue-600 uppercase mb-2">SAMSUNG</h3>
+            <p class="text-lg font-mono font-bold text-slate-700">*#0*#</p>
+            <p class="text-[9px] text-slate-400 uppercase font-bold">General Test</p>
+        </div>
+
+        <div onclick="copyToClipboard('*#*#64663#*#*')" class="card p-4 dial-card cursor-pointer hover:shadow-md transition active:scale-95 border border-slate-100">
+            <h3 class="font-black text-[10px] text-orange-500 uppercase mb-2">XIAOMI/POCO </h3>
+            <p class="text-lg font-mono font-bold text-slate-700 text-xs truncate">*#*#6484#*#*</p>
+            <p class="text-[9px] text-slate-400 uppercase font-bold">CIT Hardware Test</p>
+        </div>
+
+        <div onclick="copyToClipboard('*#899#')" class="card p-4 dial-card cursor-pointer hover:shadow-md transition active:scale-95 border border-slate-100">
+            <h3 class="font-black text-[10px] text-green-600 uppercase mb-2">OPPO/REALME</h3>
+            <p class="text-lg font-mono font-bold text-slate-700">*#899#</p>
+            <p class="text-[9px] text-slate-400 uppercase font-bold">Engineer Mode</p>
+        </div>
+
+        <div onclick="copyToClipboard('*#558#')" class="card p-4 dial-card cursor-pointer hover:shadow-md transition active:scale-95 border border-slate-100">
+            <h3 class="font-black text-[10px] text-blue-400 uppercase mb-2">VIVO/IQOO</h3>
+            <p class="text-lg font-mono font-bold text-slate-700">*#558#</p>
+            <p class="text-[9px] text-slate-400 uppercase font-bold">Factory Test</p>
+        </div>
+
+        <div onclick="copyToClipboard('*#90#')" class="card p-4 dial-card cursor-pointer hover:shadow-md transition active:scale-95 border border-slate-100">
+            <h3 class="font-black text-[10px] text-emerald-500 uppercase mb-2">INFINIX</h3>
+            <p class="text-lg font-mono font-bold text-slate-700">*#90#</p>
+            <p class="text-[9px] text-slate-400 uppercase font-bold">Manual Test</p>
+        </div>
+
+        <div onclick="copyToClipboard('*#*#7378423#*#*')" class="card p-4 dial-card cursor-pointer hover:shadow-md transition active:scale-95 border border-slate-100">
+            <h3 class="font-black text-[10px] text-slate-800 uppercase mb-2">SONY</h3>
+            <p class="text-lg font-mono font-bold text-slate-700 text-xs truncate">*#*#7378423#*#*</p>
+            <p class="text-[9px] text-slate-400 uppercase font-bold">Service Menu</p>
+        </div>
+    </div>
+
+    <div class="mt-8 p-4 bg-slate-800 rounded-2xl text-white">
+        <h4 class="text-xs font-black uppercase mb-2 text-indigo-400">💡 Tips Pengecekan</h4>
+        <ul class="text-[11px] space-y-2 text-slate-300">
+            <li class="flex gap-2"><span>•</span> <b>iPhone:</b> Tidak ada dial hardware, cek 3uTools & Field Test (*3001#12345#*).</li>
+            <li class="flex gap-2"><span>•</span> <b>Asus:</b> Buka Kalkulator, ketik <b>.12345+=</b> untuk masuk SMMI Test.</li>
+            <li class="flex gap-2"><span>•</span> <b>LCD:</b> Pastikan cek di warna putih (cek spot) dan hitam (cek kebocoran cahaya).</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert("Kode " + text + " berhasil disalin!");
+    });
+}
+</script>
+
+            <div id="page-laptop" class="max-w-3xl w-full mx-auto hidden flex-1 lg:overflow-y-auto pt-8 px-4 md:px-8">
+                <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali</button>
+                <h1 class="text-2xl font-black italic mb-6">💻 Laptop Check List</h1>
+                <div class="space-y-4">
+                    <div class="card p-5">
+                        <h3 class="font-bold text-sm mb-3 text-slate-800">1. Pengecekan Fisik & Layar</h3>
+                        <ul class="text-[11px] space-y-2 text-slate-600 uppercase font-bold">
+                            <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Cek Engsel & Baut (Pastikan rapat)</li>
+                            <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Dead Pixel Test (Buka browser: deadpixeltest.org)</li>
+                            <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> White Spot / Jamur pada LCD</li>
+                        </ul>
+                    </div>
+                    <div class="card p-5">
+                        <h3 class="font-bold text-sm mb-3 text-slate-800">2. Performa & Baterai</h3>
+                        <ul class="text-[11px] space-y-2 text-slate-600 uppercase font-bold">
+                            <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> CMD: <code class="bg-slate-100 px-1 lowercase">powercfg /batteryreport</code></li>
+                            <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Cek Kesehatan SSD (Gunakan CrystalDiskInfo)</li>
+                            <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Keyboard Test (Buka: keyboardtester.com)</li>
+                        </ul>
+                    </div>
+                    <div class="card p-5">
+                        <h3 class="font-bold text-sm mb-3 text-slate-800">3. Konektivitas & Suara</h3>
+                        <ul class="text-[11px] space-y-2 text-slate-600 uppercase font-bold">
+                            <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Tes Semua Port USB, HDMI, Audio Jack</li>
+                            <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Tes Webcam & Mic</li>
+                            <li class="flex items-center gap-2"><span class="text-indigo-600">✓</span> Cek Speaker (Pastikan tidak sember)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+        </div> </div> <div id="importModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="display: none;">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="toggleImportModal()"></div>
+        <div class="relative bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl">
+            <h3 class="text-xl font-black text-indigo-900 uppercase italic mb-4">📥 Import Data</h3>
+            <p class="text-xs text-slate-500 mb-2">Paste kode backup (JSON) atau data teks lama di sini.</p>
+            <textarea id="importArea" class="input-field h-48 mb-4 text-[11px] font-mono" placeholder="Paste data..."></textarea>
+            <button onclick="processImport()" class="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold shadow-lg">RESTORE DATA SEKARANG</button>
+        </div>
+    </div>
+
+    <div id="editModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="display: none;">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeEditModal()"></div>
+        <div class="relative bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl">
+            <h3 class="text-lg font-black text-slate-800 uppercase italic mb-4">✏️ Edit Barang</h3>
+            <div class="space-y-3">
+                <input type="text" id="editItemName" class="input-field" placeholder="Nama">
+                <input type="number" id="editItemModal" class="input-field" placeholder="Modal">
+                <input type="number" id="editItemPrice" class="input-field" placeholder="Jual">
+                <div class="bg-slate-50 p-2 rounded-lg border border-slate-200">
+                    <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Tanggal Masuk (Manual)</label>
+                    <input type="date" id="editEntryDate" class="input-field mt-1 text-sm bg-white">
+                </div>
+                <button onclick="saveEditItem()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold mt-2">SIMPAN</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="costModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="display: none;">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeCostModal()"></div>
+        <div class="relative bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl">
+            <h3 class="text-lg font-black text-slate-800 uppercase italic mb-2">🛠️ Tambah Biaya</h3>
+            <input type="text" id="costDesc" class="input-field mt-1" placeholder="Keterangan (cth: Ganti LCD)">
+            <input type="number" id="costAmount" class="input-field mt-1" placeholder="Biaya (Rp)">
+            <button onclick="saveCost()" class="w-full py-3 bg-orange-500 text-white rounded-xl font-bold mt-4">TAMBAH KE MODAL</button>
+        </div>
+    </div>
+
+    <script>
+        // ===============================================
+        // ☁️ KONFIGURASI CLOUD & SECURITY
+        // ===============================================
+        const BIN_ID = '699644fdae596e708f3582af'; 
+        const API_KEY = '$2a$10$tcKHEWwuz2sqRoMCKJfga.1xxTFW0RxpXUPnP.NI4YbivtlK1xxau'; 
+        const OWNER_PIN = '011204';
+        
+        // ===============================================
+        // VARIABLES
+        // ===============================================
+        let items = [];
+        let extraProfits = [];
+        let currentFilter = 'stok';
+        let currentMonthString = '';
+        let currentSort = 'date_desc'; // Default Sort
+        
+        // ACCESS CONTROL STATE
+        let currentUserMode = 'client_view'; 
+        let isBlurMode = false; // BLUR STATE
+        
+        // OWNER FEATURE VARIABLES
+        let targetGoal = 25000000; 
+        let targetName = "BEP Modal 25 Juta";
+        
+        // ANALYTICS VARIABLES
+        let brandChartInstance = null;
+        let trendChartInstance = null;
+        let quarterlyChartInstance = null;
+        
+        // EDIT & COST VARIABLES
+        let currentEditId = null;
+        let currentCostId = null;
+        
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+        // ===============================================
+        // 🔐 SECURITY & AUTH LOGIC
+        // ===============================================
+        
+        function checkAutoPin(el) {
+            if (el.value.length === 6) {
+                checkPin();
+            }
+        }
+
+        function checkPin() {
+            const input = document.getElementById('pinInput').value;
+            if (input === OWNER_PIN) {
+                currentUserMode = 'owner';
+                document.getElementById('authModal').style.display = 'none';
+                
+                const btnInd = document.getElementById('btnAccessIndicator');
+                btnInd.innerText = "OWNER MODE";
+                btnInd.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white cursor-default";
+                
+                updateUIForMode();
+                autoFetchCloud(); // Menarik data terbaru otomatis saat admin login
+            } else {
+                if(input.length === 6) {
+                    alert("PIN Salah! Akses ditolak.");
+                    document.getElementById('pinInput').value = '';
+                }
+            }
+        }
+
+        function enterClientMode() {
+            currentUserMode = 'client_view';
+            document.getElementById('authModal').style.display = 'none';
+            
+            const btnInd = document.getElementById('btnAccessIndicator');
+            btnInd.innerText = "GUEST MODE";
+            btnInd.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-slate-600 text-white cursor-default";
+
+            updateUIForMode();
+            autoFetchCloud(); // Menarik data terbaru otomatis untuk klien
+        }
+
+        function enableSandboxMode() {
+            if(confirm("Masuk Mode Demo Admin?\n\nAnda bisa edit/tambah data, tapi TIDAK AKAN DISIMPAN KE CLOUD OWNER.\nIni hanya simulasi di browser Anda.")) {
+                currentUserMode = 'client_demo';
+                document.getElementById('clientBanner').classList.add('hidden');
+                document.getElementById('sandboxBanner').classList.remove('hidden');
+                
+                const btnInd = document.getElementById('btnAccessIndicator');
+                btnInd.innerText = "SANDBOX ADMIN";
+                btnInd.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-orange-500 text-white cursor-default";
+                
+                document.getElementById('cloudStatus').innerText = "⚪ Local Sandbox Only";
+                
+                updateUIForMode();
+            }
+        }
+
+        function updateUIForMode() {
+            const adminContent = document.querySelectorAll('.admin-only-view');
+            const clientBanner = document.getElementById('clientBanner');
+            
+            if (currentUserMode === 'client_view') {
+                adminContent.forEach(el => el.classList.add('hidden'));
+                clientBanner.classList.remove('hidden');
+            } else {
+                adminContent.forEach(el => el.classList.remove('hidden'));
+                clientBanner.classList.add('hidden');
+            }
+            renderRows(); 
+        }
+
+        // ===============================================
+        // 👁️ PRIVACY (BLUR) MODE
+        // ===============================================
+        function toggleBlur() {
+            isBlurMode = !isBlurMode;
+            const btn = document.getElementById('btnBlur');
+            
+            if(isBlurMode) {
+                btn.innerHTML = "🙈 MODE BLUR: ON";
+                btn.className = "w-full py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white transition shadow-lg";
+            } else {
+                btn.innerHTML = "👁️ MODE BLUR: OFF";
+                btn.className = "w-full py-2 rounded-lg text-[10px] font-black text-slate-500 bg-transparent hover:bg-slate-800 transition";
+            }
+            
+            applyBlurClass();
+        }
+
+        function applyBlurClass() {
+            // Static elements
+            document.querySelectorAll('.sensitive-data').forEach(el => {
+                if(isBlurMode) {
+                    el.classList.add('blur-sensitive');
+                } else {
+                    el.classList.remove('blur-sensitive');
+                }
+            });
+            // Re-render Dynamic elements
+            renderRows();
+            renderExtraProfitList();
+        }
+
+        // ===============================================
+        // 🆘 EMERGENCY RESCUE SYSTEM
+        // ===============================================
+        function emergencyRescue() {
+            const rawData = localStorage.getItem('ledger_v2_final');
+            if (rawData) {
+                const blob = new Blob([rawData], {type: "application/json"});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = "RESCUE_DATA_FARID_STORE.json";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                alert("✅ Data berhasil diselamatkan! File JSON telah didownload. Simpan file ini baik-baik.");
+            } else {
+                alert("⚠️ Data LocalStorage Kosong! Pastikan Anda tidak menghapus cache browser.");
+            }
+        }
+
+        // ===============================================
+        // ☁️ CLOUD SYNC & DATA LOAD
+        // ===============================================
+        
+        // Fungsi baru untuk menarik data secara otomatis
+        async function autoFetchCloud() {
+            if(BIN_ID === 'GANTI_DENGAN_BIN_ID_ANDA') {
+                loadLocalData();
+                return;
+            }
+            
+            document.getElementById('loadingCloud').style.display = 'flex';
+            document.getElementById('loadingText').innerText = "Menghubungkan ke Server (Sync Stok)...";
+            
+            try {
+                const req = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { 
+                    headers: { 'X-Master-Key': API_KEY } 
+                });
+                const res = await req.json();
+                
+                if(res.record) {
+                    applyData(res.record);
+                    localStorage.setItem('ledger_v2_final', JSON.stringify(res.record)); 
+                    document.getElementById('cloudStatus').innerText = "🟢 Server Terkini";
+                } else {
+                    loadLocalData();
+                }
+            } catch(e) {
+                console.error("Cloud Error:", e);
+                document.getElementById('cloudStatus').innerText = "🔴 Offline (Data Lokal)";
+                loadLocalData(); 
+            } finally {
+                document.getElementById('loadingCloud').style.display = 'none';
+            }
+        }
+        
+        function loadLocalData() {
+            const localData = JSON.parse(localStorage.getItem('ledger_v2_final'));
+            if (localData) {
+                applyData(localData);
+                document.getElementById('cloudStatus').innerText = "⚪ Local Data";
+            }
+        }
+
+        // Ini hanya dipakai Admin untuk Manual Sync Up/Down
+        async function forceSync() {
+            if (currentUserMode !== 'owner') {
+                return alert("⛔ AKSES DITOLAK: Fitur Cloud Sync hanya untuk Owner dengan PIN.");
+            }
+            
+            if(BIN_ID === 'GANTI_DENGAN_BIN_ID_ANDA') return alert("Harap isi BIN_ID dan API_KEY di script.");
+            
+            const choice = prompt("MANUAL SYNC: \nKetik 'UP' untuk Upload Data Lokal ke Cloud.\nKetik 'DOWN' untuk Tarik Data Cloud ke Lokal.\n(Hati-hati data akan tertimpa!)");
+            
+            if (!choice) return;
+
+            document.getElementById('loadingCloud').style.display = 'flex';
+            
+            try {
+                if(choice.toUpperCase() === 'UP') {
+                    await saveDataToCloud();
+                    alert("Data Lokal berhasil di-upload ke Cloud!");
+                } else if (choice.toUpperCase() === 'DOWN') {
+                    const req = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': API_KEY } });
+                    const res = await req.json();
+                    if(res.record) {
+                        applyData(res.record);
+                        localStorage.setItem('ledger_v2_final', JSON.stringify(res.record)); 
+                        alert("Data Cloud berhasil ditarik!");
+                    }
+                }
+            } catch(e) {
+                alert("Error koneksi Cloud: " + e.message);
+            } finally {
+                document.getElementById('loadingCloud').style.display = 'none';
+            }
+        }
+
+        async function saveDataToCloud() {
+            // Keamanan Tambahan: Client TIDAK BISA menimpa data server
+            if (currentUserMode !== 'owner') return; 
+
+            const dataState = { startBalance: document.getElementById('startBalance').value, items, extraProfits, targetGoal, targetName };
+            await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+                body: JSON.stringify(dataState)
+            });
+        }
+
+        function applyData(data) {
+            if (data) {
+                document.getElementById('startBalance').value = data.startBalance || 0;
+                items = data.items || [];
+                extraProfits = data.extraProfits || [];
+                targetGoal = data.targetGoal || 25000000;
+                targetName = data.targetName || "BEP Modal 25 Juta";
+                calculateAll(false);
+            }
+            document.getElementById('ownerNote').value = localStorage.getItem('ledger_owner_note') || "";
+        }
+
+        // ===============================================
+        // 🛠️ UTILITY & UI FUNCTIONS
+        // ===============================================
+        function toggleSidebar() { 
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('overlay');
+            sb.classList.toggle('-translate-x-full');
+            
+            if(sb.classList.contains('-translate-x-full')) {
+                ov.classList.add('hidden');
+            } else {
+                ov.classList.remove('hidden');
+            }
+        }
+
+        function toggleDropdown(id) { 
+            document.getElementById(id).classList.toggle('show'); 
+        }
+
+        function toggleConfig(panelId, labelId, originalText) { 
+            const panel = document.getElementById(panelId);
+            const label = document.getElementById(labelId);
+            
+            panel.classList.toggle('hidden-panel');
+            label.innerText = panel.classList.contains('hidden-panel') ? originalText : "✖ Tutup";
+        }
+
+        function switchPage(page) {
+            const pages = ['page-main', 'page-hp', 'page-laptop', 'page-dial', 'page-analytics'];
+            pages.forEach(p => { 
+                const el = document.getElementById(p); 
+                if(el) el.classList.add('hidden'); 
+            });
+            const target = document.getElementById('page-' + page); 
+            if(target) target.classList.remove('hidden');
+            
+            if(window.innerWidth < 1024) {
+                 const sb = document.getElementById('sidebar');
+                 if(!sb.classList.contains('-translate-x-full')) {
+                    toggleSidebar(); 
+                 }
+            }
+            window.scrollTo(0,0);
+            
+            if(page === 'analytics') renderAnalytics();
+        }
+        
+        // --- CALCULATOR FUNCTIONS ---
+        let cInput = '0';
+        let cPrev = '';
+        let cOp = null;
+
+        function formatDisplay(n) {
+            if (!n || n === '-') return n;
+            const p = n.split('.');
+            p[0] = parseFloat(p[0]).toLocaleString('id-ID');
+            return p.length > 1 ? p[0] + ',' + p[1] : p[0];
+        }
+
+        function calcNum(n) {
+            if (n === '.' && cInput.includes('.')) return;
+            cInput = (cInput === '0' && n !== '.') ? n : cInput + n;
+            calcUpd();
+        }
+
+        function calcOp(op) {
+            if (cInput === '') return;
+            if (cPrev !== '') calcResult();
+            cOp = op;
+            cPrev = cInput;
+            cInput = '';
+            calcUpd();
+        }
+
+        function calcPerc() {
+            if (cInput === '0' || cInput === '') return;
+            cInput = (parseFloat(cInput) / 100).toString();
+            calcUpd();
+        }
+
+        function calcClear() {
+            cInput = '0';
+            cPrev = '';
+            cOp = null;
+            calcUpd();
+        }
+
+        function calcDel() {
+            cInput = cInput.toString().slice(0, -1) || '0';
+            calcUpd();
+        }
+
+        function calcUpd() {
+            document.getElementById('calc-curr').innerText = formatDisplay(cInput);
+            document.getElementById('calc-prev').innerText = cPrev ? formatDisplay(cPrev) + (cOp || '') : '';
+        }
+
+        function calcResult() {
+            let r;
+            const p = parseFloat(cPrev);
+            const c = parseFloat(cInput);
+            if (isNaN(p) || isNaN(c)) return;
+            
+            switch (cOp) {
+                case '+': r = p + c; break;
+                case '-': r = p - c; break;
+                case '*': r = p * c; break;
+                case '/': r = p / c; break;
+                default: return;
+            }
+            cInput = parseFloat(r.toFixed(10)).toString();
+            cOp = null;
+            cPrev = '';
+            calcUpd();
+        }
+
+        function getNow() { 
+            const d = new Date(); 
+            return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`; 
+        }
+        
+        function parseDateString(s) { 
+            if(!s||s==='Imported'||s==='Bulan Lalu') return new Date();
+            const p=s.split(' ');
+            
+            if (p[0].includes('-')) {
+                return new Date(p[0]);
+            }
+
+            const d=p[0].split('/');
+            return new Date(d[2],d[1]-1,d[0]); 
+        }
+
+        // ===============================================
+        // 💰 CORE BUSINESS LOGIC
+        // ===============================================
+        function calculateAll(shouldSave = true) {
+            const start = Number(document.getElementById('startBalance').value) || 0;
+            let belanjaBaru = 0, uangMasuk = 0, profit = 0, floatPrice = 0, floatModal = 0;
+            
+            items.forEach(i => {
+                if (i.status === 'sold') {
+                    if (i.type === 'new') belanjaBaru += i.modal; 
+                    uangMasuk += i.price; 
+                    profit += (i.price - i.modal);
+                } else {
+                    if (i.type === 'new') belanjaBaru += i.modal; 
+                    floatPrice += i.price; 
+                    floatModal += i.modal;
+                }
+            });
+            
+            const extraProfitTotal = extraProfits.reduce((sum, p) => sum + p.profit, 0);
+            const totalProfitReal = profit + extraProfitTotal;
+            const cash = start - belanjaBaru + uangMasuk;
+            
+            // DOM UPDATES
+            document.getElementById('summaryCash').innerText = "Rp " + cash.toLocaleString('id-ID');
+            document.getElementById('summaryFloating').innerText = "Rp " + floatPrice.toLocaleString('id-ID');
+            document.getElementById('summaryTotal').innerText = "Rp " + (cash + floatPrice).toLocaleString('id-ID');
+            document.getElementById('summaryProfit').innerText = "Rp " + totalProfitReal.toLocaleString('id-ID');
+            document.getElementById('previewModalStock').innerText = "Rp " + floatModal.toLocaleString('id-ID');
+            document.getElementById('previewUnrealizedProfit').innerText = "Rp " + (floatPrice - floatModal).toLocaleString('id-ID');
+            
+            // Re-apply blur to newly updated text dynamically
+            document.querySelectorAll('.sensitive-data').forEach(el => {
+                if(isBlurMode) el.classList.add('blur-sensitive');
+                else el.classList.remove('blur-sensitive');
+            });
+            
+            updateTargetBar(totalProfitReal);
+            updateRankBadge(totalProfitReal);
+            renderRows();
+            renderExtraProfitList();
+            
+            if(shouldSave) {
+                localStorage.setItem('ledger_v2_final', JSON.stringify({ 
+                    startBalance: document.getElementById('startBalance').value, 
+                    items, 
+                    extraProfits, 
+                    targetGoal, 
+                    targetName 
+                }));
+            }
+        }
+
+        function parseText(type) {
+            const rawText = document.getElementById('bulkInput').value;
+            if (!rawText.trim()) return;
+            rawText.split('\n').forEach(line => {
+                if (line.includes(':') && line.includes('>')) {
+                    const parts = line.split(/[:>]/);
+                    const name = parts[0].trim().replace(/^-\s*/, '').replace(/\[[BL]\]\s*/, '');
+                    const modal = Number(parts[1].replace(/[^0-9]/g, ''));
+                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
+                    if (name && modal) {
+                        items.unshift({ id: Date.now() + Math.random(), name, modal, price, status: 'stok', type, entryDate: getNow(), soldAt: '' });
+                    }
+                }
+            });
+            document.getElementById('bulkInput').value = '';
+            calculateAll();
+        }
+        
+        function parseExtraProfitText() {
+            const rawText = document.getElementById('exBulkInput').value;
+            if (!rawText.trim()) return;
+            rawText.split('\n').forEach(line => {
+                if (line.includes(':') && line.includes('>')) {
+                    const parts = line.split(/[:>]/);
+                    const name = parts[0].trim();
+                    const modal = Number(parts[1].replace(/[^0-9]/g, ''));
+                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
+                    if (name && modal && price) { 
+                        extraProfits.push({ id: Date.now() + Math.random(), name, modal, price, profit: price - modal }); 
+                    }
+                }
+            });
+            document.getElementById('exBulkInput').value = '';
+            calculateAll();
+        }
+
+        function removeExtraProfit(id) { 
+            extraProfits = extraProfits.filter(p => p.id !== id); 
+            calculateAll(); 
+        }
+
+        function renderExtraProfitList() {
+            const list = document.getElementById('extraProfitList');
+            list.innerHTML = '';
+            
+            // Assign blur class state
+            const bClass = isBlurMode ? "blur-sensitive" : "";
+            
+            extraProfits.forEach(p => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center text-[10px] bg-white p-2 rounded-lg border border-emerald-100";
+                div.innerHTML = `<div><b class="text-slate-700">${p.name}</b><p class="text-slate-400 ${bClass}">Profit: Rp ${p.profit.toLocaleString('id-ID')}</p></div><div class="flex gap-2"><button onclick="removeExtraProfit(${p.id})" class="text-red-400 font-bold">✕</button></div>`;
+                list.appendChild(div);
+            });
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.getElementById('tabStok').className = filter === 'stok' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
+            document.getElementById('tabSold').className = filter === 'sold' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
+            document.getElementById('tabExtra').className = filter === 'extra' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
+            renderRows();
+        }
+
+        // ===============================================
+        // 🔃 SORTING LOGIC
+        // ===============================================
+        function setSort(val) {
+            currentSort = val;
+            renderRows();
+        }
+
+        function sortItems(arr) {
+            return arr.sort((a, b) => {
+                if (currentSort === 'date_desc') return parseDateString(b.entryDate) - parseDateString(a.entryDate);
+                if (currentSort === 'date_asc') return parseDateString(a.entryDate) - parseDateString(b.entryDate);
+                if (currentSort === 'price_asc') return a.price - b.price;
+                if (currentSort === 'price_desc') return b.price - a.price;
+                if (currentSort === 'name_asc') return a.name.localeCompare(b.name);
+                return 0;
+            });
+        }
+
+        // ===============================================
+        // 🔥 NEW: UPDATED RENDER ROWS (Client & Admin)
+        // ===============================================
+        function renderRows() {
+            const container = document.getElementById('itemRows');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const now = new Date(); 
+            let display = [];
+            
+            if (currentFilter === 'extra') {
+                display = extraProfits.filter(p => p.name.toLowerCase().includes(search)).map(p => ({
+                    ...p, status: 'sold', type: 'extra', entryDate: 'Bulan Lalu', soldAt: 'Bulan Lalu'
+                }));
+            } else {
+                display = items.filter(i => i.status === currentFilter && i.name.toLowerCase().includes(search));
+            }
+            
+            // APPLY SORTING
+            display = sortItems(display);
+            
+            container.innerHTML = '';
+            
+            if (display.length === 0) { 
+                container.innerHTML = `<div class="text-center py-10 text-slate-300 font-bold text-xs uppercase italic">Data Kosong</div>`; 
+                return; 
+            }
+            
+            const bClass = isBlurMode ? "blur-sensitive" : "";
+            
+            display.forEach(item => {
+                const profit = item.price - item.modal;
+                const card = document.createElement('div');
+                
+                const brand = getBrandCategory(item.name);
+                let brandColor = 'bg-slate-100 text-slate-500';
+                if(brand === 'APPLE') brandColor = 'bg-slate-800 text-white';
+                if(brand === 'SAMSUNG') brandColor = 'bg-blue-600 text-white';
+                if(brand === 'XIAOMI/POCO') brandColor = 'bg-orange-500 text-white';
+                if(brand === 'OPPO') brandColor = 'bg-green-600 text-white';
+                if(brand === 'VIVO') brandColor = 'bg-blue-400 text-white';
+                
+                // --- MODE CLIENT VIEW ---
+                if (currentUserMode === 'client_view') {
+                    // Tampilan Khusus Client: Bersih, Harga Besar, Tanpa Modal/Tombol
+                    card.className = `p-4 rounded-xl shadow-sm bg-white border-l-4 border-indigo-500 relative mb-3`;
+                    
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                             <span class="text-[9px] font-black px-2 py-1 rounded ${brandColor}">${brand}</span>
+                             <span class="text-[10px] text-slate-400 font-bold">${item.entryDate.split(' ')[0]}</span>
+                        </div>
+                        <h4 class="font-black text-slate-800 text-lg leading-tight mb-2">${item.name}</h4>
+                        <div class="flex items-end justify-between border-t border-slate-100 pt-3 mt-1">
+                             <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">HARGA BEST PRICE</span>
+                             <span class="font-black text-2xl text-emerald-600">Rp ${item.price.toLocaleString('id-ID')}</span>
+                        </div>
+                    `;
+                } 
+                // --- MODE ADMIN / SANDBOX ---
+                else {
+                    let showModalPrice = true;
+                    let showActions = true;
+                    let borderClass = 'border-l-4 border-l-indigo-500';
+                    let bgClass = 'bg-white';
+                    let opacityClass = '';
+                    
+                    if(item.status === 'stok') {
+                        const entry = parseDateString(item.entryDate);
+                        const diffTime = Math.abs(now - entry);
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                        
+                        if (diffDays > 30) { 
+                            borderClass = 'border-l-4 border-l-red-500'; 
+                            bgClass = 'bg-red-50';
+                        } else if (diffDays > 14) { 
+                            borderClass = 'border-l-4 border-l-amber-500'; 
+                            bgClass = 'bg-amber-50';
+                        }
+                    } else if (item.status === 'sold') { 
+                        borderClass = 'border-l-4 border-l-emerald-500';
+                        bgClass = 'bg-slate-50';
+                        opacityClass = 'opacity-75 hover:opacity-100 transition';
+                    }
+                    
+                    card.className = `p-4 rounded-xl shadow-sm border border-slate-100 ${borderClass} ${bgClass} ${opacityClass} relative group`;
+                    
+                    let typeLabel = item.type === 'old' ? 'L' : (item.type === 'new' ? 'B' : 'X');
+                    let typeColor = item.type === 'old' ? 'bg-orange-100 text-orange-600' : (item.type === 'new' ? 'bg-indigo-100 text-indigo-600' : 'bg-emerald-100 text-emerald-600');
+
+                    const modalDisplay = item.modal.toLocaleString();
+                    
+                    const editBtn = `
+                        <button onclick="openEditModal(${item.id})" class="p-2 rounded-lg hover:bg-yellow-100 text-slate-400 hover:text-yellow-600 transition" title="Edit Data">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                        </button>`;
+
+                    const costBtn = item.status === 'stok' ? `
+                        <button onclick="openCostModal(${item.id})" class="p-2 rounded-lg hover:bg-orange-100 text-slate-400 hover:text-orange-600 transition" title="Tambah Biaya">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        </button>` : '';
+
+                    const soldBtn = item.status === 'stok' ? `
+                        <button onclick="toggleSold(${item.id})" class="p-2 rounded-lg hover:bg-emerald-100 text-slate-400 hover:text-emerald-600 transition" title="Tandai Terjual">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                        </button>` : '';
+
+                    const deleteAction = item.type === 'extra' ? `removeExtraProfit(${item.id})` : `removeItem(${item.id})`;
+                    const delBtn = `
+                        <button onclick="${deleteAction}" class="p-2 rounded-lg hover:bg-red-100 text-slate-300 hover:text-red-500 transition" title="Hapus">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>`;
+                    
+                    const actionIcons = `<div class="flex items-center gap-1 border-l border-slate-100 pl-2 ml-2">${editBtn}${costBtn}${soldBtn}${delBtn}</div>`;
+
+                    card.innerHTML = `
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full ${typeColor}">${typeLabel}</span>
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${item.entryDate}</span>
+                            </div>
+                            ${item.status === 'sold' ? `<span class="badge-profit text-[10px] ${bClass}">+${profit.toLocaleString()}</span>` : ''}
+                        </div>
+                        
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm leading-tight mb-1">${item.name}</h4>
+                                <div class="flex flex-col text-[11px]">
+                                    <span class="text-slate-600 ${bClass}">M: ${modalDisplay}</span>
+                                    <span class="font-bold text-indigo-900 ${bClass}">J: ${item.price.toLocaleString()}</span>
+                                </div>
+                            </div>
+                            ${actionIcons}
+                        </div>
+                    `;
+                }
+
+                container.appendChild(card);
+            });
+        }
+
+        // ===============================================
+        // 🔧 MODALS & ACTIONS FUNCTIONS
+        // ===============================================
+        function openEditModal(id) { 
+            let i = items.find(x => x.id === id); 
+            if (!i) i = extraProfits.find(x => x.id === id);
+            if(!i) return; 
+
+            currentEditId = id; 
+            document.getElementById('editItemName').value = i.name; 
+            document.getElementById('editItemModal').value = i.modal || 0; 
+            document.getElementById('editItemPrice').value = i.price; 
+            
+            try {
+                if (i.entryDate && i.entryDate.includes('/')) {
+                    const entryStr = i.entryDate.split(' ')[0]; 
+                    const parts = entryStr.split('/');
+                    if(parts.length === 3) {
+                        const isoDate = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+                        document.getElementById('editEntryDate').value = isoDate;
+                    }
+                } else {
+                    document.getElementById('editEntryDate').value = "";
+                }
+            } catch(e) { console.log(e); }
+
+            document.getElementById('editModal').style.display = 'flex';
+        }
+        
+        function closeEditModal() { 
+            document.getElementById('editModal').style.display = 'none';
+            currentEditId=null; 
+        }
+        
+        function saveEditItem() {
+            if (!currentEditId) return;
+
+            let itemIndex = items.findIndex(i => i.id === currentEditId);
+            let isExtra = false;
+
+            if (itemIndex === -1) {
+                itemIndex = extraProfits.findIndex(i => i.id === currentEditId);
+                isExtra = true;
+            }
+
+            if (itemIndex > -1) {
+                const newName = document.getElementById('editItemName').value;
+                const newModal = Number(document.getElementById('editItemModal').value);
+                const newPrice = Number(document.getElementById('editItemPrice').value);
+                const dateInput = document.getElementById('editEntryDate').value;
+
+                if (isExtra) {
+                    extraProfits[itemIndex].name = newName;
+                    extraProfits[itemIndex].modal = newModal;
+                    extraProfits[itemIndex].price = newPrice;
+                    extraProfits[itemIndex].profit = newPrice - newModal;
+                } else {
+                    items[itemIndex].name = newName;
+                    items[itemIndex].modal = newModal;
+                    items[itemIndex].price = newPrice;
+                    
+                    if(dateInput) {
+                        const d = new Date(dateInput);
+                        items[itemIndex].entryDate = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} 00:00`;
+                    }
+                }
+
+                calculateAll(); 
+                closeEditModal();
+                alert("Data berhasil diperbarui!");
+            }
+        }
+        
+        function openCostModal(id) { 
+            currentCostId = id; 
+            document.getElementById('costDesc').value=''; 
+            document.getElementById('costAmount').value=''; 
+            document.getElementById('costModal').style.display = 'flex';
+        }
+        
+        function closeCostModal() { 
+            document.getElementById('costModal').style.display = 'none';
+            currentCostId = null; 
+        }
+        
+        function saveCost() {
+            if(!currentCostId) return;
+            const amount = Number(document.getElementById('costAmount').value);
+            const desc = document.getElementById('costDesc').value;
+            const idx = items.findIndex(x => x.id === currentCostId);
+            if(idx > -1 && amount && desc) {
+                items[idx].modal += amount;
+                items[idx].name += ` (+${desc} ${amount/1000}k)`;
+                calculateAll(); 
+                closeCostModal();
+            }
+        }
+        
+        function toggleSold(id) { 
+            const i = items.find(x => x.id === id); 
+            if(i){ i.status='sold'; i.soldAt=getNow(); calculateAll(); }
+        }
+        
+        function removeItem(id) { 
+            if(confirm('Hapus unit ini permanen?')) { 
+                items = items.filter(x => x.id !== id); 
+                calculateAll(); 
+            }
+        }
+        
+        function updateTargetBar(profit) {
+            let p = 0;
+            if (targetGoal > 0) {
+                p = (profit / targetGoal) * 100;
+            }
+            if (p > 100) p = 100;
+            if (p < 0) p = 0;
+
+            const bar = document.getElementById('progressBar');
+            bar.style.width = p + "%";
+            
+            if(p >= 100) {
+                bar.className = "bg-emerald-500 h-3 rounded-full relative transition-all duration-1000";
+            } else {
+                bar.className = "bg-indigo-600 h-3 rounded-full relative transition-all duration-1000";
+            }
+
+            document.getElementById('targetPercentage').innerText = p.toFixed(0) + "%";
+            
+            const currentText = document.getElementById('currentProgressText');
+            if(currentText) {
+                currentText.innerText = "Tercapai: Rp " + profit.toLocaleString('id-ID');
+            }
+
+            document.getElementById('targetNameDisplay').innerText = targetName;
+            document.getElementById('targetValueDisplay').innerText = "Target: Rp " + targetGoal.toLocaleString('id-ID');
+        }
+
+        function updateRankBadge(profit) {
+            let r="Pedagang Pemula", c="bg-slate-200 text-slate-500";
+            if(profit>=50000000){r="👑 SULTAN GADGET";c="bg-yellow-100 text-yellow-600 border-yellow-300";}
+            else if(profit>=25000000){r="💎 JURAGAN PRO";c="bg-indigo-100 text-indigo-600 border-indigo-300";}
+            else if(profit>=10000000){r="🔥 STARTUP OWNER";c="bg-emerald-100 text-emerald-600";}
+            else if(profit>=5000000){r="🚀 RISING STAR";c="bg-blue-100 text-blue-600";}
+            document.getElementById('rankBadge').className = `badge-rank ${c} mb-1`;
+            document.getElementById('rankBadge').innerText = r;
+        }
+        
+        // --- ANALYTICS VISUALIZATION ---
+        function renderAnalytics() {
+            const soldItems = items.filter(i => i.status === 'sold');
+            if (soldItems.length === 0) {
+                document.getElementById('avgSellTime').innerText = "-";
+                document.getElementById('winRateStock').innerText = "0%";
+                return; 
+            }
+
+            let totalDays = 0; 
+            let validSales = 0;
+            soldItems.forEach(i => {
+                const entry = parseDateString(i.entryDate); 
+                const sold = parseDateString(i.soldAt);
+                const diffTime = Math.abs(sold - entry);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                if(!isNaN(diffDays)) { totalDays += diffDays; validSales++; }
+            });
+            const avgDays = validSales > 0 ? (totalDays / validSales).toFixed(1) : 0;
+            document.getElementById('avgSellTime').innerText = avgDays + " Hari";
+
+            const totalStock = items.length; 
+            const totalSold = soldItems.length;
+            const winRate = totalStock > 0 ? ((totalSold / totalStock) * 100).toFixed(0) : 0;
+            document.getElementById('winRateStock').innerText = winRate + "%";
+
+            const brands = {};
+            soldItems.forEach(i => {
+                const brandName = getBrandCategory(i.name);
+                if(brands[brandName]) brands[brandName]++; else brands[brandName] = 1;
+            });
+            const ctxBrand = document.getElementById('brandChart');
+            if (ctxBrand) {
+                if(brandChartInstance) brandChartInstance.destroy();
+                brandChartInstance = new Chart(ctxBrand, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(brands),
+                        datasets: [{
+                            data: Object.values(brands),
+                            backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { size: 10 } } } } }
+                });
+            }
+
+            const lastSales = soldItems.slice(0, 10).reverse(); 
+            const labels = lastSales.map(i => i.name.substring(0, 10)); 
+            const profits = lastSales.map(i => i.price - i.modal);
+            const ctxTrend = document.getElementById('profitTrendChart');
+            if (ctxTrend) {
+                if(trendChartInstance) trendChartInstance.destroy();
+                trendChartInstance = new Chart(ctxTrend, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{ label: 'Profit (Rp)', data: profits, backgroundColor: '#10b981', borderRadius: 4 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { ticks: { font: { size: 8 } } } }, plugins: { legend: { display: false } } }
+                });
+            }
+
+            const quarters = { "Q1 (Jan-Mar)": 0, "Q2 (Apr-Jun)": 0, "Q3 (Jul-Sep)": 0, "Q4 (Oct-Dec)": 0 };
+            soldItems.forEach(i => {
+                const date = parseDateString(i.soldAt);
+                const month = date.getMonth(); 
+                const profit = i.price - i.modal;
+                
+                if (month >= 0 && month <= 2) quarters["Q1 (Jan-Mar)"] += profit;
+                else if (month >= 3 && month <= 5) quarters["Q2 (Apr-Jun)"] += profit;
+                else if (month >= 6 && month <= 8) quarters["Q3 (Jul-Sep)"] += profit;
+                else quarters["Q4 (Oct-Dec)"] += profit;
+            });
+            const ctxQuarter = document.getElementById('quarterlyChart');
+            if (ctxQuarter) {
+                if(quarterlyChartInstance) quarterlyChartInstance.destroy();
+                quarterlyChartInstance = new Chart(ctxQuarter, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(quarters),
+                        datasets: [{
+                            label: 'Total Profit',
+                            data: Object.values(quarters),
+                            backgroundColor: ['#3b82f6', '#8b5cf6', '#eab308', '#f43f5e'],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, ticks: { callback: function(value) { return 'Rp ' + value/1000 + 'k'; } } } }
+                    }
+                });
+            }
+        }
+
+        function getBrandCategory(itemName) {
+            const lower = itemName.toLowerCase();
+            if (lower.includes('iphone') || lower.includes('apple') || lower.includes('ipad') || lower.includes('ip ')) return 'APPLE';
+            if (lower.includes('samsung') || lower.includes('galaxy') || lower.includes('sein') || lower.includes('z flip') || lower.includes('z fold')) return 'SAMSUNG';
+            if (lower.includes('xiaomi') || lower.includes('note') || lower.includes('redmi') || lower.includes('poco') || lower.includes('mi ')) return 'XIAOMI/POCO';
+            if (lower.includes('oppo') || lower.includes('reno')) return 'OPPO';
+            if (lower.includes('vivo') || lower.includes('iqoo')) return 'VIVO';
+            if (lower.includes('realme')) return 'REALME';
+            if (lower.includes('infinix')) return 'INFINIX';
+            if (lower.includes('tecno')) return 'TECNO';
+            if (lower.includes('itel')) return 'ITEL';
+            if (lower.includes('asus') || lower.includes('rog')) return 'ASUS';
+            if (lower.includes('google') || lower.includes('pixel')) return 'GOOGLE';
+            return itemName.split(' ')[0].replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+        }
+
+        function setMonthlyTarget() {
+            if(currentUserMode!=='owner') return alert("Hanya Owner yang bisa set target.");
+            const newName = prompt("Nama Target?", targetName);
+            const newAmount = prompt("Nominal Target?", targetGoal);
+            if(newName && newAmount) { 
+                targetName = newName; 
+                targetGoal = Number(newAmount); 
+                calculateAll(); 
+            }
+        }
+        
+        function saveNote() { 
+            localStorage.setItem('ledger_owner_note', document.getElementById('ownerNote').value); 
+        }
+        
+        function exportReport() {
+            const cash = document.getElementById('summaryCash').innerText;
+            const stokVal = document.getElementById('previewModalStock').innerText;
+            const profit = document.getElementById('summaryProfit').innerText;
+            const startBal = Number(document.getElementById('startBalance').value);
+            const totalAsset = Number(cash.replace(/[^0-9]/g,'')) + Number(stokVal.replace(/[^0-9]/g,''));
+            
+            let report = `📊 *LAPORAN KEUANGAN FARID STORE*\n`;
+            report += `🗓️ Periode: ${currentMonthString}\n\n`;
+            report += `💰 *RINGKASAN*\n💵 Saldo Tunai: ${cash}\n📦 Nilai Stok: ${stokVal}\n📈 Total Aset: Rp ${totalAsset.toLocaleString('id-ID')}\n🔥 Profit Bersih: ${profit}\n\n✅ *PENJUALAN*\n`;
+            
+            let soldCount = 0;
+            items.filter(i => i.status === 'sold').forEach((i, index) => {
+                soldCount++;
+                const p = i.price - i.modal;
+                report += `${index + 1}. *${i.name}* (Profit: +${p.toLocaleString()})\n`;
+            });
+            if(soldCount === 0) report += `(Nihil)\n`;
+            
+            report += `\n🛑 *STOK GUDANG*\n`;
+            let stokCount = 0;
+            items.filter(i => i.status === 'stok').forEach((i, index) => {
+                stokCount++;
+                report += `${index + 1}. ${i.name} (M: ${i.modal.toLocaleString()})\n`;
+            });
+            if(stokCount === 0) report += `(Kosong)\n`;
+
+            report += `\n_Generated by Farid Store System_`;
+            navigator.clipboard.writeText(report).then(() => alert("Laporan Investor berhasil disalin!"));
+        }
+        
+        function toggleImportModal() { 
+            const el = document.getElementById('importModal');
+            el.style.display = (el.style.display === 'none') ? 'flex' : 'none';
+        }
+        
+        function processImport() {
+            const text = document.getElementById('importArea').value.trim();
+            if(!text) return;
+
+            if (text.startsWith('{')) {
+                try {
+                    const parsed = JSON.parse(text);
+                    if(parsed.items || parsed.startBalance !== undefined) {
+                        applyData(parsed);
+                        localStorage.setItem('ledger_v2_final', text);
+                        alert("Data System berhasil dipulihkan!");
+                        location.reload();
+                        return;
+                    }
+                } catch (e) {
+                    alert("Kode backup rusak.");
+                }
+            } else {
+                alert("Gunakan format JSON untuk restore penuh.");
+            }
+        }
+        
+        function toggleHelpModal() { alert("Gunakan tombol 'Cloud Sync' untuk sinkronisasi data antar device."); }
+        function clearData() { if(confirm('Hapus permanen?')) { localStorage.clear(); location.reload(); } }
+        function directImei() { const i=document.getElementById('imeiInput').value; if(i)window.open(`https://www.imei.info/?imei=${i}`, '_blank'); }
+
+        // --- INIT ---
+        window.onload = () => {
+            const now = new Date();
+            currentMonthString = monthNames[now.getMonth()] + " " + now.getFullYear();
+            document.getElementById('currentMonth').innerText = currentMonthString;
+            
+            // Perhatikan bahwa saat ini tidak ada data yang dimuat di window.onload.
+            // Pemuatan data dipindah secara otomatis ke momen di mana Guest/Owner dipilih di menu akses awal.
+        };
+    </script>
+</body>
+</html>
