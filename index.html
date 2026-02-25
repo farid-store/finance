@@ -497,12 +497,17 @@
         Pesan
     </a>
 
-    <select onchange="if(this.value) { window.open(this.value, '_blank'); this.selectedIndex=0; }" class="w-full bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl px-2 py-2.5 shadow-sm outline-none cursor-pointer hover:bg-slate-50 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200 appearance-none text-center" style="text-align-last: center;">
-        <option value="" disabled selected>⭐ Testimoni</option>
-        <option value="https://id.shp.ee/ieSggGu">🛍️ Shopee</option>
-        <option value="https://instagram.com/scv.farid1717_">📷 Instagram</option>
-        <option value="https://facebook.com/farid.siddiq.11">📘 Facebook</option>
-    </select>
+    <div class="relative w-full">
+        <button onclick="toggleTesti()" onblur="setTimeout(() => closeTesti(), 200)" class="w-full h-full bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl px-2 py-2.5 shadow-sm outline-none cursor-pointer hover:bg-slate-50 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200 flex items-center justify-center gap-1">
+            ⭐ Testimoni
+        </button>
+        
+        <div id="testiMenu" class="hidden absolute top-full left-0 mt-2 w-[140%] sm:w-full bg-white border border-slate-200 rounded-xl shadow-lg z-50 flex-col overflow-hidden">
+            <a href="https://id.shp.ee/ieSggGu" target="_blank" class="px-4 py-3 text-xs sm:text-sm text-slate-700 hover:bg-slate-50 border-b border-slate-100 flex items-center gap-2 transition-colors">🛍️ Shopee</a>
+            <a href="https://instagram.com/scv.farid1717_" target="_blank" class="px-4 py-3 text-xs sm:text-sm text-slate-700 hover:bg-slate-50 border-b border-slate-100 flex items-center gap-2 transition-colors">📷 Instagram</a>
+            <a href="https://facebook.com/farid.siddiq.11" target="_blank" class="px-4 py-3 text-xs sm:text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors">📘 Facebook</a>
+        </div>
+    </div>
 
     <select id="sortSelect" onchange="setSort(this.value)" class="w-full bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl px-2 py-2.5 shadow-sm outline-none cursor-pointer hover:bg-slate-50 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200 appearance-none text-center" style="text-align-last: center;">
         <option value="" disabled selected>🔃 Sortir</option>
@@ -514,6 +519,20 @@
     </select>
 
 </div>
+
+<script>
+    function toggleTesti() {
+        const menu = document.getElementById('testiMenu');
+        menu.classList.toggle('hidden');
+        menu.classList.toggle('flex');
+    }
+    
+    function closeTesti() {
+        const menu = document.getElementById('testiMenu');
+        menu.classList.add('hidden');
+        menu.classList.remove('flex');
+    }
+</script>
 
                         <div class="relative">
                             <input type="text" id="searchInput" onkeyup="renderRows()" placeholder="Cari unit..." class="input-field pl-10 text-sm bg-white shadow-sm border-slate-200">
