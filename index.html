@@ -505,8 +505,8 @@
         <div id="testiMenu" class="hidden absolute top-full left-0 mt-2 w-[140%] sm:w-full bg-white border border-slate-200 rounded-xl shadow-lg z-50 flex-col overflow-hidden">
             <a href="https://id.shp.ee/ieSggGu" target="_blank" class="px-4 py-3 text-xs sm:text-sm text-slate-700 hover:bg-slate-50 border-b border-slate-100 flex items-center gap-2 transition-colors">🛍️ Shopee</a>
             <a href="https://instagram.com/scv.farid1717_" target="_blank" class="px-4 py-3 text-xs sm:text-sm text-slate-700 hover:bg-slate-50 border-b border-slate-100 flex items-center gap-2 transition-colors">📷 Instagram</a>
-            <a href="https://www.facebook.com/marketplace/profile/100025975151176" target="_blank" class="px-4 py-3 text-xs sm:text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors">📘 Facebook</a>
-            <a href="https://www.facebook.com/marketplace/profile/100012652447480" target="_blank" class="px-4 py-3 text-xs sm:text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors">📘 Facebook</a>
+            <a href="https://www.facebook.com/marketplace/profile/100025975151176" target="_blank" class="px-4 py-3 text-xs sm:text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors">📘 Facebook [1]</a>
+            <a href="https://www.facebook.com/marketplace/profile/100012652447480" target="_blank" class="px-4 py-3 text-xs sm:text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors">📘 Facebook [2]</a>
         </div>
     </div>
 
@@ -541,6 +541,7 @@
                         </div>
                         <div class="flex bg-slate-200 p-1 rounded-xl gap-1">
                             <button onclick="setFilter('stok')" id="tabStok" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all bg-white text-indigo-600 shadow-sm">Unit Stok</button>
+                            <button onclick="setFilter('sold')" id="tabSold" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500">History Terjual</button>
                             <button onclick="setFilter('extra')" id="tabExtra" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500">History Bulan Lalu</button>
                         </div>
                     </div>
@@ -728,7 +729,7 @@ function copyToClipboard(text) {
                 </div>
             </div>
             
-        </div> </div> <div id="importModal" class="fixed inset-0 z- flex items-center justify-center p-4" style="display: none;">
+        </div> </div> <div id="importModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="display: none;">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="toggleImportModal()"></div>
         <div class="relative bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl">
             <h3 class="text-xl font-black text-indigo-900 uppercase italic mb-4">📥 Import Data</h3>
@@ -738,7 +739,7 @@ function copyToClipboard(text) {
         </div>
     </div>
 
-    <div id="editModal" class="fixed inset-0 z- flex items-center justify-center p-4" style="display: none;">
+    <div id="editModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="display: none;">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeEditModal()"></div>
         <div class="relative bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl">
             <h3 class="text-lg font-black text-slate-800 uppercase italic mb-4">✏️ Edit Barang</h3>
@@ -755,7 +756,7 @@ function copyToClipboard(text) {
         </div>
     </div>
 
-    <div id="costModal" class="fixed inset-0 z- flex items-center justify-center p-4" style="display: none;">
+    <div id="costModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="display: none;">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeCostModal()"></div>
         <div class="relative bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl">
             <h3 class="text-lg font-black text-slate-800 uppercase italic mb-2">🛠️ Tambah Biaya</h3>
@@ -931,6 +932,11 @@ function copyToClipboard(text) {
         
         // Fungsi baru untuk menarik data secara otomatis
         async function autoFetchCloud() {
+            if(BIN_ID === 'GANTI_DENGAN_BIN_ID_ANDA') {
+                loadLocalData();
+                return;
+            }
+            
             document.getElementById('loadingCloud').style.display = 'flex';
             document.getElementById('loadingText').innerText = "Menghubungkan ke Server (Sync Stok)...";
             
@@ -969,6 +975,8 @@ function copyToClipboard(text) {
             if (currentUserMode !== 'owner') {
                 return alert("⛔ AKSES DITOLAK: Fitur Cloud Sync hanya untuk Owner dengan PIN.");
             }
+            
+            if(BIN_ID === 'GANTI_DENGAN_BIN_ID_ANDA') return alert("Harap isi BIN_ID dan API_KEY di script.");
             
             const choice = prompt("MANUAL SYNC: \nKetik 'UP' untuk Upload Data Lokal ke Cloud.\nKetik 'DOWN' untuk Tarik Data Cloud ke Lokal.\n(Hati-hati data akan tertimpa!)");
             
@@ -1044,7 +1052,7 @@ function copyToClipboard(text) {
             const label = document.getElementById(labelId);
             
             panel.classList.toggle('hidden-panel');
-            label.innerText = panel.classList.contains('hidden-panel') ? "✖ Tutup" : originalText;
+            label.innerText = panel.classList.contains('hidden-panel') ? originalText : "✖ Tutup";
         }
 
         function switchPage(page) {
@@ -1075,8 +1083,8 @@ function copyToClipboard(text) {
         function formatDisplay(n) {
             if (!n || n === '-') return n;
             const p = n.split('.');
-            p = parseFloat(p).toLocaleString('id-ID');
-            return p.length > 1 ? p + ',' + p : p;
+            p[0] = parseFloat(p[0]).toLocaleString('id-ID');
+            return p.length > 1 ? p[0] + ',' + p[1] : p[0];
         }
 
         function calcNum(n) {
@@ -1142,45 +1150,39 @@ function copyToClipboard(text) {
         }
         
         function parseDateString(s) { 
-            if(!s || s==='Imported' || s==='Bulan Lalu') return 0; // Return 0 untuk cegah error saat sorting Bulan Lalu
-            const p = s.split(' ');
+            if(!s||s==='Imported'||s==='Bulan Lalu') return new Date();
+            const p=s.split(' ');
             
-            if (p.includes('-')) {
-                return new Date(p).getTime(); 
+            if (p[0].includes('-')) {
+                return new Date(p[0]);
             }
 
-            const d = p.split('/');
-            return new Date(d, d-1, d).getTime(); 
+            const d=p[0].split('/');
+            return new Date(d[2],d[1]-1,d[0]); 
         }
 
         // ===============================================
-        // 💰 CORE BUSINESS LOGIC (UPDATED FOR NEW DATA STRUCTURE)
+        // 💰 CORE BUSINESS LOGIC
         // ===============================================
         function calculateAll(shouldSave = true) {
             const start = Number(document.getElementById('startBalance').value) || 0;
-            let belanjaBaru = 0, floatPrice = 0, floatModal = 0;
+            let belanjaBaru = 0, uangMasuk = 0, profit = 0, floatPrice = 0, floatModal = 0;
             
-            // 1. Loop ITEMS (Sekarang HANYA BERISI STOK AKTIF)
             items.forEach(i => {
-                if (i.status === 'stok') { 
+                if (i.status === 'sold') {
+                    if (i.type === 'new') belanjaBaru += i.modal; 
+                    uangMasuk += i.price; 
+                    profit += (i.price - i.modal);
+                } else {
                     if (i.type === 'new') belanjaBaru += i.modal; 
                     floatPrice += i.price; 
                     floatModal += i.modal;
                 }
             });
             
-            // 2. Loop EXTRA PROFITS (Berisi Profit Asli 2025 + Migrasi)
-            let uangMasuk = 0;
-            let extraProfitTotal = 0;
-            
-            extraProfits.forEach(p => {
-                extraProfitTotal += p.profit;
-                uangMasuk += p.price; 
-            });
-
-            // 3. Kalkulasi Final
-            const totalProfitReal = extraProfitTotal; 
-            const cash = start + totalProfitReal - floatModal; // Saldo Saat Ini
+            const extraProfitTotal = extraProfits.reduce((sum, p) => sum + p.profit, 0);
+            const totalProfitReal = profit + extraProfitTotal;
+            const cash = start - belanjaBaru + uangMasuk;
             
             // DOM UPDATES
             document.getElementById('summaryCash').innerText = "Rp " + cash.toLocaleString('id-ID');
@@ -1218,9 +1220,9 @@ function copyToClipboard(text) {
             rawText.split('\n').forEach(line => {
                 if (line.includes(':') && line.includes('>')) {
                     const parts = line.split(/[:>]/);
-                    const name = parts.trim().replace(/^-\s*/, '').replace(/\[[BL]\]\s*/, '');
-                    const modal = Number(parts.replace(/[^0-9]/g, ''));
-                    const price = Number(parts.replace(/[^0-9]/g, ''));
+                    const name = parts[0].trim().replace(/^-\s*/, '').replace(/\[[BL]\]\s*/, '');
+                    const modal = Number(parts[1].replace(/[^0-9]/g, ''));
+                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
                     if (name && modal) {
                         items.unshift({ id: Date.now() + Math.random(), name, modal, price, status: 'stok', type, entryDate: getNow(), soldAt: '' });
                     }
@@ -1236,9 +1238,9 @@ function copyToClipboard(text) {
             rawText.split('\n').forEach(line => {
                 if (line.includes(':') && line.includes('>')) {
                     const parts = line.split(/[:>]/);
-                    const name = parts.trim();
-                    const modal = Number(parts.replace(/[^0-9]/g, ''));
-                    const price = Number(parts.replace(/[^0-9]/g, ''));
+                    const name = parts[0].trim();
+                    const modal = Number(parts[1].replace(/[^0-9]/g, ''));
+                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
                     if (name && modal && price) { 
                         extraProfits.push({ id: Date.now() + Math.random(), name, modal, price, profit: price - modal }); 
                     }
@@ -1271,6 +1273,7 @@ function copyToClipboard(text) {
         function setFilter(filter) {
             currentFilter = filter;
             document.getElementById('tabStok').className = filter === 'stok' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
+            document.getElementById('tabSold').className = filter === 'sold' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
             document.getElementById('tabExtra').className = filter === 'extra' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
             renderRows();
         }
@@ -1295,7 +1298,7 @@ function copyToClipboard(text) {
         }
 
         // ===============================================
-        // 🔥 RENDER ROWS (Client & Admin)
+        // 🔥 NEW: UPDATED RENDER ROWS (Client & Admin)
         // ===============================================
         function renderRows() {
             const container = document.getElementById('itemRows');
@@ -1343,7 +1346,7 @@ function copyToClipboard(text) {
                     card.innerHTML = `
                         <div class="flex justify-between items-start mb-2">
                              <span class="text-[9px] font-black px-2 py-1 rounded ${brandColor}">${brand}</span>
-                             <span class="text-[10px] text-slate-400 font-bold">${item.entryDate.split(' ')}</span>
+                             <span class="text-[10px] text-slate-400 font-bold">${item.entryDate.split(' ')[0]}</span>
                         </div>
                         <h4 class="font-black text-slate-800 text-lg leading-tight mb-2">${item.name}</h4>
                         <div class="flex items-end justify-between border-t border-slate-100 pt-3 mt-1">
@@ -1449,10 +1452,10 @@ function copyToClipboard(text) {
             
             try {
                 if (i.entryDate && i.entryDate.includes('/')) {
-                    const entryStr = i.entryDate.split(' '); 
+                    const entryStr = i.entryDate.split(' ')[0]; 
                     const parts = entryStr.split('/');
                     if(parts.length === 3) {
-                        const isoDate = `${parts}-${parts.padStart(2,'0')}-${parts.padStart(2,'0')}`;
+                        const isoDate = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
                         document.getElementById('editEntryDate').value = isoDate;
                     }
                 } else {
@@ -1534,21 +1537,7 @@ function copyToClipboard(text) {
         
         function toggleSold(id) { 
             const i = items.find(x => x.id === id); 
-            if(i){ 
-                // Karena logika "terjual" sekarang langsung masuk Extra Profit, kita bisa memindahkannya:
-                const p = i.price - i.modal;
-                extraProfits.unshift({
-                    id: Date.now() + Math.random(),
-                    name: i.name + " (Terjual Baru)",
-                    modal: i.modal,
-                    price: i.price,
-                    profit: p
-                });
-                // Hapus dari items
-                items = items.filter(x => x.id !== id); 
-                calculateAll(); 
-                alert("Barang berhasil ditandai Laku dan dipindah ke History!");
-            }
+            if(i){ i.status='sold'; i.soldAt=getNow(); calculateAll(); }
         }
         
         function removeItem(id) { 
@@ -1598,19 +1587,28 @@ function copyToClipboard(text) {
         
         // --- ANALYTICS VISUALIZATION ---
         function renderAnalytics() {
-            // Analitik menggunakan extraProfits karena data sold ada di sana
-            const soldItems = extraProfits;
+            const soldItems = items.filter(i => i.status === 'sold');
             if (soldItems.length === 0) {
                 document.getElementById('avgSellTime').innerText = "-";
                 document.getElementById('winRateStock').innerText = "0%";
                 return; 
             }
 
-            document.getElementById('avgSellTime').innerText = "Migrated Data"; // Tidak bisa hitung rata-rata hari karena tidak ada entryDate di extraProfits
+            let totalDays = 0; 
+            let validSales = 0;
+            soldItems.forEach(i => {
+                const entry = parseDateString(i.entryDate); 
+                const sold = parseDateString(i.soldAt);
+                const diffTime = Math.abs(sold - entry);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                if(!isNaN(diffDays)) { totalDays += diffDays; validSales++; }
+            });
+            const avgDays = validSales > 0 ? (totalDays / validSales).toFixed(1) : 0;
+            document.getElementById('avgSellTime').innerText = avgDays + " Hari";
 
             const totalStock = items.length; 
             const totalSold = soldItems.length;
-            const winRate = totalStock > 0 ? ((totalSold / (totalStock + totalSold)) * 100).toFixed(0) : 100;
+            const winRate = totalStock > 0 ? ((totalSold / totalStock) * 100).toFixed(0) : 0;
             document.getElementById('winRateStock').innerText = winRate + "%";
 
             const brands = {};
@@ -1635,9 +1633,9 @@ function copyToClipboard(text) {
                 });
             }
 
-            const lastSales = [...soldItems].reverse().slice(0, 10); 
+            const lastSales = soldItems.slice(0, 10).reverse(); 
             const labels = lastSales.map(i => i.name.substring(0, 10)); 
-            const profits = lastSales.map(i => i.profit);
+            const profits = lastSales.map(i => i.price - i.modal);
             const ctxTrend = document.getElementById('profitTrendChart');
             if (ctxTrend) {
                 if(trendChartInstance) trendChartInstance.destroy();
@@ -1652,11 +1650,16 @@ function copyToClipboard(text) {
             }
 
             const quarters = { "Q1 (Jan-Mar)": 0, "Q2 (Apr-Jun)": 0, "Q3 (Jul-Sep)": 0, "Q4 (Oct-Dec)": 0 };
-            // Semua profit migrasi kita masukkan ke Q1 karena tidak ada data tanggal asli
             soldItems.forEach(i => {
-                quarters["Q1 (Jan-Mar)"] += i.profit;
+                const date = parseDateString(i.soldAt);
+                const month = date.getMonth(); 
+                const profit = i.price - i.modal;
+                
+                if (month >= 0 && month <= 2) quarters["Q1 (Jan-Mar)"] += profit;
+                else if (month >= 3 && month <= 5) quarters["Q2 (Apr-Jun)"] += profit;
+                else if (month >= 6 && month <= 8) quarters["Q3 (Jul-Sep)"] += profit;
+                else quarters["Q4 (Oct-Dec)"] += profit;
             });
-            
             const ctxQuarter = document.getElementById('quarterlyChart');
             if (ctxQuarter) {
                 if(quarterlyChartInstance) quarterlyChartInstance.destroy();
@@ -1694,7 +1697,7 @@ function copyToClipboard(text) {
             if (lower.includes('itel')) return 'ITEL';
             if (lower.includes('asus') || lower.includes('rog')) return 'ASUS';
             if (lower.includes('google') || lower.includes('pixel')) return 'GOOGLE';
-            return itemName.split(' ').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+            return itemName.split(' ')[0].replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
         }
 
         function setMonthlyTarget() {
@@ -1724,9 +1727,10 @@ function copyToClipboard(text) {
             report += `💰 *RINGKASAN*\n💵 Saldo Tunai: ${cash}\n📦 Nilai Stok: ${stokVal}\n📈 Total Aset: Rp ${totalAsset.toLocaleString('id-ID')}\n🔥 Profit Bersih: ${profit}\n\n✅ *PENJUALAN*\n`;
             
             let soldCount = 0;
-            extraProfits.forEach((i, index) => {
+            items.filter(i => i.status === 'sold').forEach((i, index) => {
                 soldCount++;
-                report += `${index + 1}. *${i.name}* (Profit: +${i.profit.toLocaleString('id-ID')})\n`;
+                const p = i.price - i.modal;
+                report += `${index + 1}. *${i.name}* (Profit: +${p.toLocaleString()})\n`;
             });
             if(soldCount === 0) report += `(Nihil)\n`;
             
@@ -1734,7 +1738,7 @@ function copyToClipboard(text) {
             let stokCount = 0;
             items.filter(i => i.status === 'stok').forEach((i, index) => {
                 stokCount++;
-                report += `${index + 1}. ${i.name} (M: ${i.modal.toLocaleString('id-ID')})\n`;
+                report += `${index + 1}. ${i.name} (M: ${i.modal.toLocaleString()})\n`;
             });
             if(stokCount === 0) report += `(Kosong)\n`;
 
@@ -1778,6 +1782,9 @@ function copyToClipboard(text) {
             const now = new Date();
             currentMonthString = monthNames[now.getMonth()] + " " + now.getFullYear();
             document.getElementById('currentMonth').innerText = currentMonthString;
+            
+            // Perhatikan bahwa saat ini tidak ada data yang dimuat di window.onload.
+            // Pemuatan data dipindah secara otomatis ke momen di mana Guest/Owner dipilih di menu akses awal.
         };
     </script>
 </body>
