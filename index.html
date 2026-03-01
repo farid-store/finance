@@ -190,12 +190,6 @@
             backdrop-filter: blur(4px); 
         }
 
-        /* SECURITY PIN MODAL */
-        #authModal {
-            position: fixed; inset: 0; z-index: 999; background: #f8fafc; 
-            display: flex; justify-content: center; align-items: center;
-        }
-
         /* TOOL MIGRASI MODAL STYLES */
         .migration-modal { transition: opacity 0.3s ease, transform 0.3s ease; backdrop-filter: blur(4px); }
         .migration-scale-in { animation: scaleIn 0.3s ease forwards; }
@@ -205,6 +199,12 @@
         .toast { transition: transform 0.3s ease, opacity 0.3s ease; }
         .toast.show { transform: translateY(0); opacity: 1; }
         .toast.hide { transform: translateY(-100%); opacity: 0; pointer-events: none; }
+
+        /* SECURITY PIN MODAL */
+        #authModal {
+            position: fixed; inset: 0; z-index: 999; background: #f8fafc; 
+            display: flex; justify-content: center; align-items: center;
+        }
     </style>
 </head>
 <body class="antialiased lg:overflow-hidden">
@@ -255,7 +255,7 @@
                         <div onclick="switchPage('analytics')" class="sidebar-item hover:bg-indigo-600 hover:text-white transition">
                             <span class="mr-3 text-lg">📈</span> Analisa Bisnis
                         </div>
-                        
+
                         <div onclick="switchPage('migration')" class="sidebar-item hover:bg-indigo-600 hover:text-white transition">
                             <span class="mr-3 text-lg">🗄️</span> Tool Migrasi
                         </div>
@@ -519,8 +519,8 @@
         <div id="testiMenu" class="hidden absolute top-full left-0 mt-2 w-[140%] sm:w-full bg-white border border-slate-200 rounded-xl shadow-lg z-50 flex-col overflow-hidden">
             <a href="https://id.shp.ee/ieSggGu" target="_blank" class="px-4 py-3 text-xs sm:text-sm text-slate-700 hover:bg-slate-50 border-b border-slate-100 flex items-center gap-2 transition-colors">🛍️ Shopee</a>
             <a href="https://instagram.com/scv.farid1717_" target="_blank" class="px-4 py-3 text-xs sm:text-sm text-slate-700 hover:bg-slate-50 border-b border-slate-100 flex items-center gap-2 transition-colors">📷 Instagram</a>
-            <a href="https://www.facebook.com/marketplace/profile/100025975151176" target="_blank" class="px-4 py-3 text-xs sm:text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors">📘 Facebook</a>
-            <a href="https://www.facebook.com/marketplace/profile/100012652447480" target="_blank" class="px-4 py-3 text-xs sm:text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors">📘 Facebook</a>
+            <a href="https://www.facebook.com/marketplace/profile/100025975151176" target="_blank" class="px-4 py-3 text-xs sm:text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors">📘 Facebook [1]</a>
+            <a href="https://www.facebook.com/marketplace/profile/100012652447480" target="_blank" class="px-4 py-3 text-xs sm:text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors">📘 Facebook [2]</a>
         </div>
     </div>
 
@@ -565,6 +565,45 @@
                 </div>
             </main>
 
+            <div id="page-analytics" class="max-w-4xl w-full mx-auto hidden flex-1 lg:overflow-y-auto pt-8 px-4 md:px-8">
+                <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali Dashboard</button>
+                <h1 class="text-2xl font-black italic mb-6 text-slate-800">📊 PERFORMA TOKO</h1>
+            
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="card p-4 border-l-4 border-blue-500">
+                        <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Kecepatan Putaran</p>
+                        <h2 id="avgSellTime" class="text-2xl font-black text-slate-800">- Hari</h2>
+                        <p class="text-[9px] text-slate-400 italic mt-1">Rata-rata barang laku</p>
+                    </div>
+                    <div class="card p-4 border-l-4 border-purple-500">
+                        <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Win Rate Barang</p>
+                        <h2 id="winRateStock" class="text-2xl font-black text-slate-800">0%</h2>
+                        <p class="text-[9px] text-slate-400 italic mt-1">Rasio Laku vs Stok Diam</p>
+                    </div>
+                </div>
+            
+                <div class="card p-5 mb-6">
+                    <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Dominasi Brand (Smart Grouping)</h3>
+                    <div class="h-64">
+                        <canvas id="brandChart"></canvas>
+                    </div>
+                </div>
+            
+                <div class="card p-5 mb-6">
+                    <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Tren Profit Harian</h3>
+                    <div class="h-48">
+                        <canvas id="profitTrendChart" class="sensitive-data"></canvas>
+                    </div>
+                </div>
+
+                <div class="card p-5 mb-6">
+                    <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Performa Profit Per Kuartal</h3>
+                    <div class="h-48">
+                        <canvas id="quarterlyChart" class="sensitive-data"></canvas>
+                    </div>
+                </div>
+            </div>
+
             <div id="page-migration" class="max-w-4xl w-full mx-auto hidden flex-1 lg:overflow-y-auto pt-8 px-4 md:px-8">
                 <div id="migration-toast-container" class="fixed top-4 left-1/2 transform -translate-x-1/2 z- flex flex-col gap-2"></div>
                 
@@ -575,7 +614,7 @@
                 <div class="mb-8">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-brand-200">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200">
                                 <i class="fa-solid fa-bolt"></i>
                             </div>
                             <div>
@@ -584,7 +623,7 @@
                             </div>
                         </div>
                         <div class="bg-slate-100 px-4 py-2 rounded-full border border-slate-200 flex items-center gap-2 shadow-inner">
-                            <i class="fa-regular fa-calendar text-brand-500"></i>
+                            <i class="fa-regular fa-calendar text-indigo-500"></i>
                             <span class="text-sm font-semibold text-slate-700" id="migration-date-badge">Memuat tanggal...</span>
                         </div>
                     </div>
@@ -605,7 +644,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     
                     <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 relative overflow-hidden group hover:shadow-md transition-shadow">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-brand-50 rounded-bl-full -z-10 transition-transform group-hover:scale-110"></div>
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-bl-full -z-10 transition-transform group-hover:scale-110"></div>
                         
                         <div class="flex items-center gap-3 mb-6">
                             <span class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-500 font-bold text-sm">1</span>
@@ -712,45 +751,6 @@
                         <button id="btn-migration-execute-sync" onclick="executeMigrationSync()" disabled class="px-6 py-2.5 text-sm font-bold text-white bg-red-300 rounded-xl cursor-not-allowed transition-all duration-300 flex items-center gap-2">
                             Eksekusi Sync <i class="fa-solid fa-arrow-right"></i>
                         </button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="page-analytics" class="max-w-4xl w-full mx-auto hidden flex-1 lg:overflow-y-auto pt-8 px-4 md:px-8">
-                <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali Dashboard</button>
-                <h1 class="text-2xl font-black italic mb-6 text-slate-800">📊 PERFORMA TOKO</h1>
-            
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="card p-4 border-l-4 border-blue-500">
-                        <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Kecepatan Putaran</p>
-                        <h2 id="avgSellTime" class="text-2xl font-black text-slate-800">- Hari</h2>
-                        <p class="text-[9px] text-slate-400 italic mt-1">Rata-rata barang laku</p>
-                    </div>
-                    <div class="card p-4 border-l-4 border-purple-500">
-                        <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Win Rate Barang</p>
-                        <h2 id="winRateStock" class="text-2xl font-black text-slate-800">0%</h2>
-                        <p class="text-[9px] text-slate-400 italic mt-1">Rasio Laku vs Stok Diam</p>
-                    </div>
-                </div>
-            
-                <div class="card p-5 mb-6">
-                    <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Dominasi Brand (Smart Grouping)</h3>
-                    <div class="h-64">
-                        <canvas id="brandChart"></canvas>
-                    </div>
-                </div>
-            
-                <div class="card p-5 mb-6">
-                    <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Tren Profit Harian</h3>
-                    <div class="h-48">
-                        <canvas id="profitTrendChart" class="sensitive-data"></canvas>
-                    </div>
-                </div>
-
-                <div class="card p-5 mb-6">
-                    <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Performa Profit Per Kuartal</h3>
-                    <div class="h-48">
-                        <canvas id="quarterlyChart" class="sensitive-data"></canvas>
                     </div>
                 </div>
             </div>
@@ -894,7 +894,7 @@ function copyToClipboard(text) {
                 </div>
             </div>
             
-        </div> </div> <div id="importModal" class="fixed inset-0 z- flex items-center justify-center p-4" style="display: none;">
+        </div> </div> <div id="importModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="display: none;">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="toggleImportModal()"></div>
         <div class="relative bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl">
             <h3 class="text-xl font-black text-indigo-900 uppercase italic mb-4">📥 Import Data</h3>
@@ -904,7 +904,7 @@ function copyToClipboard(text) {
         </div>
     </div>
 
-    <div id="editModal" class="fixed inset-0 z- flex items-center justify-center p-4" style="display: none;">
+    <div id="editModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="display: none;">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeEditModal()"></div>
         <div class="relative bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl">
             <h3 class="text-lg font-black text-slate-800 uppercase italic mb-4">✏️ Edit Barang</h3>
@@ -921,7 +921,7 @@ function copyToClipboard(text) {
         </div>
     </div>
 
-    <div id="costModal" class="fixed inset-0 z- flex items-center justify-center p-4" style="display: none;">
+    <div id="costModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="display: none;">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeCostModal()"></div>
         <div class="relative bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl">
             <h3 class="text-lg font-black text-slate-800 uppercase italic mb-2">🛠️ Tambah Biaya</h3>
@@ -964,11 +964,11 @@ function copyToClipboard(text) {
         // EDIT & COST VARIABLES
         let currentEditId = null;
         let currentCostId = null;
-        
+
         // MIGRATION VARIABLES
         let originalMigrationData = null;
         let migratedDataState = null;
-
+        
         const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
         // ===============================================
@@ -1095,6 +1095,20 @@ function copyToClipboard(text) {
             }
         }
 
+        // ===============================================
+        // 🔄 MIGRATION TOOL FUNCTIONS
+        // ===============================================
+        
+        function showMigrationToast(message, type = 'success') { ... }
+        async function fetchMigrationData() { ... }
+        function processMigrationDataLocally() { ... }
+        function downloadMigrationJSON() { ... }
+        function openMigrationModal() { ... }
+        function closeMigrationModal() { ... }
+        function resetMigrationModal() { ... }
+        function checkMigrationVerification() { ... }
+        async function executeMigrationSync() { ... }
+        
         // ===============================================
         // ☁️ CLOUD SYNC & DATA LOAD
         // ===============================================
@@ -1242,7 +1256,7 @@ function copyToClipboard(text) {
             window.scrollTo(0,0);
             
             if(page === 'analytics') renderAnalytics();
-            
+
             // Inisialisasi tanggal jika membuka page migration
             if(page === 'migration') {
                 const today = new Date();
@@ -1257,6 +1271,8 @@ function copyToClipboard(text) {
                 }
             }
         }
+
+        
         
         // --- CALCULATOR FUNCTIONS ---
         let cInput = '0';
@@ -1266,8 +1282,8 @@ function copyToClipboard(text) {
         function formatDisplay(n) {
             if (!n || n === '-') return n;
             const p = n.split('.');
-            p = parseFloat(p).toLocaleString('id-ID');
-            return p.length > 1 ? p + ',' + p : p;
+            p[0] = parseFloat(p[0]).toLocaleString('id-ID');
+            return p.length > 1 ? p[0] + ',' + p[1] : p[0];
         }
 
         function calcNum(n) {
@@ -1336,12 +1352,12 @@ function copyToClipboard(text) {
             if(!s||s==='Imported'||s==='Bulan Lalu') return new Date();
             const p=s.split(' ');
             
-            if (p.includes('-')) {
-                return new Date(p);
+            if (p[0].includes('-')) {
+                return new Date(p[0]);
             }
 
-            const d=p.split('/');
-            return new Date(d,d-1,d); 
+            const d=p[0].split('/');
+            return new Date(d[2],d[1]-1,d[0]); 
         }
 
         // ===============================================
@@ -1403,9 +1419,9 @@ function copyToClipboard(text) {
             rawText.split('\n').forEach(line => {
                 if (line.includes(':') && line.includes('>')) {
                     const parts = line.split(/[:>]/);
-                    const name = parts.trim().replace(/^-\s*/, '').replace(/\[[BL]\]\s*/, '');
-                    const modal = Number(parts.replace(/[^0-9]/g, ''));
-                    const price = Number(parts.replace(/[^0-9]/g, ''));
+                    const name = parts[0].trim().replace(/^-\s*/, '').replace(/\[[BL]\]\s*/, '');
+                    const modal = Number(parts[1].replace(/[^0-9]/g, ''));
+                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
                     if (name && modal) {
                         items.unshift({ id: Date.now() + Math.random(), name, modal, price, status: 'stok', type, entryDate: getNow(), soldAt: '' });
                     }
@@ -1421,9 +1437,9 @@ function copyToClipboard(text) {
             rawText.split('\n').forEach(line => {
                 if (line.includes(':') && line.includes('>')) {
                     const parts = line.split(/[:>]/);
-                    const name = parts.trim();
-                    const modal = Number(parts.replace(/[^0-9]/g, ''));
-                    const price = Number(parts.replace(/[^0-9]/g, ''));
+                    const name = parts[0].trim();
+                    const modal = Number(parts[1].replace(/[^0-9]/g, ''));
+                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
                     if (name && modal && price) { 
                         extraProfits.push({ id: Date.now() + Math.random(), name, modal, price, profit: price - modal }); 
                     }
@@ -1529,7 +1545,7 @@ function copyToClipboard(text) {
                     card.innerHTML = `
                         <div class="flex justify-between items-start mb-2">
                              <span class="text-[9px] font-black px-2 py-1 rounded ${brandColor}">${brand}</span>
-                             <span class="text-[10px] text-slate-400 font-bold">${item.entryDate.split(' ')}</span>
+                             <span class="text-[10px] text-slate-400 font-bold">${item.entryDate.split(' ')[0]}</span>
                         </div>
                         <h4 class="font-black text-slate-800 text-lg leading-tight mb-2">${item.name}</h4>
                         <div class="flex items-end justify-between border-t border-slate-100 pt-3 mt-1">
@@ -1635,10 +1651,10 @@ function copyToClipboard(text) {
             
             try {
                 if (i.entryDate && i.entryDate.includes('/')) {
-                    const entryStr = i.entryDate.split(' '); 
+                    const entryStr = i.entryDate.split(' ')[0]; 
                     const parts = entryStr.split('/');
                     if(parts.length === 3) {
-                        const isoDate = `${parts}-${parts.padStart(2,'0')}-${parts.padStart(2,'0')}`;
+                        const isoDate = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
                         document.getElementById('editEntryDate').value = isoDate;
                     }
                 } else {
@@ -1880,7 +1896,7 @@ function copyToClipboard(text) {
             if (lower.includes('itel')) return 'ITEL';
             if (lower.includes('asus') || lower.includes('rog')) return 'ASUS';
             if (lower.includes('google') || lower.includes('pixel')) return 'GOOGLE';
-            return itemName.split(' ').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+            return itemName.split(' ')[0].replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
         }
 
         function setMonthlyTarget() {
@@ -1959,181 +1975,6 @@ function copyToClipboard(text) {
         function toggleHelpModal() { alert("Gunakan tombol 'Cloud Sync' untuk sinkronisasi data antar device."); }
         function clearData() { if(confirm('Hapus permanen?')) { localStorage.clear(); location.reload(); } }
         function directImei() { const i=document.getElementById('imeiInput').value; if(i)window.open(`https://www.imei.info/?imei=${i}`, '_blank'); }
-
-        // ===============================================
-        // 🔄 MIGRATION TOOL FUNCTIONS
-        // ===============================================
-        
-        function showMigrationToast(message, type = 'success') {
-            const toastContainer = document.getElementById('migration-toast-container');
-            const toast = document.createElement('div');
-            
-            const bgClass = type === 'success' ? 'bg-emerald-600' : 'bg-red-600';
-            const iconClass = type === 'success' ? 'fa-check-circle' : 'fa-circle-exclamation';
-            
-            toast.className = `toast hide flex items-center gap-3 text-white px-5 py-3 rounded-xl shadow-lg shadow-slate-200 border border-white/10 backdrop-blur-md ${bgClass}`;
-            toast.innerHTML = `<i class="fa-solid ${iconClass}"></i><span class="text-sm font-medium tracking-wide">${message}</span>`;
-            
-            toastContainer.appendChild(toast);
-            
-            setTimeout(() => { toast.classList.remove('hide'); toast.classList.add('show'); }, 10);
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-                toast.classList.add('hide');
-                setTimeout(() => toast.remove(), 300);
-            }, 3500);
-        }
-
-        async function fetchMigrationData() {
-            const btn = document.getElementById('btn-migration-fetch');
-            const originalText = btn.innerHTML;
-            
-            try {
-                btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Menghubungkan ke Cloud...';
-                btn.disabled = true;
-                
-                const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-                    headers: { 'X-Master-Key': API_KEY }
-                });
-                
-                if (!response.ok) throw new Error('Gagal menarik data dari server');
-                
-                const result = await response.json();
-                originalMigrationData = result.record;
-                
-                processMigrationDataLocally();
-                
-                btn.innerHTML = '<i class="fa-solid fa-check text-emerald-400"></i> Data Siap Diproses';
-                btn.classList.replace('bg-slate-900', 'bg-slate-800');
-                showMigrationToast('Data berhasil ditarik dari Cloud!', 'success');
-
-                const actionPanel = document.getElementById('migration-action-panel');
-                actionPanel.classList.remove('opacity-40', 'pointer-events-none', 'filter', 'grayscale');
-                
-            } catch (error) {
-                showMigrationToast(error.message, 'error');
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        }
-
-        function processMigrationDataLocally() {
-            migratedDataState = JSON.parse(JSON.stringify(originalMigrationData));
-            
-            let newItems = [];
-            let soldCount = 0;
-            let stokCount = 0;
-
-            if (!migratedDataState.extraProfits) migratedDataState.extraProfits = [];
-
-            originalMigrationData.items.forEach(item => {
-                if (item.status === 'sold') {
-                    soldCount++;
-                    migratedDataState.extraProfits.push({
-                        id: item.id,
-                        name: item.name + ' (Migrasi)',
-                        modal: item.modal,
-                        price: item.price,
-                        profit: item.price - item.modal
-                    });
-                } else {
-                    stokCount++;
-                    newItems.push(item);
-                }
-            });
-
-            migratedDataState.items = newItems;
-
-            document.getElementById('migration-status-box').classList.remove('hidden');
-            
-            document.getElementById('migration-stat-total').innerText = originalMigrationData.items.length;
-            document.getElementById('migration-stat-sold').innerText = soldCount;
-            document.getElementById('migration-stat-stok').innerText = stokCount;
-        }
-
-        function downloadMigrationJSON() {
-            if (!migratedDataState) return;
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(migratedDataState, null, 2));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", `Backup_Ledger_${new Date().getTime()}.json`);
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
-            showMigrationToast('File backup berhasil diunduh.', 'success');
-        }
-
-        function openMigrationModal() {
-            const modal = document.getElementById('migration-sync-modal');
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-            document.body.classList.add('modal-active');
-            resetMigrationModal();
-        }
-
-        function closeMigrationModal() {
-            const modal = document.getElementById('migration-sync-modal');
-            modal.classList.add('opacity-0', 'pointer-events-none');
-            document.body.classList.remove('modal-active');
-        }
-
-        function resetMigrationModal() {
-            document.getElementById('migration-verify-1').checked = false;
-            document.getElementById('migration-verify-2').value = "";
-            document.getElementById('migration-verify-3').value = "";
-            checkMigrationVerification();
-        }
-
-        function checkMigrationVerification() {
-            const v1 = document.getElementById('migration-verify-1').checked;
-            const v2 = document.getElementById('migration-verify-2').value === "MIGRASI";
-            const v3 = document.getElementById('migration-verify-3').value === OWNER_PIN;
-            
-            const btn = document.getElementById('btn-migration-execute-sync');
-            
-            if (v1 && v2 && v3) {
-                btn.disabled = false;
-                btn.classList.remove('bg-red-300', 'cursor-not-allowed');
-                btn.classList.add('bg-red-600', 'hover:bg-red-700', 'shadow-lg', 'shadow-red-200');
-            } else {
-                btn.disabled = true;
-                btn.classList.add('bg-red-300', 'cursor-not-allowed');
-                btn.classList.remove('bg-red-600', 'hover:bg-red-700', 'shadow-lg', 'shadow-red-200');
-            }
-        }
-
-        async function executeMigrationSync() {
-            const btn = document.getElementById('btn-migration-execute-sync');
-            const originalText = btn.innerHTML;
-            
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Menyinkronkan...';
-            btn.disabled = true;
-
-            try {
-                const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': API_KEY
-                    },
-                    body: JSON.stringify(migratedDataState)
-                });
-
-                if (!response.ok) throw new Error('Gagal menyinkronkan ke cloud');
-                
-                closeMigrationModal();
-                showMigrationToast('SUKSES! Data berhasil disinkronkan ke Cloud.', 'success');
-                
-                setTimeout(() => {
-                    window.location.reload();
-                }, 2000);
-
-            } catch (error) {
-                showMigrationToast("Gagal: " + error.message, 'error');
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        }
 
         // --- INIT ---
         window.onload = () => {
