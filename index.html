@@ -551,34 +551,52 @@
                 </div>
             </main>
 
-            <div id="page-analytics" class="max-w-4xl w-full mx-auto hidden flex-1 lg:overflow-y-auto pt-8 px-4 md:px-8">
+<div id="page-analytics" class="max-w-4xl w-full mx-auto hidden flex-1 lg:overflow-y-auto pt-8 px-4 md:px-8">
                 <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali Dashboard</button>
                 <h1 class="text-2xl font-black italic mb-6 text-slate-800">📊 PERFORMA TOKO</h1>
             
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="card p-4 border-l-4 border-blue-500">
-                        <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Kecepatan Putaran</p>
-                        <h2 id="avgSellTime" class="text-2xl font-black text-slate-800">- Hari</h2>
-                        <p class="text-[9px] text-slate-400 italic mt-1">Rata-rata barang laku</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="card p-4 border-b-4 border-emerald-500 bg-emerald-50/30">
+                        <p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Total Unit Terjual</p>
+                        <h2 id="statTotalSold" class="text-2xl font-black text-emerald-700">0</h2>
+                        <p class="text-[9px] text-slate-400 italic mt-1">Sepanjang masa</p>
                     </div>
-                    <div class="card p-4 border-l-4 border-purple-500">
+                    <div class="card p-4 border-b-4 border-indigo-500 bg-indigo-50/30">
+                        <p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Total Stok Aktif</p>
+                        <h2 id="statActiveStock" class="text-2xl font-black text-indigo-700">0</h2>
+                        <p class="text-[9px] text-slate-400 italic mt-1">Siap jual</p>
+                    </div>
+                    <div class="card p-4 border-b-4 border-blue-500">
+                        <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Kecepatan Putaran</p>
+                        <h2 id="avgSellTime" class="text-2xl font-black text-slate-800">-</h2>
+                        <p class="text-[9px] text-slate-400 italic mt-1">Rata-rata hari laku</p>
+                    </div>
+                    <div class="card p-4 border-b-4 border-purple-500">
                         <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Win Rate Barang</p>
                         <h2 id="winRateStock" class="text-2xl font-black text-slate-800">0%</h2>
-                        <p class="text-[9px] text-slate-400 italic mt-1">Rasio Laku vs Stok Diam</p>
+                        <p class="text-[9px] text-slate-400 italic mt-1">Rasio Laku vs Stok</p>
                     </div>
                 </div>
-            
+
                 <div class="card p-5 mb-6">
-                    <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Dominasi Brand (Smart Grouping)</h3>
-                    <div class="h-64">
-                        <canvas id="brandChart"></canvas>
-                    </div>
-                </div>
-            
-                <div class="card p-5 mb-6">
-                    <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Tren Profit Harian</h3>
+                    <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Volume Penjualan (Unit / Bulan)</h3>
                     <div class="h-48">
-                        <canvas id="profitTrendChart" class="sensitive-data"></canvas>
+                        <canvas id="monthlySalesChart" class="sensitive-data"></canvas>
+                    </div>
+                </div>
+            
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="card p-5">
+                        <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Dominasi Brand (Unit)</h3>
+                        <div class="h-48">
+                            <canvas id="brandChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card p-5">
+                        <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">10 Transaksi Terakhir (Profit)</h3>
+                        <div class="h-48">
+                            <canvas id="profitTrendChart" class="sensitive-data"></canvas>
+                        </div>
                     </div>
                 </div>
 
@@ -835,6 +853,7 @@ function copyToClipboard(text) {
         let brandChartInstance = null;
         let trendChartInstance = null;
         let quarterlyChartInstance = null;
+        let monthlySalesChartInstance = null;
         
         // EDIT & COST VARIABLES
         let currentEditId = null;
@@ -1687,35 +1706,35 @@ function copyToClipboard(text) {
             document.getElementById('rankBadge').innerText = r;
         }
         
-// --- ANALYTICS VISUALIZATION (REVISI ALL-TIME) ---
+// --- ANALYTICS VISUALIZATION (FULL UPGRADE) ---
         function renderAnalytics() {
-            // 1. Ambil data Sold bulan ini
             const currentSold = items.filter(i => i.status === 'sold');
-            
-            // 2. Ambil data Extra Profit (history bulan lalu) dan sesuaikan formatnya
             const pastSold = extraProfits.map(p => ({
+                id: p.id, // <-- Kunci Rahasianya ada di ID
                 name: p.name,
                 modal: p.modal,
                 price: p.price,
-                entryDate: 'Bulan Lalu', // Label dummy agar tidak error kalkulasi hari
+                entryDate: 'Bulan Lalu', 
                 soldAt: 'Bulan Lalu'
             }));
 
-            // 3. Gabungkan keduanya untuk dianalisa (All-Time Sales)
             const allSoldItems = [...pastSold, ...currentSold];
+            const activeStockItems = items.filter(i => i.status === 'stok');
 
-            // Jika benar-benar belum pernah ada yang laku sejak toko berdiri
+            // UPDATE KOTAK ANGKA BARU
+            document.getElementById('statTotalSold').innerText = allSoldItems.length;
+            document.getElementById('statActiveStock').innerText = activeStockItems.length;
+
             if (allSoldItems.length === 0) {
                 document.getElementById('avgSellTime').innerText = "-";
                 document.getElementById('winRateStock').innerText = "0%";
                 return; 
             }
 
-            // --- HITUNG RATA-RATA HARI TERJUAL ---
+            // HITUNG RATA-RATA HARI
             let totalDays = 0; 
             let validSales = 0;
             allSoldItems.forEach(i => {
-                // Hanya hitung kecepatan putaran untuk barang yang punya tanggal spesifik
                 if (i.entryDate !== 'Bulan Lalu' && i.soldAt && i.soldAt !== 'Bulan Lalu') {
                     const entry = parseDateString(i.entryDate); 
                     const sold = parseDateString(i.soldAt);
@@ -1727,12 +1746,49 @@ function copyToClipboard(text) {
             const avgDays = validSales > 0 ? (totalDays / validSales).toFixed(1) : 0;
             document.getElementById('avgSellTime').innerText = avgDays + " Hari";
 
-            // --- HITUNG WIN RATE BARANG ---
-            const activeStock = items.filter(i => i.status === 'stok').length; 
-            const totalSold = allSoldItems.length;
-            const totalItemsEver = activeStock + totalSold;
-            const winRate = totalItemsEver > 0 ? ((totalSold / totalItemsEver) * 100).toFixed(0) : 0;
+            // HITUNG WIN RATE
+            const totalItemsEver = activeStockItems.length + allSoldItems.length;
+            const winRate = totalItemsEver > 0 ? ((allSoldItems.length / totalItemsEver) * 100).toFixed(0) : 0;
             document.getElementById('winRateStock').innerText = winRate + "%";
+
+            // --- CHART 0: NEW! PENJUALAN PER BULAN (EKSTRAK DARI ID) ---
+            const monthlySalesCount = {};
+            const shortMonths = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+            
+            allSoldItems.forEach(i => {
+                // Ekstrak timestamp murni dari ID (buang angka desimal di belakang titik)
+                const timestamp = Math.floor(i.id);
+                const dateFromId = new Date(timestamp);
+                const monthYear = shortMonths[dateFromId.getMonth()] + " " + dateFromId.getFullYear().toString().slice(-2);
+                
+                if(monthlySalesCount[monthYear]) {
+                    monthlySalesCount[monthYear]++;
+                } else {
+                    monthlySalesCount[monthYear] = 1;
+                }
+            });
+
+            const ctxMonthly = document.getElementById('monthlySalesChart');
+            if (ctxMonthly) {
+                if(monthlySalesChartInstance) monthlySalesChartInstance.destroy();
+                monthlySalesChartInstance = new Chart(ctxMonthly, {
+                    type: 'line', // Line chart agar terlihat tren naik-turunnya
+                    data: {
+                        labels: Object.keys(monthlySalesCount),
+                        datasets: [{ 
+                            label: 'Unit Terjual', 
+                            data: Object.values(monthlySalesCount), 
+                            borderColor: '#3b82f6', 
+                            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4, // Membuat garis melengkung halus
+                            pointBackgroundColor: '#1e40af'
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { ticks: { font: { size: 10 } } } }, plugins: { legend: { display: false } } }
+                });
+            }
 
             // --- CHART 1: DOMINASI BRAND ---
             const brands = {};
@@ -1757,7 +1813,7 @@ function copyToClipboard(text) {
                 });
             }
 
-            // --- CHART 2: TREN PROFIT HARIAN (10 Transaksi Terakhir) ---
+            // --- CHART 2: TREN PROFIT HARIAN ---
             const lastSales = allSoldItems.slice(-10); 
             const labels = lastSales.map(i => i.name.substring(0, 10)); 
             const profits = lastSales.map(i => i.price - i.modal);
@@ -1777,7 +1833,9 @@ function copyToClipboard(text) {
             // --- CHART 3: PERFORMA KUARTAL ---
             const quarters = { "Q1 (Jan-Mar)": 0, "Q2 (Apr-Jun)": 0, "Q3 (Jul-Sep)": 0, "Q4 (Oct-Dec)": 0 };
             allSoldItems.forEach(i => {
-                const date = parseDateString(i.soldAt);
+                // Gunakan tanggal dari ID karena lebih akurat sepanjang masa
+                const timestamp = Math.floor(i.id);
+                const date = new Date(timestamp);
                 const month = date.getMonth(); 
                 const profit = i.price - i.modal;
                 
@@ -1809,7 +1867,7 @@ function copyToClipboard(text) {
                 });
             }
         }
-
+        
         function getBrandCategory(itemName) {
             const lower = itemName.toLowerCase();
             if (lower.includes('iphone') || lower.includes('apple') || lower.includes('ipad') || lower.includes('ip ')) return 'APPLE';
