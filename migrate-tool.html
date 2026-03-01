@@ -5,59 +5,131 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Migrasi Bulanan - Farid Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 900: '#1e3a8a' }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body { background-color: #f3f4f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .modal { transition: opacity 0.25s ease; }
-        body.modal-active { overflow-x: hidden; overflow-y: hidden !important; }
+        body { background-color: #f8fafc; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Modal & Animations */
+        .modal { transition: opacity 0.3s ease, transform 0.3s ease; backdrop-filter: blur(4px); }
+        body.modal-active { overflow: hidden; }
+        .scale-in { animation: scaleIn 0.3s ease forwards; }
+        @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        /* Toast Notification */
+        .toast { transition: transform 0.3s ease, opacity 0.3s ease; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.hide { transform: translateY(-100%); opacity: 0; pointer-events: none; }
     </style>
 </head>
-<body class="text-gray-800 antialiased h-screen flex flex-col">
+<body class="text-slate-800 antialiased min-h-screen flex flex-col selection:bg-brand-100 selection:text-brand-900">
 
-    <header class="bg-blue-600 text-white shadow-lg py-4">
-        <div class="container mx-auto px-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold"><i class="fa-solid fa-server mr-2"></i> Alat Migrasi Bulanan</h1>
-            <p class="text-sm bg-blue-800 px-3 py-1 rounded-full" id="date-badge">Cek Tanggal...</p>
+    <div id="toast-container" class="fixed top-4 left-1/2 transform -translate-x-1/2 z- flex flex-col gap-2"></div>
+
+    <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="container mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-brand-200">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900 leading-tight">Data Migration Tool</h1>
+                    <p class="text-xs text-slate-500 font-medium tracking-wide uppercase">Farid Store Ledger</p>
+                </div>
+            </div>
+            <div class="bg-slate-100 px-4 py-2 rounded-full border border-slate-200 flex items-center gap-2 shadow-inner">
+                <i class="fa-regular fa-calendar text-brand-500"></i>
+                <span class="text-sm font-semibold text-slate-700" id="date-badge">Memuat tanggal...</span>
+            </div>
         </div>
     </header>
 
-    <main class="container mx-auto px-4 py-8 flex-grow">
+    <main class="container mx-auto px-6 py-8 flex-grow max-w-5xl">
         
-        <div id="date-warning" class="hidden bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded shadow-sm" role="alert">
-            <p class="font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Peringatan Tanggal</p>
-            <p>Fitur ini didesain khusus untuk awal bulan (tanggal 1-5). Anda mengaksesnya di luar tanggal tersebut. Harap berhati-hati.</p>
+        <div id="date-warning" class="hidden mb-8 overflow-hidden rounded-2xl bg-amber-50 border border-amber-200 shadow-sm transition-all duration-300">
+            <div class="px-6 py-4 flex items-start gap-4">
+                <div class="bg-amber-100 text-amber-600 p-2 rounded-lg mt-0.5">
+                    <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-amber-800">Perhatian: Di Luar Jadwal Migrasi</h3>
+                    <p class="text-sm text-amber-700 mt-1">Sistem mendeteksi hari ini bukan tanggal 1-5 awal bulan. Pastikan Anda benar-benar perlu melakukan sinkronisasi data pada tanggal ini.</p>
+                </div>
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             
-            <div class="bg-white rounded-xl shadow-md p-6">
-                <h2 class="text-xl font-bold border-b pb-2 mb-4"><i class="fa-solid fa-cloud-arrow-down text-blue-500"></i> 1. Tarik Data Cloud</h2>
-                <p class="text-sm text-gray-600 mb-4">Tarik data bulan lalu dari database sebelum melakukan konversi.</p>
-                <button onclick="fetchData()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
-                    <i class="fa-solid fa-rotate mr-2"></i> Tarik Data Sekarang
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 relative overflow-hidden group hover:shadow-md transition-shadow">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-brand-50 rounded-bl-full -z-10 transition-transform group-hover:scale-110"></div>
+                
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-500 font-bold text-sm">1</span>
+                    <h2 class="text-xl font-bold text-slate-800">Tarik Data Cloud</h2>
+                </div>
+                
+                <p class="text-slate-500 mb-8 text-sm leading-relaxed">Hubungkan ke database <b>Digital Ledger</b> untuk menarik rekap data bulan lalu sebelum dikonversi menjadi laporan Extra Profit.</p>
+                
+                <button onclick="fetchData()" id="btn-fetch" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-3.5 px-6 rounded-xl transition-all duration-300 shadow-lg shadow-slate-200 flex justify-center items-center gap-2 hover:-translate-y-0.5">
+                    <i class="fa-solid fa-cloud-arrow-down"></i> Tarik Data Sekarang
                 </button>
 
-                <div id="status-box" class="mt-6 hidden bg-gray-50 p-4 rounded-lg border border-gray-200">
-                    <h3 class="font-semibold text-gray-700 mb-2">Ringkasan Data Saat Ini:</h3>
-                    <ul class="text-sm space-y-2">
-                        <li>Total Item di Database: <span id="stat-total" class="font-bold text-blue-600">0</span></li>
-                        <li>Barang Terjual (Siap Migrasi): <span id="stat-sold" class="font-bold text-green-600">0</span></li>
-                        <li>Barang Stok (Tetap Dipertahankan): <span id="stat-stok" class="font-bold text-orange-600">0</span></li>
-                    </ul>
+                <div id="status-box" class="mt-8 hidden animate-[scaleIn_0.4s_ease-out]">
+                    <div class="h-px bg-slate-100 w-full mb-6"></div>
+                    <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Ringkasan Database</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                            <p class="text-xs text-slate-500 mb-1">Total Item</p>
+                            <p class="text-2xl font-bold text-slate-800" id="stat-total">0</p>
+                        </div>
+                        <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-100">
+                            <p class="text-xs text-emerald-600 mb-1">Siap Migrasi (Sold)</p>
+                            <p class="text-2xl font-bold text-emerald-700" id="stat-sold">0</p>
+                        </div>
+                        <div class="bg-indigo-50 rounded-xl p-4 border border-indigo-100 col-span-2 flex justify-between items-center">
+                            <div>
+                                <p class="text-xs text-indigo-600 mb-1">Tetap Dipertahankan (Stok)</p>
+                                <p class="text-2xl font-bold text-indigo-700" id="stat-stok">0</p>
+                            </div>
+                            <i class="fa-solid fa-boxes-stacked text-indigo-200 text-3xl"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-md p-6 opacity-50 pointer-events-none transition-opacity duration-300" id="action-panel">
-                <h2 class="text-xl font-bold border-b pb-2 mb-4"><i class="fa-solid fa-wand-magic-sparkles text-purple-500"></i> 2. Eksekusi Migrasi</h2>
-                <p class="text-sm text-gray-600 mb-6">Barang berstatus <b>"sold"</b> akan dipindah ke <b>Extra Profit</b>. Barang <b>"stok"</b> akan tetap berada di daftar utama.</p>
+            <div id="action-panel" class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 relative overflow-hidden opacity-40 pointer-events-none transition-all duration-500 filter grayscale">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-500 font-bold text-sm">2</span>
+                    <h2 class="text-xl font-bold text-slate-800">Eksekusi Migrasi</h2>
+                </div>
+                
+                <p class="text-slate-500 mb-8 text-sm leading-relaxed">Pindahkan data barang <b>Sold</b> ke Extra Profit. Data asli akan ditimpa, pastikan Anda mendownload backup JSON terlebih dahulu.</p>
                 
                 <div class="space-y-4">
-                    <button onclick="downloadJSON()" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
-                        <i class="fa-solid fa-file-arrow-down mr-2"></i> Download JSON (Backup)
+                    <button onclick="downloadJSON()" class="w-full bg-white border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold py-3.5 px-6 rounded-xl transition-all duration-300 flex justify-center items-center gap-2">
+                        <i class="fa-solid fa-file-code text-slate-400"></i> Download JSON Backup
                     </button>
                     
-                    <button onclick="openModal()" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200 shadow-lg shadow-red-200">
-                        <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Sync & Timpa ke Cloud
+                    <button onclick="openModal()" class="w-full bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg shadow-red-200 flex justify-center items-center gap-2 hover:-translate-y-0.5">
+                        <i class="fa-solid fa-rotate text-white/90"></i> Sinkronisasi & Timpa Cloud
                     </button>
                 </div>
             </div>
@@ -65,51 +137,61 @@
         </div>
     </main>
 
-    <div id="sync-modal" class="modal opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center z-50">
-        <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-60"></div>
+    <div id="sync-modal" class="modal opacity-0 pointer-events-none fixed inset-0 z-50 flex items-center justify-center px-4">
+        <div class="absolute inset-0 bg-slate-900/40" onclick="closeModal()"></div>
         
-        <div class="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded-xl shadow-2xl z-50 overflow-y-auto">
-            <div class="modal-content py-4 text-left px-6">
-                <div class="flex justify-between items-center pb-3 border-b border-red-200">
-                    <p class="text-xl font-bold text-red-600"><i class="fa-solid fa-shield-halved"></i> Verifikasi Keamanan 3x</p>
-                    <div class="modal-close cursor-pointer z-50" onclick="closeModal()">
-                        <i class="fa-solid fa-xmark text-gray-500 hover:text-gray-800 text-2xl"></i>
+        <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl z-10 overflow-hidden scale-in">
+            <div class="bg-red-50 border-b border-red-100 px-6 py-5 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-red-100 text-red-600 p-2 rounded-lg">
+                        <i class="fa-solid fa-shield-halved"></i>
                     </div>
+                    <h3 class="text-lg font-bold text-red-900">Verifikasi Keamanan</h3>
+                </div>
+                <button onclick="closeModal()" class="text-red-400 hover:text-red-700 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-100">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-5">
+                <p class="text-sm text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    Proses ini bersifat <b>PERMANEN</b>. Data item terjual akan dihapus dari array utama dan dipindah ke Extra Profit.
+                </p>
+                
+                <div class="flex items-start gap-3 p-1">
+                    <div class="flex h-6 items-center">
+                        <input id="verify-1" type="checkbox" class="h-5 w-5 rounded border-slate-300 text-red-600 focus:ring-red-600 cursor-pointer transition-all" onchange="checkVerification()">
+                    </div>
+                    <label for="verify-1" class="text-sm text-slate-700 cursor-pointer select-none pt-0.5">
+                        <span class="font-bold text-slate-900 block mb-0.5">Lapis 1: Konfirmasi Sadar</span>
+                        Saya mengerti proses ini akan menimpa data utama di Cloud dan saya telah memiliki file backup.
+                    </label>
                 </div>
 
-                <div class="my-5 space-y-4">
-                    <p class="text-sm text-gray-600">Proses ini akan <b>MENGHAPUS</b> data item yang sudah terjual dan memindahkannya ke laporan Extra Profit secara permanen di database Cloud.</p>
-                    
-                    <div class="bg-gray-50 p-3 rounded border">
-                        <label class="flex items-start space-x-3 cursor-pointer">
-                            <input type="checkbox" id="verify-1" class="mt-1 h-5 w-5 text-red-600 rounded border-gray-300 focus:ring-red-500" onchange="checkVerification()">
-                            <span class="text-sm font-medium"><b>Lapis 1:</b> Saya sadar proses ini akan menimpa data utama di Cloud dan telah melakukan backup jika diperlukan.</span>
-                        </label>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-bold mb-1">Lapis 2: Ketik "MIGRASI"</label>
-                        <input type="text" id="verify-2" placeholder="Ketik persis huruf besar..." class="w-full border p-2 rounded focus:ring-red-500 focus:border-red-500 outline-none" onkeyup="checkVerification()">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-bold mb-1">Lapis 3: Masukkan PIN Owner</label>
-                        <input type="password" id="verify-3" placeholder="******" class="w-full border p-2 rounded focus:ring-red-500 focus:border-red-500 outline-none" onkeyup="checkVerification()">
-                    </div>
+                <div class="relative">
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5 ml-1">Lapis 2: Ketik "MIGRASI"</label>
+                    <input type="text" id="verify-2" placeholder="Harus huruf besar semua" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 block p-3.5 outline-none transition-all" onkeyup="checkVerification()">
                 </div>
 
-                <div class="flex justify-end pt-2 border-t mt-4">
-                    <button onclick="closeModal()" class="px-4 bg-transparent p-3 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 mr-2">Batal</button>
-                    <button id="btn-execute-sync" onclick="executeSync()" disabled class="px-4 bg-red-300 text-white p-3 rounded-lg font-bold cursor-not-allowed transition-colors duration-200">
-                        <i class="fa-solid fa-rocket mr-1"></i> Eksekusi Sync
-                    </button>
+                <div class="relative">
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5 ml-1">Lapis 3: PIN Otorisasi</label>
+                    <input type="password" id="verify-3" placeholder="Masukkan 6 digit PIN" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 block p-3.5 outline-none transition-all tracking-[0.3em] font-mono" onkeyup="checkVerification()">
                 </div>
+            </div>
+
+            <div class="px-6 py-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+                <button onclick="closeModal()" class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 bg-white border border-slate-200 hover:bg-slate-100 rounded-xl transition-colors">
+                    Batal
+                </button>
+                <button id="btn-execute-sync" onclick="executeSync()" disabled class="px-6 py-2.5 text-sm font-bold text-white bg-red-300 rounded-xl cursor-not-allowed transition-all duration-300 flex items-center gap-2">
+                    Eksekusi Sync <i class="fa-solid fa-arrow-right"></i>
+                </button>
             </div>
         </div>
     </div>
 
     <script>
-        // Konfigurasi Cloud
+        // ☁️ KONFIGURASI CLOUD & SECURITY
         const BIN_ID = '699644fdae596e708f3582af'; 
         const API_KEY = '$2a$10$tcKHEWwuz2sqRoMCKJfga.1xxTFW0RxpXUPnP.NI4YbivtlK1xxau'; 
         const OWNER_PIN = '011204';
@@ -118,11 +200,35 @@
         let originalData = null;
         let migratedData = null;
 
+        // Custom Toast Function
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const bgClass = type === 'success' ? 'bg-emerald-600' : 'bg-red-600';
+            const iconClass = type === 'success' ? 'fa-check-circle' : 'fa-circle-exclamation';
+            
+            toast.className = `toast hide flex items-center gap-3 text-white px-5 py-3 rounded-xl shadow-lg shadow-slate-200 border border-white/10 backdrop-blur-md ${bgClass}`;
+            toast.innerHTML = `<i class="fa-solid ${iconClass}"></i><span class="text-sm font-medium tracking-wide">${message}</span>`;
+            
+            toastContainer.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => { toast.classList.remove('hide'); toast.classList.add('show'); }, 10);
+            
+            // Animate out and remove
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
         // Cek Tanggal
         document.addEventListener('DOMContentLoaded', () => {
             const today = new Date();
-            const dateStr = today.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-            document.getElementById('date-badge').innerText = `Hari ini: ${dateStr}`;
+            const dateOptions = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            document.getElementById('date-badge').innerText = today.toLocaleDateString('id-ID', dateOptions);
 
             const day = today.getDate();
             if(day < 1 || day > 5) {
@@ -132,9 +238,12 @@
 
         // 1. Fetch Data
         async function fetchData() {
+            const btn = document.getElementById('btn-fetch');
+            const originalText = btn.innerHTML;
+            
             try {
-                const btn = event.currentTarget;
-                btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Menarik Data...';
+                btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Menghubungkan ke Cloud...';
+                btn.disabled = true;
                 
                 const response = await fetch(BIN_URL, {
                     headers: { 'X-Master-Key': API_KEY }
@@ -147,51 +256,54 @@
                 
                 processDataLocally();
                 
-                btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i> Data Berhasil Ditarik';
-                btn.classList.replace('bg-blue-500', 'bg-green-500');
-                btn.classList.replace('hover:bg-blue-600', 'hover:bg-green-600');
+                btn.innerHTML = '<i class="fa-solid fa-check text-emerald-400"></i> Data Siap Diproses';
+                btn.classList.replace('bg-slate-900', 'bg-slate-800');
+                showToast('Data berhasil ditarik dari Cloud!', 'success');
 
-                // Buka Kunci Panel Kanan
-                document.getElementById('action-panel').classList.remove('opacity-50', 'pointer-events-none');
+                // Buka Kunci Panel Kanan (Hilangkan grayscale dan disable)
+                const actionPanel = document.getElementById('action-panel');
+                actionPanel.classList.remove('opacity-40', 'pointer-events-none', 'filter', 'grayscale');
                 
             } catch (error) {
-                alert("Error: " + error.message);
-                event.currentTarget.innerHTML = '<i class="fa-solid fa-rotate mr-2"></i> Coba Tarik Lagi';
+                showToast(error.message, 'error');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             }
         }
 
         // 2. Proses Logika Migrasi (Lokal)
         function processDataLocally() {
-            // Clone data untuk menghindari mutasi langsung
             migratedData = JSON.parse(JSON.stringify(originalData));
             
             let newItems = [];
             let soldCount = 0;
             let stokCount = 0;
 
+            // Pastikan array extraProfits ada
+            if (!migratedData.extraProfits) migratedData.extraProfits = [];
+
             originalData.items.forEach(item => {
                 if (item.status === 'sold') {
                     soldCount++;
-                    // Pindah ke Extra Profit
                     migratedData.extraProfits.push({
-                        id: item.id, // Pertahankan ID unik
-                        name: item.name + ' (Migrasi)', // Penanda opsional
+                        id: item.id,
+                        name: item.name + ' (Migrasi)',
                         modal: item.modal,
                         price: item.price,
                         profit: item.price - item.modal
                     });
                 } else {
                     stokCount++;
-                    // Tetap di Items
                     newItems.push(item);
                 }
             });
 
-            // Update array items dengan yang tersisa (stok)
             migratedData.items = newItems;
 
-            // Update UI
+            // Update UI Stats
             document.getElementById('status-box').classList.remove('hidden');
+            
+            // Animasi angka (opsional simpel)
             document.getElementById('stat-total').innerText = originalData.items.length;
             document.getElementById('stat-sold').innerText = soldCount;
             document.getElementById('stat-stok').innerText = stokCount;
@@ -203,10 +315,11 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(migratedData, null, 2));
             const downloadAnchorNode = document.createElement('a');
             downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", `Data_Migrasi_FaridStore_${new Date().getTime()}.json`);
-            document.body.appendChild(downloadAnchorNode); // required for firefox
+            downloadAnchorNode.setAttribute("download", `Backup_Ledger_${new Date().getTime()}.json`);
+            document.body.appendChild(downloadAnchorNode);
             downloadAnchorNode.click();
             downloadAnchorNode.remove();
+            showToast('File backup berhasil diunduh.', 'success');
         }
 
         // 4. Manajemen Modal
@@ -240,18 +353,20 @@
             if (v1 && v2 && v3) {
                 btn.disabled = false;
                 btn.classList.remove('bg-red-300', 'cursor-not-allowed');
-                btn.classList.add('bg-red-600', 'hover:bg-red-700', 'shadow-lg');
+                btn.classList.add('bg-red-600', 'hover:bg-red-700', 'shadow-lg', 'shadow-red-200');
             } else {
                 btn.disabled = true;
                 btn.classList.add('bg-red-300', 'cursor-not-allowed');
-                btn.classList.remove('bg-red-600', 'hover:bg-red-700', 'shadow-lg');
+                btn.classList.remove('bg-red-600', 'hover:bg-red-700', 'shadow-lg', 'shadow-red-200');
             }
         }
 
         // 6. Eksekusi Sync ke Cloud
         async function executeSync() {
             const btn = document.getElementById('btn-execute-sync');
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-1"></i> Menyinkronkan...';
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Menyinkronkan...';
             btn.disabled = true;
 
             try {
@@ -266,15 +381,17 @@
 
                 if (!response.ok) throw new Error('Gagal menyinkronkan ke cloud');
                 
-                alert("SUKSES! Data bulan lalu berhasil dibersihkan dan dipindahkan ke Extra Profit.");
                 closeModal();
+                showToast('SUKSES! Data berhasil disinkronkan ke Cloud.', 'success');
                 
-                // Refresh halaman agar kembali kosong dan aman
-                window.location.reload();
+                // Refresh halaman setelah jeda agar pesan sukses terlihat
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
 
             } catch (error) {
-                alert("Sync Error: " + error.message);
-                btn.innerHTML = '<i class="fa-solid fa-rocket mr-1"></i> Eksekusi Sync';
+                showToast("Gagal: " + error.message, 'error');
+                btn.innerHTML = originalText;
                 btn.disabled = false;
             }
         }
