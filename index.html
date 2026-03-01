@@ -505,8 +505,8 @@
         <div id="testiMenu" class="hidden absolute top-full left-0 mt-2 w-[140%] sm:w-full bg-white border border-slate-200 rounded-xl shadow-lg z-50 flex-col overflow-hidden">
             <a href="https://id.shp.ee/ieSggGu" target="_blank" class="px-4 py-3 text-xs sm:text-sm text-slate-700 hover:bg-slate-50 border-b border-slate-100 flex items-center gap-2 transition-colors">🛍️ Shopee</a>
             <a href="https://instagram.com/scv.farid1717_" target="_blank" class="px-4 py-3 text-xs sm:text-sm text-slate-700 hover:bg-slate-50 border-b border-slate-100 flex items-center gap-2 transition-colors">📷 Instagram</a>
-            <a href="https://www.facebook.com/marketplace/profile/100025975151176" target="_blank" class="px-4 py-3 text-xs sm:text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors">📘 Facebook [1]</a>
-            <a href="https://www.facebook.com/marketplace/profile/100012652447480" target="_blank" class="px-4 py-3 text-xs sm:text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors">📘 Facebook [2]</a>
+            <a href="https://www.facebook.com/marketplace/profile/100025975151176" target="_blank" class="px-4 py-3 text-xs sm:text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors">📘 Facebook</a>
+            <a href="https://www.facebook.com/marketplace/profile/100012652447480" target="_blank" class="px-4 py-3 text-xs sm:text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors">📘 Facebook</a>
         </div>
     </div>
 
@@ -729,7 +729,7 @@ function copyToClipboard(text) {
                 </div>
             </div>
             
-        </div> </div> <div id="importModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="display: none;">
+        </div> </div> <div id="importModal" class="fixed inset-0 z- flex items-center justify-center p-4" style="display: none;">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="toggleImportModal()"></div>
         <div class="relative bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl">
             <h3 class="text-xl font-black text-indigo-900 uppercase italic mb-4">📥 Import Data</h3>
@@ -739,7 +739,7 @@ function copyToClipboard(text) {
         </div>
     </div>
 
-    <div id="editModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="display: none;">
+    <div id="editModal" class="fixed inset-0 z- flex items-center justify-center p-4" style="display: none;">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeEditModal()"></div>
         <div class="relative bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl">
             <h3 class="text-lg font-black text-slate-800 uppercase italic mb-4">✏️ Edit Barang</h3>
@@ -751,12 +751,16 @@ function copyToClipboard(text) {
                     <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Tanggal Masuk (Manual)</label>
                     <input type="date" id="editEntryDate" class="input-field mt-1 text-sm bg-white">
                 </div>
+                <div class="bg-slate-50 p-2 rounded-lg border border-slate-200 mt-2" id="editSoldDateContainer" style="display: none;">
+                    <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Tanggal Terjual (Manual)</label>
+                    <input type="date" id="editSoldDate" class="input-field mt-1 text-sm bg-white">
+                </div>
                 <button onclick="saveEditItem()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold mt-2">SIMPAN</button>
             </div>
         </div>
     </div>
 
-    <div id="costModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="display: none;">
+    <div id="costModal" class="fixed inset-0 z- flex items-center justify-center p-4" style="display: none;">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeCostModal()"></div>
         <div class="relative bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl">
             <h3 class="text-lg font-black text-slate-800 uppercase italic mb-2">🛠️ Tambah Biaya</h3>
@@ -1083,8 +1087,8 @@ function copyToClipboard(text) {
         function formatDisplay(n) {
             if (!n || n === '-') return n;
             const p = n.split('.');
-            p[0] = parseFloat(p[0]).toLocaleString('id-ID');
-            return p.length > 1 ? p[0] + ',' + p[1] : p[0];
+            p = parseFloat(p).toLocaleString('id-ID');
+            return p.length > 1 ? p + ',' + p : p;
         }
 
         function calcNum(n) {
@@ -1153,12 +1157,12 @@ function copyToClipboard(text) {
             if(!s||s==='Imported'||s==='Bulan Lalu') return new Date();
             const p=s.split(' ');
             
-            if (p[0].includes('-')) {
-                return new Date(p[0]);
+            if (p.includes('-')) {
+                return new Date(p);
             }
 
-            const d=p[0].split('/');
-            return new Date(d[2],d[1]-1,d[0]); 
+            const d=p.split('/');
+            return new Date(d,d-1,d); 
         }
 
         // ===============================================
@@ -1220,9 +1224,9 @@ function copyToClipboard(text) {
             rawText.split('\n').forEach(line => {
                 if (line.includes(':') && line.includes('>')) {
                     const parts = line.split(/[:>]/);
-                    const name = parts[0].trim().replace(/^-\s*/, '').replace(/\[[BL]\]\s*/, '');
-                    const modal = Number(parts[1].replace(/[^0-9]/g, ''));
-                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
+                    const name = parts.trim().replace(/^-\s*/, '').replace(/\[[BL]\]\s*/, '');
+                    const modal = Number(parts.replace(/[^0-9]/g, ''));
+                    const price = Number(parts.replace(/[^0-9]/g, ''));
                     if (name && modal) {
                         items.unshift({ id: Date.now() + Math.random(), name, modal, price, status: 'stok', type, entryDate: getNow(), soldAt: '' });
                     }
@@ -1238,9 +1242,9 @@ function copyToClipboard(text) {
             rawText.split('\n').forEach(line => {
                 if (line.includes(':') && line.includes('>')) {
                     const parts = line.split(/[:>]/);
-                    const name = parts[0].trim();
-                    const modal = Number(parts[1].replace(/[^0-9]/g, ''));
-                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
+                    const name = parts.trim();
+                    const modal = Number(parts.replace(/[^0-9]/g, ''));
+                    const price = Number(parts.replace(/[^0-9]/g, ''));
                     if (name && modal && price) { 
                         extraProfits.push({ id: Date.now() + Math.random(), name, modal, price, profit: price - modal }); 
                     }
@@ -1298,7 +1302,7 @@ function copyToClipboard(text) {
         }
 
         // ===============================================
-        // 🔥 NEW: UPDATED RENDER ROWS (Client & Admin)
+        // 🔥 RENDER ROWS (Client & Admin)
         // ===============================================
         function renderRows() {
             const container = document.getElementById('itemRows');
@@ -1346,7 +1350,7 @@ function copyToClipboard(text) {
                     card.innerHTML = `
                         <div class="flex justify-between items-start mb-2">
                              <span class="text-[9px] font-black px-2 py-1 rounded ${brandColor}">${brand}</span>
-                             <span class="text-[10px] text-slate-400 font-bold">${item.entryDate.split(' ')[0]}</span>
+                             <span class="text-[10px] text-slate-400 font-bold">${item.entryDate.split(' ')}</span>
                         </div>
                         <h4 class="font-black text-slate-800 text-lg leading-tight mb-2">${item.name}</h4>
                         <div class="flex items-end justify-between border-t border-slate-100 pt-3 mt-1">
@@ -1452,16 +1456,34 @@ function copyToClipboard(text) {
             
             try {
                 if (i.entryDate && i.entryDate.includes('/')) {
-                    const entryStr = i.entryDate.split(' ')[0]; 
+                    const entryStr = i.entryDate.split(' '); 
                     const parts = entryStr.split('/');
                     if(parts.length === 3) {
-                        const isoDate = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+                        const isoDate = `${parts}-${parts.padStart(2,'0')}-${parts.padStart(2,'0')}`;
                         document.getElementById('editEntryDate').value = isoDate;
                     }
                 } else {
                     document.getElementById('editEntryDate').value = "";
                 }
             } catch(e) { console.log(e); }
+
+            // Logika menampilkan input Edit Sold Date
+            const soldDateContainer = document.getElementById('editSoldDateContainer');
+            const editSoldDateInput = document.getElementById('editSoldDate');
+            if (i.status === 'sold' && i.soldAt && i.soldAt !== 'Bulan Lalu' && i.soldAt.includes('/')) {
+                soldDateContainer.style.display = 'block';
+                try {
+                    const soldStr = i.soldAt.split(' '); 
+                    const parts = soldStr.split('/');
+                    if(parts.length === 3) {
+                        const isoDate = `${parts}-${parts.padStart(2,'0')}-${parts.padStart(2,'0')}`;
+                        editSoldDateInput.value = isoDate;
+                    }
+                } catch(e) { console.log(e); }
+            } else {
+                soldDateContainer.style.display = 'none';
+                editSoldDateInput.value = "";
+            }
 
             document.getElementById('editModal').style.display = 'flex';
         }
@@ -1487,6 +1509,7 @@ function copyToClipboard(text) {
                 const newModal = Number(document.getElementById('editItemModal').value);
                 const newPrice = Number(document.getElementById('editItemPrice').value);
                 const dateInput = document.getElementById('editEntryDate').value;
+                const soldDateInput = document.getElementById('editSoldDate').value;
 
                 if (isExtra) {
                     extraProfits[itemIndex].name = newName;
@@ -1501,6 +1524,11 @@ function copyToClipboard(text) {
                     if(dateInput) {
                         const d = new Date(dateInput);
                         items[itemIndex].entryDate = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} 00:00`;
+                    }
+
+                    if(items[itemIndex].status === 'sold' && soldDateInput) {
+                        const dSold = new Date(soldDateInput);
+                        items[itemIndex].soldAt = `${dSold.getDate()}/${dSold.getMonth()+1}/${dSold.getFullYear()} 00:00`;
                     }
                 }
 
@@ -1697,7 +1725,7 @@ function copyToClipboard(text) {
             if (lower.includes('itel')) return 'ITEL';
             if (lower.includes('asus') || lower.includes('rog')) return 'ASUS';
             if (lower.includes('google') || lower.includes('pixel')) return 'GOOGLE';
-            return itemName.split(' ')[0].replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+            return itemName.split(' ').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
         }
 
         function setMonthlyTarget() {
