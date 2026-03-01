@@ -798,22 +798,18 @@ function copyToClipboard(text) {
         let extraProfits = [];
         let currentFilter = 'stok';
         let currentMonthString = '';
-        let currentSort = 'date_desc'; // Default Sort
+        let currentSort = 'date_desc'; 
         
-        // ACCESS CONTROL STATE
         let currentUserMode = 'client_view'; 
-        let isBlurMode = false; // BLUR STATE
+        let isBlurMode = false; 
         
-        // OWNER FEATURE VARIABLES
         let targetGoal = 25000000; 
         let targetName = "BEP Modal 25 Juta";
         
-        // ANALYTICS VARIABLES
         let brandChartInstance = null;
         let trendChartInstance = null;
         let quarterlyChartInstance = null;
         
-        // EDIT & COST VARIABLES
         let currentEditId = null;
         let currentCostId = null;
         
@@ -822,11 +818,8 @@ function copyToClipboard(text) {
         // ===============================================
         // 🔐 SECURITY & AUTH LOGIC
         // ===============================================
-        
         function checkAutoPin(el) {
-            if (el.value.length === 6) {
-                checkPin();
-            }
+            if (el.value.length === 6) checkPin();
         }
 
         function checkPin() {
@@ -840,7 +833,7 @@ function copyToClipboard(text) {
                 btnInd.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white cursor-default";
                 
                 updateUIForMode();
-                autoFetchCloud(); // Menarik data terbaru otomatis saat admin login
+                autoFetchCloud(); 
             } else {
                 if(input.length === 6) {
                     alert("PIN Salah! Akses ditolak.");
@@ -858,7 +851,7 @@ function copyToClipboard(text) {
             btnInd.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-slate-600 text-white cursor-default";
 
             updateUIForMode();
-            autoFetchCloud(); // Menarik data terbaru otomatis untuk klien
+            autoFetchCloud(); 
         }
 
         function enableSandboxMode() {
@@ -872,7 +865,6 @@ function copyToClipboard(text) {
                 btnInd.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-orange-500 text-white cursor-default";
                 
                 document.getElementById('cloudStatus').innerText = "⚪ Local Sandbox Only";
-                
                 updateUIForMode();
             }
         }
@@ -905,20 +897,14 @@ function copyToClipboard(text) {
                 btn.innerHTML = "👁️ MODE BLUR: OFF";
                 btn.className = "w-full py-2 rounded-lg text-[10px] font-black text-slate-500 bg-transparent hover:bg-slate-800 transition";
             }
-            
             applyBlurClass();
         }
 
         function applyBlurClass() {
-            // Static elements
             document.querySelectorAll('.sensitive-data').forEach(el => {
-                if(isBlurMode) {
-                    el.classList.add('blur-sensitive');
-                } else {
-                    el.classList.remove('blur-sensitive');
-                }
+                if(isBlurMode) el.classList.add('blur-sensitive');
+                else el.classList.remove('blur-sensitive');
             });
-            // Re-render Dynamic elements
             renderRows();
             renderExtraProfitList();
         }
@@ -988,7 +974,6 @@ function copyToClipboard(text) {
         // ===============================================
         // ☁️ CLOUD SYNC & DATA LOAD
         // ===============================================
-        
         async function autoFetchCloud() {
             if(BIN_ID === 'GANTI_DENGAN_BIN_ID_ANDA') {
                 loadLocalData();
@@ -1030,16 +1015,11 @@ function copyToClipboard(text) {
             }
         }
 
-        // Ini hanya dipakai Admin untuk Manual Sync Up/Down
         async function forceSync() {
-            if (currentUserMode !== 'owner') {
-                return alert("⛔ AKSES DITOLAK: Fitur Cloud Sync hanya untuk Owner dengan PIN.");
-            }
+            if (currentUserMode !== 'owner') return alert("⛔ AKSES DITOLAK: Fitur Cloud Sync hanya untuk Owner.");
+            if(BIN_ID === 'GANTI_DENGAN_BIN_ID_ANDA') return alert("Harap isi BIN_ID dan API_KEY.");
             
-            if(BIN_ID === 'GANTI_DENGAN_BIN_ID_ANDA') return alert("Harap isi BIN_ID dan API_KEY di script.");
-            
-            const choice = prompt("MANUAL SYNC: \nKetik 'UP' untuk Upload Data Lokal ke Cloud.\nKetik 'DOWN' untuk Tarik Data Cloud ke Lokal.\n(Hati-hati data akan tertimpa!)");
-            
+            const choice = prompt("MANUAL SYNC: \nKetik 'UP' untuk Upload Data Lokal ke Cloud.\nKetik 'DOWN' untuk Tarik Data Cloud ke Lokal.\n(Hati-hati data tertimpa!)");
             if (!choice) return;
 
             document.getElementById('loadingCloud').style.display = 'flex';
@@ -1065,9 +1045,7 @@ function copyToClipboard(text) {
         }
 
         async function saveDataToCloud() {
-            // Keamanan Tambahan: Client TIDAK BISA menimpa data server
             if (currentUserMode !== 'owner') return; 
-
             const dataState = { startBalance: document.getElementById('startBalance').value, items, extraProfits, targetGoal, targetName };
             await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                 method: 'PUT',
@@ -1089,28 +1067,21 @@ function copyToClipboard(text) {
         }
 
         // ===============================================
-        // 🛠️ UTILITY & UI FUNCTIONS
+        // 🛠️ UTILITY & CALCULATOR FUNCTIONS
         // ===============================================
         function toggleSidebar() { 
             const sb = document.getElementById('sidebar');
             const ov = document.getElementById('overlay');
             sb.classList.toggle('-translate-x-full');
-            
-            if(sb.classList.contains('-translate-x-full')) {
-                ov.classList.add('hidden');
-            } else {
-                ov.classList.remove('hidden');
-            }
+            if(sb.classList.contains('-translate-x-full')) ov.classList.add('hidden');
+            else ov.classList.remove('hidden');
         }
 
-        function toggleDropdown(id) { 
-            document.getElementById(id).classList.toggle('show'); 
-        }
+        function toggleDropdown(id) { document.getElementById(id).classList.toggle('show'); }
 
         function toggleConfig(panelId, labelId, originalText) { 
             const panel = document.getElementById(panelId);
             const label = document.getElementById(labelId);
-            
             panel.classList.toggle('hidden-panel');
             label.innerText = panel.classList.contains('hidden-panel') ? originalText : "✖ Tutup";
         }
@@ -1126,23 +1097,17 @@ function copyToClipboard(text) {
             
             if(window.innerWidth < 1024) {
                  const sb = document.getElementById('sidebar');
-                 if(!sb.classList.contains('-translate-x-full')) {
-                    toggleSidebar(); 
-                 }
+                 if(!sb.classList.contains('-translate-x-full')) toggleSidebar(); 
             }
             window.scrollTo(0,0);
-            
             if(page === 'analytics') renderAnalytics();
         }
         
-        // --- CALCULATOR FUNCTIONS ---
-        let cInput = '0';
-        let cPrev = '';
-        let cOp = null;
+        let cInput = '0', cPrev = '', cOp = null;
 
         function formatDisplay(n) {
             if (!n || n === '-') return n;
-            const p = n.split('.');
+            const p = String(n).split('.');
             p = parseFloat(p).toLocaleString('id-ID');
             return p.length > 1 ? p + ',' + p : p;
         }
@@ -1156,9 +1121,7 @@ function copyToClipboard(text) {
         function calcOp(op) {
             if (cInput === '') return;
             if (cPrev !== '') calcResult();
-            cOp = op;
-            cPrev = cInput;
-            cInput = '';
+            cOp = op; cPrev = cInput; cInput = '';
             calcUpd();
         }
 
@@ -1168,40 +1131,20 @@ function copyToClipboard(text) {
             calcUpd();
         }
 
-        function calcClear() {
-            cInput = '0';
-            cPrev = '';
-            cOp = null;
-            calcUpd();
-        }
-
-        function calcDel() {
-            cInput = cInput.toString().slice(0, -1) || '0';
-            calcUpd();
-        }
-
+        function calcClear() { cInput = '0'; cPrev = ''; cOp = null; calcUpd(); }
+        function calcDel() { cInput = cInput.toString().slice(0, -1) || '0'; calcUpd(); }
         function calcUpd() {
             document.getElementById('calc-curr').innerText = formatDisplay(cInput);
             document.getElementById('calc-prev').innerText = cPrev ? formatDisplay(cPrev) + (cOp || '') : '';
         }
-
         function calcResult() {
-            let r;
-            const p = parseFloat(cPrev);
-            const c = parseFloat(cInput);
+            let r; const p = parseFloat(cPrev); const c = parseFloat(cInput);
             if (isNaN(p) || isNaN(c)) return;
-            
             switch (cOp) {
-                case '+': r = p + c; break;
-                case '-': r = p - c; break;
-                case '*': r = p * c; break;
-                case '/': r = p / c; break;
-                default: return;
+                case '+': r = p + c; break; case '-': r = p - c; break;
+                case '*': r = p * c; break; case '/': r = p / c; break; default: return;
             }
-            cInput = parseFloat(r.toFixed(10)).toString();
-            cOp = null;
-            cPrev = '';
-            calcUpd();
+            cInput = parseFloat(r.toFixed(10)).toString(); cOp = null; cPrev = ''; calcUpd();
         }
 
         function getNow() { 
@@ -1209,16 +1152,19 @@ function copyToClipboard(text) {
             return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`; 
         }
         
+        // PENGAMANAN SPLIT DATE 🛡️
         function parseDateString(s) { 
-            if(!s||s==='Imported'||s==='Bulan Lalu') return new Date();
-            const p=s.split(' ');
+            if(!s || s === 'Imported' || s === 'Bulan Lalu') return new Date();
+            if(typeof s === 'number') return new Date(s); // Jika timestamp lama
             
-            if (p.includes('-')) {
-                return new Date(p);
-            }
-
-            const d=p.split('/');
-            return new Date(d,d-1,d); 
+            const str = String(s);
+            const p = str.split(' ');
+            if (p.includes('-')) return new Date(p);
+            
+            const d = p.split('/');
+            if (d.length === 3) return new Date(d, d-1, d); 
+            
+            return new Date(); 
         }
 
         // ===============================================
@@ -1244,7 +1190,6 @@ function copyToClipboard(text) {
             const totalProfitReal = profit + extraProfitTotal;
             const cash = start - belanjaBaru + uangMasuk;
             
-            // DOM UPDATES
             document.getElementById('summaryCash').innerText = "Rp " + cash.toLocaleString('id-ID');
             document.getElementById('summaryFloating').innerText = "Rp " + floatPrice.toLocaleString('id-ID');
             document.getElementById('summaryTotal').innerText = "Rp " + (cash + floatPrice).toLocaleString('id-ID');
@@ -1252,7 +1197,6 @@ function copyToClipboard(text) {
             document.getElementById('previewModalStock').innerText = "Rp " + floatModal.toLocaleString('id-ID');
             document.getElementById('previewUnrealizedProfit').innerText = "Rp " + (floatPrice - floatModal).toLocaleString('id-ID');
             
-            // Re-apply blur to newly updated text dynamically
             document.querySelectorAll('.sensitive-data').forEach(el => {
                 if(isBlurMode) el.classList.add('blur-sensitive');
                 else el.classList.remove('blur-sensitive');
@@ -1266,10 +1210,7 @@ function copyToClipboard(text) {
             if(shouldSave) {
                 localStorage.setItem('ledger_v2_final', JSON.stringify({ 
                     startBalance: document.getElementById('startBalance').value, 
-                    items, 
-                    extraProfits, 
-                    targetGoal, 
-                    targetName 
+                    items, extraProfits, targetGoal, targetName 
                 }));
             }
         }
@@ -1283,9 +1224,7 @@ function copyToClipboard(text) {
                     const name = parts.trim().replace(/^-\s*/, '').replace(/\[[BL]\]\s*/, '');
                     const modal = Number(parts.replace(/[^0-9]/g, ''));
                     const price = Number(parts.replace(/[^0-9]/g, ''));
-                    if (name && modal) {
-                        items.unshift({ id: Date.now() + Math.random(), name, modal, price, status: 'stok', type, entryDate: getNow(), soldAt: '' });
-                    }
+                    if (name && modal) items.unshift({ id: Date.now() + Math.random(), name, modal, price, status: 'stok', type, entryDate: getNow(), soldAt: '' });
                 }
             });
             document.getElementById('bulkInput').value = '';
@@ -1301,27 +1240,19 @@ function copyToClipboard(text) {
                     const name = parts.trim();
                     const modal = Number(parts.replace(/[^0-9]/g, ''));
                     const price = Number(parts.replace(/[^0-9]/g, ''));
-                    if (name && modal && price) { 
-                        extraProfits.push({ id: Date.now() + Math.random(), name, modal, price, profit: price - modal }); 
-                    }
+                    if (name && modal && price) extraProfits.push({ id: Date.now() + Math.random(), name, modal, price, profit: price - modal }); 
                 }
             });
             document.getElementById('exBulkInput').value = '';
             calculateAll();
         }
 
-        function removeExtraProfit(id) { 
-            extraProfits = extraProfits.filter(p => p.id !== id); 
-            calculateAll(); 
-        }
+        function removeExtraProfit(id) { extraProfits = extraProfits.filter(p => p.id !== id); calculateAll(); }
 
         function renderExtraProfitList() {
             const list = document.getElementById('extraProfitList');
             list.innerHTML = '';
-            
-            // Assign blur class state
             const bClass = isBlurMode ? "blur-sensitive" : "";
-            
             extraProfits.forEach(p => {
                 const div = document.createElement('div');
                 div.className = "flex justify-between items-center text-[10px] bg-white p-2 rounded-lg border border-emerald-100";
@@ -1338,13 +1269,7 @@ function copyToClipboard(text) {
             renderRows();
         }
 
-        // ===============================================
-        // 🔃 SORTING LOGIC
-        // ===============================================
-        function setSort(val) {
-            currentSort = val;
-            renderRows();
-        }
+        function setSort(val) { currentSort = val; renderRows(); }
 
         function sortItems(arr) {
             return arr.sort((a, b) => {
@@ -1358,7 +1283,7 @@ function copyToClipboard(text) {
         }
 
         // ===============================================
-        // 🔥 NEW: UPDATED RENDER ROWS (Client & Admin)
+        // 🔥 RENDER ROWS & UI
         // ===============================================
         function renderRows() {
             const container = document.getElementById('itemRows');
@@ -1374,9 +1299,7 @@ function copyToClipboard(text) {
                 display = items.filter(i => i.status === currentFilter && i.name.toLowerCase().includes(search));
             }
             
-            // APPLY SORTING
             display = sortItems(display);
-            
             container.innerHTML = '';
             
             if (display.length === 0) { 
@@ -1389,23 +1312,23 @@ function copyToClipboard(text) {
             display.forEach(item => {
                 const profit = item.price - item.modal;
                 const card = document.createElement('div');
-                
                 const brand = getBrandCategory(item.name);
                 let brandColor = 'bg-slate-100 text-slate-500';
+                
                 if(brand === 'APPLE') brandColor = 'bg-slate-800 text-white';
                 if(brand === 'SAMSUNG') brandColor = 'bg-blue-600 text-white';
                 if(brand === 'XIAOMI/POCO') brandColor = 'bg-orange-500 text-white';
                 if(brand === 'OPPO') brandColor = 'bg-green-600 text-white';
                 if(brand === 'VIVO') brandColor = 'bg-blue-400 text-white';
                 
-                // --- MODE CLIENT VIEW ---
+                const displayEntryDate = item.entryDate ? String(item.entryDate).split(' ') : '-';
+
                 if (currentUserMode === 'client_view') {
                     card.className = `p-4 rounded-xl shadow-sm bg-white border-l-4 border-indigo-500 relative mb-3`;
-                    
                     card.innerHTML = `
                         <div class="flex justify-between items-start mb-2">
                              <span class="text-[9px] font-black px-2 py-1 rounded ${brandColor}">${brand}</span>
-                             <span class="text-[10px] text-slate-400 font-bold">${item.entryDate.split(' ')}</span>
+                             <span class="text-[10px] text-slate-400 font-bold">${displayEntryDate}</span>
                         </div>
                         <h4 class="font-black text-slate-800 text-lg leading-tight mb-2">${item.name}</h4>
                         <div class="flex items-end justify-between border-t border-slate-100 pt-3 mt-1">
@@ -1413,11 +1336,7 @@ function copyToClipboard(text) {
                              <span class="font-black text-2xl text-emerald-600">Rp ${item.price.toLocaleString('id-ID')}</span>
                         </div>
                     `;
-                } 
-                // --- MODE ADMIN / SANDBOX ---
-                else {
-                    let showModalPrice = true;
-                    let showActions = true;
+                } else {
                     let borderClass = 'border-l-4 border-l-indigo-500';
                     let bgClass = 'bg-white';
                     let opacityClass = '';
@@ -1427,13 +1346,8 @@ function copyToClipboard(text) {
                         const diffTime = Math.abs(now - entry);
                         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
                         
-                        if (diffDays > 30) { 
-                            borderClass = 'border-l-4 border-l-red-500'; 
-                            bgClass = 'bg-red-50';
-                        } else if (diffDays > 14) { 
-                            borderClass = 'border-l-4 border-l-amber-500'; 
-                            bgClass = 'bg-amber-50';
-                        }
+                        if (diffDays > 30) { borderClass = 'border-l-4 border-l-red-500'; bgClass = 'bg-red-50'; } 
+                        else if (diffDays > 14) { borderClass = 'border-l-4 border-l-amber-500'; bgClass = 'bg-amber-50'; }
                     } else if (item.status === 'sold') { 
                         borderClass = 'border-l-4 border-l-emerald-500';
                         bgClass = 'bg-slate-50';
@@ -1444,41 +1358,23 @@ function copyToClipboard(text) {
                     
                     let typeLabel = item.type === 'old' ? 'L' : (item.type === 'new' ? 'B' : 'X');
                     let typeColor = item.type === 'old' ? 'bg-orange-100 text-orange-600' : (item.type === 'new' ? 'bg-indigo-100 text-indigo-600' : 'bg-emerald-100 text-emerald-600');
-
                     const modalDisplay = item.modal.toLocaleString();
                     
-                    const editBtn = `
-                        <button onclick="openEditModal(${item.id})" class="p-2 rounded-lg hover:bg-yellow-100 text-slate-400 hover:text-yellow-600 transition" title="Edit Data">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                        </button>`;
-
-                    const costBtn = item.status === 'stok' ? `
-                        <button onclick="openCostModal(${item.id})" class="p-2 rounded-lg hover:bg-orange-100 text-slate-400 hover:text-orange-600 transition" title="Tambah Biaya">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                        </button>` : '';
-
-                    const soldBtn = item.status === 'stok' ? `
-                        <button onclick="toggleSold(${item.id})" class="p-2 rounded-lg hover:bg-emerald-100 text-slate-400 hover:text-emerald-600 transition" title="Tandai Terjual">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                        </button>` : '';
-
+                    const editBtn = `<button onclick="openEditModal(${item.id})" class="p-2 rounded-lg hover:bg-yellow-100 text-slate-400 hover:text-yellow-600 transition" title="Edit Data"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button>`;
+                    const costBtn = item.status === 'stok' ? `<button onclick="openCostModal(${item.id})" class="p-2 rounded-lg hover:bg-orange-100 text-slate-400 hover:text-orange-600 transition" title="Tambah Biaya"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg></button>` : '';
+                    const soldBtn = item.status === 'stok' ? `<button onclick="toggleSold(${item.id})" class="p-2 rounded-lg hover:bg-emerald-100 text-slate-400 hover:text-emerald-600 transition" title="Tandai Terjual"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg></button>` : '';
                     const deleteAction = item.type === 'extra' ? `removeExtraProfit(${item.id})` : `removeItem(${item.id})`;
-                    const delBtn = `
-                        <button onclick="${deleteAction}" class="p-2 rounded-lg hover:bg-red-100 text-slate-300 hover:text-red-500 transition" title="Hapus">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                        </button>`;
-                    
+                    const delBtn = `<button onclick="${deleteAction}" class="p-2 rounded-lg hover:bg-red-100 text-slate-300 hover:text-red-500 transition" title="Hapus"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>`;
                     const actionIcons = `<div class="flex items-center gap-1 border-l border-slate-100 pl-2 ml-2">${editBtn}${costBtn}${soldBtn}${delBtn}</div>`;
 
                     card.innerHTML = `
                         <div class="flex justify-between items-center mb-2">
                             <div class="flex items-center gap-2">
                                 <span class="text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full ${typeColor}">${typeLabel}</span>
-                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${item.entryDate}</span>
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${displayEntryDate}</span>
                             </div>
                             ${item.status === 'sold' ? `<span class="badge-profit text-[10px] ${bClass}">+${profit.toLocaleString()}</span>` : ''}
                         </div>
-                        
                         <div class="flex justify-between items-end">
                             <div>
                                 <h4 class="font-bold text-slate-800 text-sm leading-tight mb-1">${item.name}</h4>
@@ -1491,7 +1387,6 @@ function copyToClipboard(text) {
                         </div>
                     `;
                 }
-
                 container.appendChild(card);
             });
         }
@@ -1510,29 +1405,23 @@ function copyToClipboard(text) {
             document.getElementById('editItemPrice').value = i.price; 
             
             try {
-                if (i.entryDate && i.entryDate.includes('/')) {
-                    const entryStr = i.entryDate.split(' '); 
+                if (i.entryDate && String(i.entryDate).includes('/')) {
+                    const entryStr = String(i.entryDate).split(' '); 
                     const parts = entryStr.split('/');
                     if(parts.length === 3) {
                         const isoDate = `${parts}-${parts.padStart(2,'0')}-${parts.padStart(2,'0')}`;
                         document.getElementById('editEntryDate').value = isoDate;
                     }
-                } else {
-                    document.getElementById('editEntryDate').value = "";
-                }
+                } else { document.getElementById('editEntryDate').value = ""; }
             } catch(e) { console.log(e); }
 
             document.getElementById('editModal').style.display = 'flex';
         }
         
-        function closeEditModal() { 
-            document.getElementById('editModal').style.display = 'none';
-            currentEditId=null; 
-        }
+        function closeEditModal() { document.getElementById('editModal').style.display = 'none'; currentEditId=null; }
         
         function saveEditItem() {
             if (!currentEditId) return;
-
             let itemIndex = items.findIndex(i => i.id === currentEditId);
             let isExtra = false;
 
@@ -1556,31 +1445,17 @@ function copyToClipboard(text) {
                     items[itemIndex].name = newName;
                     items[itemIndex].modal = newModal;
                     items[itemIndex].price = newPrice;
-                    
                     if(dateInput) {
                         const d = new Date(dateInput);
                         items[itemIndex].entryDate = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} 00:00`;
                     }
                 }
-
-                calculateAll(); 
-                closeEditModal();
-                alert("Data berhasil diperbarui!");
+                calculateAll(); closeEditModal(); alert("Data berhasil diperbarui!");
             }
         }
         
-        function openCostModal(id) { 
-            currentCostId = id; 
-            document.getElementById('costDesc').value=''; 
-            document.getElementById('costAmount').value=''; 
-            document.getElementById('costModal').style.display = 'flex';
-        }
-        
-        function closeCostModal() { 
-            document.getElementById('costModal').style.display = 'none';
-            currentCostId = null; 
-        }
-        
+        function openCostModal(id) { currentCostId = id; document.getElementById('costDesc').value=''; document.getElementById('costAmount').value=''; document.getElementById('costModal').style.display = 'flex'; }
+        function closeCostModal() { document.getElementById('costModal').style.display = 'none'; currentCostId = null; }
         function saveCost() {
             if(!currentCostId) return;
             const amount = Number(document.getElementById('costAmount').value);
@@ -1589,47 +1464,26 @@ function copyToClipboard(text) {
             if(idx > -1 && amount && desc) {
                 items[idx].modal += amount;
                 items[idx].name += ` (+${desc} ${amount/1000}k)`;
-                calculateAll(); 
-                closeCostModal();
+                calculateAll(); closeCostModal();
             }
         }
         
-        function toggleSold(id) { 
-            const i = items.find(x => x.id === id); 
-            if(i){ i.status='sold'; i.soldAt=getNow(); calculateAll(); }
-        }
-        
-        function removeItem(id) { 
-            if(confirm('Hapus unit ini permanen?')) { 
-                items = items.filter(x => x.id !== id); 
-                calculateAll(); 
-            }
-        }
+        function toggleSold(id) { const i = items.find(x => x.id === id); if(i){ i.status='sold'; i.soldAt=getNow(); calculateAll(); } }
+        function removeItem(id) { if(confirm('Hapus unit ini permanen?')) { items = items.filter(x => x.id !== id); calculateAll(); } }
         
         function updateTargetBar(profit) {
             let p = 0;
-            if (targetGoal > 0) {
-                p = (profit / targetGoal) * 100;
-            }
+            if (targetGoal > 0) p = (profit / targetGoal) * 100;
             if (p > 100) p = 100;
             if (p < 0) p = 0;
 
             const bar = document.getElementById('progressBar');
             bar.style.width = p + "%";
-            
-            if(p >= 100) {
-                bar.className = "bg-emerald-500 h-3 rounded-full relative transition-all duration-1000";
-            } else {
-                bar.className = "bg-indigo-600 h-3 rounded-full relative transition-all duration-1000";
-            }
+            bar.className = p >= 100 ? "bg-emerald-500 h-3 rounded-full relative transition-all duration-1000" : "bg-indigo-600 h-3 rounded-full relative transition-all duration-1000";
 
             document.getElementById('targetPercentage').innerText = p.toFixed(0) + "%";
-            
             const currentText = document.getElementById('currentProgressText');
-            if(currentText) {
-                currentText.innerText = "Tercapai: Rp " + profit.toLocaleString('id-ID');
-            }
-
+            if(currentText) currentText.innerText = "Tercapai: Rp " + profit.toLocaleString('id-ID');
             document.getElementById('targetNameDisplay').innerText = targetName;
             document.getElementById('targetValueDisplay').innerText = "Target: Rp " + targetGoal.toLocaleString('id-ID');
         }
@@ -1651,8 +1505,7 @@ function copyToClipboard(text) {
                 document.getElementById('avgSellTime').innerText = "-";
                 document.getElementById('winRateStock').innerText = "0%";
             } else {
-                let totalDays = 0; 
-                let validSales = 0;
+                let totalDays = 0, validSales = 0;
                 soldItems.forEach(i => {
                     const entry = parseDateString(i.entryDate); 
                     const sold = parseDateString(i.soldAt);
@@ -1660,13 +1513,8 @@ function copyToClipboard(text) {
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
                     if(!isNaN(diffDays)) { totalDays += diffDays; validSales++; }
                 });
-                const avgDays = validSales > 0 ? (totalDays / validSales).toFixed(1) : 0;
-                document.getElementById('avgSellTime').innerText = avgDays + " Hari";
-
-                const totalStock = items.length; 
-                const totalSold = soldItems.length;
-                const winRate = totalStock > 0 ? ((totalSold / totalStock) * 100).toFixed(0) : 0;
-                document.getElementById('winRateStock').innerText = winRate + "%";
+                document.getElementById('avgSellTime').innerText = (validSales > 0 ? (totalDays / validSales).toFixed(1) : 0) + " Hari";
+                document.getElementById('winRateStock').innerText = (items.length > 0 ? ((soldItems.length / items.length) * 100).toFixed(0) : 0) + "%";
 
                 const brands = {};
                 soldItems.forEach(i => {
@@ -1677,44 +1525,31 @@ function copyToClipboard(text) {
                 if (ctxBrand) {
                     if(brandChartInstance) brandChartInstance.destroy();
                     brandChartInstance = new Chart(ctxBrand, {
-                        type: 'doughnut',
-                        data: {
-                            labels: Object.keys(brands),
-                            datasets: [{
-                                data: Object.values(brands),
-                                backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'],
-                                borderWidth: 0
-                            }]
-                        },
+                        type: 'doughnut', data: { labels: Object.keys(brands), datasets: [{ data: Object.values(brands), backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'], borderWidth: 0 }] },
                         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { size: 10 } } } } }
                     });
                 }
 
                 const lastSales = soldItems.slice(0, 10).reverse(); 
-                const labels = lastSales.map(i => i.name.substring(0, 10)); 
+                const labels = lastSales.map(i => String(i.name).substring(0, 10)); 
                 const profits = lastSales.map(i => i.price - i.modal);
                 const ctxTrend = document.getElementById('profitTrendChart');
                 if (ctxTrend) {
                     if(trendChartInstance) trendChartInstance.destroy();
                     trendChartInstance = new Chart(ctxTrend, {
-                        type: 'bar',
-                        data: {
-                            labels: labels,
-                            datasets: [{ label: 'Profit (Rp)', data: profits, backgroundColor: '#10b981', borderRadius: 4 }]
-                        },
+                        type: 'bar', data: { labels: labels, datasets: [{ label: 'Profit (Rp)', data: profits, backgroundColor: '#10b981', borderRadius: 4 }] },
                         options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { ticks: { font: { size: 8 } } } }, plugins: { legend: { display: false } } }
                     });
                 }
             }
 
-            // --- LOGIKA KUARTAL & BAGI HASIL INVESTOR ---
             const quarters = { "Q1 (Jan-Mar)": 0, "Q2 (Apr-Jun)": 0, "Q3 (Jul-Sep)": 0, "Q4 (Oct-Dec)": 0 };
             let totalAllProfit = 0;
 
             function addToQuarter(dateObj, profit) {
+                if (!(dateObj instanceof Date) || isNaN(dateObj.getTime())) dateObj = new Date();
                 const month = dateObj.getMonth();
                 totalAllProfit += profit;
-                
                 if (month >= 0 && month <= 2) quarters["Q1 (Jan-Mar)"] += profit;
                 else if (month >= 3 && month <= 5) quarters["Q2 (Apr-Jun)"] += profit;
                 else if (month >= 6 && month <= 8) quarters["Q3 (Jul-Sep)"] += profit;
@@ -1730,40 +1565,23 @@ function copyToClipboard(text) {
             const qContainer = document.getElementById('quarterlyBreakdown');
             qContainer.innerHTML = '';
             Object.entries(quarters).forEach(([key, val]) => {
-                qContainer.innerHTML += `
-                    <div class="bg-slate-50 p-2 rounded-lg text-center border border-slate-100 sensitive-data">
-                        <div class="text-[9px] font-bold text-slate-400 uppercase">${key}</div>
-                        <div class="text-sm font-black text-slate-700">Rp ${val.toLocaleString('id-ID')}</div>
-                    </div>
-                `;
+                qContainer.innerHTML += `<div class="bg-slate-50 p-2 rounded-lg text-center border border-slate-100 sensitive-data"><div class="text-[9px] font-bold text-slate-400 uppercase">${key}</div><div class="text-sm font-black text-slate-700">Rp ${val.toLocaleString('id-ID')}</div></div>`;
             });
 
             const ctxQuarter = document.getElementById('quarterlyChart');
             if (ctxQuarter) {
                 if(quarterlyChartInstance) quarterlyChartInstance.destroy();
                 quarterlyChartInstance = new Chart(ctxQuarter, {
-                    type: 'bar',
-                    data: {
-                        labels: Object.keys(quarters),
-                        datasets: [{
-                            label: 'Total Profit',
-                            data: Object.values(quarters),
-                            backgroundColor: ['#3b82f6', '#8b5cf6', '#eab308', '#f43f5e'],
-                            borderRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: true, ticks: { callback: function(value) { return 'Rp ' + value/1000 + 'k'; } } } }
-                    }
+                    type: 'bar', data: { labels: Object.keys(quarters), datasets: [{ label: 'Total Profit', data: Object.values(quarters), backgroundColor: ['#3b82f6', '#8b5cf6', '#eab308', '#f43f5e'], borderRadius: 6 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { callback: function(value) { return 'Rp ' + value/1000 + 'k'; } } } } }
                 });
             }
         }
 
+        // PENGAMANAN SPLIT STRING 🛡️
         function getBrandCategory(itemName) {
-            const lower = itemName.toLowerCase();
+            const safeName = String(itemName || '');
+            const lower = safeName.toLowerCase();
             if (lower.includes('iphone') || lower.includes('apple') || lower.includes('ipad') || lower.includes('ip ')) return 'APPLE';
             if (lower.includes('samsung') || lower.includes('galaxy') || lower.includes('sein') || lower.includes('z flip') || lower.includes('z fold')) return 'SAMSUNG';
             if (lower.includes('xiaomi') || lower.includes('note') || lower.includes('redmi') || lower.includes('poco') || lower.includes('mi ')) return 'XIAOMI/POCO';
@@ -1775,23 +1593,17 @@ function copyToClipboard(text) {
             if (lower.includes('itel')) return 'ITEL';
             if (lower.includes('asus') || lower.includes('rog')) return 'ASUS';
             if (lower.includes('google') || lower.includes('pixel')) return 'GOOGLE';
-            return itemName.split(' ').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+            return safeName.split(' ').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
         }
 
         function setMonthlyTarget() {
             if(currentUserMode!=='owner') return alert("Hanya Owner yang bisa set target.");
             const newName = prompt("Nama Target?", targetName);
             const newAmount = prompt("Nominal Target?", targetGoal);
-            if(newName && newAmount) { 
-                targetName = newName; 
-                targetGoal = Number(newAmount); 
-                calculateAll(); 
-            }
+            if(newName && newAmount) { targetName = newName; targetGoal = Number(newAmount); calculateAll(); }
         }
         
-        function saveNote() { 
-            localStorage.setItem('ledger_owner_note', document.getElementById('ownerNote').value); 
-        }
+        function saveNote() { localStorage.setItem('ledger_owner_note', document.getElementById('ownerNote').value); }
         
         function exportReport() {
             const cash = document.getElementById('summaryCash').innerText;
@@ -1800,23 +1612,18 @@ function copyToClipboard(text) {
             const startBal = Number(document.getElementById('startBalance').value);
             const totalAsset = Number(cash.replace(/[^0-9]/g,'')) + Number(stokVal.replace(/[^0-9]/g,''));
             
-            let report = `📊 *LAPORAN KEUANGAN FARID STORE*\n`;
-            report += `🗓️ Periode: ${currentMonthString}\n\n`;
-            report += `💰 *RINGKASAN*\n💵 Saldo Tunai: ${cash}\n📦 Nilai Stok: ${stokVal}\n📈 Total Aset: Rp ${totalAsset.toLocaleString('id-ID')}\n🔥 Profit Bersih: ${profit}\n\n✅ *PENJUALAN*\n`;
+            let report = `📊 *LAPORAN KEUANGAN FARID STORE*\n🗓️ Periode: ${currentMonthString}\n\n💰 *RINGKASAN*\n💵 Saldo Tunai: ${cash}\n📦 Nilai Stok: ${stokVal}\n📈 Total Aset: Rp ${totalAsset.toLocaleString('id-ID')}\n🔥 Profit Bersih: ${profit}\n\n✅ *PENJUALAN*\n`;
             
             let soldCount = 0;
             items.filter(i => i.status === 'sold').forEach((i, index) => {
-                soldCount++;
-                const p = i.price - i.modal;
-                report += `${index + 1}. *${i.name}* (Profit: +${p.toLocaleString()})\n`;
+                soldCount++; const p = i.price - i.modal; report += `${index + 1}. *${i.name}* (Profit: +${p.toLocaleString()})\n`;
             });
             if(soldCount === 0) report += `(Nihil)\n`;
             
             report += `\n🛑 *STOK GUDANG*\n`;
             let stokCount = 0;
             items.filter(i => i.status === 'stok').forEach((i, index) => {
-                stokCount++;
-                report += `${index + 1}. ${i.name} (M: ${i.modal.toLocaleString()})\n`;
+                stokCount++; report += `${index + 1}. ${i.name} (M: ${i.modal.toLocaleString()})\n`;
             });
             if(stokCount === 0) report += `(Kosong)\n`;
 
@@ -1832,7 +1639,6 @@ function copyToClipboard(text) {
         function processImport() {
             const text = document.getElementById('importArea').value.trim();
             if(!text) return;
-
             if (text.startsWith('{')) {
                 try {
                     const parsed = JSON.parse(text);
@@ -1843,12 +1649,8 @@ function copyToClipboard(text) {
                         location.reload();
                         return;
                     }
-                } catch (e) {
-                    alert("Kode backup rusak.");
-                }
-            } else {
-                alert("Gunakan format JSON untuk restore penuh.");
-            }
+                } catch (e) { alert("Kode backup rusak."); }
+            } else { alert("Gunakan format JSON untuk restore penuh."); }
         }
         
         function toggleHelpModal() { alert("Gunakan tombol 'Cloud Sync' untuk sinkronisasi data antar device."); }
