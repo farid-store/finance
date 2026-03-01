@@ -1,0 +1,790 @@
+{
+  "startBalance": "22550000",
+  "items": [
+    {
+      "id": 1772280864478.855,
+      "name": "Note 12 pro",
+      "modal": 1100000,
+      "price": 1300000,
+      "status": "stok",
+      "type": "new",
+      "entryDate": "28/2/2026 19:14",
+      "soldAt": ""
+    },
+    {
+      "id": 1772280864478.1487,
+      "name": "Poco x5",
+      "modal": 1100000,
+      "price": 1300000,
+      "status": "stok",
+      "type": "new",
+      "entryDate": "28/2/2026 19:14",
+      "soldAt": ""
+    },
+    {
+      "id": 1772280864478.5818,
+      "name": "Note 12 pro",
+      "modal": 1200000,
+      "price": 1400000,
+      "status": "stok",
+      "type": "new",
+      "entryDate": "28/2/2026 19:14",
+      "soldAt": ""
+    },
+    {
+      "id": 1772280864478.5842,
+      "name": "Note 12 pro",
+      "modal": 1200000,
+      "price": 1400000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "28/2/2026 19:14",
+      "soldAt": "28/2/2026 21:40"
+    },
+    {
+      "id": 1772280864478.4033,
+      "name": "Samsung A15",
+      "modal": 1000000,
+      "price": 1150000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "28/2/2026 19:14",
+      "soldAt": "28/2/2026 19:15"
+    },
+    {
+      "id": 1772280864478.2373,
+      "name": "Note 11 Pro",
+      "modal": 1000000,
+      "price": 1150000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "28/2/2026 00:00",
+      "soldAt": "28/2/2026 19:14"
+    },
+    {
+      "id": 1772280864478.053,
+      "name": "Oppo Reno 8T",
+      "modal": 1000000,
+      "price": 1150000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "28/2/2026 00:00",
+      "soldAt": "28/2/2026 19:14"
+    },
+    {
+      "id": 1772280864478.87,
+      "name": "Samsung A15",
+      "modal": 1000000,
+      "price": 1150000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "28/2/2026 00:00",
+      "soldAt": "28/2/2026 19:14"
+    },
+    {
+      "id": 1772280864477.53,
+      "name": "Oppo A95",
+      "modal": 800000,
+      "price": 900000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "28/2/2026 19:14",
+      "soldAt": "28/2/2026 19:14"
+    },
+    {
+      "id": 1772015270567.0325,
+      "name": "Poco X5",
+      "modal": 1100000,
+      "price": 1200000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "25/2/2026 00:00",
+      "soldAt": "28/2/2026 21:40"
+    },
+    {
+      "id": 1772015270564.2246,
+      "name": "Note 12 Pro",
+      "modal": 1200000,
+      "price": 1400000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "25/2/2026 17:27",
+      "soldAt": "28/2/2026 21:40"
+    },
+    {
+      "id": 1771981225850.7563,
+      "name": "Note 12 Pro",
+      "modal": 1150000,
+      "price": 1400000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "25/2/2026 08:00",
+      "soldAt": "25/2/2026 15:27"
+    },
+    {
+      "id": 1771981225850.383,
+      "name": "Note 12 Pro",
+      "modal": 1150000,
+      "price": 1400000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "25/2/2026 08:00",
+      "soldAt": "25/2/2026 15:27"
+    },
+    {
+      "id": 1771981225850.2788,
+      "name": "Note 12",
+      "modal": 1100000,
+      "price": 1250000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "25/2/2026 00:00",
+      "soldAt": "26/2/2026 22:00"
+    },
+    {
+      "id": 1771981225850.9048,
+      "name": "Note 13",
+      "modal": 1100000,
+      "price": 1250000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "25/2/2026 00:00",
+      "soldAt": "26/2/2026 22:00"
+    },
+    {
+      "id": 1771981225850.57,
+      "name": "Note 12 Pro",
+      "modal": 1200000,
+      "price": 1400000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "25/2/2026 00:00",
+      "soldAt": "25/2/2026 15:27"
+    },
+    {
+      "id": 1771981225850.857,
+      "name": "Poco X5",
+      "modal": 1100000,
+      "price": 1200000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "25/2/2026 00:00",
+      "soldAt": "25/2/2026 15:27"
+    },
+    {
+      "id": 1771981225849.7205,
+      "name": "Note 12",
+      "modal": 1100000,
+      "price": 1200000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "25/2/2026 00:00",
+      "soldAt": "25/2/2026 18:12"
+    },
+    {
+      "id": 1771900189517.03,
+      "name": "Note 12 Pro",
+      "modal": 1200000,
+      "price": 1400000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "24/2/2026 09:29",
+      "soldAt": "25/2/2026 15:27"
+    },
+    {
+      "id": 1771900156591.291,
+      "name": "Oppo A95",
+      "modal": 750000,
+      "price": 900000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "24/2/2026 09:29",
+      "soldAt": "24/2/2026 09:34"
+    },
+    {
+      "id": 1771597223164.056,
+      "name": "Iphone 11 Beacukai",
+      "modal": 2900000,
+      "price": 3300000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "20/2/2026 00:00",
+      "soldAt": "26/2/2026 19:53"
+    },
+    {
+      "id": 1771457809215.2607,
+      "name": "Note 12",
+      "modal": 1100000,
+      "price": 1250000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.1453,
+      "name": "Note 12",
+      "modal": 1100000,
+      "price": 1250000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.8333,
+      "name": "Poco X5",
+      "modal": 1100000,
+      "price": 1300000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.1003,
+      "name": "Note 12",
+      "modal": 1100000,
+      "price": 1300000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.5767,
+      "name": "Note 12",
+      "modal": 1100000,
+      "price": 1300000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.8076,
+      "name": "Reno 8T",
+      "modal": 1000000,
+      "price": 1200000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.128,
+      "name": "Note 12",
+      "modal": 1100000,
+      "price": 1300000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.304,
+      "name": "Techno 20 Pro",
+      "modal": 900000,
+      "price": 1050000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.2207,
+      "name": "Oppo A95",
+      "modal": 800000,
+      "price": 900000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.3171,
+      "name": "Samsung A15",
+      "modal": 1000000,
+      "price": 1200000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.3567,
+      "name": "Note 13",
+      "modal": 1100000,
+      "price": 1400000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.116,
+      "name": "Techno Spark 20 Pro",
+      "modal": 850000,
+      "price": 950000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.225,
+      "name": "Oppo A31",
+      "modal": 400000,
+      "price": 550000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.365,
+      "name": "⁠Techno Spark 20 Pro",
+      "modal": 800000,
+      "price": 900000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.252,
+      "name": "⁠Poco M3",
+      "modal": 500000,
+      "price": 600000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.5127,
+      "name": "⁠Redmi Note 13",
+      "modal": 1100000,
+      "price": 1300000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.1624,
+      "name": "⁠Poco C65",
+      "modal": 700000,
+      "price": 900000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.0217,
+      "name": "⁠Techno Spark 20 Pro",
+      "modal": 800000,
+      "price": 900000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.1865,
+      "name": "⁠Infinix Hot 10s",
+      "modal": 500000,
+      "price": 600000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.2656,
+      "name": "Oppo A54",
+      "modal": 500000,
+      "price": 650000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.8247,
+      "name": "⁠Iphone XR",
+      "modal": 1100000,
+      "price": 1500000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.9595,
+      "name": "⁠Pixel 7",
+      "modal": 2500000,
+      "price": 2700000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.429,
+      "name": "⁠Techno Spark 20 Pro",
+      "modal": 800000,
+      "price": 900000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.6028,
+      "name": "Redmi 14C",
+      "modal": 800000,
+      "price": 1000000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.2349,
+      "name": "Oppo Reno 8T",
+      "modal": 1000000,
+      "price": 1300000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.4114,
+      "name": "⁠Oppo A95",
+      "modal": 800000,
+      "price": 900000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.3955,
+      "name": "⁠Note 12",
+      "modal": 1100000,
+      "price": 1300000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.6511,
+      "name": "⁠Note 12",
+      "modal": 1100000,
+      "price": 1300000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.677,
+      "name": "⁠Note 12",
+      "modal": 1100000,
+      "price": 1300000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.535,
+      "name": "⁠Infinix Hot 40i",
+      "modal": 800000,
+      "price": 900000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "Imported",
+      "soldAt": "Imported"
+    },
+    {
+      "id": 1771457809215.024,
+      "name": "Xiaomi Note 12",
+      "modal": 1100000,
+      "price": 1300000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "18/2/2026 00:00",
+      "soldAt": "25/2/2026 18:12"
+    },
+    {
+      "id": 1771457809215.3474,
+      "name": "Samsung A15",
+      "modal": 1000000,
+      "price": 1200000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "18/2/2026 00:00",
+      "soldAt": "25/2/2026 15:28"
+    },
+    {
+      "id": 1771457809215.0493,
+      "name": "Oppo Reno 8T",
+      "modal": 1000000,
+      "price": 1100000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "18/2/2026 00:00",
+      "soldAt": "25/2/2026 15:28"
+    },
+    {
+      "id": 1771457809215.4663,
+      "name": "Xiaomi Note 12",
+      "modal": 1100000,
+      "price": 1300000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "18/2/2026 00:00",
+      "soldAt": "25/2/2026 18:12"
+    },
+    {
+      "id": 1771457809215.1323,
+      "name": "Xiaomi Note 12",
+      "modal": 1100000,
+      "price": 1300000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "18/2/2026 00:00",
+      "soldAt": "24/2/2026 09:33"
+    },
+    {
+      "id": 1771457809215.056,
+      "name": "Poco X5",
+      "modal": 1100000,
+      "price": 1300000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "18/2/2026 00:00",
+      "soldAt": "24/2/2026 09:33"
+    },
+    {
+      "id": 1771457809215.9778,
+      "name": "Xiaomi Note 11 Pro",
+      "modal": 1000000,
+      "price": 1200000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "16/2/2026 00:00",
+      "soldAt": "24/2/2026 09:33"
+    },
+    {
+      "id": 1771457809215.587,
+      "name": "Xiaomi Note 12 Pro",
+      "modal": 1200000,
+      "price": 1400000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "16/2/2026 00:00",
+      "soldAt": "25/2/2026 15:27"
+    },
+    {
+      "id": 1771457809215.602,
+      "name": "Samsung A15",
+      "modal": 1000000,
+      "price": 1200000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "14/2/2026 00:00",
+      "soldAt": "24/2/2026 09:32"
+    },
+    {
+      "id": 1771457809215.0793,
+      "name": "Xiaomi Note 13",
+      "modal": 1100000,
+      "price": 1300000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "14/2/2026 00:00",
+      "soldAt": "24/2/2026 09:35"
+    },
+    {
+      "id": 1771457809215.1816,
+      "name": "Xiaomi Note 12 Pro",
+      "modal": 1200000,
+      "price": 1400000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "14/2/2026 00:00",
+      "soldAt": "24/2/2026 09:34"
+    },
+    {
+      "id": 1771457809215.6863,
+      "name": "Poco X6 Pro",
+      "modal": 2000000,
+      "price": 2100000,
+      "status": "sold",
+      "type": "new",
+      "entryDate": "9/2/2026 00:00",
+      "soldAt": "20/2/2026 18:14"
+    },
+    {
+      "id": 1771457809215.212,
+      "name": "Iphone 11",
+      "modal": 2000000,
+      "price": 2500000,
+      "status": "stok",
+      "type": "old",
+      "entryDate": "Imported",
+      "soldAt": ""
+    },
+    {
+      "id": 1771457809215.1072,
+      "name": "Iphone XR",
+      "modal": 1500000,
+      "price": 1500000,
+      "status": "sold",
+      "type": "old",
+      "entryDate": "Imported",
+      "soldAt": "23/2/2026 20:02"
+    },
+    {
+      "id": 1771457809215.168,
+      "name": "Oppo A16",
+      "modal": 300000,
+      "price": 500000,
+      "status": "stok",
+      "type": "old",
+      "entryDate": "Imported",
+      "soldAt": ""
+    },
+    {
+      "id": 1771457809215.0654,
+      "name": "Samsung A32",
+      "modal": 500000,
+      "price": 550000,
+      "status": "stok",
+      "type": "old",
+      "entryDate": "Imported",
+      "soldAt": ""
+    },
+    {
+      "id": 1771457809215.7234,
+      "name": "Vivo S1 Pro",
+      "modal": 450000,
+      "price": 600000,
+      "status": "stok",
+      "type": "old",
+      "entryDate": "Imported",
+      "soldAt": ""
+    },
+    {
+      "id": 1771457809215.488,
+      "name": "Poco M3",
+      "modal": 450000,
+      "price": 600000,
+      "status": "sold",
+      "type": "old",
+      "entryDate": "Imported",
+      "soldAt": "20/2/2026 21:20"
+    }
+  ],
+  "extraProfits": [
+    {
+      "id": 1771476234212.4155,
+      "name": "Poco C65",
+      "modal": 650000,
+      "price": 900000,
+      "profit": 250000
+    },
+    {
+      "id": 1771476234212.9246,
+      "name": "Note 7",
+      "modal": 300000,
+      "price": 500000,
+      "profit": 200000
+    },
+    {
+      "id": 1771476234212.9736,
+      "name": "Note 8 Pro",
+      "modal": 400000,
+      "price": 600000,
+      "profit": 200000
+    },
+    {
+      "id": 1771476234212.857,
+      "name": "Realme C2",
+      "modal": 250000,
+      "price": 400000,
+      "profit": 150000
+    },
+    {
+      "id": 1771476234212.164,
+      "name": "Note 12",
+      "modal": 1100000,
+      "price": 1500000,
+      "profit": 400000
+    },
+    {
+      "id": 1771476234212.6396,
+      "name": "iPhone 12",
+      "modal": 2300000,
+      "price": 2600000,
+      "profit": 300000
+    },
+    {
+      "id": 1771476234212.2217,
+      "name": "Vivo Y53S",
+      "modal": 600000,
+      "price": 700000,
+      "profit": 100000
+    },
+    {
+      "id": 1771476234212.0715,
+      "name": "Poco M3",
+      "modal": 400000,
+      "price": 650000,
+      "profit": 250000
+    },
+    {
+      "id": 1771476234212.9272,
+      "name": "Oppo A92",
+      "modal": 600000,
+      "price": 750000,
+      "profit": 150000
+    },
+    {
+      "id": 1771476234212.5454,
+      "name": "Oppo A31",
+      "modal": 500000,
+      "price": 600000,
+      "profit": 100000
+    },
+    {
+      "id": 1771476234212.4229,
+      "name": "⁠iPhone 14 Pro",
+      "modal": 7800000,
+      "price": 8200000,
+      "profit": 400000
+    },
+    {
+      "id": 1771476383036.7122,
+      "name": "Note 12",
+      "modal": 1100000,
+      "price": 1300000,
+      "profit": 200000
+    },
+    {
+      "id": 1771476962496.998,
+      "name": "Infinix Hot 10s",
+      "modal": 450000,
+      "price": 700000,
+      "profit": 250000
+    }
+  ],
+  "targetGoal": 25000000,
+  "targetName": "BEP Modal 25 Juta"
+}
