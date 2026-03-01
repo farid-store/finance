@@ -582,28 +582,26 @@
                     </div>
                 </div>
 
-                <div class="card p-6 mb-6 bg-slate-900 border-none shadow-xl relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-4 opacity-10">
-                        <span class="text-7xl">🤝</span>
-                    </div>
-                    <h3 class="font-bold text-slate-300 text-xs uppercase mb-4 relative z-10">Skema Bagi Hasil (60 : 40)</h3>
-                    <p class="text-[10px] text-slate-400 mb-1 relative z-10">Total Profit Bersih Berjalan</p>
-                    <h2 id="analyticsTotalProfit" class="text-3xl font-black text-white mb-5 relative z-10 sensitive-data">Rp 0</h2>
-                    
-                    <div class="grid grid-cols-2 gap-4 relative z-10">
-                        <div class="bg-indigo-500/20 border border-indigo-500/30 p-4 rounded-xl">
-                            <p class="text-[10px] text-indigo-300 uppercase font-bold mb-1">Pengelola (60%)</p>
-                            <h3 id="shareFarid" class="text-xl font-black text-indigo-400 sensitive-data">Rp 0</h3>
-                        </div>
-                        <div class="bg-emerald-500/20 border border-emerald-500/30 p-4 rounded-xl">
-                            <p class="text-[10px] text-emerald-300 uppercase font-bold mb-1">Investor (40%)</p>
-                            <h3 id="shareInvestor" class="text-xl font-black text-emerald-400 sensitive-data">Rp 0</h3>
-                        </div>
-                    </div>
-                </div>
                 <div class="card p-5 mb-6">
-                    <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Performa Profit Per Kuartal</h3>
-                    <div class="h-48">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-slate-700 text-xs uppercase">Bagi Hasil & Profit Kuartal</h3>
+                        <span class="badge-profit bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-[9px] uppercase font-black">Total Realized</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+                            <p class="text-[10px] text-indigo-500 uppercase font-black mb-1">Farid (60%)</p>
+                            <h2 id="sharePengelola" class="text-xl font-black text-indigo-700 sensitive-data">Rp 0</h2>
+                        </div>
+                        <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+                            <p class="text-[10px] text-emerald-500 uppercase font-black mb-1">Investor (40%)</p>
+                            <h2 id="shareInvestor" class="text-xl font-black text-emerald-700 sensitive-data">Rp 0</h2>
+                        </div>
+                    </div>
+
+                    <div id="quarterlyBreakdown" class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4"></div>
+
+                    <div class="h-48 mt-4">
                         <canvas id="quarterlyChart" class="sensitive-data"></canvas>
                     </div>
                 </div>
@@ -946,10 +944,51 @@ function copyToClipboard(text) {
         }
 
         // ===============================================
+        // 🔄 AUTO-MIGRASI BULANAN (TANGGAL 1)
+        // ===============================================
+        async function checkMonthlyMigration() {
+            const now = new Date();
+            if (now.getDate() === 1) {
+                const currentMonthStr = `${now.getMonth()}-${now.getFullYear()}`;
+                const lastRun = localStorage.getItem('last_migration');
+
+                if (lastRun !== currentMonthStr) {
+                    let remainingItems = [];
+                    let migrationCount = 0;
+
+                    items.forEach(i => {
+                        if (i.status === 'sold') {
+                            extraProfits.push({
+                                id: Date.now() + Math.random(),
+                                name: i.name,
+                                modal: i.modal,
+                                price: i.price,
+                                profit: i.price - i.modal
+                            });
+                            migrationCount++;
+                        } else {
+                            i.type = 'old'; 
+                            remainingItems.push(i);
+                        }
+                    });
+
+                    items = remainingItems;
+                    localStorage.setItem('last_migration', currentMonthStr);
+                    
+                    calculateAll(true);
+                    await saveDataToCloud(); 
+
+                    if (migrationCount > 0) {
+                        alert(`✅ MAINTENANCE AWAL BULAN SELESAI!\n\n${migrationCount} unit HP terjual otomatis dipindah ke Histori Bulan Lalu.\nSemua sisa stok berjalan otomatis diubah statusnya menjadi 'Stok Lama' [L].`);
+                    }
+                }
+            }
+        }
+
+        // ===============================================
         // ☁️ CLOUD SYNC & DATA LOAD
         // ===============================================
         
-        // Fungsi baru untuk menarik data secara otomatis
         async function autoFetchCloud() {
             if(BIN_ID === 'GANTI_DENGAN_BIN_ID_ANDA') {
                 loadLocalData();
@@ -967,6 +1006,7 @@ function copyToClipboard(text) {
                 
                 if(res.record) {
                     applyData(res.record);
+                    if (currentUserMode === 'owner') checkMonthlyMigration();
                     localStorage.setItem('ledger_v2_final', JSON.stringify(res.record)); 
                     document.getElementById('cloudStatus').innerText = "🟢 Server Terkini";
                 } else {
@@ -985,6 +1025,7 @@ function copyToClipboard(text) {
             const localData = JSON.parse(localStorage.getItem('ledger_v2_final'));
             if (localData) {
                 applyData(localData);
+                if (currentUserMode === 'owner') checkMonthlyMigration();
                 document.getElementById('cloudStatus').innerText = "⚪ Local Data";
             }
         }
@@ -1359,7 +1400,6 @@ function copyToClipboard(text) {
                 
                 // --- MODE CLIENT VIEW ---
                 if (currentUserMode === 'client_view') {
-                    // Tampilan Khusus Client: Bersih, Harga Besar, Tanpa Modal/Tombol
                     card.className = `p-4 rounded-xl shadow-sm bg-white border-l-4 border-indigo-500 relative mb-3`;
                     
                     card.innerHTML = `
@@ -1610,93 +1650,94 @@ function copyToClipboard(text) {
             if (soldItems.length === 0) {
                 document.getElementById('avgSellTime').innerText = "-";
                 document.getElementById('winRateStock').innerText = "0%";
-                return; 
-            }
-
-            let totalDays = 0; 
-            let validSales = 0;
-            soldItems.forEach(i => {
-                const entry = parseDateString(i.entryDate); 
-                const sold = parseDateString(i.soldAt);
-                const diffTime = Math.abs(sold - entry);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                if(!isNaN(diffDays)) { totalDays += diffDays; validSales++; }
-            });
-            const avgDays = validSales > 0 ? (totalDays / validSales).toFixed(1) : 0;
-            document.getElementById('avgSellTime').innerText = avgDays + " Hari";
-
-            const totalStock = items.length; 
-            const totalSold = soldItems.length;
-            const winRate = totalStock > 0 ? ((totalSold / totalStock) * 100).toFixed(0) : 0;
-            document.getElementById('winRateStock').innerText = winRate + "%";
-
-            // --- NEW: Kalkulasi Total Profit & Skema Bagi Hasil 60:40 ---
-            let totalProfitNet = 0;
-            soldItems.forEach(i => { totalProfitNet += (i.price - i.modal); });
-            const extraProfitNet = extraProfits.reduce((sum, p) => sum + p.profit, 0);
-            const grandTotalProfit = totalProfitNet + extraProfitNet;
-
-            const faridShare = grandTotalProfit * 0.60;
-            const investorShare = grandTotalProfit * 0.40;
-
-            const elTotal = document.getElementById('analyticsTotalProfit');
-            const elFarid = document.getElementById('shareFarid');
-            const elInvestor = document.getElementById('shareInvestor');
-            
-            if (elTotal) elTotal.innerText = "Rp " + grandTotalProfit.toLocaleString('id-ID');
-            if (elFarid) elFarid.innerText = "Rp " + faridShare.toLocaleString('id-ID');
-            if (elInvestor) elInvestor.innerText = "Rp " + investorShare.toLocaleString('id-ID');
-            // --- END NEW ---
-
-            const brands = {};
-            soldItems.forEach(i => {
-                const brandName = getBrandCategory(i.name);
-                if(brands[brandName]) brands[brandName]++; else brands[brandName] = 1;
-            });
-            const ctxBrand = document.getElementById('brandChart');
-            if (ctxBrand) {
-                if(brandChartInstance) brandChartInstance.destroy();
-                brandChartInstance = new Chart(ctxBrand, {
-                    type: 'doughnut',
-                    data: {
-                        labels: Object.keys(brands),
-                        datasets: [{
-                            data: Object.values(brands),
-                            backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'],
-                            borderWidth: 0
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { size: 10 } } } } }
+            } else {
+                let totalDays = 0; 
+                let validSales = 0;
+                soldItems.forEach(i => {
+                    const entry = parseDateString(i.entryDate); 
+                    const sold = parseDateString(i.soldAt);
+                    const diffTime = Math.abs(sold - entry);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                    if(!isNaN(diffDays)) { totalDays += diffDays; validSales++; }
                 });
-            }
+                const avgDays = validSales > 0 ? (totalDays / validSales).toFixed(1) : 0;
+                document.getElementById('avgSellTime').innerText = avgDays + " Hari";
 
-            const lastSales = soldItems.slice(0, 10).reverse(); 
-            const labels = lastSales.map(i => i.name.substring(0, 10)); 
-            const profits = lastSales.map(i => i.price - i.modal);
-            const ctxTrend = document.getElementById('profitTrendChart');
-            if (ctxTrend) {
-                if(trendChartInstance) trendChartInstance.destroy();
-                trendChartInstance = new Chart(ctxTrend, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{ label: 'Profit (Rp)', data: profits, backgroundColor: '#10b981', borderRadius: 4 }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { ticks: { font: { size: 8 } } } }, plugins: { legend: { display: false } } }
+                const totalStock = items.length; 
+                const totalSold = soldItems.length;
+                const winRate = totalStock > 0 ? ((totalSold / totalStock) * 100).toFixed(0) : 0;
+                document.getElementById('winRateStock').innerText = winRate + "%";
+
+                const brands = {};
+                soldItems.forEach(i => {
+                    const brandName = getBrandCategory(i.name);
+                    if(brands[brandName]) brands[brandName]++; else brands[brandName] = 1;
                 });
+                const ctxBrand = document.getElementById('brandChart');
+                if (ctxBrand) {
+                    if(brandChartInstance) brandChartInstance.destroy();
+                    brandChartInstance = new Chart(ctxBrand, {
+                        type: 'doughnut',
+                        data: {
+                            labels: Object.keys(brands),
+                            datasets: [{
+                                data: Object.values(brands),
+                                backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { size: 10 } } } } }
+                    });
+                }
+
+                const lastSales = soldItems.slice(0, 10).reverse(); 
+                const labels = lastSales.map(i => i.name.substring(0, 10)); 
+                const profits = lastSales.map(i => i.price - i.modal);
+                const ctxTrend = document.getElementById('profitTrendChart');
+                if (ctxTrend) {
+                    if(trendChartInstance) trendChartInstance.destroy();
+                    trendChartInstance = new Chart(ctxTrend, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{ label: 'Profit (Rp)', data: profits, backgroundColor: '#10b981', borderRadius: 4 }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { ticks: { font: { size: 8 } } } }, plugins: { legend: { display: false } } }
+                    });
+                }
             }
 
+            // --- LOGIKA KUARTAL & BAGI HASIL INVESTOR ---
             const quarters = { "Q1 (Jan-Mar)": 0, "Q2 (Apr-Jun)": 0, "Q3 (Jul-Sep)": 0, "Q4 (Oct-Dec)": 0 };
-            soldItems.forEach(i => {
-                const date = parseDateString(i.soldAt);
-                const month = date.getMonth(); 
-                const profit = i.price - i.modal;
+            let totalAllProfit = 0;
+
+            function addToQuarter(dateObj, profit) {
+                const month = dateObj.getMonth();
+                totalAllProfit += profit;
                 
                 if (month >= 0 && month <= 2) quarters["Q1 (Jan-Mar)"] += profit;
                 else if (month >= 3 && month <= 5) quarters["Q2 (Apr-Jun)"] += profit;
                 else if (month >= 6 && month <= 8) quarters["Q3 (Jul-Sep)"] += profit;
                 else quarters["Q4 (Oct-Dec)"] += profit;
+            }
+
+            soldItems.forEach(i => addToQuarter(parseDateString(i.soldAt), i.price - i.modal));
+            extraProfits.forEach(p => addToQuarter(new Date(p.id), p.profit));
+
+            document.getElementById('sharePengelola').innerText = "Rp " + (totalAllProfit * 0.6).toLocaleString('id-ID');
+            document.getElementById('shareInvestor').innerText = "Rp " + (totalAllProfit * 0.4).toLocaleString('id-ID');
+
+            const qContainer = document.getElementById('quarterlyBreakdown');
+            qContainer.innerHTML = '';
+            Object.entries(quarters).forEach(([key, val]) => {
+                qContainer.innerHTML += `
+                    <div class="bg-slate-50 p-2 rounded-lg text-center border border-slate-100 sensitive-data">
+                        <div class="text-[9px] font-bold text-slate-400 uppercase">${key}</div>
+                        <div class="text-sm font-black text-slate-700">Rp ${val.toLocaleString('id-ID')}</div>
+                    </div>
+                `;
             });
+
             const ctxQuarter = document.getElementById('quarterlyChart');
             if (ctxQuarter) {
                 if(quarterlyChartInstance) quarterlyChartInstance.destroy();
@@ -1819,9 +1860,6 @@ function copyToClipboard(text) {
             const now = new Date();
             currentMonthString = monthNames[now.getMonth()] + " " + now.getFullYear();
             document.getElementById('currentMonth').innerText = currentMonthString;
-            
-            // Perhatikan bahwa saat ini tidak ada data yang dimuat di window.onload.
-            // Pemuatan data dipindah secara otomatis ke momen di mana Guest/Owner dipilih di menu akses awal.
         };
     </script>
 </body>
