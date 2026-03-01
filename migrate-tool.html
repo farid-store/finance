@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migrasi Bulanan - Farid Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f3f4f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .modal { transition: opacity 0.25s ease; }
+        body.modal-active { overflow-x: hidden; overflow-y: hidden !important; }
+    </style>
+</head>
+<body class="text-gray-800 antialiased h-screen flex flex-col">
+
+    <header class="bg-blue-600 text-white shadow-lg py-4">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold"><i class="fa-solid fa-server mr-2"></i> Alat Migrasi Bulanan</h1>
+            <p class="text-sm bg-blue-800 px-3 py-1 rounded-full" id="date-badge">Cek Tanggal...</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 flex-grow">
+        
+        <div id="date-warning" class="hidden bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded shadow-sm" role="alert">
+            <p class="font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Peringatan Tanggal</p>
+            <p>Fitur ini didesain khusus untuk awal bulan (tanggal 1-5). Anda mengaksesnya di luar tanggal tersebut. Harap berhati-hati.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-bold border-b pb-2 mb-4"><i class="fa-solid fa-cloud-arrow-down text-blue-500"></i> 1. Tarik Data Cloud</h2>
+                <p class="text-sm text-gray-600 mb-4">Tarik data bulan lalu dari database sebelum melakukan konversi.</p>
+                <button onclick="fetchData()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
+                    <i class="fa-solid fa-rotate mr-2"></i> Tarik Data Sekarang
+                </button>
+
+                <div id="status-box" class="mt-6 hidden bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h3 class="font-semibold text-gray-700 mb-2">Ringkasan Data Saat Ini:</h3>
+                    <ul class="text-sm space-y-2">
+                        <li>Total Item di Database: <span id="stat-total" class="font-bold text-blue-600">0</span></li>
+                        <li>Barang Terjual (Siap Migrasi): <span id="stat-sold" class="font-bold text-green-600">0</span></li>
+                        <li>Barang Stok (Tetap Dipertahankan): <span id="stat-stok" class="font-bold text-orange-600">0</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6 opacity-50 pointer-events-none transition-opacity duration-300" id="action-panel">
+                <h2 class="text-xl font-bold border-b pb-2 mb-4"><i class="fa-solid fa-wand-magic-sparkles text-purple-500"></i> 2. Eksekusi Migrasi</h2>
+                <p class="text-sm text-gray-600 mb-6">Barang berstatus <b>"sold"</b> akan dipindah ke <b>Extra Profit</b>. Barang <b>"stok"</b> akan tetap berada di daftar utama.</p>
+                
+                <div class="space-y-4">
+                    <button onclick="downloadJSON()" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
+                        <i class="fa-solid fa-file-arrow-down mr-2"></i> Download JSON (Backup)
+                    </button>
+                    
+                    <button onclick="openModal()" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200 shadow-lg shadow-red-200">
+                        <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Sync & Timpa ke Cloud
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="sync-modal" class="modal opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center z-50">
+        <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-60"></div>
+        
+        <div class="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded-xl shadow-2xl z-50 overflow-y-auto">
+            <div class="modal-content py-4 text-left px-6">
+                <div class="flex justify-between items-center pb-3 border-b border-red-200">
+                    <p class="text-xl font-bold text-red-600"><i class="fa-solid fa-shield-halved"></i> Verifikasi Keamanan 3x</p>
+                    <div class="modal-close cursor-pointer z-50" onclick="closeModal()">
+                        <i class="fa-solid fa-xmark text-gray-500 hover:text-gray-800 text-2xl"></i>
+                    </div>
+                </div>
+
+                <div class="my-5 space-y-4">
+                    <p class="text-sm text-gray-600">Proses ini akan <b>MENGHAPUS</b> data item yang sudah terjual dan memindahkannya ke laporan Extra Profit secara permanen di database Cloud.</p>
+                    
+                    <div class="bg-gray-50 p-3 rounded border">
+                        <label class="flex items-start space-x-3 cursor-pointer">
+                            <input type="checkbox" id="verify-1" class="mt-1 h-5 w-5 text-red-600 rounded border-gray-300 focus:ring-red-500" onchange="checkVerification()">
+                            <span class="text-sm font-medium"><b>Lapis 1:</b> Saya sadar proses ini akan menimpa data utama di Cloud dan telah melakukan backup jika diperlukan.</span>
+                        </label>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold mb-1">Lapis 2: Ketik "MIGRASI"</label>
+                        <input type="text" id="verify-2" placeholder="Ketik persis huruf besar..." class="w-full border p-2 rounded focus:ring-red-500 focus:border-red-500 outline-none" onkeyup="checkVerification()">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold mb-1">Lapis 3: Masukkan PIN Owner</label>
+                        <input type="password" id="verify-3" placeholder="******" class="w-full border p-2 rounded focus:ring-red-500 focus:border-red-500 outline-none" onkeyup="checkVerification()">
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-2 border-t mt-4">
+                    <button onclick="closeModal()" class="px-4 bg-transparent p-3 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 mr-2">Batal</button>
+                    <button id="btn-execute-sync" onclick="executeSync()" disabled class="px-4 bg-red-300 text-white p-3 rounded-lg font-bold cursor-not-allowed transition-colors duration-200">
+                        <i class="fa-solid fa-rocket mr-1"></i> Eksekusi Sync
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Konfigurasi Cloud
+        const BIN_ID = '699644fdae596e708f3582af'; 
+        const API_KEY = '$2a$10$tcKHEWwuz2sqRoMCKJfga.1xxTFW0RxpXUPnP.NI4YbivtlK1xxau'; 
+        const OWNER_PIN = '011204';
+        const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+
+        let originalData = null;
+        let migratedData = null;
+
+        // Cek Tanggal
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            document.getElementById('date-badge').innerText = `Hari ini: ${dateStr}`;
+
+            const day = today.getDate();
+            if(day < 1 || day > 5) {
+                document.getElementById('date-warning').classList.remove('hidden');
+            }
+        });
+
+        // 1. Fetch Data
+        async function fetchData() {
+            try {
+                const btn = event.currentTarget;
+                btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Menarik Data...';
+                
+                const response = await fetch(BIN_URL, {
+                    headers: { 'X-Master-Key': API_KEY }
+                });
+                
+                if (!response.ok) throw new Error('Gagal menarik data dari server');
+                
+                const result = await response.json();
+                originalData = result.record;
+                
+                processDataLocally();
+                
+                btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i> Data Berhasil Ditarik';
+                btn.classList.replace('bg-blue-500', 'bg-green-500');
+                btn.classList.replace('hover:bg-blue-600', 'hover:bg-green-600');
+
+                // Buka Kunci Panel Kanan
+                document.getElementById('action-panel').classList.remove('opacity-50', 'pointer-events-none');
+                
+            } catch (error) {
+                alert("Error: " + error.message);
+                event.currentTarget.innerHTML = '<i class="fa-solid fa-rotate mr-2"></i> Coba Tarik Lagi';
+            }
+        }
+
+        // 2. Proses Logika Migrasi (Lokal)
+        function processDataLocally() {
+            // Clone data untuk menghindari mutasi langsung
+            migratedData = JSON.parse(JSON.stringify(originalData));
+            
+            let newItems = [];
+            let soldCount = 0;
+            let stokCount = 0;
+
+            originalData.items.forEach(item => {
+                if (item.status === 'sold') {
+                    soldCount++;
+                    // Pindah ke Extra Profit
+                    migratedData.extraProfits.push({
+                        id: item.id, // Pertahankan ID unik
+                        name: item.name + ' (Migrasi)', // Penanda opsional
+                        modal: item.modal,
+                        price: item.price,
+                        profit: item.price - item.modal
+                    });
+                } else {
+                    stokCount++;
+                    // Tetap di Items
+                    newItems.push(item);
+                }
+            });
+
+            // Update array items dengan yang tersisa (stok)
+            migratedData.items = newItems;
+
+            // Update UI
+            document.getElementById('status-box').classList.remove('hidden');
+            document.getElementById('stat-total').innerText = originalData.items.length;
+            document.getElementById('stat-sold').innerText = soldCount;
+            document.getElementById('stat-stok').innerText = stokCount;
+        }
+
+        // 3. Download JSON
+        function downloadJSON() {
+            if (!migratedData) return;
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(migratedData, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", `Data_Migrasi_FaridStore_${new Date().getTime()}.json`);
+            document.body.appendChild(downloadAnchorNode); // required for firefox
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        // 4. Manajemen Modal
+        const modal = document.getElementById('sync-modal');
+        function openModal() {
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            document.body.classList.add('modal-active');
+            resetModal();
+        }
+
+        function closeModal() {
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            document.body.classList.remove('modal-active');
+        }
+
+        function resetModal() {
+            document.getElementById('verify-1').checked = false;
+            document.getElementById('verify-2').value = "";
+            document.getElementById('verify-3').value = "";
+            checkVerification();
+        }
+
+        // 5. Verifikasi 3 Lapis
+        function checkVerification() {
+            const v1 = document.getElementById('verify-1').checked;
+            const v2 = document.getElementById('verify-2').value === "MIGRASI";
+            const v3 = document.getElementById('verify-3').value === OWNER_PIN;
+            
+            const btn = document.getElementById('btn-execute-sync');
+            
+            if (v1 && v2 && v3) {
+                btn.disabled = false;
+                btn.classList.remove('bg-red-300', 'cursor-not-allowed');
+                btn.classList.add('bg-red-600', 'hover:bg-red-700', 'shadow-lg');
+            } else {
+                btn.disabled = true;
+                btn.classList.add('bg-red-300', 'cursor-not-allowed');
+                btn.classList.remove('bg-red-600', 'hover:bg-red-700', 'shadow-lg');
+            }
+        }
+
+        // 6. Eksekusi Sync ke Cloud
+        async function executeSync() {
+            const btn = document.getElementById('btn-execute-sync');
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-1"></i> Menyinkronkan...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(BIN_URL, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': API_KEY
+                    },
+                    body: JSON.stringify(migratedData)
+                });
+
+                if (!response.ok) throw new Error('Gagal menyinkronkan ke cloud');
+                
+                alert("SUKSES! Data bulan lalu berhasil dibersihkan dan dipindahkan ke Extra Profit.");
+                closeModal();
+                
+                // Refresh halaman agar kembali kosong dan aman
+                window.location.reload();
+
+            } catch (error) {
+                alert("Sync Error: " + error.message);
+                btn.innerHTML = '<i class="fa-solid fa-rocket mr-1"></i> Eksekusi Sync';
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
