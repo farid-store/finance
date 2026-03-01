@@ -769,36 +769,36 @@ function copyToClipboard(text) {
 <div id="monthlyResetModal" class="fixed inset-0 flex items-center justify-center p-4" style="display: none; z-index: 99999 !important;">
         <div class="absolute inset-0 bg-slate-900/90 backdrop-blur-md"></div>
         
-        <div class="relative bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl text-center border border-slate-100">
-            <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce shadow-inner">
-                <span class="text-4xl">⚠️</span>
+        <div class="relative bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center border border-slate-100">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3 animate-bounce shadow-inner">
+                <span class="text-3xl">⚠️</span>
             </div>
-            <h3 class="text-2xl font-black text-slate-800 uppercase italic mb-2">Tutup Buku Bulanan</h3>
-            <p class="text-sm text-slate-500 mb-6">Sistem mendeteksi ini adalah awal bulan. Anda diwajibkan melakukan migrasi data agar perhitungan tetap akurat.</p>
+            <h3 class="text-xl font-black text-slate-800 uppercase italic mb-1">Tutup Buku Bulanan</h3>
+            <p class="text-[11px] text-slate-500 mb-4">Sistem mendeteksi ini adalah awal bulan. Anda diwajibkan melakukan migrasi data agar perhitungan tetap akurat.</p>
 
-            <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 mb-6 text-left">
-                <p class="text-xs text-indigo-800 font-bold mb-2">Proses Otomatis Sistem:</p>
-                <ul class="text-[11px] text-indigo-600 space-y-1">
-                    <li class="flex items-center gap-1"><span>✓</span> Barang laku (Sold) pindah ke History.</li>
-                    <li class="flex items-center gap-1"><span>✓</span> Sisa Stok Baru [B] otomatis menjadi Stok Lalu [L].</li>
-                    <li class="flex items-center gap-1"><span>✓</span> Menghindari dobel potong modal di bulan baru.</li>
+            <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100 mb-5 text-left">
+                <p class="text-[10px] text-indigo-800 font-bold mb-1.5">Proses Otomatis Sistem:</p>
+                <ul class="text-[10px] text-indigo-600 space-y-1">
+                    <li class="flex items-start gap-1"><span>✓</span> Barang laku (Sold) pindah ke History.</li>
+                    <li class="flex items-start gap-1"><span>✓</span> Sisa Stok Baru [B] otomatis menjadi Stok Lalu [L].</li>
+                    <li class="flex items-start gap-1"><span>✓</span> Menghindari dobel potong modal di bulan baru.</li>
                 </ul>
             </div>
 
-            <div class="text-left mb-6">
-                <label class="text-[10px] font-bold text-slate-400 uppercase block mb-2">Total Uang Tunai / Saldo Fisik Saat Ini (Wajib)</label>
-                <input type="number" id="newStartBalance" class="w-full text-center text-2xl font-black py-3 border-b-2 border-slate-200 focus:border-indigo-600 outline-none bg-transparent transition text-indigo-600 placeholder-slate-300" placeholder="Rp 0">
-                <div class="flex justify-between items-center mt-2">
-                    <p class="text-[9px] text-slate-400">*Sesuai uang di rekening/laci.</p>
-                    <p class="text-[10px] font-bold text-indigo-600 bg-indigo-100 px-2 py-1 rounded" id="systemCashHint">Sistem: Rp 0</p>
+            <div class="text-left mb-5">
+                <label class="text-[9px] font-bold text-slate-400 uppercase block mb-1">Total Uang Tunai / Saldo Fisik Saat Ini (Wajib)</label>
+                <input type="number" id="newStartBalance" class="w-full text-center text-xl font-black py-2 border-b-2 border-slate-200 focus:border-indigo-600 outline-none bg-transparent transition text-indigo-600 placeholder-slate-300" placeholder="Rp 0">
+                <div class="flex justify-between items-center mt-1.5">
+                    <p class="text-[8px] text-slate-400">*Sesuai uang di rekening/laci.</p>
+                    <p class="text-[9px] font-bold text-indigo-600 bg-indigo-100 px-2 py-0.5 rounded" id="systemCashHint">Sistem: Rp 0</p>
                 </div>
             </div>
 
-            <div class="space-y-3 relative z-10">
-                <button onclick="executeMonthlyReset()" class="w-full py-4 bg-red-600 text-white rounded-xl font-bold uppercase shadow-lg shadow-red-200 hover:bg-red-700 transition active:scale-95">
+            <div class="space-y-2 relative z-10">
+                <button onclick="executeMonthlyReset()" class="w-full py-3 bg-red-600 text-white rounded-xl text-sm font-bold uppercase shadow-lg shadow-red-200 hover:bg-red-700 transition active:scale-95">
                     Eksekusi Migrasi Sekarang
                 </button>
-                <button onclick="exportReport()" class="w-full py-3 bg-slate-100 text-slate-600 rounded-xl font-bold text-xs uppercase hover:bg-slate-200 transition flex items-center justify-center gap-2 active:scale-95">
+                <button onclick="exportReport()" class="w-full py-2.5 bg-slate-100 text-slate-600 rounded-xl font-bold text-[10px] uppercase hover:bg-slate-200 transition flex items-center justify-center gap-1.5 active:scale-95">
                     <span>📑</span> Copy Laporan Bulan Lalu
                 </button>
             </div>
