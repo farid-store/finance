@@ -1687,34 +1687,56 @@ function copyToClipboard(text) {
             document.getElementById('rankBadge').innerText = r;
         }
         
-        // --- ANALYTICS VISUALIZATION ---
+// --- ANALYTICS VISUALIZATION (REVISI ALL-TIME) ---
         function renderAnalytics() {
-            const soldItems = items.filter(i => i.status === 'sold');
-            if (soldItems.length === 0) {
+            // 1. Ambil data Sold bulan ini
+            const currentSold = items.filter(i => i.status === 'sold');
+            
+            // 2. Ambil data Extra Profit (history bulan lalu) dan sesuaikan formatnya
+            const pastSold = extraProfits.map(p => ({
+                name: p.name,
+                modal: p.modal,
+                price: p.price,
+                entryDate: 'Bulan Lalu', // Label dummy agar tidak error kalkulasi hari
+                soldAt: 'Bulan Lalu'
+            }));
+
+            // 3. Gabungkan keduanya untuk dianalisa (All-Time Sales)
+            const allSoldItems = [...pastSold, ...currentSold];
+
+            // Jika benar-benar belum pernah ada yang laku sejak toko berdiri
+            if (allSoldItems.length === 0) {
                 document.getElementById('avgSellTime').innerText = "-";
                 document.getElementById('winRateStock').innerText = "0%";
                 return; 
             }
 
+            // --- HITUNG RATA-RATA HARI TERJUAL ---
             let totalDays = 0; 
             let validSales = 0;
-            soldItems.forEach(i => {
-                const entry = parseDateString(i.entryDate); 
-                const sold = parseDateString(i.soldAt);
-                const diffTime = Math.abs(sold - entry);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                if(!isNaN(diffDays)) { totalDays += diffDays; validSales++; }
+            allSoldItems.forEach(i => {
+                // Hanya hitung kecepatan putaran untuk barang yang punya tanggal spesifik
+                if (i.entryDate !== 'Bulan Lalu' && i.soldAt && i.soldAt !== 'Bulan Lalu') {
+                    const entry = parseDateString(i.entryDate); 
+                    const sold = parseDateString(i.soldAt);
+                    const diffTime = Math.abs(sold - entry);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                    if(!isNaN(diffDays)) { totalDays += diffDays; validSales++; }
+                }
             });
             const avgDays = validSales > 0 ? (totalDays / validSales).toFixed(1) : 0;
             document.getElementById('avgSellTime').innerText = avgDays + " Hari";
 
-            const totalStock = items.length; 
-            const totalSold = soldItems.length;
-            const winRate = totalStock > 0 ? ((totalSold / totalStock) * 100).toFixed(0) : 0;
+            // --- HITUNG WIN RATE BARANG ---
+            const activeStock = items.filter(i => i.status === 'stok').length; 
+            const totalSold = allSoldItems.length;
+            const totalItemsEver = activeStock + totalSold;
+            const winRate = totalItemsEver > 0 ? ((totalSold / totalItemsEver) * 100).toFixed(0) : 0;
             document.getElementById('winRateStock').innerText = winRate + "%";
 
+            // --- CHART 1: DOMINASI BRAND ---
             const brands = {};
-            soldItems.forEach(i => {
+            allSoldItems.forEach(i => {
                 const brandName = getBrandCategory(i.name);
                 if(brands[brandName]) brands[brandName]++; else brands[brandName] = 1;
             });
@@ -1735,7 +1757,8 @@ function copyToClipboard(text) {
                 });
             }
 
-            const lastSales = soldItems.slice(0, 10).reverse(); 
+            // --- CHART 2: TREN PROFIT HARIAN (10 Transaksi Terakhir) ---
+            const lastSales = allSoldItems.slice(-10); 
             const labels = lastSales.map(i => i.name.substring(0, 10)); 
             const profits = lastSales.map(i => i.price - i.modal);
             const ctxTrend = document.getElementById('profitTrendChart');
@@ -1751,8 +1774,9 @@ function copyToClipboard(text) {
                 });
             }
 
+            // --- CHART 3: PERFORMA KUARTAL ---
             const quarters = { "Q1 (Jan-Mar)": 0, "Q2 (Apr-Jun)": 0, "Q3 (Jul-Sep)": 0, "Q4 (Oct-Dec)": 0 };
-            soldItems.forEach(i => {
+            allSoldItems.forEach(i => {
                 const date = parseDateString(i.soldAt);
                 const month = date.getMonth(); 
                 const profit = i.price - i.modal;
