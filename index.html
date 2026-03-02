@@ -578,6 +578,25 @@
                     </div>
                 </div>
 
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="card p-5 border-l-4 border-amber-500 bg-gradient-to-r from-amber-50 to-white shadow-sm">
+                        <div class="flex justify-between items-start mb-1">
+                            <p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Hak Pengelola (60%)</p>
+                            <span class="bg-amber-100 text-amber-600 text-xs px-2 py-1 rounded-md">💼</span>
+                        </div>
+                        <h2 id="splitPengelola" class="text-xl font-black text-slate-800 sensitive-data">Rp 0</h2>
+                        <p class="text-[9px] text-slate-400 mt-1">Porsi keuntungan operasional</p>
+                    </div>
+                    <div class="card p-5 border-l-4 border-emerald-500 bg-gradient-to-r from-emerald-50 to-white shadow-sm">
+                        <div class="flex justify-between items-start mb-1">
+                            <p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Hak Investor (40%)</p>
+                            <span class="bg-emerald-100 text-emerald-600 text-xs px-2 py-1 rounded-md">🤝</span>
+                        </div>
+                        <h2 id="splitInvestor" class="text-xl font-black text-slate-800 sensitive-data">Rp 0</h2>
+                        <p class="text-[9px] text-slate-400 mt-1">Porsi keuntungan pemodal</p>
+                    </div>
+                </div>
+
                 <div class="card p-5 mb-6">
                     <h3 class="font-bold text-slate-700 text-xs uppercase mb-4">Volume Penjualan (Unit / Bulan)</h3>
                     <div class="h-48">
@@ -1707,10 +1726,12 @@ function copyToClipboard(text) {
         }
         
 // --- ANALYTICS VISUALIZATION (FULL UPGRADE) ---
+
+
         function renderAnalytics() {
             const currentSold = items.filter(i => i.status === 'sold');
             const pastSold = extraProfits.map(p => ({
-                id: p.id, // <-- Kunci Rahasianya ada di ID
+                id: p.id,
                 name: p.name,
                 modal: p.modal,
                 price: p.price,
@@ -1721,7 +1742,6 @@ function copyToClipboard(text) {
             const allSoldItems = [...pastSold, ...currentSold];
             const activeStockItems = items.filter(i => i.status === 'stok');
 
-            // UPDATE KOTAK ANGKA BARU
             document.getElementById('statTotalSold').innerText = allSoldItems.length;
             document.getElementById('statActiveStock').innerText = activeStockItems.length;
 
@@ -1731,7 +1751,6 @@ function copyToClipboard(text) {
                 return; 
             }
 
-            // HITUNG RATA-RATA HARI
             let totalDays = 0; 
             let validSales = 0;
             allSoldItems.forEach(i => {
@@ -1746,17 +1765,26 @@ function copyToClipboard(text) {
             const avgDays = validSales > 0 ? (totalDays / validSales).toFixed(1) : 0;
             document.getElementById('avgSellTime').innerText = avgDays + " Hari";
 
-            // HITUNG WIN RATE
             const totalItemsEver = activeStockItems.length + allSoldItems.length;
             const winRate = totalItemsEver > 0 ? ((allSoldItems.length / totalItemsEver) * 100).toFixed(0) : 0;
             document.getElementById('winRateStock').innerText = winRate + "%";
 
-            // --- CHART 0: NEW! PENJUALAN PER BULAN (EKSTRAK DARI ID) ---
+            // LOGIKA SPLIT BAGI HASIL
+            let totalProfitAllTime = 0;
+            allSoldItems.forEach(i => {
+                totalProfitAllTime += (i.price - i.modal);
+            });
+            const porsiPengelola = totalProfitAllTime * 0.6;
+            const porsiInvestor = totalProfitAllTime * 0.4;
+            
+            document.getElementById('splitPengelola').innerText = "Rp " + porsiPengelola.toLocaleString('id-ID');
+            document.getElementById('splitInvestor').innerText = "Rp " + porsiInvestor.toLocaleString('id-ID');
+
+            // CHART PENJUALAN PER BULAN
             const monthlySalesCount = {};
             const shortMonths = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
             
             allSoldItems.forEach(i => {
-                // Ekstrak timestamp murni dari ID (buang angka desimal di belakang titik)
                 const timestamp = Math.floor(i.id);
                 const dateFromId = new Date(timestamp);
                 const monthYear = shortMonths[dateFromId.getMonth()] + " " + dateFromId.getFullYear().toString().slice(-2);
@@ -1772,7 +1800,7 @@ function copyToClipboard(text) {
             if (ctxMonthly) {
                 if(monthlySalesChartInstance) monthlySalesChartInstance.destroy();
                 monthlySalesChartInstance = new Chart(ctxMonthly, {
-                    type: 'line', // Line chart agar terlihat tren naik-turunnya
+                    type: 'line',
                     data: {
                         labels: Object.keys(monthlySalesCount),
                         datasets: [{ 
@@ -1780,17 +1808,13 @@ function copyToClipboard(text) {
                             data: Object.values(monthlySalesCount), 
                             borderColor: '#3b82f6', 
                             backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                            borderWidth: 2,
-                            fill: true,
-                            tension: 0.4, // Membuat garis melengkung halus
-                            pointBackgroundColor: '#1e40af'
+                            borderWidth: 2, fill: true, tension: 0.4, pointBackgroundColor: '#1e40af'
                         }]
                     },
                     options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { ticks: { font: { size: 10 } } } }, plugins: { legend: { display: false } } }
                 });
             }
 
-            // --- CHART 1: DOMINASI BRAND ---
             const brands = {};
             allSoldItems.forEach(i => {
                 const brandName = getBrandCategory(i.name);
@@ -1801,19 +1825,11 @@ function copyToClipboard(text) {
                 if(brandChartInstance) brandChartInstance.destroy();
                 brandChartInstance = new Chart(ctxBrand, {
                     type: 'doughnut',
-                    data: {
-                        labels: Object.keys(brands),
-                        datasets: [{
-                            data: Object.values(brands),
-                            backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'],
-                            borderWidth: 0
-                        }]
-                    },
+                    data: { labels: Object.keys(brands), datasets: [{ data: Object.values(brands), backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'], borderWidth: 0 }] },
                     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { size: 10 } } } } }
                 });
             }
 
-            // --- CHART 2: TREN PROFIT HARIAN ---
             const lastSales = allSoldItems.slice(-10); 
             const labels = lastSales.map(i => i.name.substring(0, 10)); 
             const profits = lastSales.map(i => i.price - i.modal);
@@ -1822,18 +1838,13 @@ function copyToClipboard(text) {
                 if(trendChartInstance) trendChartInstance.destroy();
                 trendChartInstance = new Chart(ctxTrend, {
                     type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{ label: 'Profit (Rp)', data: profits, backgroundColor: '#10b981', borderRadius: 4 }]
-                    },
+                    data: { labels: labels, datasets: [{ label: 'Profit (Rp)', data: profits, backgroundColor: '#10b981', borderRadius: 4 }] },
                     options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { ticks: { font: { size: 8 } } } }, plugins: { legend: { display: false } } }
                 });
             }
 
-            // --- CHART 3: PERFORMA KUARTAL ---
             const quarters = { "Q1 (Jan-Mar)": 0, "Q2 (Apr-Jun)": 0, "Q3 (Jul-Sep)": 0, "Q4 (Oct-Dec)": 0 };
             allSoldItems.forEach(i => {
-                // Gunakan tanggal dari ID karena lebih akurat sepanjang masa
                 const timestamp = Math.floor(i.id);
                 const date = new Date(timestamp);
                 const month = date.getMonth(); 
@@ -1849,21 +1860,8 @@ function copyToClipboard(text) {
                 if(quarterlyChartInstance) quarterlyChartInstance.destroy();
                 quarterlyChartInstance = new Chart(ctxQuarter, {
                     type: 'bar',
-                    data: {
-                        labels: Object.keys(quarters),
-                        datasets: [{
-                            label: 'Total Profit',
-                            data: Object.values(quarters),
-                            backgroundColor: ['#3b82f6', '#8b5cf6', '#eab308', '#f43f5e'],
-                            borderRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: true, ticks: { callback: function(value) { return 'Rp ' + value/1000 + 'k'; } } } }
-                    }
+                    data: { labels: Object.keys(quarters), datasets: [{ label: 'Total Profit', data: Object.values(quarters), backgroundColor: ['#3b82f6', '#8b5cf6', '#eab308', '#f43f5e'], borderRadius: 6 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { callback: function(value) { return 'Rp ' + value/1000 + 'k'; } } } } }
                 });
             }
         }
@@ -1899,35 +1897,74 @@ function copyToClipboard(text) {
             localStorage.setItem('ledger_owner_note', document.getElementById('ownerNote').value); 
         }
         
-        function exportReport() {
-            const cash = document.getElementById('summaryCash').innerText;
-            const stokVal = document.getElementById('previewModalStock').innerText;
-            const profit = document.getElementById('summaryProfit').innerText;
-            const startBal = Number(document.getElementById('startBalance').value);
-            const totalAsset = Number(cash.replace(/[^0-9]/g,'')) + Number(stokVal.replace(/[^0-9]/g,''));
+function exportReport() {
+            const startBal = Number(document.getElementById('startBalance').value) || 0;
+            
+            let belanjaBaru = 0;
+            let uangMasuk = 0;
+            let profitBulanIni = 0;
+            let floatModal = 0; 
+            let floatPrice = 0; 
+            
+            items.forEach(i => {
+                if (i.status === 'sold') {
+                    if (i.type === 'new') belanjaBaru += i.modal;
+                    uangMasuk += i.price;
+                    profitBulanIni += (i.price - i.modal);
+                } else {
+                    if (i.type === 'new') belanjaBaru += i.modal;
+                    floatModal += i.modal;
+                    floatPrice += i.price;
+                }
+            });
+            
+            const extraProfitTotal = extraProfits.reduce((sum, p) => sum + p.profit, 0);
+            const totalProfitReal = profitBulanIni + extraProfitTotal;
+            
+            const cash = startBal - belanjaBaru + uangMasuk;
+            const totalAsset = cash + floatPrice; 
+            
+            const porsiPengelola = totalProfitReal * 0.6;
+            const porsiInvestor = totalProfitReal * 0.4;
             
             let report = `📊 *LAPORAN KEUANGAN FARID STORE*\n`;
             report += `🗓️ Periode: ${currentMonthString}\n\n`;
-            report += `💰 *RINGKASAN*\n💵 Saldo Tunai: ${cash}\n📦 Nilai Stok: ${stokVal}\n📈 Total Aset: Rp ${totalAsset.toLocaleString('id-ID')}\n🔥 Profit Bersih: ${profit}\n\n✅ *PENJUALAN*\n`;
+            
+            report += `💰 *ARUS KAS & ASET*\n`;
+            report += `🏦 Saldo Awal (Modal): Rp ${startBal.toLocaleString('id-ID')}\n`;
+            report += `💸 Total Belanja Baru: Rp ${belanjaBaru.toLocaleString('id-ID')}\n`;
+            report += `📥 Total Uang Masuk: Rp ${uangMasuk.toLocaleString('id-ID')}\n`;
+            report += `💵 *Sisa Tunai Aktual: Rp ${cash.toLocaleString('id-ID')}*\n`;
+            report += `📦 Nilai Stok Mengendap: Rp ${floatModal.toLocaleString('id-ID')}\n`;
+            report += `📈 Estimasi Total Aset: Rp ${totalAsset.toLocaleString('id-ID')}\n\n`;
+            
+            report += `🔥 *PROFIT & BAGI HASIL*\n`;
+            report += `✨ Total Profit Bersih: Rp ${totalProfitReal.toLocaleString('id-ID')}\n`;
+            report += `💼 Hak Pengelola (60%): Rp ${porsiPengelola.toLocaleString('id-ID')}\n`;
+            report += `🤝 Hak Investor (40%): Rp ${porsiInvestor.toLocaleString('id-ID')}\n\n`;
+            
+            report += `✅ *DAFTAR UNIT TERJUAL*\n`;
             
             let soldCount = 0;
             items.filter(i => i.status === 'sold').forEach((i, index) => {
                 soldCount++;
                 const p = i.price - i.modal;
-                report += `${index + 1}. *${i.name}* (Profit: +${p.toLocaleString()})\n`;
+                report += `${index + 1}. *${i.name}* (Profit: +${p.toLocaleString('id-ID')})\n`;
             });
             if(soldCount === 0) report += `(Nihil)\n`;
             
-            report += `\n🛑 *STOK GUDANG*\n`;
+            report += `\n🛑 *DAFTAR STOK GUDANG*\n`;
+            
             let stokCount = 0;
             items.filter(i => i.status === 'stok').forEach((i, index) => {
                 stokCount++;
-                report += `${index + 1}. ${i.name} (M: ${i.modal.toLocaleString()})\n`;
+                report += `${index + 1}. ${i.name} (M: ${i.modal.toLocaleString('id-ID')})\n`;
             });
             if(stokCount === 0) report += `(Kosong)\n`;
 
             report += `\n_Generated by Farid Store System_`;
-            navigator.clipboard.writeText(report).then(() => alert("Laporan Investor berhasil disalin!"));
+            
+            navigator.clipboard.writeText(report).then(() => alert("Laporan Super Detail + Bagi Hasil berhasil disalin!"));
         }
         
         function toggleImportModal() { 
