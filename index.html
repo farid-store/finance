@@ -1924,27 +1924,34 @@ function exportReport() {
             const cash = startBal - belanjaBaru + uangMasuk;
             const totalAsset = cash + floatPrice; 
             
-            // Catatan: Porsi bagi hasil 60:40 sengaja tidak dimasukkan ke report ini sesuai request
+            const potensiUntung = floatPrice - floatModal;
             
-            // === RAKIT TEKS LAPORAN (FORMAT BARU YANG RAPI) ===
+            // === RAKIT TEKS LAPORAN (FORMAT FINAL YANG RAPI & JELAS) ===
             let report = `📊 *LAPORAN KEUANGAN FARID STORE*\n`;
             report += `🗓️ Periode: ${currentMonthString}\n`;
-            report += `------------------------------\n\n`;
+            report += `➖➖➖➖➖➖➖➖➖➖➖➖➖➖\n\n`;
             
             report += `💰 *RINGKASAN KAS & ASET*\n`;
-            report += `▫️ Modal Awal   : Rp ${startBal.toLocaleString('id-ID')}\n`;
-            report += `▫️ Belanja Baru : Rp ${belanjaBaru.toLocaleString('id-ID')}\n`;
-            report += `▫️ Uang Masuk   : Rp ${uangMasuk.toLocaleString('id-ID')}\n`;
+            report += `▫️ Modal Awal          : Rp ${startBal.toLocaleString('id-ID')}\n`;
+            report += `▫️ Pengeluaran Bln Ini : Rp ${belanjaBaru.toLocaleString('id-ID')}\n`;
+            report += `▫️ Pemasukan Bln Ini   : Rp ${uangMasuk.toLocaleString('id-ID')}\n`;
+            report += `▫️ Profit Jual Bln Ini : Rp ${profitBulanIni.toLocaleString('id-ID')}\n`;
             report += `------------------------------\n`;
-            report += `💵 *Sisa Tunai : Rp ${cash.toLocaleString('id-ID')}*\n`;
-            report += `📦 Nilai Stok  : Rp ${floatModal.toLocaleString('id-ID')}\n`;
+            report += `💵 *Sisa Tunai        : Rp ${cash.toLocaleString('id-ID')}*\n`;
+            report += `📦 Nilai Stok Gudang  : Rp ${floatModal.toLocaleString('id-ID')}\n`;
+            report += `🎯 Potensi Untung     : Rp ${potensiUntung.toLocaleString('id-ID')}\n`;
             report += `------------------------------\n`;
-            report += `📈 *TOTAL ASET : Rp ${totalAsset.toLocaleString('id-ID')}*\n\n`;
+            report += `📈 *TOTAL ASET        : Rp ${totalAsset.toLocaleString('id-ID')}*\n\n`;
             
-            report += `🔥 *PROFIT BULAN INI*\n`;
-            report += `✨ *Total Bersih : Rp ${totalProfitReal.toLocaleString('id-ID')}*\n\n`;
+            report += `🔥 *PROFIT KESELURUHAN*\n`;
+            report += `✨ *Total Bersih      : Rp ${totalProfitReal.toLocaleString('id-ID')}*\n`;
             
-            report += `------------------------------\n`;
+            // Catatan kecil jika ada tambahan profit dari history bulan lalu
+            if (extraProfitTotal > 0) {
+                report += `   _(Termasuk tambahan history: Rp ${extraProfitTotal.toLocaleString('id-ID')})_\n`;
+            }
+            
+            report += `\n➖➖➖➖➖➖➖➖➖➖➖➖➖➖\n`;
             report += `✅ *UNIT TERJUAL (SOLD)*\n`;
             
             let soldCount = 0;
@@ -1955,7 +1962,7 @@ function exportReport() {
             });
             if(soldCount === 0) report += `(Belum ada unit terjual)\n`;
             
-            report += `\n------------------------------\n`;
+            report += `\n➖➖➖➖➖➖➖➖➖➖➖➖➖➖\n`;
             report += `🛑 *STOK GUDANG AKTIF*\n`;
             
             let stokCount = 0;
@@ -1965,10 +1972,10 @@ function exportReport() {
             });
             if(stokCount === 0) report += `(Stok kosong)\n`;
 
-            report += `\n------------------------------\n`;
+            report += `\n➖➖➖➖➖➖➖➖➖➖➖➖➖➖\n`;
             report += `_Digital Ledger - Farid Store_`;
             
-            navigator.clipboard.writeText(report).then(() => alert("Laporan berhasil disalin dengan format baru yang lebih rapi!"));
+            navigator.clipboard.writeText(report).then(() => alert("Laporan berhasil disalin! Format sudah sangat rapi dan mudah dipahami."));
         }
         
         function toggleImportModal() { 
