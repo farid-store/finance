@@ -1929,7 +1929,7 @@ function exportReport() {
             // === RAKIT TEKS LAPORAN (FORMAT BARU YANG RAPI) ===
             let report = `📊 *LAPORAN KEUANGAN FARID STORE*\n`;
             report += `🗓️ Periode: ${currentMonthString}\n`;
-            report += `➖➖➖➖➖➖➖➖➖➖➖➖➖➖\n\n`;
+            report += `------------------------------\n\n`;
             
             report += `💰 *RINGKASAN KAS & ASET*\n`;
             report += `▫️ Modal Awal   : Rp ${startBal.toLocaleString('id-ID')}\n`;
@@ -1944,7 +1944,7 @@ function exportReport() {
             report += `🔥 *PROFIT BULAN INI*\n`;
             report += `✨ *Total Bersih : Rp ${totalProfitReal.toLocaleString('id-ID')}*\n\n`;
             
-            report += `➖➖➖➖➖➖➖➖➖➖➖➖➖➖\n`;
+            report += `------------------------------\n`;
             report += `✅ *UNIT TERJUAL (SOLD)*\n`;
             
             let soldCount = 0;
@@ -1955,7 +1955,7 @@ function exportReport() {
             });
             if(soldCount === 0) report += `(Belum ada unit terjual)\n`;
             
-            report += `\n➖➖➖➖➖➖➖➖➖➖➖➖➖➖\n`;
+            report += `\n------------------------------\n`;
             report += `🛑 *STOK GUDANG AKTIF*\n`;
             
             let stokCount = 0;
@@ -1965,7 +1965,7 @@ function exportReport() {
             });
             if(stokCount === 0) report += `(Stok kosong)\n`;
 
-            report += `\n➖➖➖➖➖➖➖➖➖➖➖➖➖➖\n`;
+            report += `\n------------------------------\n`;
             report += `_Digital Ledger - Farid Store_`;
             
             navigator.clipboard.writeText(report).then(() => alert("Laporan berhasil disalin dengan format baru yang lebih rapi!"));
