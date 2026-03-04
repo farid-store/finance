@@ -551,7 +551,7 @@
                 </div>
             </main>
 
-            <div id="page-analytics" class="max-w-4xl w-full mx-auto hidden flex-1 lg:overflow-y-auto pt-8 px-4 md:px-8 pb-20">
+<div id="page-analytics" class="max-w-4xl w-full mx-auto hidden flex-1 lg:overflow-y-auto pt-8 px-4 md:px-8 pb-20">
                 <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali Dashboard</button>
                 <div class="flex justify-between items-end mb-6">
                     <div>
@@ -559,22 +559,26 @@
                         <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Data Real-time Sistem</p>
                     </div>
                     <button onclick="archiveOldSales()" class="bg-slate-800 text-white px-3 py-2.5 rounded-xl text-[10px] font-bold hover:bg-slate-900 transition flex items-center gap-2 shadow-lg">
-                        <span>📦</span> Arsipkan Data Bln Lalu
+                        <span>📦</span> Pindah Data Bln Lalu
                     </button>
                 </div>
             
-                <div class="grid grid-cols-3 gap-3 mb-6">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                     <div class="card p-4 border-l-4 border-indigo-500">
-                        <p class="text-[9px] text-slate-400 uppercase font-black tracking-wider mb-1">Unit Ready (Stok)</p>
+                        <p class="text-[9px] text-slate-400 uppercase font-black tracking-wider mb-1">Unit Ready</p>
                         <h2 id="statUnitReady" class="text-2xl font-black text-slate-800">0</h2>
                     </div>
                     <div class="card p-4 border-l-4 border-emerald-500">
-                        <p class="text-[9px] text-slate-400 uppercase font-black tracking-wider mb-1">Laku Bulan Ini</p>
+                        <p class="text-[9px] text-slate-400 uppercase font-black tracking-wider mb-1">Laku Bln Ini</p>
                         <h2 id="statUnitBulanIni" class="text-2xl font-black text-slate-800">0</h2>
                     </div>
-                    <div class="card p-4 border-l-4 border-slate-300">
-                        <p class="text-[9px] text-slate-400 uppercase font-black tracking-wider mb-1">Laku Bulan Lalu</p>
+                    <div class="card p-4 border-l-4 border-amber-500">
+                        <p class="text-[9px] text-slate-400 uppercase font-black tracking-wider mb-1">Laku Bln Lalu</p>
                         <h2 id="statUnitBulanLalu" class="text-2xl font-black text-slate-800">0</h2>
+                    </div>
+                    <div class="card p-4 border-l-4 border-blue-500">
+                        <p class="text-[9px] text-slate-400 uppercase font-black tracking-wider mb-1">Total Terjual (All)</p>
+                        <h2 id="statUnitAllTime" class="text-2xl font-black text-slate-800">0</h2>
                     </div>
                 </div>
             
@@ -583,7 +587,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                             <h4 class="text-[10px] font-black text-slate-500 uppercase mb-3 border-b border-slate-100 pb-2 tracking-widest">
-                                Bulan Ini <span id="lblBulanIni" class="text-indigo-600 float-right sensitive-data">Rp 0</span>
+                                KHUSUS BULAN INI <span id="lblBulanIni" class="text-indigo-600 float-right sensitive-data">Rp 0</span>
                             </h4>
                             <div class="space-y-2.5 text-xs font-bold sensitive-data">
                                 <div class="flex justify-between items-center"><span class="text-slate-600">👨‍💼 Pengelola (50%)</span><span id="bhPengelolaBln" class="text-slate-800 bg-slate-100 px-2 py-1 rounded">Rp 0</span></div>
@@ -592,15 +596,15 @@
                                 <div class="flex justify-between items-center"><span class="text-slate-600">🤲 Zakat (3%)</span><span id="bhZakatBln" class="text-emerald-600 bg-emerald-50 px-2 py-1 rounded">Rp 0</span></div>
                             </div>
                         </div>
-                        <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
-                            <h4 class="text-[10px] font-black text-indigo-800 uppercase mb-3 border-b border-indigo-200 pb-2 tracking-widest">
-                                Akumulasi Setahun <span id="lblTahunIni" class="text-indigo-700 float-right sensitive-data">Rp 0</span>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <h4 class="text-[10px] font-black text-slate-500 uppercase mb-3 border-b border-slate-100 pb-2 tracking-widest">
+                                AKUMULASI KESELURUHAN <span id="lblTotalAll" class="text-indigo-600 float-right sensitive-data">Rp 0</span>
                             </h4>
                             <div class="space-y-2.5 text-xs font-bold sensitive-data">
-                                <div class="flex justify-between items-center"><span class="text-indigo-900">👨‍💼 Pengelola (50%)</span><span id="bhPengelolaThn" class="text-indigo-900">Rp 0</span></div>
-                                <div class="flex justify-between items-center"><span class="text-indigo-900">📈 Investor (40%)</span><span id="bhInvThn" class="text-indigo-900">Rp 0</span></div>
-                                <div class="flex justify-between items-center"><span class="text-indigo-900">⚙️ Operasional (7%)</span><span id="bhOpsThn" class="text-indigo-900">Rp 0</span></div>
-                                <div class="flex justify-between items-center"><span class="text-indigo-900">🤲 Zakat (3%)</span><span id="bhZakatThn" class="text-emerald-700">Rp 0</span></div>
+                                <div class="flex justify-between items-center"><span class="text-slate-600">👨‍💼 Pengelola (50%)</span><span id="bhPengelolaThn" class="text-slate-800 bg-slate-100 px-2 py-1 rounded">Rp 0</span></div>
+                                <div class="flex justify-between items-center"><span class="text-slate-600">📈 Investor (40%)</span><span id="bhInvThn" class="text-slate-800 bg-slate-100 px-2 py-1 rounded">Rp 0</span></div>
+                                <div class="flex justify-between items-center"><span class="text-slate-600">⚙️ Operasional (7%)</span><span id="bhOpsThn" class="text-slate-800 bg-slate-100 px-2 py-1 rounded">Rp 0</span></div>
+                                <div class="flex justify-between items-center"><span class="text-slate-600">🤲 Zakat (3%)</span><span id="bhZakatThn" class="text-emerald-600 bg-emerald-50 px-2 py-1 rounded">Rp 0</span></div>
                             </div>
                         </div>
                     </div>
@@ -1630,8 +1634,11 @@ function renderAnalytics() {
             let unitBulanIni = 0;
             let unitBulanLalu = 0;
             let profitBulanIni = 0;
-            let profitTahunIni = 0;
             let unitReady = 0;
+            
+            // Masukkan data dari Extra Profit (Histori Bulan Lalu)
+            let profitTotalAll = extraProfits.reduce((sum, p) => sum + p.profit, 0);
+            let unitAllTime = extraProfits.length;
 
             const now = new Date();
             const currM = now.getMonth();
@@ -1642,51 +1649,59 @@ function renderAnalytics() {
             items.forEach(i => {
                 if (i.status === 'stok') {
                     unitReady++;
-                } else if (i.status === 'sold' && i.soldAt) {
-                    const d = parseDateString(i.soldAt);
-                    const m = d.getMonth();
-                    const y = d.getFullYear();
+                } else if (i.status === 'sold') {
+                    unitAllTime++; // Tambah 1 ke Total Unit Semua Waktu
+                    
                     const profit = i.price - i.modal;
+                    profitTotalAll += profit; // Tambah ke Total Uang Keseluruhan
 
-                    // Data Setahun (Akumulasi Jan-Des di tahun ini)
-                    if (y === currY) {
-                        profitPerMonth[m] += profit;
-                        unitPerMonth[m] += 1;
-                        profitTahunIni += profit;
-                    }
+                    if (i.soldAt) {
+                        const d = parseDateString(i.soldAt);
+                        const m = d.getMonth();
+                        const y = d.getFullYear();
 
-                    // Deteksi Bulan Ini vs Bulan Lalu
-                    if (y === currY && m === currM) {
-                        unitBulanIni++;
-                        profitBulanIni += profit;
-                    } else if (y === lastMY && m === lastM) {
-                        unitBulanLalu++;
+                        // Data Chart Setahun
+                        if (y === currY) {
+                            profitPerMonth[m] += profit;
+                            unitPerMonth[m] += 1;
+                        }
+
+                        // Cek Bulan Ini vs Bulan Lalu
+                        if (y === currY && m === currM) {
+                            unitBulanIni++;
+                            profitBulanIni += profit;
+                        } else if (y === lastMY && m === lastM) {
+                            unitBulanLalu++;
+                        }
                     }
                 }
             });
 
-            // Update UI Angka Statistik
+            // Update UI Angka Statistik Atas
+            document.getElementById('statUnitReady').innerText = unitReady;
             document.getElementById('statUnitBulanIni').innerText = unitBulanIni;
             document.getElementById('statUnitBulanLalu').innerText = unitBulanLalu;
-            document.getElementById('statUnitReady').innerText = unitReady;
+            document.getElementById('statUnitAllTime').innerText = unitAllTime;
 
-            // --- Update UI Bagi Hasil (Otomatis Reset) ---
+            // --- Update UI Bagi Hasil ---
+            // 1. KHUSUS BULAN INI (Hanya profit laku di bulan berjalan)
             document.getElementById('lblBulanIni').innerText = "Rp " + profitBulanIni.toLocaleString('id-ID');
             document.getElementById('bhPengelolaBln').innerText = "Rp " + (profitBulanIni * 0.50).toLocaleString('id-ID');
             document.getElementById('bhInvBln').innerText = "Rp " + (profitBulanIni * 0.40).toLocaleString('id-ID');
             document.getElementById('bhOpsBln').innerText = "Rp " + (profitBulanIni * 0.07).toLocaleString('id-ID');
             document.getElementById('bhZakatBln').innerText = "Rp " + (profitBulanIni * 0.03).toLocaleString('id-ID');
 
-            document.getElementById('lblTahunIni').innerText = "Rp " + profitTahunIni.toLocaleString('id-ID');
-            document.getElementById('bhPengelolaThn').innerText = "Rp " + (profitTahunIni * 0.50).toLocaleString('id-ID');
-            document.getElementById('bhInvThn').innerText = "Rp " + (profitTahunIni * 0.40).toLocaleString('id-ID');
-            document.getElementById('bhOpsThn').innerText = "Rp " + (profitTahunIni * 0.07).toLocaleString('id-ID');
-            document.getElementById('bhZakatThn').innerText = "Rp " + (profitTahunIni * 0.03).toLocaleString('id-ID');
+            // 2. AKUMULASI KESELURUHAN (Termasuk Profit History/Extra Profit)
+            document.getElementById('lblTotalAll').innerText = "Rp " + profitTotalAll.toLocaleString('id-ID');
+            document.getElementById('bhPengelolaThn').innerText = "Rp " + (profitTotalAll * 0.50).toLocaleString('id-ID');
+            document.getElementById('bhInvThn').innerText = "Rp " + (profitTotalAll * 0.40).toLocaleString('id-ID');
+            document.getElementById('bhOpsThn').innerText = "Rp " + (profitTotalAll * 0.07).toLocaleString('id-ID');
+            document.getElementById('bhZakatThn').innerText = "Rp " + (profitTotalAll * 0.03).toLocaleString('id-ID');
 
             // --- Update Grafik Chart.js ---
             const monthLabels = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
 
-            // 1. Grafik Profit Setahun
+            // Grafik Profit
             const ctxProfit = document.getElementById('profitYearChart');
             if (window.profitYearChartInstance) window.profitYearChartInstance.destroy();
             window.profitYearChartInstance = new Chart(ctxProfit, {
@@ -1707,7 +1722,7 @@ function renderAnalytics() {
                 }
             });
 
-            // 2. Grafik Unit Terjual Setahun
+            // Grafik Unit
             const ctxUnit = document.getElementById('unitYearChart');
             if (window.unitYearChartInstance) window.unitYearChartInstance.destroy();
             window.unitYearChartInstance = new Chart(ctxUnit, {
@@ -1732,7 +1747,7 @@ function renderAnalytics() {
                 }
             });
         }
-
+        
         function archiveOldSales() {
             const now = new Date();
             const currM = now.getMonth();
