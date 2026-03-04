@@ -558,8 +558,8 @@
                         <h1 class="text-2xl font-black italic text-slate-800">📊 ANALISA BISNIS</h1>
                         <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Data Real-time Sistem</p>
                     </div>
-                    <button onclick="archiveOldSales()" class="bg-slate-800 text-white px-3 py-2.5 rounded-xl text-[10px] font-bold hover:bg-slate-900 transition flex items-center gap-2 shadow-lg">
-                        <span>📦</span> Pindah Data Bln Lalu
+                    <button onclick="openArchiveModal()" class="bg-slate-800 text-white px-3 py-2.5 rounded-xl text-[10px] font-bold hover:bg-slate-900 transition flex items-center gap-2 shadow-lg">
+    <span>📦</span> Pindah Data Bln Lalu
                     </button>
                 </div>
             
@@ -724,6 +724,22 @@
         </ul>
     </div>
 </div>
+
+            <div id="archiveModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="display: none;">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeArchiveModal()"></div>
+        <div class="relative bg-white w-full max-w-lg rounded-3xl p-6 shadow-2xl flex flex-col max-h-[80vh]">
+            <h3 class="text-lg font-black text-slate-800 uppercase italic mb-1">📦 Cross-Check Pindah Data</h3>
+            <p class="text-[10px] text-slate-500 mb-4 font-bold">Pastikan tanggal laku sudah benar sebelum dipindah ke arsip bulan lalu.</p>
+            
+            <div id="archiveListContainer" class="flex-1 overflow-y-auto space-y-2 mb-4 pr-2 no-scrollbar border-y border-slate-100 py-3">
+                </div>
+            
+            <div class="flex gap-2 mt-auto pt-2">
+                <button onclick="closeArchiveModal()" class="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold text-[11px] uppercase hover:bg-slate-200 transition">Batal / Tutup</button>
+                <button onclick="archiveAllEligibleItems()" class="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-bold text-[11px] uppercase hover:bg-indigo-700 transition shadow-lg">Pindahkan Semua</button>
+            </div>
+        </div>
+    </div>
 
 <script>
 function copyToClipboard(text) {
@@ -1765,30 +1781,84 @@ function renderAnalytics() {
             });
         }
         
-        function archiveOldSales() {
-            const now = new Date();
-            const currM = now.getMonth();
-            const currY = now.getFullYear();
-            let archivedCount = 0;
+        // ===============================================
+        // 📦 SISTEM ARSIP & PINDAH DATA MANUAL
+        // ===============================================
+        function openArchiveModal() {
+            renderArchiveList();
+            document.getElementById('archiveModal').style.display = 'flex';
+        }
 
-            items.forEach(i => {
-                // Cari data yang terjual, tapi bulannya adalah bulan SEBELUM bulan ini
-                if (i.status === 'sold' && i.soldAt && !i.isArchived) {
-                    const d = parseDateString(i.soldAt);
-                    if (d.getFullYear() < currY || (d.getFullYear() === currY && d.getMonth() < currM)) {
-                        i.isArchived = true; // Tandai sebagai arsip (tidak mengganggu kalkulator uang)
-                        archivedCount++;
-                    }
-                }
+        function closeArchiveModal() {
+            document.getElementById('archiveModal').style.display = 'none';
+        }
+
+        function renderArchiveList() {
+            const container = document.getElementById('archiveListContainer');
+            container.innerHTML = '';
+            
+            // Ambil SEMUA data yang sudah Terjual (sold) tapi BELUM diarsipkan
+            const eligibleItems = items.filter(i => i.status === 'sold' && !i.isArchived);
+            
+            // Urutkan dari yang paling baru laku
+            eligibleItems.sort((a, b) => parseDateString(b.soldAt) - parseDateString(a.soldAt));
+
+            if (eligibleItems.length === 0) {
+                container.innerHTML = `<div class="text-center py-10 text-slate-400 text-xs italic font-bold uppercase">✅ Bersih!<br>Tidak ada data penjualan yang menggantung.</div>`;
+                return;
+            }
+
+            eligibleItems.forEach(i => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-200 hover:border-indigo-300 transition";
+                
+                // Format tanggal laku
+                const soldDate = i.soldAt ? i.soldAt : i.entryDate;
+                const profit = i.price - i.modal;
+                
+                div.innerHTML = `
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-[13px] leading-tight">${i.name}</h4>
+                        <div class="flex items-center gap-2 mt-1 text-[10px] font-bold">
+                            <span class="text-slate-500">🗓️ Laku: <span class="text-indigo-600">${soldDate}</span></span>
+                            <span class="text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded">Profit: Rp ${profit.toLocaleString('id-ID')}</span>
+                        </div>
+                    </div>
+                    <button onclick="archiveSingleItem(${i.id})" class="px-3 py-2 bg-slate-800 text-white rounded-lg text-[10px] font-black uppercase hover:bg-indigo-600 transition shadow-sm flex-shrink-0">
+                        Pindah
+                    </button>
+                `;
+                container.appendChild(div);
             });
+        }
 
-            if (archivedCount > 0) {
-                alert(`✅ Berhasil mengarsipkan ${archivedCount} unit penjualan bulan lalu!\n\nData tersebut kini pindah ke tab "History Bulan Lalu". Data keuangan total Anda tetap 100% aman dan akurat.`);
-                calculateAll(); // Simpan dan re-render UI
-            } else {
-                alert("Tidak ada data penjualan dari bulan lalu yang belum diarsipkan.");
+        function archiveSingleItem(id) {
+            const item = items.find(i => i.id === id);
+            if (item) {
+                item.isArchived = true;
+                calculateAll(); // Update angka-angka keuangan (background)
+                renderArchiveList(); // Render ulang list di dalam modal agar data yang diklik hilang
             }
         }
+
+        function archiveAllEligibleItems() {
+            const eligibleItems = items.filter(i => i.status === 'sold' && !i.isArchived);
+            if (eligibleItems.length === 0) return;
+            
+            if (confirm(`PENTING: Anda akan memindahkan SELURUH DATA (${eligibleItems.length} unit) ini ke Histori Arsip sekaligus. Lanjutkan?`)) {
+                let count = 0;
+                items.forEach(i => {
+                    if (i.status === 'sold' && !i.isArchived) {
+                        i.isArchived = true;
+                        count++;
+                    }
+                });
+                calculateAll(); // Simpan dan kalkulasi ulang
+                closeArchiveModal();
+                alert(`✅ ${count} data berhasil dipindahkan ke histori secara massal!`);
+            }
+        }
+        
 
         function getBrandCategory(itemName) {
             const lower = itemName.toLowerCase();
