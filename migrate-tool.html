@@ -1628,6 +1628,7 @@ function copyToClipboard(text) {
         
         // --- ANALYTICS VISUALIZATION ---
 function renderAnalytics() {
+            // Array untuk menampung data 12 bulan di Chart
             const profitPerMonth = new Array(12).fill(0);
             const unitPerMonth = new Array(12).fill(0);
             
@@ -1636,9 +1637,8 @@ function renderAnalytics() {
             let profitBulanIni = 0;
             let unitReady = 0;
             
-            // Masukkan data dari Extra Profit (Histori Bulan Lalu)
-            let profitTotalAll = extraProfits.reduce((sum, p) => sum + p.profit, 0);
-            let unitAllTime = extraProfits.length;
+            let profitTotalAll = 0;
+            let unitAllTime = 0;
 
             const now = new Date();
             const currM = now.getMonth();
@@ -1646,27 +1646,27 @@ function renderAnalytics() {
             const lastM = currM === 0 ? 11 : currM - 1;
             const lastMY = currM === 0 ? currY - 1 : currY;
 
+            // 1. PROSES DATA UTAMA (Tabel Items)
             items.forEach(i => {
                 if (i.status === 'stok') {
                     unitReady++;
                 } else if (i.status === 'sold') {
-                    unitAllTime++; // Tambah 1 ke Total Unit Semua Waktu
-                    
+                    unitAllTime++; 
                     const profit = i.price - i.modal;
-                    profitTotalAll += profit; // Tambah ke Total Uang Keseluruhan
+                    profitTotalAll += profit; 
 
                     if (i.soldAt) {
                         const d = parseDateString(i.soldAt);
                         const m = d.getMonth();
                         const y = d.getFullYear();
 
-                        // Data Chart Setahun
+                        // Masukkan ke Grafik Setahun
                         if (y === currY) {
                             profitPerMonth[m] += profit;
                             unitPerMonth[m] += 1;
                         }
 
-                        // Cek Bulan Ini vs Bulan Lalu
+                        // Deteksi Stat Bulan Ini vs Bulan Lalu
                         if (y === currY && m === currM) {
                             unitBulanIni++;
                             profitBulanIni += profit;
@@ -1674,6 +1674,23 @@ function renderAnalytics() {
                             unitBulanLalu++;
                         }
                     }
+                }
+            });
+
+            // 2. PROSES DATA EXTRA PROFIT (Agar Masuk ke Grafik & Total)
+            extraProfits.forEach(p => {
+                unitAllTime++;
+                profitTotalAll += p.profit;
+
+                // Ekstrak waktu dari ID (karena ID digenerate dari Date.now())
+                const d = new Date(Math.floor(p.id));
+                const m = d.getMonth();
+                const y = d.getFullYear();
+
+                // Masukkan Extra Profit ke dalam Grafik jika tahunnya sama!
+                if (y === currY) {
+                    profitPerMonth[m] += p.profit;
+                    unitPerMonth[m] += 1;
                 }
             });
 
@@ -1691,7 +1708,7 @@ function renderAnalytics() {
             document.getElementById('bhOpsBln').innerText = "Rp " + (profitBulanIni * 0.07).toLocaleString('id-ID');
             document.getElementById('bhZakatBln').innerText = "Rp " + (profitBulanIni * 0.03).toLocaleString('id-ID');
 
-            // 2. AKUMULASI KESELURUHAN (Termasuk Profit History/Extra Profit)
+            // 2. AKUMULASI KESELURUHAN (Termasuk Extra Profit)
             document.getElementById('lblTotalAll').innerText = "Rp " + profitTotalAll.toLocaleString('id-ID');
             document.getElementById('bhPengelolaThn').innerText = "Rp " + (profitTotalAll * 0.50).toLocaleString('id-ID');
             document.getElementById('bhInvThn').innerText = "Rp " + (profitTotalAll * 0.40).toLocaleString('id-ID');
@@ -1701,7 +1718,7 @@ function renderAnalytics() {
             // --- Update Grafik Chart.js ---
             const monthLabels = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
 
-            // Grafik Profit
+            // Grafik Profit Bersih
             const ctxProfit = document.getElementById('profitYearChart');
             if (window.profitYearChartInstance) window.profitYearChartInstance.destroy();
             window.profitYearChartInstance = new Chart(ctxProfit, {
@@ -1722,7 +1739,7 @@ function renderAnalytics() {
                 }
             });
 
-            // Grafik Unit
+            // Grafik Total Unit
             const ctxUnit = document.getElementById('unitYearChart');
             if (window.unitYearChartInstance) window.unitYearChartInstance.destroy();
             window.unitYearChartInstance = new Chart(ctxUnit, {
