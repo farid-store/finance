@@ -634,23 +634,131 @@
                 </div>
             </div>
             
-            <div id="page-hp" class="max-w-3xl w-full mx-auto hidden flex-1 lg:overflow-y-auto pt-8 px-4 md:px-8">
-                <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase">← Kembali</button>
-                <h1 class="text-2xl font-black italic mb-6">📱 Handphone Check</h1>
-                <div class="card p-6 space-y-4">
-                    <div class="bg-slate-50 p-4 rounded-xl border">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase block mb-2 italic">Cek IMEI (imei.info)</label>
-                        <div class="flex gap-2">
-                            <input type="number" id="imeiInput" class="input-field text-sm bg-white" placeholder="Masukkan 15 digit IMEI...">
-                            <button onclick="directImei()" class="bg-indigo-600 text-white px-6 rounded-xl font-bold text-[10px]">CEK</button>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 gap-2">
-                        <button onclick="window.open('https://old.beacukai.go.id/websitenewV2/cek-imei.html')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">Cek IMEI Beacukai <span>🌐</span></button>
-                        <button onclick="window.open('https://sickw.com/')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">SICKSW (SN/IMEI) <span>🌐</span></button>
-                        <button onclick="window.open('https://www.touchscreentest.com/')" class="p-4 bg-slate-900 text-white rounded-xl text-xs font-bold flex justify-between">Touchscreen Test <span>🌐</span></button>
+            <div id="page-hp" class="max-w-3xl w-full mx-auto hidden flex-1 lg:overflow-y-auto pt-8 px-4 md:px-8 pb-20">
+                <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase flex items-center gap-1 hover:underline">
+                    <span>←</span> Kembali Dashboard
+                </button>
+                
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h1 class="text-2xl font-black italic text-slate-800">📱 HANDPHONE CHECK</h1>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mt-1">SOP Inspeksi Unit Second</p>
                     </div>
                 </div>
+
+                <div class="card p-5 mb-4 border-t-4 border-indigo-500">
+                    <h3 class="font-bold text-sm mb-3 text-slate-800 flex items-center gap-2"><span>🌐</span> Alat Cek Online Khusus</h3>
+                    
+                    <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 mb-3">
+                        <label class="text-[10px] font-black text-indigo-800 uppercase block mb-2 tracking-wider">Cek Info Basic (imei.info)</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="imeiInput" class="input-field text-sm bg-white border-indigo-200" placeholder="Masukkan 15 digit IMEI...">
+                            <button onclick="directImei()" class="bg-indigo-600 hover:bg-indigo-700 transition text-white px-6 rounded-xl font-bold text-[10px] shadow-md">CEK</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <button onclick="window.open('https://old.beacukai.go.id/websitenewV2/cek-imei.html')" class="p-3 bg-slate-800 hover:bg-slate-900 transition text-white rounded-xl text-xs font-bold flex justify-between items-center shadow-sm">
+                            Cek IMEI Beacukai <span class="text-[10px] bg-slate-700 px-2 py-1 rounded">WEB</span>
+                        </button>
+                        <button onclick="window.open('https://imei.kemenperin.go.id/')" class="p-3 bg-slate-800 hover:bg-slate-900 transition text-white rounded-xl text-xs font-bold flex justify-between items-center shadow-sm">
+                            Cek IMEI Kemenperin <span class="text-[10px] bg-slate-700 px-2 py-1 rounded">WEB</span>
+                        </button>
+                        <button onclick="window.open('https://sickw.com/')" class="p-3 bg-slate-800 hover:bg-slate-900 transition text-white rounded-xl text-xs font-bold flex justify-between items-center shadow-sm">
+                            SICKSW (SN/IMEI Apple) <span class="text-[10px] bg-slate-700 px-2 py-1 rounded">WEB</span>
+                        </button>
+                        <button onclick="window.open('https://www.touchscreentest.com/')" class="p-3 bg-slate-800 hover:bg-slate-900 transition text-white rounded-xl text-xs font-bold flex justify-between items-center shadow-sm">
+                            Touchscreen Test <span class="text-[10px] bg-slate-700 px-2 py-1 rounded">WEB</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card p-5 mb-4 border-t-4 border-emerald-500">
+                    <h3 class="font-bold text-sm mb-3 text-slate-800 flex items-center gap-2"><span>🛠️</span> Aplikasi Wajib Teknisi</h3>
+                    <p class="text-[10px] text-slate-500 mb-4 font-bold">Instal aplikasi berikut di HP user/target untuk inspeksi mendalam.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <h4 class="text-xs font-black text-slate-700 mb-1">AIDA64 / Device Info HW</h4>
+                            <p class="text-[10px] text-slate-500 leading-relaxed">Cek spek asli (Processor, RAM, Resolusi Layar). Sangat ampuh mendeteksi HP HDC / Supercopy.</p>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <h4 class="text-xs font-black text-slate-700 mb-1">Phone Doctor Plus / TestM</h4>
+                            <p class="text-[10px] text-slate-500 leading-relaxed">Aplikasi all-in-one untuk tes otomatis seluruh sensor, mic, getar, layar, dan speaker.</p>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <h4 class="text-xs font-black text-slate-700 mb-1">AccuBattery (Android)</h4>
+                            <p class="text-[10px] text-slate-500 leading-relaxed">Cek *Battery Health* real Android. Perhatikan grafik "Discharging" apakah baterai bocor drastis.</p>
+                        </div>
+                        <div class="bg-blue-50 p-3 rounded-xl border border-blue-200">
+                            <h4 class="text-xs font-black text-blue-800 mb-1">3uTools (Wajib via Laptop)</h4>
+                            <p class="text-[10px] text-blue-600 leading-relaxed">Wajib untuk cek iPhone. Melihat skor originalitas komponen (Layar, Baterai, Kamera gantian atau tidak).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-5 mb-4 border-t-4 border-amber-500">
+                    <h3 class="font-bold text-sm mb-4 text-slate-800 flex items-center gap-2"><span>🔍</span> SOP Cek Fisik & Hardware</h3>
+                    
+                    <ul class="text-[11px] space-y-3 text-slate-600">
+                        <li class="flex gap-2 items-start">
+                            <span class="text-amber-500 font-bold mt-0.5">1.</span>
+                            <div>
+                                <b class="text-slate-800 block mb-0.5">Inspeksi Layar & LCD (Penting!)</b>
+                                Cek kerapatan lem di pinggir bezel (jika meluber/renggang = gantian). Buka background putih terang (cek *white spot* / jamur). Buka background abu-abu/hitam full terang (cek *Shadow/Burn-in* khusus HP AMOLED seperti seri Samsung atau Poco kelas atas).
+                            </div>
+                        </li>
+                        <li class="flex gap-2 items-start">
+                            <span class="text-amber-500 font-bold mt-0.5">2.</span>
+                            <div>
+                                <b class="text-slate-800 block mb-0.5">Fisik Bodi & Engsel</b>
+                                Raba pinggiran frame. Dent/penyok parah menandakan riwayat jatuh ekstrem (risiko mesin *microsoldering* retak). Cek kelurusan body (bengkok atau tidak).
+                            </div>
+                        </li>
+                        <li class="flex gap-2 items-start">
+                            <span class="text-amber-500 font-bold mt-0.5">3.</span>
+                            <div>
+                                <b class="text-slate-800 block mb-0.5">Tes Kamera & Mic Video</b>
+                                Buka kamera belakang. Ketuk bodi pelan, perhatikan jika layar bergoyang hebat (OIS rusak). Tes fokus jarak dekat & jauh. Rekam video sambil berbicara, lalu putar (tes mic belakang & bawah sekaligus).
+                            </div>
+                        </li>
+                        <li class="flex gap-2 items-start">
+                            <span class="text-amber-500 font-bold mt-0.5">4.</span>
+                            <div>
+                                <b class="text-slate-800 block mb-0.5">Port & Tombol</b>
+                                Colok charger, goyang sedikit kabelnya (pastikan port tidak kendor/putus nyambung). Tes empuk/kerasnya tombol power & volume.
+                            </div>
+                        </li>
+                        <li class="flex gap-2 items-start">
+                            <span class="text-amber-500 font-bold mt-0.5">5.</span>
+                            <div>
+                                <b class="text-slate-800 block mb-0.5">Konektivitas & Sinyal (Awas Begal IMEI)</b>
+                                Wajib masukkan SIM Card (Telkomsel/Indosat). Pastikan logo 4G/5G muncul dan BISA buat internetan/nelfon. Coba sambungkan WiFi & hidupkan Bluetooth (pastikan nyala, tidak *greyed out*).
+                            </div>
+                        </li>
+                        <li class="flex gap-2 items-start">
+                            <span class="text-amber-500 font-bold mt-0.5">6.</span>
+                            <div>
+                                <b class="text-slate-800 block mb-0.5">Sensor Krusial</b>
+                                Tes nelfon, tutup area atas layar dengan tangan (Proximity sensor harus mati). Tes putar video YouTube 360 derajat (Gyroscope).
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card p-5 mb-8 border-t-4 border-red-500">
+                    <h3 class="font-bold text-sm mb-3 text-slate-800 flex items-center gap-2"><span>🔐</span> SOP Keamanan & Akun</h3>
+                    <div class="bg-red-50 p-4 rounded-xl border border-red-100">
+                        <p class="text-[10px] text-red-600 font-bold uppercase tracking-wider mb-2">Peringatan Keras Sebelum Deal Bayar:</p>
+                        <ul class="text-[11px] space-y-2 text-red-900 font-medium">
+                            <li>• <b>iPhone/iPad:</b> Pastikan iCloud (Apple ID) di *Settings* SUDAH LOGOUT. Jangan bayar jika lupa password!</li>
+                            <li>• <b>Xiaomi/Poco:</b> Wajib pastikan "Mi Account" (Akun Mi) sudah kosong/logout sempurna.</li>
+                            <li>• <b>Samsung/Oppo/Vivo:</b> Pastikan Samsung Account dan Google Account utama dihapus sebelum Factory Reset (mencegah nyangkut *FRP Lock*).</li>
+                            <li>• Cek Fingerprint / FaceID (Jika tidak bisa di-setup sama sekali, berarti hardware biometrik rusak).</li>
+                        </ul>
+                    </div>
+                </div>
+
             </div>
 
             <div id="page-dial" class="max-w-3xl w-full mx-auto hidden flex-1 lg:overflow-y-auto pt-8 px-4 md:px-8 pb-12">
