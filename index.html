@@ -244,12 +244,12 @@
 
         .stamp-sold-lp { position: absolute; top: 12px; right: -15px; border: 2px solid #ef4444; color: #ef4444; padding: 2px 12px; font-weight: 900; font-size: 11px; text-transform: uppercase; transform: rotate(15deg); opacity: 0.9; border-radius: 4px; box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); pointer-events: none; z-index: 5; letter-spacing: 1px;}
         
-        /* Animasi Ticker */
-        .ticker-container-lp { height: 40px; position: relative; overflow: hidden; margin-top: 0.5rem; }
-        .ticker-item-lp { position: absolute; width: 100%; left: 0; top: 0; opacity: 0; transform: translateY(15px); animation: tickerPopLp 0.5s ease-out forwards; }
+        /* Animasi Ticker (Tinggi Disesuaikan Anti-Potong) */
+        .ticker-container-lp { height: 54px; position: relative; overflow: hidden; margin-top: 0.5rem; }
+        .ticker-item-lp { position: absolute; width: 100%; left: 0; top: 0; opacity: 0; transform: translateY(20px); animation: tickerPopLp 0.5s ease-out forwards; }
         .ticker-item-lp.exit { animation: tickerExitLp 0.4s ease-in forwards; }
-        @keyframes tickerPopLp { 0% { opacity: 0; transform: translateY(15px); } 100% { opacity: 1; transform: translateY(0); } }
-        @keyframes tickerExitLp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-15px); } }
+        @keyframes tickerPopLp { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes tickerExitLp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-20px); } }
         
     </style>
 </head>
@@ -479,33 +479,35 @@
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
                                     
-                                    <div class="guest-lp-card p-5 relative overflow-hidden group flex flex-col justify-center">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 lg:gap-4 mb-6">
+                                    
+                                    <div class="guest-lp-card p-4 lg:p-5 relative overflow-hidden group flex flex-col justify-center">
                                         <div class="relative z-10">
-                                            <p class="text-[#38bdf8] font-bold text-[10px] uppercase tracking-widest mb-1.5">Terlaris Saat Ini</p>
-                                            <h3 id="guest-best-seller" class="text-2xl font-black text-white leading-none">Memuat...</h3>
-                                            <p class="text-slate-500 text-[10px] mt-1.5 font-medium line-clamp-1">Kategori brand paling diburu.</p>
+                                            <p class="text-[#38bdf8] font-bold text-[9px] lg:text-[10px] uppercase tracking-widest mb-1.5 truncate">Terlaris Saat Ini</p>
+                                            <h3 id="guest-best-seller" class="text-xl lg:text-2xl font-black text-white leading-none truncate">Memuat...</h3>
+                                            <p class="text-slate-500 text-[9px] lg:text-[10px] mt-1.5 font-medium truncate">Kategori paling diburu.</p>
                                         </div>
-                                        <span class="absolute -right-3 -bottom-5 text-6xl opacity-5 group-hover:opacity-10 transition-opacity">🔥</span>
+                                        <span class="absolute -right-3 -bottom-5 text-5xl lg:text-6xl opacity-5 group-hover:opacity-10 transition-opacity">🔥</span>
                                     </div>
 
-                                    <div class="guest-lp-card p-5 relative overflow-hidden group flex flex-col justify-center">
+                                    <div class="guest-lp-card p-4 lg:p-5 relative overflow-hidden group flex flex-col justify-center">
                                         <div class="relative z-10">
-                                            <p class="text-[#a78bfa] font-bold text-[10px] uppercase tracking-widest mb-1.5">Terjual Bulan Ini</p>
+                                            <p class="text-[#a78bfa] font-bold text-[9px] lg:text-[10px] uppercase tracking-widest mb-1.5 truncate">Terjual Bln Ini</p>
                                             <div class="flex items-baseline gap-1">
-                                                <h3 id="guest-sales-month" class="text-2xl font-black text-white leading-none">0</h3>
-                                                <span class="text-slate-400 text-xs font-medium">Unit</span>
+                                                <h3 id="guest-sales-month" class="text-xl lg:text-2xl font-black text-white leading-none truncate">0</h3>
+                                                <span class="text-slate-400 text-[10px] lg:text-xs font-medium">Unit</span>
                                             </div>
-                                            <p id="guest-sales-trend" class="text-slate-500 text-[10px] mt-1.5 font-medium line-clamp-1">Kalkulasi performa...</p>
+                                            <p id="guest-sales-trend" class="text-slate-500 text-[9px] lg:text-[10px] mt-1.5 font-medium truncate">Kalkulasi performa...</p>
                                         </div>
-                                        <span class="absolute -right-3 -bottom-5 text-6xl opacity-5 group-hover:opacity-10 transition-opacity">📈</span>
+                                        <span class="absolute -right-3 -bottom-5 text-5xl lg:text-6xl opacity-5 group-hover:opacity-10 transition-opacity">📈</span>
                                     </div>
 
-                                    <div class="guest-lp-card p-5 relative overflow-hidden group flex flex-col justify-center md:col-span-2 xl:col-span-1">
+                                    <div class="guest-lp-card p-4 lg:p-5 relative overflow-hidden group flex flex-col justify-center md:col-span-2 xl:col-span-1">
                                         <div class="relative z-10">
-                                            <p class="text-[#34d399] font-bold text-[10px] uppercase tracking-widest mb-1">Baru Saja Terjual</p>
+                                            <p class="text-[#34d399] font-bold text-[9px] lg:text-[10px] uppercase tracking-widest mb-1 truncate">Baru Saja Terjual</p>
                                             <div id="recent-sold-list" class="ticker-container-lp w-full"></div>
                                         </div>
-                                        <span class="absolute -right-3 -bottom-5 text-6xl opacity-5 group-hover:opacity-10 transition-opacity">✨</span>
+                                        <span class="absolute -right-3 -bottom-5 text-5xl lg:text-6xl opacity-5 group-hover:opacity-10 transition-opacity">✨</span>
                                     </div>
                                 </div>
 
