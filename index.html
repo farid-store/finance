@@ -559,7 +559,7 @@
                         <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Data Real-time Sistem</p>
                     </div>
                     <button onclick="openArchiveModal()" class="bg-slate-800 text-white px-3 py-2.5 rounded-xl text-[10px] font-bold hover:bg-slate-900 transition flex items-center gap-2 shadow-lg">
-    <span>📦</span> Pindah Data Bln Lalu
+                        <span>📦</span> Pindah Data Bln Lalu
                     </button>
                 </div>
             
@@ -582,13 +582,6 @@
                     </div>
                 </div>
 
-                <div class="card p-5 mb-6">
-                    <h3 class="font-bold text-slate-700 text-xs uppercase mb-4 tracking-widest">Dominasi Brand Terjual</h3>
-                    <div class="h-64">
-                        <canvas id="brandChart"></canvas>
-                    </div>
-                </div>
-            
                 <div class="card p-5 mb-6 border-t-4 border-yellow-400 shadow-md">
                     <h3 class="font-black text-slate-800 text-xs uppercase mb-4 flex items-center gap-2">🤝 Simulasi Bagi Hasil (Profit Bersih)</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -614,6 +607,13 @@
                                 <div class="flex justify-between items-center"><span class="text-slate-600">🤲 Zakat (3%)</span><span id="bhZakatThn" class="text-emerald-600 bg-emerald-50 px-2 py-1 rounded">Rp 0</span></div>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <div class="card p-5 mb-6">
+                    <h3 class="font-bold text-slate-700 text-xs uppercase mb-4 tracking-widest">Dominasi Brand Terjual</h3>
+                    <div class="h-64">
+                        <canvas id="brandChart"></canvas>
                     </div>
                 </div>
             
@@ -1649,11 +1649,14 @@ function copyToClipboard(text) {
             document.getElementById('rankBadge').innerText = r;
         }
         
+// ===============================================
         // --- ANALYTICS VISUALIZATION ---
-function renderAnalytics() {
+        // ===============================================
+        function renderAnalytics() {
             // Array untuk menampung data 12 bulan di Chart
             const profitPerMonth = new Array(12).fill(0);
             const unitPerMonth = new Array(12).fill(0);
+            const brands = {}; // Objek untuk Grafik Brand
             
             let unitBulanIni = 0;
             let unitBulanLalu = 0;
@@ -1677,6 +1680,10 @@ function renderAnalytics() {
                     unitAllTime++; 
                     const profit = i.price - i.modal;
                     profitTotalAll += profit; 
+
+                    // Hitung Dominasi Brand
+                    const brandName = getBrandCategory(i.name);
+                    brands[brandName] = (brands[brandName] || 0) + 1;
 
                     if (i.soldAt) {
                         const d = parseDateString(i.soldAt);
@@ -1704,6 +1711,10 @@ function renderAnalytics() {
             extraProfits.forEach(p => {
                 unitAllTime++;
                 profitTotalAll += p.profit;
+
+                // Hitung Dominasi Brand dari Extra Profit
+                const brandNameEx = getBrandCategory(p.name);
+                brands[brandNameEx] = (brands[brandNameEx] || 0) + 1;
 
                 // Ekstrak waktu dari ID (karena ID digenerate dari Date.now())
                 const d = new Date(Math.floor(p.id));
@@ -1740,6 +1751,24 @@ function renderAnalytics() {
 
             // --- Update Grafik Chart.js ---
             const monthLabels = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
+
+            // Grafik Brand (Pie/Doughnut)
+            const ctxBrand = document.getElementById('brandChart');
+            if (ctxBrand) {
+                if (window.brandChartInstance) window.brandChartInstance.destroy();
+                window.brandChartInstance = new Chart(ctxBrand, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(brands),
+                        datasets: [{
+                            data: Object.values(brands),
+                            backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#3b82f6', '#1e293b'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { size: 10 } } } } }
+                });
+            }
 
             // Grafik Profit Bersih
             const ctxProfit = document.getElementById('profitYearChart');
@@ -1865,7 +1894,6 @@ function renderAnalytics() {
                 alert(`✅ ${count} data berhasil dipindahkan ke histori secara massal!`);
             }
         }
-        
 
         function getBrandCategory(itemName) {
             const lower = itemName.toLowerCase();
@@ -1881,6 +1909,82 @@ function renderAnalytics() {
             if (lower.includes('asus') || lower.includes('rog')) return 'ASUS';
             if (lower.includes('google') || lower.includes('pixel')) return 'GOOGLE';
             return itemName.split(' ')[0].replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+        }
+
+        function exportReport() {
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+
+            let pengeluaranBulanIni = 0; 
+            let pemasukanBulanIni = 0;   
+            let profitBulanIni = 0;      
+
+            let listTerjual = '';
+            let terjualCount = 0;
+
+            items.forEach(i => {
+                // Kalkulasi Pengeluaran Khusus Bulan Ini (Belanja stok baru)
+                const entryDate = parseDateString(i.entryDate);
+                if (entryDate.getMonth() === currentMonth && entryDate.getFullYear() === currentYear) {
+                    if (i.type === 'new') { 
+                        pengeluaranBulanIni += i.modal;
+                    }
+                }
+
+                // Kalkulasi Pemasukan & Profit Khusus Bulan Ini
+                if (i.status === 'sold' && i.soldAt) {
+                    const soldDate = parseDateString(i.soldAt);
+                    if (soldDate.getMonth() === currentMonth && soldDate.getFullYear() === currentYear) {
+                        pemasukanBulanIni += i.price;
+                        const profitItem = i.price - i.modal;
+                        profitBulanIni += profitItem;
+                        
+                        terjualCount++;
+                        listTerjual += `▪ ${i.name} (+Rp ${profitItem.toLocaleString('id-ID')})\n`;
+                    }
+                }
+            });
+
+            const cash = document.getElementById('summaryCash').innerText;
+            const stokVal = document.getElementById('previewModalStock').innerText;
+            const totalAsset = document.getElementById('summaryTotal').innerText;
+
+            // ==========================================
+            // FORMATTING WHATSAPP TEXT
+            // ==========================================
+            let report = `📋 *LAPORAN KEUANGAN FARID STORE*\n`;
+            report += `🗓️ *Periode:* ${currentMonthString}\n`;
+            report += `═════════════════════════\n\n`;
+
+            report += `💼 *POSISI ASET KESELURUHAN*\n`;
+            report += `-------------------------\n`;
+            report += `💵 Saldo Tunai : ${cash}\n`;
+            report += `📦 Nilai Stok  : ${stokVal}\n`;
+            report += `📊 *Total Aset : ${totalAsset}*\n`;
+            report += `═════════════════════════\n\n`;
+
+            report += `🔄 *ARUS KAS KHUSUS BULAN INI*\n`;
+            report += `-------------------------\n`;
+            report += `📉 Pengeluaran Belanja : Rp ${pengeluaranBulanIni.toLocaleString('id-ID')}\n`;
+            report += `📈 Pemasukan Penjualan : Rp ${pemasukanBulanIni.toLocaleString('id-ID')}\n`;
+            report += `✨ *Profit Bulan Ini    : Rp ${profitBulanIni.toLocaleString('id-ID')}*\n`;
+            report += `═════════════════════════\n\n`;
+
+            report += `✅ *RINCIAN TERJUAL BULAN INI*\n`;
+            report += `-------------------------\n`;
+            if (terjualCount > 0) {
+                report += listTerjual;
+                report += `-------------------------\n`;
+                report += `*Total Terjual: ${terjualCount} Unit*\n`;
+            } else {
+                report += `(Belum ada data penjualan)\n`;
+            }
+            report += `═════════════════════════\n\n`;
+
+            report += `_System Auto-Generated by Digital Ledger_`;
+
+            navigator.clipboard.writeText(report).then(() => alert("Format Laporan Bulan Ini berhasil disalin ke clipboard! Siap di-paste ke WhatsApp."));
         }
 
         function setMonthlyTarget() {
