@@ -256,6 +256,7 @@
                             <div onclick="switchPage('hp')" class="sidebar-item text-xs pl-12">Handphone Check</div>
                             <div onclick="switchPage('dial')" class="sidebar-item text-xs pl-12">Dial Check (Kode)</div>
                             <div onclick="switchPage('laptop')" class="sidebar-item text-xs pl-12">Laptop Check</div>
+<div onclick="switchPage('repair')" class="sidebar-item text-xs pl-12 text-red-400 font-bold hover:text-red-300">🔓 FRP & Repair</div>
                         </div>
                     </div>
                     <div>
@@ -922,6 +923,166 @@ function copyToClipboard(text) {
                     </div>
                 </div>
             </div>
+
+            <div id="page-repair" class="max-w-4xl w-full mx-auto hidden flex-1 lg:overflow-y-auto pt-8 px-4 md:px-8 pb-20">
+                <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase flex items-center gap-1 hover:underline">
+                    <span>←</span> Kembali Dashboard
+                </button>
+                
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h1 class="text-2xl font-black italic text-slate-800">🔓 FRP & REPAIR</h1>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mt-1">Bypass & Direct Shortcut Tools</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <div class="card p-5 border-t-4 border-red-500">
+                        <h3 class="font-black text-xs text-red-600 uppercase mb-4 tracking-widest flex items-center gap-2"><span>⚡</span> Universal Android Intent</h3>
+                        <p class="text-[9px] text-slate-400 mb-3 font-bold leading-relaxed">Klik tombol di bawah dari browser HP target untuk mem-bypass masuk ke sistem.</p>
+                        
+                        <div class="space-y-2">
+                            <a href="intent://com.google.android.gms/#Intent;scheme=promote_smartlock_scheme;end" class="flex items-center justify-between p-3 bg-red-50 hover:bg-red-100 rounded-xl border border-red-100 transition group">
+                                <span class="text-xs font-bold text-red-900">Set Lock Screen (Smartlock)</span>
+                                <span class="text-[9px] bg-red-200 text-red-700 px-2 py-1 rounded font-black tracking-widest">OPEN</span>
+                            </a>
+                            <a href="intent://com.android.settings/#Intent;scheme=android-app;end" class="flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 transition group">
+                                <span class="text-xs font-bold text-slate-700">Open Settings Menu</span>
+                                <span class="text-[9px] bg-slate-200 text-slate-500 px-2 py-1 rounded font-black tracking-widest">OPEN</span>
+                            </a>
+                            <a href="intent://com.google.android.googlequicksearchbox/#Intent;scheme=android-app;end" class="flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 transition group">
+                                <span class="text-xs font-bold text-slate-700">Google Search App</span>
+                                <span class="text-[9px] bg-slate-200 text-slate-500 px-2 py-1 rounded font-black tracking-widest">OPEN</span>
+                            </a>
+                            <a href="intent://com.sec.android.app.myfiles/#Intent;scheme=android-app;end" class="flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 transition group">
+                                <span class="text-xs font-bold text-slate-700">My Files / File Manager</span>
+                                <span class="text-[9px] bg-slate-200 text-slate-500 px-2 py-1 rounded font-black tracking-widest">OPEN</span>
+                            </a>
+                            <a href="intent://com.google.android.youtube/#Intent;scheme=android-app;end" class="flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 transition group">
+                                <span class="text-xs font-bold text-slate-700">YouTube App</span>
+                                <span class="text-[9px] bg-slate-200 text-slate-500 px-2 py-1 rounded font-black tracking-widest">OPEN</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card p-5 border-t-4 border-blue-600">
+                        <h3 class="font-black text-xs text-blue-700 uppercase mb-4 tracking-widest flex items-center gap-2"><span>📱</span> Samsung Special Tasks</h3>
+                        <p class="text-[9px] text-slate-400 mb-3 font-bold leading-relaxed">Direct intent khusus untuk device Samsung.</p>
+                        
+                        <div class="space-y-2">
+                            <a href="https://s.id/1WDFh" target="_blank" class="flex items-center justify-between p-3 bg-blue-50 hover:bg-blue-100 rounded-xl border border-blue-100 transition group">
+                                <span class="text-xs font-bold text-blue-900">Galaxy Store</span>
+                                <span class="text-[9px] bg-blue-200 text-blue-700 px-2 py-1 rounded font-black tracking-widest">OPEN</span>
+                            </a>
+                            <a href="intent://com.android.chrome/#Intent;scheme=android-app;end" class="flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 transition group">
+                                <span class="text-xs font-bold text-slate-700">Chrome Browser</span>
+                                <span class="text-[9px] bg-slate-200 text-slate-500 px-2 py-1 rounded font-black tracking-widest">OPEN</span>
+                            </a>
+                            <a href="intent://com.android.settings/com.samsung.android.settings.biometrics.fingerprint.FingerprintEntry/#Intent;scheme=android-app;end" class="flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 transition group">
+                                <span class="text-xs font-bold text-slate-700">Fingerprint Setup</span>
+                                <span class="text-[9px] bg-slate-200 text-slate-500 px-2 py-1 rounded font-black tracking-widest">OPEN</span>
+                            </a>
+                            <a href="intent://com.sika524.android.quickshortcut/#Intent;scheme=android-app;end" class="flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 transition group">
+                                <span class="text-xs font-bold text-slate-700">QuickShortcutMaker App</span>
+                                <span class="text-[9px] bg-slate-200 text-slate-500 px-2 py-1 rounded font-black tracking-widest">OPEN</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card p-5 border-t-4 border-emerald-500 md:col-span-2">
+                        <h3 class="font-black text-xs text-emerald-600 uppercase mb-4 tracking-widest flex items-center gap-2"><span>📦</span> Bypass by Android Version</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-100">
+                                <h4 class="text-xs font-black text-emerald-800 mb-3 border-b border-emerald-200 pb-2">Android 8.X</h4>
+                                <div class="space-y-2">
+                                    <a href="https://s.id/1DASf" target="_blank" class="block text-[10px] font-bold text-emerald-700 hover:text-emerald-500 truncate">📥 GAM 8 APK</a>
+                                    <a href="https://s.id/1DASo" target="_blank" class="block text-[10px] font-bold text-emerald-700 hover:text-emerald-500 truncate">📥 Bypass FRP 8</a>
+                                    <a href="https://s.id/1WDFT" target="_blank" class="block text-[10px] font-bold text-emerald-700 hover:text-emerald-500 truncate">📥 Hush SMS</a>
+                                    <a href="//youtube.com/magelangflasher" target="_blank" class="block text-[10px] font-bold text-red-500 hover:text-red-400 mt-2">▶️ Tutorial Video</a>
+                                </div>
+                            </div>
+                            <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-100">
+                                <h4 class="text-xs font-black text-emerald-800 mb-3 border-b border-emerald-200 pb-2">Android 7.X</h4>
+                                <div class="space-y-2">
+                                    <a href="https://s.id/1DASx" target="_blank" class="block text-[10px] font-bold text-emerald-700 hover:text-emerald-500 truncate">📥 Remote APK</a>
+                                    <a href="https://s.id/1DASD" target="_blank" class="block text-[10px] font-bold text-emerald-700 hover:text-emerald-500 truncate">📥 GAM 7</a>
+                                    <a href="https://s.id/1DASM" target="_blank" class="block text-[10px] font-bold text-emerald-700 hover:text-emerald-500 truncate">📥 FRP Android 7</a>
+                                    <a href="https://s.id/1WDFB" target="_blank" class="block text-[10px] font-bold text-red-500 hover:text-red-400 mt-2">▶️ Tutorial Video</a>
+                                </div>
+                            </div>
+                            <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-100">
+                                <h4 class="text-xs font-black text-emerald-800 mb-3 border-b border-emerald-200 pb-2">Android 6.X</h4>
+                                <div class="space-y-2">
+                                    <a href="https://s.id/1DASP" target="_blank" class="block text-[10px] font-bold text-emerald-700 hover:text-emerald-500 truncate">📥 GAM 6 APK</a>
+                                    <a href="https://s.id/1DASS" target="_blank" class="block text-[10px] font-bold text-emerald-700 hover:text-emerald-500 truncate">📥 QuickShortcutMaker</a>
+                                </div>
+                            </div>
+                            <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-100">
+                                <h4 class="text-xs font-black text-emerald-800 mb-3 border-b border-emerald-200 pb-2">Android 5.X</h4>
+                                <div class="space-y-2">
+                                    <a href="https://s.id/1DASY" target="_blank" class="block text-[10px] font-bold text-emerald-700 hover:text-emerald-500 truncate">📥 GAM 5 APK</a>
+                                    <a href="https://s.id/1DAT1" target="_blank" class="block text-[10px] font-bold text-emerald-700 hover:text-emerald-500 truncate">📥 QuickShortcutMaker</a>
+                                    <a href="https://s.id/1DAT4" target="_blank" class="block text-[10px] font-bold text-emerald-700 hover:text-emerald-500 truncate">📥 Quick Touch APK</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card p-5 border-t-4 border-purple-500 md:col-span-2">
+                        <h3 class="font-black text-xs text-purple-600 uppercase mb-4 tracking-widest flex items-center gap-2"><span>🛠️</span> Universal Bypass Tools & Launchers</h3>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <a href="https://s.id/1DATK" target="_blank" class="bg-slate-50 p-3 rounded-xl border border-slate-200 hover:border-purple-300 transition text-center">
+                                <span class="text-xl block mb-1">📦</span>
+                                <span class="text-[10px] font-bold text-slate-700">Vnrom Bypass (L1)</span>
+                            </a>
+                            <a href="https://s.id/1DATN" target="_blank" class="bg-slate-50 p-3 rounded-xl border border-slate-200 hover:border-purple-300 transition text-center">
+                                <span class="text-xl block mb-1">📦</span>
+                                <span class="text-[10px] font-bold text-slate-700">Vnrom Bypass (L2)</span>
+                            </a>
+                            <a href="https://s.id/1DATQ" target="_blank" class="bg-slate-50 p-3 rounded-xl border border-slate-200 hover:border-purple-300 transition text-center">
+                                <span class="text-xl block mb-1">🔍</span>
+                                <span class="text-[10px] font-bold text-slate-700">QuickShortcutMaker</span>
+                            </a>
+                            <a href="https://s.id/1DAU5" target="_blank" class="bg-slate-50 p-3 rounded-xl border border-slate-200 hover:border-purple-300 transition text-center">
+                                <span class="text-xl block mb-1">🛠️</span>
+                                <span class="text-[10px] font-bold text-slate-700">FRP Bypass Tool</span>
+                            </a>
+                            <a href="https://s.id/1DATW" target="_blank" class="bg-slate-50 p-3 rounded-xl border border-slate-200 hover:border-purple-300 transition text-center">
+                                <span class="text-xl block mb-1">⚙️</span>
+                                <span class="text-[10px] font-bold text-slate-700">Setting Shortcut</span>
+                            </a>
+                            <a href="https://www.mediafire.com/file/58fhjuajnyjlqdg/factorytest.apk/file" target="_blank" class="bg-slate-50 p-3 rounded-xl border border-slate-200 hover:border-purple-300 transition text-center">
+                                <span class="text-xl block mb-1">🏭</span>
+                                <span class="text-[10px] font-bold text-slate-700">Factory Test</span>
+                            </a>
+                            <a href="https://s.id/1Et2H" target="_blank" class="bg-slate-50 p-3 rounded-xl border border-slate-200 hover:border-purple-300 transition text-center">
+                                <span class="text-xl block mb-1">📡</span>
+                                <span class="text-[10px] font-bold text-slate-700">Remote GSM Edge</span>
+                            </a>
+                            <a href="https://github.com/addrom/bypass/raw/master/Package_Disabler_Pro.apk" target="_blank" class="bg-slate-50 p-3 rounded-xl border border-slate-200 hover:border-purple-300 transition text-center">
+                                <span class="text-xl block mb-1">🛡️</span>
+                                <span class="text-[10px] font-bold text-slate-700">Package Disabler</span>
+                            </a>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4 pt-4 border-t border-slate-100">
+                            <a href="https://s.id/1DAUb" target="_blank" class="flex items-center gap-2 bg-purple-50 p-2 rounded-lg border border-purple-100 hover:bg-purple-100 transition">
+                                <span class="text-lg">🚀</span> <span class="text-[10px] font-bold text-purple-800">Nova Launcher</span>
+                            </a>
+                            <a href="https://s.id/1DAUh" target="_blank" class="flex items-center gap-2 bg-purple-50 p-2 rounded-lg border border-purple-100 hover:bg-purple-100 transition">
+                                <span class="text-lg">🚀</span> <span class="text-[10px] font-bold text-purple-800">Apex Launcher</span>
+                            </a>
+                            <a href="https://bit.ly/3voEjyc" target="_blank" class="flex items-center gap-2 bg-purple-50 p-2 rounded-lg border border-purple-100 hover:bg-purple-100 transition">
+                                <span class="text-lg">💬</span> <span class="text-[10px] font-bold text-purple-800">Hush SMS</span>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
             
         </div> </div> <div id="importModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="display: none;">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="toggleImportModal()"></div>
@@ -1250,7 +1411,7 @@ function copyToClipboard(text) {
         }
 
         function switchPage(page) {
-            const pages = ['page-main', 'page-hp', 'page-laptop', 'page-dial', 'page-analytics'];
+            const pages = ['page-main', 'page-hp', 'page-laptop', 'page-dial', 'page-analytics', 'page-repair'];
             pages.forEach(p => { 
                 const el = document.getElementById(p); 
                 if(el) el.classList.add('hidden'); 
