@@ -1922,12 +1922,13 @@ function copyToClipboard(text) {
                 function slideTicker() {
                     const item = latest5[tIndex];
                     const el = document.createElement('div');
-                    el.className = 'ticker-item-lp flex items-center gap-3 bg-white/5 border border-white/10 px-3 py-2 rounded-lg';
+                    // Padding diperkecil (py-1.5) agar isi lebih padat dan tidak menabrak batas bawah
+                    el.className = 'ticker-item-lp flex items-center gap-2.5 bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg';
                     el.innerHTML = `
-                        <div class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-xs">✓</div>
-                        <div class="flex flex-col min-w-0">
-                            <span class="text-xs font-bold text-white truncate">${item.name}</span>
-                            <span class="text-[9px] text-slate-400 font-medium truncate">${item.date}</span>
+                        <div class="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-[10px]">✓</div>
+                        <div class="flex flex-col min-w-0 justify-center">
+                            <span class="text-[11px] lg:text-xs font-bold text-white truncate leading-tight">${item.name}</span>
+                            <span class="text-[8px] lg:text-[9px] text-slate-400 font-medium truncate leading-tight">${item.date}</span>
                         </div>
                     `;
                     const oldEl = recentContainer.querySelector('.ticker-item-lp:not(.exit)');
