@@ -959,11 +959,16 @@
                         <h1 class="text-2xl font-black italic text-slate-800">📋 PRICELIST TARIKAN</h1>
                         <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mt-1">Standar Harga Tampung & Tukar Tambah</p>
                     </div>
-                    <div class="flex gap-2 w-full md:w-auto">
+                    <div class="flex gap-2 w-full md:w-auto items-center">
                         <div class="relative flex-1 md:w-64">
                             <input type="text" id="searchPricelist" onkeyup="renderPricelist()" placeholder="Cari tipe HP..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:border-indigo-500 outline-none shadow-sm">
                             <span class="absolute left-3 top-2.5 opacity-40">🔍</span>
                         </div>
+                        
+                        <button onclick="handlePartnerDoubleTap(event)" class="guest-only-view p-2.5 bg-white border border-slate-200 rounded-xl text-slate-300 hover:text-amber-500 transition shadow-sm shrink-0" title="Ketuk 2x untuk Akses Partner">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                        </button>
+                        
                         <button onclick="openAddPricelistModal()" class="admin-only-view bg-indigo-600 text-white px-4 py-2.5 rounded-xl text-[11px] font-bold hover:bg-indigo-700 transition shadow-lg whitespace-nowrap">
                             + Tambah Data
                         </button>
@@ -1498,6 +1503,21 @@ function copyToClipboard(text) {
         </div>
     </div>
 
+    <div id="partnerAuthModal" class="fixed inset-0 z-[105] flex items-center justify-center p-4" style="display: none;">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closePartnerAuthModal()"></div>
+        <div class="relative bg-white w-full max-w-xs rounded-3xl p-6 text-center shadow-2xl">
+            <div class="w-14 h-14 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-amber-200">
+                <span class="text-2xl">💎</span>
+            </div>
+            <h3 class="text-lg font-black text-slate-800 uppercase mb-1">Akses Partner</h3>
+            <p class="text-[10px] font-bold text-slate-500 mb-4">Masukkan PIN rahasia untuk melihat komisi.</p>
+            
+            <input type="password" inputmode="numeric" id="partnerPinInput" class="w-full text-center text-2xl font-black tracking-[10px] py-3 border-b-2 border-slate-200 focus:border-amber-500 outline-none bg-transparent transition text-amber-600 mb-6" placeholder="••••••" maxlength="6" oninput="checkAutoPartnerPin(this)">
+            
+            <button onclick="closePartnerAuthModal()" class="text-xs text-slate-400 font-bold hover:text-slate-600 uppercase tracking-widest">Batal</button>
+        </div>
+    </div>
+
     <div id="pricelistModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="display: none;">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closePricelistModal()"></div>
         <div class="relative bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl">
@@ -1548,6 +1568,9 @@ function copyToClipboard(text) {
         let currentFilter = 'stok';
         let currentMonthString = '';
         let currentSort = 'date_desc'; // Default Sort
+
+        let isPartnerMode = false;
+let lastTapTime = 0; // Untuk deteksi double-tap
         
         // ACCESS CONTROL STATE
         let currentUserMode = 'client_view'; 
@@ -1630,16 +1653,25 @@ function copyToClipboard(text) {
 
         function updateUIForMode() {
             const adminContent = document.querySelectorAll('.admin-only-view');
+            const guestContent = document.querySelectorAll('.guest-only-view'); // Tambahan
             const clientBanner = document.getElementById('clientBanner');
             
             if (currentUserMode === 'client_view') {
                 adminContent.forEach(el => el.classList.add('hidden'));
-                clientBanner.classList.remove('hidden');
+                guestContent.forEach(el => el.classList.remove('hidden')); // Tampilkan mata
+                if(clientBanner) clientBanner.classList.remove('hidden');
             } else {
                 adminContent.forEach(el => el.classList.remove('hidden'));
-                clientBanner.classList.add('hidden');
+                guestContent.forEach(el => el.classList.add('hidden')); // Sembunyikan mata
+                if(clientBanner) clientBanner.classList.add('hidden');
+                isPartnerMode = false; // Reset partner mode jika ganti ke admin
             }
             renderRows(); 
+            // Render ulang pricelist jika terbuka
+            const plPage = document.getElementById('page-pricelist');
+            if (plPage && !plPage.classList.contains('hidden')) {
+                renderPricelist();
+            }
         }
 
         let priceList = []; // VARIABEL BARU
@@ -3009,9 +3041,54 @@ function exportReport() {
         };
 
         // ===============================================
-        // 📋 SISTEM PRICELIST TARIKAN
+        // 📋 SISTEM PRICELIST TARIKAN & PARTNER HIDDEN FEATURE
         // ===============================================
         
+        let isPartnerMode = false;
+        let lastTapTime = 0;
+
+        function handlePartnerDoubleTap(e) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTapTime;
+            
+            if (tapLength < 500 && tapLength > 0) { // Deteksi ketuk 2x (jeda max 0.5 dtk)
+                openPartnerAuthModal();
+                e.preventDefault();
+            }
+            lastTapTime = currentTime;
+        }
+
+        function openPartnerAuthModal() {
+            if(isPartnerMode) {
+                // Jika sudah aktif, ketuk 2x lagi untuk MENUTUP
+                isPartnerMode = false;
+                alert("🔒 Mode Partner ditutup.");
+                renderPricelist();
+                return;
+            }
+            document.getElementById('partnerPinInput').value = '';
+            document.getElementById('partnerAuthModal').style.display = 'flex';
+            setTimeout(() => document.getElementById('partnerPinInput').focus(), 100);
+        }
+
+        function closePartnerAuthModal() {
+            document.getElementById('partnerAuthModal').style.display = 'none';
+        }
+
+        function checkAutoPartnerPin(el) {
+            if (el.value.length === 6) {
+                if (el.value === '112233') { // PIN Partner
+                    isPartnerMode = true;
+                    closePartnerAuthModal();
+                    alert("💎 Akses Terbuka! Anda sekarang dapat melihat Komisi Partner.");
+                    renderPricelist(); // Render ulang agar UI komisi muncul
+                } else {
+                    alert("⚠️ PIN Salah!");
+                    el.value = '';
+                }
+            }
+        }
+
         function renderPricelist() {
             const container = document.getElementById('pricelistContainer');
             const search = document.getElementById('searchPricelist').value.toLowerCase();
@@ -3049,19 +3126,33 @@ function exportReport() {
                 listHTML += `<div class="bg-white border border-slate-200 rounded-b-xl overflow-hidden shadow-sm divide-y divide-slate-100">`;
 
                 items.forEach(item => {
-                    // Jika Guest (Client View), sembunyikan Modal dan Komisi!
-                    const adminStats = isAdmin ? `
-                        <div class="flex gap-4 mb-2 border-b border-slate-50 pb-2">
-                            <div class="flex-1">
-                                <p class="text-[9px] font-bold text-indigo-400 uppercase">Harga Tampung</p>
-                                <p class="text-xs font-black text-indigo-700">Rp ${item.modal.toLocaleString('id-ID')}</p>
+                    let adminStats = '';
+                    
+                    if (isAdmin) {
+                        // Tampilan Admin Asli: Lihat Modal & Komisi
+                        adminStats = `
+                            <div class="flex gap-4 mb-2 border-b border-slate-50 pb-2">
+                                <div class="flex-1">
+                                    <p class="text-[9px] font-bold text-indigo-400 uppercase">Harga Tampung</p>
+                                    <p class="text-xs font-black text-indigo-700">Rp ${item.modal.toLocaleString('id-ID')}</p>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-[9px] font-bold text-amber-500 uppercase">Komisi / Profit</p>
+                                    <p class="text-xs font-black text-amber-600">Rp ${item.komisi.toLocaleString('id-ID')}</p>
+                                </div>
                             </div>
-                            <div class="flex-1">
-                                <p class="text-[9px] font-bold text-amber-500 uppercase">Komisi / Profit</p>
-                                <p class="text-xs font-black text-amber-600">Rp ${item.komisi.toLocaleString('id-ID')}</p>
+                        `;
+                    } else if (isPartnerMode) {
+                        // Tampilan Khusus Partner (Setelah PIN): Hanya lihat Komisi
+                        adminStats = `
+                            <div class="flex mb-2 border-b border-slate-50 pb-2">
+                                <div class="flex-1 bg-amber-50 p-2 rounded-lg border border-amber-100 flex items-center justify-between">
+                                    <p class="text-[10px] font-bold text-amber-600 uppercase flex items-center gap-2"><span>💎</span> Estimasi Komisi Anda</p>
+                                    <p class="text-sm font-black text-amber-700">+ Rp ${item.komisi.toLocaleString('id-ID')}</p>
+                                </div>
                             </div>
-                        </div>
-                    ` : '';
+                        `;
+                    }
 
                     const adminActions = isAdmin ? `
                         <div class="flex gap-2 ml-4">
@@ -3072,7 +3163,7 @@ function exportReport() {
 
                     listHTML += `
                         <div class="p-4 hover:bg-slate-50 transition flex justify-between items-center group">
-                            <div class="flex-1">
+                            <div class="flex-1 w-full">
                                 <h4 class="font-bold text-slate-800 text-sm mb-2">${item.name}</h4>
                                 ${adminStats}
                                 <div>
@@ -3091,7 +3182,7 @@ function exportReport() {
             }
         }
 
-        // --- Logika Modal Pricelist ---
+        // --- Logika Modal Pricelist (Tambah & Edit) ---
         function autoCalcPricelist() {
             const modal = Number(document.getElementById('plModal').value) || 0;
             const komisi = Number(document.getElementById('plKomisi').value) || 0;
@@ -3154,6 +3245,51 @@ function exportReport() {
                 priceList = priceList.filter(p => p.id !== id);
                 calculateAll();
                 renderPricelist();
+            }
+        }
+
+        // ===============================================
+        // 💎 SISTEM PARTNER HIDDEN FEATURE
+        // ===============================================
+        function handlePartnerDoubleTap(e) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTapTime;
+            
+            if (tapLength < 500 && tapLength > 0) { // Deteksi ketuk 2x (jeda max 0.5 dtk)
+                openPartnerAuthModal();
+                e.preventDefault();
+            }
+            lastTapTime = currentTime;
+        }
+
+        function openPartnerAuthModal() {
+            if(isPartnerMode) {
+                // Jika sudah aktif, ketuk 2x lagi untuk MENUTUP (fitur toggle)
+                isPartnerMode = false;
+                alert("🔒 Mode Partner ditutup.");
+                renderPricelist();
+                return;
+            }
+            document.getElementById('partnerPinInput').value = '';
+            document.getElementById('partnerAuthModal').style.display = 'flex';
+            setTimeout(() => document.getElementById('partnerPinInput').focus(), 100);
+        }
+
+        function closePartnerAuthModal() {
+            document.getElementById('partnerAuthModal').style.display = 'none';
+        }
+
+        function checkAutoPartnerPin(el) {
+            if (el.value.length === 6) {
+                if (el.value === '112233') { // PIN Partner
+                    isPartnerMode = true;
+                    closePartnerAuthModal();
+                    alert("💎 Akses Terbuka! Anda sekarang dapat melihat Komisi Partner.");
+                    renderPricelist(); // Render ulang agar UI komisi muncul
+                } else {
+                    alert("⚠️ PIN Salah!");
+                    el.value = '';
+                }
             }
         }
 
