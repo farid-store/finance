@@ -357,6 +357,7 @@
                             <div onclick="switchPage('hp')" class="sidebar-item text-xs pl-12">Handphone Check</div>
                             <div onclick="switchPage('dial')" class="sidebar-item text-xs pl-12">Dial Check (Kode)</div>
                             <div onclick="switchPage('laptop')" class="sidebar-item text-xs pl-12">Laptop Check</div>
+                            <div onclick="switchPage('pricelist')" class="sidebar-item text-xs pl-12 text-emerald-400 font-bold hover:text-emerald-300">📋 Pricelist Tarikan</div>
 <div onclick="switchPage('repair')" class="sidebar-item text-xs pl-12 text-red-400 font-bold hover:text-red-300">🔓 FRP & Repair</div>
                         </div>
                     </div>
@@ -948,6 +949,36 @@
 
             </div>
 
+            <div id="page-pricelist" class="max-w-5xl w-full mx-auto hidden flex-1 lg:overflow-y-auto pt-8 px-4 md:px-8 pb-20">
+                <button onclick="switchPage('main')" class="mb-4 text-indigo-600 font-bold text-xs uppercase flex items-center gap-1 hover:underline">
+                    <span>←</span> Kembali Dashboard
+                </button>
+                
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
+                    <div>
+                        <h1 class="text-2xl font-black italic text-slate-800">📋 PRICELIST TARIKAN</h1>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mt-1">Standar Harga Tampung & Tukar Tambah</p>
+                    </div>
+                    <div class="flex gap-2 w-full md:w-auto">
+                        <div class="relative flex-1 md:w-64">
+                            <input type="text" id="searchPricelist" onkeyup="renderPricelist()" placeholder="Cari tipe HP..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:border-indigo-500 outline-none shadow-sm">
+                            <span class="absolute left-3 top-2.5 opacity-40">🔍</span>
+                        </div>
+                        <button onclick="openAddPricelistModal()" class="admin-only-view bg-indigo-600 text-white px-4 py-2.5 rounded-xl text-[11px] font-bold hover:bg-indigo-700 transition shadow-lg whitespace-nowrap">
+                            + Tambah Data
+                        </button>
+                    </div>
+                </div>
+
+                <div id="guestPricelistNotice" class="hidden mb-6 bg-amber-50 border-l-4 border-amber-500 p-4 rounded-xl">
+                    <p class="text-amber-800 text-xs font-bold flex items-center gap-2"><span>⚠️</span> ESTIMASI HARGA PENAWARAN TOKO</p>
+                    <p class="text-[10px] text-amber-700 mt-1">Harga di bawah adalah estimasi harga terima (kami beli) untuk kondisi unit <b>Normal, Mulus, dan Fullset</b>. Harga dapat berubah setelah dilakukan pengecekan fisik dan fungsi oleh teknisi kami.</p>
+                </div>
+
+                <div id="pricelistContainer" class="space-y-6">
+                    </div>
+            </div>
+
             <div id="page-dial" class="max-w-3xl w-full mx-auto hidden flex-1 lg:overflow-y-auto pt-8 px-4 md:px-8 pb-12">
     <div class="flex items-center justify-between mb-6">
         <div>
@@ -1467,6 +1498,40 @@ function copyToClipboard(text) {
         </div>
     </div>
 
+    <div id="pricelistModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="display: none;">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closePricelistModal()"></div>
+        <div class="relative bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl">
+            <h3 id="pricelistModalTitle" class="text-lg font-black text-slate-800 uppercase italic mb-4">📋 Tambah Pricelist</h3>
+            <div class="space-y-3">
+                <div>
+                    <label class="text-[10px] font-bold text-slate-500 uppercase">Kategori Brand</label>
+                    <input type="text" id="plCategory" class="input-field text-sm font-bold" placeholder="Contoh: XIAOMI / REDMI">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-500 uppercase">Tipe / Nama HP</label>
+                    <input type="text" id="plName" class="input-field text-sm font-bold" placeholder="Contoh: Redmi Note 12 Pro">
+                </div>
+                <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100">
+                    <label class="text-[10px] font-bold text-indigo-800 uppercase">Harga Tampung (Modal Farid)</label>
+                    <input type="number" id="plModal" class="input-field text-sm mt-1 border-indigo-200 text-indigo-700 font-black" placeholder="Rp..." oninput="autoCalcPricelist()">
+                </div>
+                <div class="bg-amber-50 p-3 rounded-xl border border-amber-100">
+                    <label class="text-[10px] font-bold text-amber-800 uppercase">Komisi Partner / Sales</label>
+                    <input type="number" id="plKomisi" class="input-field text-sm mt-1 border-amber-200 text-amber-700 font-black" placeholder="Rp..." oninput="autoCalcPricelist()">
+                </div>
+                <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-100">
+                    <label class="text-[10px] font-bold text-emerald-800 uppercase">Harga Penawaran (Wajib ke User)</label>
+                    <input type="number" id="plOffer" class="input-field text-sm mt-1 border-emerald-200 text-emerald-700 font-black" placeholder="Otomatis terisi..." readonly>
+                    <p class="text-[8px] text-emerald-600 mt-1 italic">*Dihitung otomatis: Modal - Komisi</p>
+                </div>
+                <div class="flex gap-2 mt-4 pt-2 border-t border-slate-100">
+                    <button onclick="closePricelistModal()" class="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold text-xs uppercase">Batal</button>
+                    <button onclick="savePricelistItem()" class="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-bold text-xs uppercase shadow-lg">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ===============================================
         // ☁️ KONFIGURASI CLOUD & SECURITY
@@ -1500,6 +1565,8 @@ function copyToClipboard(text) {
         // EDIT & COST VARIABLES
         let currentEditId = null;
         let currentCostId = null;
+
+        let priceList = []; // VARIABEL BARU
         
         const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
@@ -1574,6 +1641,35 @@ function copyToClipboard(text) {
             }
             renderRows(); 
         }
+
+        // Data awal sesuai yang Anda berikan
+        const defaultPricelist = [
+            { id: 1, category: "📱 ANDROID UNIVERSAL (PATOKAN RAM)", name: "Android RAM 2GB", modal: 200000, komisi: 50000, offer: 150000 },
+            { id: 2, category: "📱 ANDROID UNIVERSAL (PATOKAN RAM)", name: "Android RAM 3GB", modal: 300000, komisi: 50000, offer: 250000 },
+            { id: 3, category: "📱 ANDROID UNIVERSAL (PATOKAN RAM)", name: "Android RAM 4GB", modal: 400000, komisi: 50000, offer: 350000 },
+            { id: 4, category: "🚀 XIAOMI / REDMI / POCO", name: "Redmi Note 10 biasa", modal: 500000, komisi: 50000, offer: 450000 },
+            { id: 5, category: "🚀 XIAOMI / REDMI / POCO", name: "Redmi Note 10 Pro", modal: 650000, komisi: 50000, offer: 600000 },
+            { id: 6, category: "🚀 XIAOMI / REDMI / POCO", name: "Redmi Note 11 biasa", modal: 750000, komisi: 50000, offer: 700000 },
+            { id: 7, category: "🚀 XIAOMI / REDMI / POCO", name: "Redmi Note 11 Pro", modal: 950000, komisi: 50000, offer: 900000 },
+            { id: 8, category: "🚀 XIAOMI / REDMI / POCO", name: "Redmi Note 12 biasa", modal: 1000000, komisi: 100000, offer: 900000 },
+            { id: 9, category: "🚀 XIAOMI / REDMI / POCO", name: "Redmi Note 12 Pro 4G", modal: 1150000, komisi: 100000, offer: 1050000 },
+            { id: 10, category: "🚀 XIAOMI / REDMI / POCO", name: "Redmi Note 12 Pro 5G", modal: 1300000, komisi: 100000, offer: 1200000 },
+            { id: 11, category: "🚀 XIAOMI / REDMI / POCO", name: "Redmi Note 13 biasa", modal: 1450000, komisi: 100000, offer: 1350000 },
+            { id: 12, category: "🚀 XIAOMI / REDMI / POCO", name: "Redmi Note 13 Pro 4G", modal: 1600000, komisi: 100000, offer: 1500000 },
+            { id: 13, category: "🚀 XIAOMI / REDMI / POCO", name: "Redmi Note 13 Pro 5G", modal: 1750000, komisi: 100000, offer: 1650000 },
+            { id: 14, category: "🚀 XIAOMI / REDMI / POCO", name: "Redmi Note 13 Pro+ (12/512)", modal: 2300000, komisi: 150000, offer: 2150000 },
+            { id: 15, category: "🚀 XIAOMI / REDMI / POCO", name: "Redmi Note 14 biasa (8/128)", modal: 1850000, komisi: 100000, offer: 1750000 },
+            { id: 16, category: "🚀 XIAOMI / REDMI / POCO", name: "Redmi Note 14 biasa (8/256)", modal: 2000000, komisi: 150000, offer: 1850000 },
+            { id: 17, category: "🚀 XIAOMI / REDMI / POCO", name: "Redmi Note 14 Pro 5G (8/256)", modal: 2400000, komisi: 150000, offer: 2250000 },
+            { id: 18, category: "🚀 XIAOMI / REDMI / POCO", name: "Redmi Note 14 Pro 5G (12/512)", modal: 3000000, komisi: 150000, offer: 2850000 },
+            { id: 19, category: "🚀 XIAOMI / REDMI / POCO", name: "Poco X5", modal: 1100000, komisi: 100000, offer: 1000000 },
+            { id: 20, category: "🚀 XIAOMI / REDMI / POCO", name: "Poco M3", modal: 450000, komisi: 50000, offer: 400000 },
+            { id: 21, category: "⭐ SAMSUNG & OPPO", name: "Samsung A15", modal: 1000000, komisi: 100000, offer: 900000 },
+            { id: 22, category: "⭐ SAMSUNG & OPPO", name: "Oppo Reno 8T", modal: 1000000, komisi: 100000, offer: 900000 },
+            { id: 23, category: "⭐ SAMSUNG & OPPO", name: "Oppo A95", modal: 750000, komisi: 50000, offer: 700000 },
+            { id: 24, category: "🔥 TECNO & INFINIX", name: "Tecno Spark 20 Pro", modal: 800000, komisi: 50000, offer: 750000 },
+            { id: 25, category: "🔥 TECNO & INFINIX", name: "Infinix Hot 10S", modal: 450000, komisi: 50000, offer: 400000 }
+        ];
 
         // ===============================================
         // 👁️ PRIVACY (BLUR) MODE
@@ -1724,6 +1820,11 @@ function copyToClipboard(text) {
                 extraProfits = data.extraProfits || [];
                 targetGoal = data.targetGoal || 25000000;
                 targetName = data.targetName || "BEP Modal 25 Juta";
+                
+                // Tambahan Sinkronisasi Pricelist
+                // Cek jika pricelist ada di DB, jika kosong/belum pernah simpan, gunakan default
+                priceList = (data.priceList && data.priceList.length > 0) ? data.priceList : defaultPricelist;
+                
                 calculateAll(false);
             }
             document.getElementById('ownerNote').value = localStorage.getItem('ledger_owner_note') || "";
@@ -1757,7 +1858,7 @@ function copyToClipboard(text) {
         }
 
         function switchPage(page) {
-            const pages = ['page-main', 'page-hp', 'page-laptop', 'page-dial', 'page-analytics', 'page-repair'];
+            const pages = ['page-main', 'page-hp', 'page-laptop', 'page-dial', 'page-analytics', 'page-repair', 'page-pricelist'];
             pages.forEach(p => { 
                 const el = document.getElementById(p); 
                 if(el) el.classList.add('hidden'); 
@@ -2050,7 +2151,8 @@ function copyToClipboard(text) {
                     items, 
                     extraProfits, 
                     targetGoal, 
-                    targetName 
+                    targetName,
+                    priceList
                 }));
             }
         }
@@ -2901,6 +3003,157 @@ function exportReport() {
             // Perhatikan bahwa saat ini tidak ada data yang dimuat di window.onload.
             // Pemuatan data dipindah secara otomatis ke momen di mana Guest/Owner dipilih di menu akses awal.
         };
+
+        // ===============================================
+        // 📋 SISTEM PRICELIST TARIKAN
+        // ===============================================
+        
+        function renderPricelist() {
+            const container = document.getElementById('pricelistContainer');
+            const search = document.getElementById('searchPricelist').value.toLowerCase();
+            const isAdmin = currentUserMode === 'owner' || currentUserMode === 'client_demo';
+            
+            // Atur UI Note untuk Guest
+            if(isAdmin) {
+                document.getElementById('guestPricelistNotice').classList.add('hidden');
+            } else {
+                document.getElementById('guestPricelistNotice').classList.remove('hidden');
+            }
+
+            container.innerHTML = '';
+
+            // Filter pencarian
+            const filteredData = priceList.filter(p => p.name.toLowerCase().includes(search) || p.category.toLowerCase().includes(search));
+
+            // Grouping berdasarkan kategori
+            const grouped = filteredData.reduce((acc, item) => {
+                if (!acc[item.category]) acc[item.category] = [];
+                acc[item.category].push(item);
+                return acc;
+            }, {});
+
+            if (Object.keys(grouped).length === 0) {
+                container.innerHTML = `<div class="text-center py-10 text-slate-400 font-bold text-xs uppercase italic">Data Kosong / Tidak Ditemukan</div>`;
+                return;
+            }
+
+            for (const [category, items] of Object.entries(grouped)) {
+                const catBlock = document.createElement('div');
+                catBlock.className = "mb-6";
+                
+                let listHTML = `<h3 class="font-black text-sm text-slate-800 uppercase bg-slate-100 px-4 py-2 rounded-t-xl border-b border-slate-200">${category}</h3>`;
+                listHTML += `<div class="bg-white border border-slate-200 rounded-b-xl overflow-hidden shadow-sm divide-y divide-slate-100">`;
+
+                items.forEach(item => {
+                    // Jika Guest (Client View), sembunyikan Modal dan Komisi!
+                    const adminStats = isAdmin ? `
+                        <div class="flex gap-4 mb-2 border-b border-slate-50 pb-2">
+                            <div class="flex-1">
+                                <p class="text-[9px] font-bold text-indigo-400 uppercase">Harga Tampung</p>
+                                <p class="text-xs font-black text-indigo-700">Rp ${item.modal.toLocaleString('id-ID')}</p>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-[9px] font-bold text-amber-500 uppercase">Komisi / Profit</p>
+                                <p class="text-xs font-black text-amber-600">Rp ${item.komisi.toLocaleString('id-ID')}</p>
+                            </div>
+                        </div>
+                    ` : '';
+
+                    const adminActions = isAdmin ? `
+                        <div class="flex gap-2 ml-4">
+                            <button onclick="openEditPricelistModal(${item.id})" class="p-1.5 bg-yellow-50 text-yellow-600 rounded hover:bg-yellow-100 transition"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg></button>
+                            <button onclick="deletePricelistItem(${item.id})" class="p-1.5 bg-red-50 text-red-500 rounded hover:bg-red-100 transition"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                        </div>
+                    ` : '';
+
+                    listHTML += `
+                        <div class="p-4 hover:bg-slate-50 transition flex justify-between items-center group">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-slate-800 text-sm mb-2">${item.name}</h4>
+                                ${adminStats}
+                                <div>
+                                    <p class="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Penawaran ke User</p>
+                                    <p class="text-sm font-black text-emerald-600">Rp ${item.offer.toLocaleString('id-ID')}</p>
+                                </div>
+                            </div>
+                            ${adminActions}
+                        </div>
+                    `;
+                });
+
+                listHTML += `</div>`;
+                catBlock.innerHTML = listHTML;
+                container.appendChild(catBlock);
+            }
+        }
+
+        // --- Logika Modal Pricelist ---
+        function autoCalcPricelist() {
+            const modal = Number(document.getElementById('plModal').value) || 0;
+            const komisi = Number(document.getElementById('plKomisi').value) || 0;
+            document.getElementById('plOffer').value = modal - komisi;
+        }
+
+        function openAddPricelistModal() {
+            currentEditPricelistId = null;
+            document.getElementById('pricelistModalTitle').innerText = "📋 Tambah Pricelist";
+            document.getElementById('plCategory').value = '';
+            document.getElementById('plName').value = '';
+            document.getElementById('plModal').value = '';
+            document.getElementById('plKomisi').value = '';
+            document.getElementById('plOffer').value = '';
+            document.getElementById('pricelistModal').style.display = 'flex';
+        }
+
+        function openEditPricelistModal(id) {
+            const item = priceList.find(p => p.id === id);
+            if(!item) return;
+            currentEditPricelistId = id;
+            document.getElementById('pricelistModalTitle').innerText = "✏️ Edit Pricelist";
+            document.getElementById('plCategory').value = item.category;
+            document.getElementById('plName').value = item.name;
+            document.getElementById('plModal').value = item.modal;
+            document.getElementById('plKomisi').value = item.komisi;
+            document.getElementById('plOffer').value = item.offer;
+            document.getElementById('pricelistModal').style.display = 'flex';
+        }
+
+        function closePricelistModal() {
+            document.getElementById('pricelistModal').style.display = 'none';
+        }
+
+        function savePricelistItem() {
+            const category = document.getElementById('plCategory').value.trim() || "LAIN-LAIN";
+            const name = document.getElementById('plName').value.trim();
+            const modal = Number(document.getElementById('plModal').value) || 0;
+            const komisi = Number(document.getElementById('plKomisi').value) || 0;
+            const offer = modal - komisi;
+
+            if(!name || modal <= 0) return alert("Nama HP dan Harga Modal wajib diisi!");
+
+            if(currentEditPricelistId) {
+                const idx = priceList.findIndex(p => p.id === currentEditPricelistId);
+                if(idx > -1) {
+                    priceList[idx] = { ...priceList[idx], category, name, modal, komisi, offer };
+                }
+            } else {
+                priceList.push({ id: Date.now(), category, name, modal, komisi, offer });
+            }
+
+            calculateAll(); // Simpan ke database
+            renderPricelist(); // Render ulang UI
+            closePricelistModal();
+        }
+
+        function deletePricelistItem(id) {
+            if(confirm("Hapus data pricelist ini?")) {
+                priceList = priceList.filter(p => p.id !== id);
+                calculateAll();
+                renderPricelist();
+            }
+        }
+
+                
     </script>
 </body>
 </html>
