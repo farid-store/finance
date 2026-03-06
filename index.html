@@ -1567,14 +1567,11 @@ function copyToClipboard(text) {
         let extraProfits = [];
         let currentFilter = 'stok';
         let currentMonthString = '';
-        let currentSort = 'date_desc'; // Default Sort
+        let currentSort = 'date_desc'; 
 
-        let isPartnerMode = false;
-let lastTapTime = 0; // Untuk deteksi double-tap
-        
         // ACCESS CONTROL STATE
         let currentUserMode = 'client_view'; 
-        let isBlurMode = false; // BLUR STATE
+        let isBlurMode = false; 
         
         // OWNER FEATURE VARIABLES
         let targetGoal = 25000000; 
@@ -1582,102 +1579,23 @@ let lastTapTime = 0; // Untuk deteksi double-tap
         
         // ANALYTICS VARIABLES
         let brandChartInstance = null;
-        let trendChartInstance = null;
-        let quarterlyChartInstance = null;
+        let profitYearChartInstance = null;
+        let unitYearChartInstance = null;
         
         // EDIT & COST VARIABLES
         let currentEditId = null;
         let currentCostId = null;
 
-       
-        
         const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
         // ===============================================
-        // 🔐 SECURITY & AUTH LOGIC
+        // 📋 SISTEM PRICELIST TARIKAN & PARTNER HIDDEN FEATURE
         // ===============================================
-        
-        function checkAutoPin(el) {
-            if (el.value.length === 6) {
-                checkPin();
-            }
-        }
-
-        function checkPin() {
-            const input = document.getElementById('pinInput').value;
-            if (input === OWNER_PIN) {
-                currentUserMode = 'owner';
-                document.getElementById('authModal').style.display = 'none';
-                
-                const btnInd = document.getElementById('btnAccessIndicator');
-                btnInd.innerText = "OWNER MODE";
-                btnInd.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white cursor-default";
-                
-                updateUIForMode();
-                autoFetchCloud(); // Menarik data terbaru otomatis saat admin login
-            } else {
-                if(input.length === 6) {
-                    alert("PIN Salah! Akses ditolak.");
-                    document.getElementById('pinInput').value = '';
-                }
-            }
-        }
-
-        function enterClientMode() {
-            currentUserMode = 'client_view';
-            document.getElementById('authModal').style.display = 'none';
-            
-            const btnInd = document.getElementById('btnAccessIndicator');
-            btnInd.innerText = "GUEST MODE";
-            btnInd.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-slate-600 text-white cursor-default";
-
-            updateUIForMode();
-            autoFetchCloud(); // Menarik data terbaru otomatis untuk klien
-        }
-
-        function enableSandboxMode() {
-            if(confirm("Masuk Mode Demo Admin?\n\nAnda bisa edit/tambah data, tapi TIDAK AKAN DISIMPAN KE CLOUD OWNER.\nIni hanya simulasi di browser Anda.")) {
-                currentUserMode = 'client_demo';
-                document.getElementById('clientBanner').classList.add('hidden');
-                document.getElementById('sandboxBanner').classList.remove('hidden');
-                
-                const btnInd = document.getElementById('btnAccessIndicator');
-                btnInd.innerText = "SANDBOX ADMIN";
-                btnInd.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-orange-500 text-white cursor-default";
-                
-                document.getElementById('cloudStatus').innerText = "⚪ Local Sandbox Only";
-                
-                updateUIForMode();
-            }
-        }
-
-        function updateUIForMode() {
-            const adminContent = document.querySelectorAll('.admin-only-view');
-            const guestContent = document.querySelectorAll('.guest-only-view'); // Tambahan
-            const clientBanner = document.getElementById('clientBanner');
-            
-            if (currentUserMode === 'client_view') {
-                adminContent.forEach(el => el.classList.add('hidden'));
-                guestContent.forEach(el => el.classList.remove('hidden')); // Tampilkan mata
-                if(clientBanner) clientBanner.classList.remove('hidden');
-            } else {
-                adminContent.forEach(el => el.classList.remove('hidden'));
-                guestContent.forEach(el => el.classList.add('hidden')); // Sembunyikan mata
-                if(clientBanner) clientBanner.classList.add('hidden');
-                isPartnerMode = false; // Reset partner mode jika ganti ke admin
-            }
-            renderRows(); 
-            // Render ulang pricelist jika terbuka
-            const plPage = document.getElementById('page-pricelist');
-            if (plPage && !plPage.classList.contains('hidden')) {
-                renderPricelist();
-            }
-        }
-
-        let priceList = []; // VARIABEL BARU
+        let priceList = [];
         let currentEditPricelistId = null;
+        let isPartnerMode = false;
+        let lastTapTime = 0; 
 
-        // Data awal sesuai yang Anda berikan
         const defaultPricelist = [
             { id: 1, category: "📱 ANDROID UNIVERSAL (PATOKAN RAM)", name: "Android RAM 2GB", modal: 200000, komisi: 50000, offer: 150000 },
             { id: 2, category: "📱 ANDROID UNIVERSAL (PATOKAN RAM)", name: "Android RAM 3GB", modal: 300000, komisi: 50000, offer: 250000 },
@@ -1707,6 +1625,85 @@ let lastTapTime = 0; // Untuk deteksi double-tap
         ];
 
         // ===============================================
+        // 🔐 SECURITY & AUTH LOGIC
+        // ===============================================
+        function checkAutoPin(el) {
+            if (el.value.length === 6) {
+                checkPin();
+            }
+        }
+
+        function checkPin() {
+            const input = document.getElementById('pinInput').value;
+            if (input === OWNER_PIN) {
+                currentUserMode = 'owner';
+                document.getElementById('authModal').style.display = 'none';
+                
+                const btnInd = document.getElementById('btnAccessIndicator');
+                btnInd.innerText = "OWNER MODE";
+                btnInd.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-indigo-600 text-white cursor-default";
+                
+                updateUIForMode();
+                autoFetchCloud(); 
+            } else {
+                if(input.length === 6) {
+                    alert("PIN Salah! Akses ditolak.");
+                    document.getElementById('pinInput').value = '';
+                }
+            }
+        }
+
+        function enterClientMode() {
+            currentUserMode = 'client_view';
+            document.getElementById('authModal').style.display = 'none';
+            
+            const btnInd = document.getElementById('btnAccessIndicator');
+            btnInd.innerText = "GUEST MODE";
+            btnInd.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-slate-600 text-white cursor-default";
+
+            updateUIForMode();
+            autoFetchCloud(); 
+        }
+
+        function enableSandboxMode() {
+            if(confirm("Masuk Mode Demo Admin?\n\nAnda bisa edit/tambah data, tapi TIDAK AKAN DISIMPAN KE CLOUD OWNER.\nIni hanya simulasi di browser Anda.")) {
+                currentUserMode = 'client_demo';
+                document.getElementById('clientBanner').classList.add('hidden');
+                document.getElementById('sandboxBanner').classList.remove('hidden');
+                
+                const btnInd = document.getElementById('btnAccessIndicator');
+                btnInd.innerText = "SANDBOX ADMIN";
+                btnInd.className = "flex-1 py-2 rounded-lg text-[10px] font-black bg-orange-500 text-white cursor-default";
+                
+                document.getElementById('cloudStatus').innerText = "⚪ Local Sandbox Only";
+                
+                updateUIForMode();
+            }
+        }
+
+        function updateUIForMode() {
+            const adminContent = document.querySelectorAll('.admin-only-view');
+            const guestContent = document.querySelectorAll('.guest-only-view'); 
+            const clientBanner = document.getElementById('clientBanner');
+            
+            if (currentUserMode === 'client_view') {
+                adminContent.forEach(el => el.classList.add('hidden'));
+                guestContent.forEach(el => el.classList.remove('hidden')); 
+                if(clientBanner) clientBanner.classList.remove('hidden');
+            } else {
+                adminContent.forEach(el => el.classList.remove('hidden'));
+                guestContent.forEach(el => el.classList.add('hidden')); 
+                if(clientBanner) clientBanner.classList.add('hidden');
+                isPartnerMode = false; 
+            }
+            renderRows(); 
+            const plPage = document.getElementById('page-pricelist');
+            if (plPage && !plPage.classList.contains('hidden')) {
+                renderPricelist();
+            }
+        }
+
+        // ===============================================
         // 👁️ PRIVACY (BLUR) MODE
         // ===============================================
         function toggleBlur() {
@@ -1725,15 +1722,10 @@ let lastTapTime = 0; // Untuk deteksi double-tap
         }
 
         function applyBlurClass() {
-            // Static elements
             document.querySelectorAll('.sensitive-data').forEach(el => {
-                if(isBlurMode) {
-                    el.classList.add('blur-sensitive');
-                } else {
-                    el.classList.remove('blur-sensitive');
-                }
+                if(isBlurMode) el.classList.add('blur-sensitive');
+                else el.classList.remove('blur-sensitive');
             });
-            // Re-render Dynamic elements
             renderRows();
             renderExtraProfitList();
         }
@@ -1752,17 +1744,15 @@ let lastTapTime = 0; // Untuk deteksi double-tap
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-                alert("✅ Data berhasil diselamatkan! File JSON telah didownload. Simpan file ini baik-baik.");
+                alert("✅ Data berhasil diselamatkan! File JSON telah didownload.");
             } else {
-                alert("⚠️ Data LocalStorage Kosong! Pastikan Anda tidak menghapus cache browser.");
+                alert("⚠️ Data LocalStorage Kosong!");
             }
         }
 
         // ===============================================
         // ☁️ CLOUD SYNC & DATA LOAD
         // ===============================================
-        
-        // Fungsi baru untuk menarik data secara otomatis
         async function autoFetchCloud() {
             if(BIN_ID === 'GANTI_DENGAN_BIN_ID_ANDA') {
                 loadLocalData();
@@ -1770,7 +1760,7 @@ let lastTapTime = 0; // Untuk deteksi double-tap
             }
             
             document.getElementById('loadingCloud').style.display = 'flex';
-            document.getElementById('loadingText').innerText = "Menghubungkan ke Server (Sync Stok)...";
+            document.getElementById('loadingText').innerText = "Menghubungkan ke Server...";
             
             try {
                 const req = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { 
@@ -1802,20 +1792,14 @@ let lastTapTime = 0; // Untuk deteksi double-tap
             }
         }
 
-        // Ini hanya dipakai Admin untuk Manual Sync Up/Down
         async function forceSync() {
-            if (currentUserMode !== 'owner') {
-                return alert("⛔ AKSES DITOLAK: Fitur Cloud Sync hanya untuk Owner dengan PIN.");
-            }
+            if (currentUserMode !== 'owner') return alert("⛔ AKSES DITOLAK: Hanya untuk Owner.");
+            if(BIN_ID === 'GANTI_DENGAN_BIN_ID_ANDA') return alert("Harap isi BIN_ID dan API_KEY.");
             
-            if(BIN_ID === 'GANTI_DENGAN_BIN_ID_ANDA') return alert("Harap isi BIN_ID dan API_KEY di script.");
-            
-            const choice = prompt("MANUAL SYNC: \nKetik 'UP' untuk Upload Data Lokal ke Cloud.\nKetik 'DOWN' untuk Tarik Data Cloud ke Lokal.\n(Hati-hati data akan tertimpa!)");
-            
+            const choice = prompt("MANUAL SYNC: \nKetik 'UP' untuk Upload Lokal ke Cloud.\nKetik 'DOWN' untuk Tarik Cloud ke Lokal.");
             if (!choice) return;
 
             document.getElementById('loadingCloud').style.display = 'flex';
-            
             try {
                 if(choice.toUpperCase() === 'UP') {
                     await saveDataToCloud();
@@ -1837,10 +1821,8 @@ let lastTapTime = 0; // Untuk deteksi double-tap
         }
 
         async function saveDataToCloud() {
-            // Keamanan Tambahan: Client TIDAK BISA menimpa data server
             if (currentUserMode !== 'owner') return; 
-
-            const dataState = { startBalance: document.getElementById('startBalance').value, items, extraProfits, targetGoal, targetName };
+            const dataState = { startBalance: document.getElementById('startBalance').value, items, extraProfits, targetGoal, targetName, priceList };
             await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
@@ -1856,8 +1838,6 @@ let lastTapTime = 0; // Untuk deteksi double-tap
                 targetGoal = data.targetGoal || 25000000;
                 targetName = data.targetName || "BEP Modal 25 Juta";
                 
-                // Tambahan Sinkronisasi Pricelist
-                // Cek jika pricelist ada di DB, jika kosong/belum pernah simpan, gunakan default
                 priceList = (data.priceList && data.priceList.length > 0) ? data.priceList : defaultPricelist;
                 
                 calculateAll(false);
@@ -1872,22 +1852,15 @@ let lastTapTime = 0; // Untuk deteksi double-tap
             const sb = document.getElementById('sidebar');
             const ov = document.getElementById('overlay');
             sb.classList.toggle('-translate-x-full');
-            
-            if(sb.classList.contains('-translate-x-full')) {
-                ov.classList.add('hidden');
-            } else {
-                ov.classList.remove('hidden');
-            }
+            if(sb.classList.contains('-translate-x-full')) ov.classList.add('hidden');
+            else ov.classList.remove('hidden');
         }
 
-        function toggleDropdown(id) { 
-            document.getElementById(id).classList.toggle('show'); 
-        }
+        function toggleDropdown(id) { document.getElementById(id).classList.toggle('show'); }
 
         function toggleConfig(panelId, labelId, originalText) { 
             const panel = document.getElementById(panelId);
             const label = document.getElementById(labelId);
-            
             panel.classList.toggle('hidden-panel');
             label.innerText = panel.classList.contains('hidden-panel') ? originalText : "✖ Tutup";
         }
@@ -1903,83 +1876,12 @@ let lastTapTime = 0; // Untuk deteksi double-tap
             
             if(window.innerWidth < 1024) {
                  const sb = document.getElementById('sidebar');
-                 if(!sb.classList.contains('-translate-x-full')) {
-                    toggleSidebar(); 
-                 }
+                 if(!sb.classList.contains('-translate-x-full')) toggleSidebar(); 
             }
             window.scrollTo(0,0);
             
             if(page === 'analytics') renderAnalytics();
-            if(page === 'pricelist') renderPricelist(); // INI YANG MEMBUAT DATANYA MUNCUL!
-        }
-        
-        // --- CALCULATOR FUNCTIONS ---
-        let cInput = '0';
-        let cPrev = '';
-        let cOp = null;
-
-        function formatDisplay(n) {
-            if (!n || n === '-') return n;
-            const p = n.split('.');
-            p[0] = parseFloat(p[0]).toLocaleString('id-ID');
-            return p.length > 1 ? p[0] + ',' + p[1] : p[0];
-        }
-
-        function calcNum(n) {
-            if (n === '.' && cInput.includes('.')) return;
-            cInput = (cInput === '0' && n !== '.') ? n : cInput + n;
-            calcUpd();
-        }
-
-        function calcOp(op) {
-            if (cInput === '') return;
-            if (cPrev !== '') calcResult();
-            cOp = op;
-            cPrev = cInput;
-            cInput = '';
-            calcUpd();
-        }
-
-        function calcPerc() {
-            if (cInput === '0' || cInput === '') return;
-            cInput = (parseFloat(cInput) / 100).toString();
-            calcUpd();
-        }
-
-        function calcClear() {
-            cInput = '0';
-            cPrev = '';
-            cOp = null;
-            calcUpd();
-        }
-
-        function calcDel() {
-            cInput = cInput.toString().slice(0, -1) || '0';
-            calcUpd();
-        }
-
-        function calcUpd() {
-            document.getElementById('calc-curr').innerText = formatDisplay(cInput);
-            document.getElementById('calc-prev').innerText = cPrev ? formatDisplay(cPrev) + (cOp || '') : '';
-        }
-
-        function calcResult() {
-            let r;
-            const p = parseFloat(cPrev);
-            const c = parseFloat(cInput);
-            if (isNaN(p) || isNaN(c)) return;
-            
-            switch (cOp) {
-                case '+': r = p + c; break;
-                case '-': r = p - c; break;
-                case '*': r = p * c; break;
-                case '/': r = p / c; break;
-                default: return;
-            }
-            cInput = parseFloat(r.toFixed(10)).toString();
-            cOp = null;
-            cPrev = '';
-            calcUpd();
+            if(page === 'pricelist') renderPricelist(); 
         }
 
         function getNow() { 
@@ -1990,17 +1892,13 @@ let lastTapTime = 0; // Untuk deteksi double-tap
         function parseDateString(s) { 
             if(!s||s==='Imported'||s==='Bulan Lalu') return new Date();
             const p=s.split(' ');
-            
-            if (p[0].includes('-')) {
-                return new Date(p[0]);
-            }
-
+            if (p[0].includes('-')) return new Date(p[0]);
             const d=p[0].split('/');
             return new Date(d[2],d[1]-1,d[0]); 
         }
 
         // ===============================================
-        // 💰 CORE BUSINESS LOGIC
+        // 💰 CORE BUSINESS LOGIC (CALCULATE)
         // ===============================================
         function calculateAll(shouldSave = true) {
             const start = Number(document.getElementById('startBalance').value) || 0;
@@ -2016,13 +1914,12 @@ let lastTapTime = 0; // Untuk deteksi double-tap
                     floatPrice += i.price; 
                     floatModal += i.modal;
                 }
-            });
+            }); // INI ADALAH PENUTUP FOR-EACH YANG KEMARIN TERPOTONG!
             
             const extraProfitTotal = extraProfits.reduce((sum, p) => sum + p.profit, 0);
             const totalProfitReal = profit + extraProfitTotal;
             const cash = start - belanjaBaru + uangMasuk;
             
-            // DOM UPDATES
             document.getElementById('summaryCash').innerText = "Rp " + cash.toLocaleString('id-ID');
             document.getElementById('summaryFloating').innerText = "Rp " + floatPrice.toLocaleString('id-ID');
             document.getElementById('summaryTotal').innerText = "Rp " + (cash + floatPrice).toLocaleString('id-ID');
@@ -2030,7 +1927,6 @@ let lastTapTime = 0; // Untuk deteksi double-tap
             document.getElementById('previewModalStock').innerText = "Rp " + floatModal.toLocaleString('id-ID');
             document.getElementById('previewUnrealizedProfit').innerText = "Rp " + (floatPrice - floatModal).toLocaleString('id-ID');
             
-            // Re-apply blur to newly updated text dynamically
             document.querySelectorAll('.sensitive-data').forEach(el => {
                 if(isBlurMode) el.classList.add('blur-sensitive');
                 else el.classList.remove('blur-sensitive');
@@ -2041,10 +1937,7 @@ let lastTapTime = 0; // Untuk deteksi double-tap
             renderRows();
             renderExtraProfitList();
 
-
-// ==========================================
-            // LOGIKA STATISTIK UNTUK GUEST VIEW (LANDING THEME FIX)
-            // ==========================================
+            // --- GUEST VIEW TEMA LANDING PAGE ---
             const nowTime = new Date();
             const thisM = nowTime.getMonth();
             const thisY = nowTime.getFullYear();
@@ -2057,12 +1950,10 @@ let lastTapTime = 0; // Untuk deteksi double-tap
             const recentSolds = [];
             const allSoldItems = [];
 
-            // 1. Ekstrak data
             items.forEach(i => {
                 if(i.status === 'sold') {
                     const b = getBrandCategory(i.name);
                     brandsStats[b] = (brandsStats[b] || 0) + 1;
-                    
                     if(i.soldAt) {
                         const d = parseDateString(i.soldAt);
                         if(d.getMonth() === thisM && d.getFullYear() === thisY) countThisMonth++;
@@ -2080,175 +1971,79 @@ let lastTapTime = 0; // Untuk deteksi double-tap
                 allSoldItems.push({...p, brand: b, soldAt: 'Bulan Lalu'});
             });
 
-            // Set Best Seller
             const sortedBrands = Object.keys(brandsStats).sort((a,b) => brandsStats[b] - brandsStats[a]);
-            document.getElementById('guest-best-seller').innerText = sortedBrands[0] || "APPLE";
+            const elBestBrand = document.getElementById('guest-best-seller');
+            if(elBestBrand) elBestBrand.innerText = sortedBrands[0] || "APPLE";
 
-            // Set Terjual Bulan Ini
-            document.getElementById('guest-sales-month').innerText = countThisMonth;
+            const elSalesMonth = document.getElementById('guest-sales-month');
+            if(elSalesMonth) elSalesMonth.innerText = countThisMonth;
+            
             const diff = countThisMonth - countLastMonth;
             const trendEl = document.getElementById('guest-sales-trend');
-            if(diff >= 0) {
-                trendEl.innerHTML = `<span class="text-[#34d399] font-bold">↑ Naik ${diff}</span> dari bulan lalu`;
-            } else {
-                trendEl.innerHTML = `<span class="text-[#f87171] font-bold">↓ Turun ${Math.abs(diff)}</span> dari bln lalu`;
+            if(trendEl) {
+                if(diff >= 0) trendEl.innerHTML = `<span class="text-[#34d399] font-bold">↑ Naik ${diff}</span> dari bulan lalu`;
+                else trendEl.innerHTML = `<span class="text-[#f87171] font-bold">↓ Turun ${Math.abs(diff)}</span> dari bln lalu`;
             }
 
-            // --- JAVASCRIPT UNTUK ANIMASI SLIDER CAROUSEL ---
             if(window.insightRotator) clearInterval(window.insightRotator);
-            
             let currentSlide = 1;
             function rotateInsights() {
                 const s1 = document.getElementById('slide-1');
                 const s2 = document.getElementById('slide-2');
                 const s3 = document.getElementById('slide-3');
-                
                 if(!s1 || !s2 || !s3) return;
-
-                // Reset kelas
                 [s1, s2, s3].forEach(s => s.classList.remove('active', 'prev', 'next'));
-                
-                // Rotasi posisi (1->2->3 Unlimited)
-                if (currentSlide === 1) {
-                    s1.classList.add('active'); s2.classList.add('next'); s3.classList.add('prev');
-                } else if (currentSlide === 2) {
-                    s2.classList.add('active'); s3.classList.add('next'); s1.classList.add('prev');
-                } else {
-                    s3.classList.add('active'); s1.classList.add('next'); s2.classList.add('prev');
-                }
-                
+                if (currentSlide === 1) { s1.classList.add('active'); s2.classList.add('next'); s3.classList.add('prev'); }
+                else if (currentSlide === 2) { s2.classList.add('active'); s3.classList.add('next'); s1.classList.add('prev'); }
+                else { s3.classList.add('active'); s1.classList.add('next'); s2.classList.add('prev'); }
                 currentSlide = currentSlide >= 3 ? 1 : currentSlide + 1;
             }
-            
-            // Jalankan perputaran setiap 3.5 detik
             window.insightRotator = setInterval(rotateInsights, 3500);
 
-            // --- JAVASCRIPT UNTUK TEKS TICKER DI DALAM SLIDER ---
             const recentContainer = document.getElementById('recent-sold-list');
-            recentSolds.sort((a,b) => b.realDate - a.realDate);
-            const latest5 = recentSolds.slice(0, 5);
-
-            if(latest5.length > 0) {
-                if(window.guestTicker) clearInterval(window.guestTicker);
-                let tIndex = 0;
-                function slideTicker() {
-                    const item = latest5[tIndex];
-                    const el = document.createElement('div');
-                    el.className = 'ticker-item-lp flex items-center gap-2 bg-white/5 border border-white/10 px-2 py-1.5 rounded-lg';
-                    el.innerHTML = `
-                        <div class="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-[10px]">✓</div>
-                        <div class="flex flex-col min-w-0 justify-center">
-                            <span class="text-[11px] font-bold text-white truncate leading-tight">${item.name}</span>
-                            <span class="text-[8px] text-slate-400 font-medium truncate leading-tight">${item.date}</span>
-                        </div>
-                    `;
-                    const oldEl = recentContainer.querySelector('.ticker-item-lp:not(.exit)');
-                    if(oldEl) {
-                        oldEl.classList.add('exit');
-                        setTimeout(() => oldEl.remove(), 400); 
+            if(recentContainer) {
+                recentSolds.sort((a,b) => b.realDate - a.realDate);
+                const latest5 = recentSolds.slice(0, 5);
+                if(latest5.length > 0) {
+                    if(window.guestTicker) clearInterval(window.guestTicker);
+                    let tIndex = 0;
+                    function slideTicker() {
+                        const item = latest5[tIndex];
+                        const el = document.createElement('div');
+                        el.className = 'ticker-item-lp flex items-center gap-2 bg-white/5 border border-white/10 px-2 py-1.5 rounded-lg';
+                        el.innerHTML = `<div class="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-[10px]">✓</div><div class="flex flex-col min-w-0 justify-center"><span class="text-[11px] font-bold text-white truncate leading-tight">${item.name}</span><span class="text-[8px] text-slate-400 font-medium truncate leading-tight">${item.date}</span></div>`;
+                        const oldEl = recentContainer.querySelector('.ticker-item-lp:not(.exit)');
+                        if(oldEl) { oldEl.classList.add('exit'); setTimeout(() => oldEl.remove(), 400); }
+                        recentContainer.appendChild(el);
+                        tIndex = (tIndex + 1) % latest5.length;
                     }
-                    recentContainer.appendChild(el);
-                    tIndex = (tIndex + 1) % latest5.length;
+                    slideTicker();
+                    window.guestTicker = setInterval(slideTicker, 2500);
+                } else {
+                    recentContainer.innerHTML = `<span class="text-xs text-gray-500 italic flex h-full items-center">Belum ada data</span>`;
                 }
-                slideTicker();
-                window.guestTicker = setInterval(slideTicker, 2500);
-            } else {
-                recentContainer.innerHTML = `<span class="text-xs text-gray-500 italic flex h-full items-center">Belum ada data</span>`;
             }
 
-            // Render Wall of Proof (Marquee)
             const marqueeList = document.getElementById('sold-marquee-list');
-            if (allSoldItems.length > 0) {
-                // Tampilkan max 15 item terbaru agar animasi ringan
-                allSoldItems.sort((a,b) => parseDateString(b.soldAt) - parseDateString(a.soldAt));
-                const topItems = allSoldItems.slice(0, 10);
-                const displayItems = [...topItems, ...topItems]; // Duplikat untuk efek infinite
-                
-                marqueeList.innerHTML = displayItems.map(item => `
-                    <div class="sold-card-lp premium-hover-lp">
-                        <div class="stamp-sold-lp">SOLD</div>
-                        <div class="flex flex-col h-full">
-                            <span class="text-[9px] text-[#38bdf8] font-black uppercase tracking-widest mb-1.5">${item.brand}</span>
-                            <h4 class="text-white font-bold text-sm mb-3 line-clamp-1">${item.name}</h4>
-                            <div class="mt-auto flex justify-between items-center">
-                                <span class="text-[10px] text-slate-400 font-medium">${item.soldAt || 'Baru Saja'}</span>
-                                <span class="text-white/30 font-black text-xs italic">Rp ${item.price.toLocaleString('id-ID')}</span>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-            } else {
-                marqueeList.innerHTML = '';
+            if (marqueeList) {
+                if (allSoldItems.length > 0) {
+                    allSoldItems.sort((a,b) => parseDateString(b.soldAt) - parseDateString(a.soldAt));
+                    const topItems = allSoldItems.slice(0, 10);
+                    const displayItems = [...topItems, ...topItems]; 
+                    marqueeList.innerHTML = displayItems.map(item => `
+                        <div class="sold-card-lp premium-hover-lp"><div class="stamp-sold-lp">SOLD</div><div class="flex flex-col h-full"><span class="text-[9px] text-[#38bdf8] font-black uppercase tracking-widest mb-1.5">${item.brand}</span><h4 class="text-white font-bold text-sm mb-3 line-clamp-1">${item.name}</h4><div class="mt-auto flex justify-between items-center"><span class="text-[10px] text-slate-400 font-medium">${item.soldAt || 'Baru Saja'}</span><span class="text-white/30 font-black text-xs italic">Rp ${item.price.toLocaleString('id-ID')}</span></div></div></div>
+                    `).join('');
+                } else { marqueeList.innerHTML = ''; }
             }
             
             if(shouldSave) {
-                localStorage.setItem('ledger_v2_final', JSON.stringify({ 
-                    startBalance: document.getElementById('startBalance').value, 
-                    items, 
-                    extraProfits, 
-                    targetGoal, 
-                    targetName,
-                    priceList
-                }));
+                localStorage.setItem('ledger_v2_final', JSON.stringify({ startBalance: document.getElementById('startBalance').value, items, extraProfits, targetGoal, targetName, priceList }));
             }
         }
 
-        function parseText(type) {
-            const rawText = document.getElementById('bulkInput').value;
-            if (!rawText.trim()) return;
-            rawText.split('\n').forEach(line => {
-                if (line.includes(':') && line.includes('>')) {
-                    const parts = line.split(/[:>]/);
-                    const name = parts[0].trim().replace(/^-\s*/, '').replace(/\[[BL]\]\s*/, '');
-                    const modal = Number(parts[1].replace(/[^0-9]/g, ''));
-                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
-                    if (name && modal) {
-                        items.unshift({ id: Date.now() + Math.random(), name, modal, price, status: 'stok', type, entryDate: getNow(), soldAt: '' });
-                    }
-                }
-            });
-            document.getElementById('bulkInput').value = '';
-            calculateAll();
-        }
-        
-        function parseExtraProfitText() {
-            const rawText = document.getElementById('exBulkInput').value;
-            if (!rawText.trim()) return;
-            rawText.split('\n').forEach(line => {
-                if (line.includes(':') && line.includes('>')) {
-                    const parts = line.split(/[:>]/);
-                    const name = parts[0].trim();
-                    const modal = Number(parts[1].replace(/[^0-9]/g, ''));
-                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
-                    if (name && modal && price) { 
-                        extraProfits.push({ id: Date.now() + Math.random(), name, modal, price, profit: price - modal }); 
-                    }
-                }
-            });
-            document.getElementById('exBulkInput').value = '';
-            calculateAll();
-        }
-
-        function removeExtraProfit(id) { 
-            extraProfits = extraProfits.filter(p => p.id !== id); 
-            calculateAll(); 
-        }
-
-        function renderExtraProfitList() {
-            const list = document.getElementById('extraProfitList');
-            list.innerHTML = '';
-            
-            // Assign blur class state
-            const bClass = isBlurMode ? "blur-sensitive" : "";
-            
-            extraProfits.forEach(p => {
-                const div = document.createElement('div');
-                div.className = "flex justify-between items-center text-[10px] bg-white p-2 rounded-lg border border-emerald-100";
-                div.innerHTML = `<div><b class="text-slate-700">${p.name}</b><p class="text-slate-400 ${bClass}">Profit: Rp ${p.profit.toLocaleString('id-ID')}</p></div><div class="flex gap-2"><button onclick="removeExtraProfit(${p.id})" class="text-red-400 font-bold">✕</button></div>`;
-                list.appendChild(div);
-            });
-        }
-
+        // ===============================================
+        // OTHER CORE FUNCTIONS (Render Rows dll)
+        // ===============================================
         function setFilter(filter) {
             currentFilter = filter;
             document.getElementById('tabStok').className = filter === 'stok' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-indigo-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-500";
@@ -2257,13 +2052,7 @@ let lastTapTime = 0; // Untuk deteksi double-tap
             renderRows();
         }
 
-        // ===============================================
-        // 🔃 SORTING LOGIC
-        // ===============================================
-        function setSort(val) {
-            currentSort = val;
-            renderRows();
-        }
+        function setSort(val) { currentSort = val; renderRows(); }
 
         function sortItems(arr) {
             return arr.sort((a, b) => {
@@ -2276,32 +2065,26 @@ let lastTapTime = 0; // Untuk deteksi double-tap
             });
         }
 
-        // ===============================================
-        // 🔥 NEW: UPDATED RENDER ROWS (Client & Admin)
-        // ===============================================
         function renderRows() {
             const container = document.getElementById('itemRows');
-            const search = document.getElementById('searchInput').value.toLowerCase();
+            const searchInput = document.getElementById('searchInput');
+            if(!container || !searchInput) return;
+            
+            const search = searchInput.value.toLowerCase();
             const now = new Date(); 
             let display = [];
             
             if (currentFilter === 'extra') {
-                // Tampilkan data Extra Profit AND data yang sudah di-Arsip
-                const extraList = extraProfits.filter(p => p.name.toLowerCase().includes(search)).map(p => ({
-                    ...p, status: 'sold', type: 'extra', entryDate: 'Bulan Lalu', soldAt: 'Bulan Lalu'
-                }));
+                const extraList = extraProfits.filter(p => p.name.toLowerCase().includes(search)).map(p => ({ ...p, status: 'sold', type: 'extra', entryDate: 'Bulan Lalu', soldAt: 'Bulan Lalu' }));
                 const archivedList = items.filter(i => i.status === 'sold' && i.isArchived && i.name.toLowerCase().includes(search));
                 display = [...extraList, ...archivedList];
             } else if (currentFilter === 'sold') {
-                // Tampilkan HANYA data terjual yang BELUM di-Arsip (Murni Bulan Ini)
                 display = items.filter(i => i.status === 'sold' && !i.isArchived && i.name.toLowerCase().includes(search));
             } else {
                 display = items.filter(i => i.status === currentFilter && i.name.toLowerCase().includes(search));
             }
             
-            // APPLY SORTING
             display = sortItems(display);
-            
             container.innerHTML = '';
             
             if (display.length === 0) { 
@@ -2314,7 +2097,6 @@ let lastTapTime = 0; // Untuk deteksi double-tap
             display.forEach(item => {
                 const profit = item.price - item.modal;
                 const card = document.createElement('div');
-                
                 const brand = getBrandCategory(item.name);
                 let brandColor = 'bg-slate-100 text-slate-500';
                 if(brand === 'APPLE') brandColor = 'bg-slate-800 text-white';
@@ -2323,150 +2105,186 @@ let lastTapTime = 0; // Untuk deteksi double-tap
                 if(brand === 'OPPO') brandColor = 'bg-green-600 text-white';
                 if(brand === 'VIVO') brandColor = 'bg-blue-400 text-white';
                 
-                // --- MODE CLIENT VIEW ---
                 if (currentUserMode === 'client_view') {
-                    // Tampilan Khusus Client: Bersih, Harga Besar, Tanpa Modal/Tombol
                     card.className = `p-4 rounded-xl shadow-sm bg-white border-l-4 border-indigo-500 relative mb-3`;
-                    
-                    card.innerHTML = `
-                        <div class="flex justify-between items-start mb-2">
-                             <span class="text-[9px] font-black px-2 py-1 rounded ${brandColor}">${brand}</span>
-                             <span class="text-[10px] text-slate-400 font-bold">${item.entryDate.split(' ')[0]}</span>
-                        </div>
-                        <h4 class="font-black text-slate-800 text-lg leading-tight mb-2">${item.name}</h4>
-                        <div class="flex items-end justify-between border-t border-slate-100 pt-3 mt-1">
-                             <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">HARGA BEST PRICE</span>
-                             <span class="font-black text-2xl text-emerald-600">Rp ${item.price.toLocaleString('id-ID')}</span>
-                        </div>
-                    `;
-                } 
-                // --- MODE ADMIN / SANDBOX ---
-                else {
-                    let showModalPrice = true;
-                    let showActions = true;
-                    let borderClass = 'border-l-4 border-l-indigo-500';
-                    let bgClass = 'bg-white';
-                    let opacityClass = '';
-                    
+                    card.innerHTML = `<div class="flex justify-between items-start mb-2"><span class="text-[9px] font-black px-2 py-1 rounded ${brandColor}">${brand}</span><span class="text-[10px] text-slate-400 font-bold">${item.entryDate.split(' ')[0]}</span></div><h4 class="font-black text-slate-800 text-lg leading-tight mb-2">${item.name}</h4><div class="flex items-end justify-between border-t border-slate-100 pt-3 mt-1"><span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">HARGA BEST PRICE</span><span class="font-black text-2xl text-emerald-600">Rp ${item.price.toLocaleString('id-ID')}</span></div>`;
+                } else {
+                    let borderClass = 'border-l-4 border-l-indigo-500', bgClass = 'bg-white', opacityClass = '';
                     if(item.status === 'stok') {
                         const entry = parseDateString(item.entryDate);
-                        const diffTime = Math.abs(now - entry);
-                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                        
-                        if (diffDays > 30) { 
-                            borderClass = 'border-l-4 border-l-red-500'; 
-                            bgClass = 'bg-red-50';
-                        } else if (diffDays > 14) { 
-                            borderClass = 'border-l-4 border-l-amber-500'; 
-                            bgClass = 'bg-amber-50';
-                        }
+                        const diffDays = Math.ceil(Math.abs(now - entry) / (1000 * 60 * 60 * 24)); 
+                        if (diffDays > 30) { borderClass = 'border-l-4 border-l-red-500'; bgClass = 'bg-red-50'; } 
+                        else if (diffDays > 14) { borderClass = 'border-l-4 border-l-amber-500'; bgClass = 'bg-amber-50'; }
                     } else if (item.status === 'sold') { 
-                        borderClass = 'border-l-4 border-l-emerald-500';
-                        bgClass = 'bg-slate-50';
-                        opacityClass = 'opacity-75 hover:opacity-100 transition';
+                        borderClass = 'border-l-4 border-l-emerald-500'; bgClass = 'bg-slate-50'; opacityClass = 'opacity-75 hover:opacity-100 transition';
                     }
                     
-                    card.className = `p-4 rounded-xl shadow-sm border border-slate-100 ${borderClass} ${bgClass} ${opacityClass} relative group`;
-                    
+                    card.className = `p-4 rounded-xl shadow-sm border border-slate-100 ${borderClass} ${bgClass} ${opacityClass} relative group mb-3`;
                     let typeLabel = item.type === 'old' ? 'L' : (item.type === 'new' ? 'B' : 'X');
                     let typeColor = item.type === 'old' ? 'bg-orange-100 text-orange-600' : (item.type === 'new' ? 'bg-indigo-100 text-indigo-600' : 'bg-emerald-100 text-emerald-600');
 
-                    const modalDisplay = item.modal.toLocaleString();
+                    const editBtn = `<button onclick="openEditModal(${item.id})" class="p-2 rounded-lg hover:bg-yellow-100 text-slate-400 hover:text-yellow-600 transition" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button>`;
+                    const costBtn = item.status === 'stok' ? `<button onclick="openCostModal(${item.id})" class="p-2 rounded-lg hover:bg-orange-100 text-slate-400 hover:text-orange-600 transition" title="Biaya"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg></button>` : '';
+                    const soldBtn = item.status === 'stok' ? `<button onclick="toggleSold(${item.id})" class="p-2 rounded-lg hover:bg-emerald-100 text-slate-400 hover:text-emerald-600 transition" title="Laku"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg></button>` : '';
+                    const delBtn = `<button onclick="${item.type === 'extra' ? `removeExtraProfit(${item.id})` : `removeItem(${item.id})`}" class="p-2 rounded-lg hover:bg-red-100 text-slate-300 hover:text-red-500 transition" title="Hapus"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>`;
                     
-                    const editBtn = `
-                        <button onclick="openEditModal(${item.id})" class="p-2 rounded-lg hover:bg-yellow-100 text-slate-400 hover:text-yellow-600 transition" title="Edit Data">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                        </button>`;
-
-                    const costBtn = item.status === 'stok' ? `
-                        <button onclick="openCostModal(${item.id})" class="p-2 rounded-lg hover:bg-orange-100 text-slate-400 hover:text-orange-600 transition" title="Tambah Biaya">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                        </button>` : '';
-
-                    const soldBtn = item.status === 'stok' ? `
-                        <button onclick="toggleSold(${item.id})" class="p-2 rounded-lg hover:bg-emerald-100 text-slate-400 hover:text-emerald-600 transition" title="Tandai Terjual">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                        </button>` : '';
-
-                    const deleteAction = item.type === 'extra' ? `removeExtraProfit(${item.id})` : `removeItem(${item.id})`;
-                    const delBtn = `
-                        <button onclick="${deleteAction}" class="p-2 rounded-lg hover:bg-red-100 text-slate-300 hover:text-red-500 transition" title="Hapus">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                        </button>`;
-                    
-                    const actionIcons = `<div class="flex items-center gap-1 border-l border-slate-100 pl-2 ml-2">${editBtn}${costBtn}${soldBtn}${delBtn}</div>`;
-
-                    card.innerHTML = `
-                        <div class="flex justify-between items-center mb-2">
-                            <div class="flex items-center gap-2">
-                                <span class="text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full ${typeColor}">${typeLabel}</span>
-                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${item.entryDate}</span>
-                            </div>
-                            ${item.status === 'sold' ? `<span class="badge-profit text-[10px] ${bClass}">+${profit.toLocaleString()}</span>` : ''}
-                        </div>
-                        
-                        <div class="flex justify-between items-end">
-                            <div>
-                                <h4 class="font-bold text-slate-800 text-sm leading-tight mb-1">${item.name}</h4>
-                                <div class="flex flex-col text-[11px]">
-                                    <span class="text-slate-600 ${bClass}">M: ${modalDisplay}</span>
-                                    <span class="font-bold text-indigo-900 ${bClass}">J: ${item.price.toLocaleString()}</span>
-                                </div>
-                            </div>
-                            ${actionIcons}
-                        </div>
-                    `;
+                    card.innerHTML = `<div class="flex justify-between items-center mb-2"><div class="flex items-center gap-2"><span class="text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full ${typeColor}">${typeLabel}</span><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${item.entryDate}</span></div>${item.status === 'sold' ? `<span class="badge-profit text-[10px] ${bClass}">+${profit.toLocaleString()}</span>` : ''}</div><div class="flex justify-between items-end"><div><h4 class="font-bold text-slate-800 text-sm leading-tight mb-1">${item.name}</h4><div class="flex flex-col text-[11px]"><span class="text-slate-600 ${bClass}">M: ${item.modal.toLocaleString()}</span><span class="font-bold text-indigo-900 ${bClass}">J: ${item.price.toLocaleString()}</span></div></div><div class="flex items-center gap-1 border-l border-slate-100 pl-2 ml-2">${editBtn}${costBtn}${soldBtn}${delBtn}</div></div>`;
                 }
-
                 container.appendChild(card);
             });
         }
 
         // ===============================================
-        // 🔧 MODALS & ACTIONS FUNCTIONS
+        // PRICELIST & MODAL LOGIC
+        // ===============================================
+        function handlePartnerDoubleTap(e) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTapTime;
+            if (tapLength < 500 && tapLength > 0) { openPartnerAuthModal(); e.preventDefault(); }
+            lastTapTime = currentTime;
+        }
+
+        function openPartnerAuthModal() {
+            if(isPartnerMode) { isPartnerMode = false; alert("🔒 Mode Partner ditutup."); renderPricelist(); return; }
+            document.getElementById('partnerPinInput').value = '';
+            document.getElementById('partnerAuthModal').style.display = 'flex';
+            setTimeout(() => document.getElementById('partnerPinInput').focus(), 100);
+        }
+
+        function closePartnerAuthModal() { document.getElementById('partnerAuthModal').style.display = 'none'; }
+
+        function checkAutoPartnerPin(el) {
+            if (el.value.length === 6) {
+                if (el.value === '112233') {
+                    isPartnerMode = true; closePartnerAuthModal(); alert("💎 Akses Terbuka!"); renderPricelist();
+                } else { alert("⚠️ PIN Salah!"); el.value = ''; }
+            }
+        }
+
+        function renderPricelist() {
+            const container = document.getElementById('pricelistContainer');
+            const searchInput = document.getElementById('searchPricelist');
+            const notice = document.getElementById('guestPricelistNotice');
+            if (!container || !searchInput) return; 
+
+            const search = searchInput.value.toLowerCase();
+            const isAdmin = currentUserMode === 'owner' || currentUserMode === 'client_demo';
+            
+            if (notice) {
+                if(isAdmin) notice.classList.add('hidden');
+                else notice.classList.remove('hidden');
+            }
+            container.innerHTML = '';
+            if (!Array.isArray(priceList)) priceList = [];
+
+            const filteredData = priceList.filter(p => p.name.toLowerCase().includes(search) || p.category.toLowerCase().includes(search));
+            const grouped = filteredData.reduce((acc, item) => {
+                if (!acc[item.category]) acc[item.category] = [];
+                acc[item.category].push(item);
+                return acc;
+            }, {});
+
+            if (Object.keys(grouped).length === 0) {
+                container.innerHTML = `<div class="text-center py-10 text-slate-400 font-bold text-xs uppercase italic">Data Kosong</div>`;
+                return;
+            }
+
+            for (const [category, items] of Object.entries(grouped)) {
+                const catBlock = document.createElement('div');
+                catBlock.className = "mb-6";
+                let listHTML = `<h3 class="font-black text-sm text-slate-800 uppercase bg-slate-100 px-4 py-2 rounded-t-xl border-b border-slate-200">${category}</h3><div class="bg-white border border-slate-200 rounded-b-xl overflow-hidden shadow-sm divide-y divide-slate-100">`;
+
+                items.forEach(item => {
+                    let adminStats = '';
+                    if (isAdmin) {
+                        adminStats = `<div class="flex gap-4 mb-2 border-b border-slate-50 pb-2"><div class="flex-1"><p class="text-[9px] font-bold text-indigo-400 uppercase">Tampung</p><p class="text-xs font-black text-indigo-700">Rp ${item.modal.toLocaleString('id-ID')}</p></div><div class="flex-1"><p class="text-[9px] font-bold text-amber-500 uppercase">Komisi</p><p class="text-xs font-black text-amber-600">Rp ${item.komisi.toLocaleString('id-ID')}</p></div></div>`;
+                    } else if (isPartnerMode) {
+                        adminStats = `<div class="flex mb-2 border-b border-slate-50 pb-2"><div class="flex-1 bg-amber-50 p-2 rounded-lg border border-amber-100 flex items-center justify-between"><p class="text-[10px] font-bold text-amber-600 uppercase flex items-center gap-2"><span>💎</span> Estimasi Komisi</p><p class="text-sm font-black text-amber-700">+ Rp ${item.komisi.toLocaleString('id-ID')}</p></div></div>`;
+                    }
+
+                    const adminActions = isAdmin ? `<div class="flex gap-2 ml-4"><button onclick="openEditPricelistModal(${item.id})" class="p-1.5 bg-yellow-50 text-yellow-600 rounded"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg></button><button onclick="deletePricelistItem(${item.id})" class="p-1.5 bg-red-50 text-red-500 rounded"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button></div>` : '';
+
+                    listHTML += `<div class="p-4 hover:bg-slate-50 transition flex justify-between items-center group"><div class="flex-1 w-full"><h4 class="font-bold text-slate-800 text-sm mb-2">${item.name}</h4>${adminStats}<div><p class="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Penawaran ke User</p><p class="text-sm font-black text-emerald-600">Rp ${item.offer.toLocaleString('id-ID')}</p></div></div>${adminActions}</div>`;
+                });
+                listHTML += `</div>`; catBlock.innerHTML = listHTML; container.appendChild(catBlock);
+            }
+        }
+
+        function autoCalcPricelist() {
+            const modal = Number(document.getElementById('plModal').value) || 0;
+            const komisi = Number(document.getElementById('plKomisi').value) || 0;
+            document.getElementById('plOffer').value = modal - komisi;
+        }
+
+        function openAddPricelistModal() {
+            currentEditPricelistId = null;
+            document.getElementById('pricelistModalTitle').innerText = "📋 Tambah Pricelist";
+            ['plCategory','plName','plModal','plKomisi','plOffer'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('pricelistModal').style.display = 'flex';
+        }
+
+        function openEditPricelistModal(id) {
+            const item = priceList.find(p => p.id === id);
+            if(!item) return;
+            currentEditPricelistId = id;
+            document.getElementById('pricelistModalTitle').innerText = "✏️ Edit Pricelist";
+            document.getElementById('plCategory').value = item.category;
+            document.getElementById('plName').value = item.name;
+            document.getElementById('plModal').value = item.modal;
+            document.getElementById('plKomisi').value = item.komisi;
+            document.getElementById('plOffer').value = item.offer;
+            document.getElementById('pricelistModal').style.display = 'flex';
+        }
+
+        function closePricelistModal() { document.getElementById('pricelistModal').style.display = 'none'; }
+
+        function savePricelistItem() {
+            const category = document.getElementById('plCategory').value.trim() || "LAIN-LAIN";
+            const name = document.getElementById('plName').value.trim();
+            const modal = Number(document.getElementById('plModal').value) || 0;
+            const komisi = Number(document.getElementById('plKomisi').value) || 0;
+            const offer = modal - komisi;
+
+            if(!name || modal <= 0) return alert("Nama HP dan Harga Modal wajib diisi!");
+
+            if(currentEditPricelistId) {
+                const idx = priceList.findIndex(p => p.id === currentEditPricelistId);
+                if(idx > -1) priceList[idx] = { ...priceList[idx], category, name, modal, komisi, offer };
+            } else {
+                priceList.push({ id: Date.now(), category, name, modal, komisi, offer });
+            }
+            calculateAll(); renderPricelist(); closePricelistModal();
+        }
+
+        function deletePricelistItem(id) {
+            if(confirm("Hapus data pricelist ini?")) { priceList = priceList.filter(p => p.id !== id); calculateAll(); renderPricelist(); }
+        }
+
+        // ===============================================
+        // MICELLANEOUS (Archive, Report, etc)
         // ===============================================
         function openEditModal(id) { 
-            let i = items.find(x => x.id === id); 
-            if (!i) i = extraProfits.find(x => x.id === id);
+            let i = items.find(x => x.id === id) || extraProfits.find(x => x.id === id);
             if(!i) return; 
-
             currentEditId = id; 
             document.getElementById('editItemName').value = i.name; 
             document.getElementById('editItemModal').value = i.modal || 0; 
             document.getElementById('editItemPrice').value = i.price; 
-            
             try {
                 if (i.entryDate && i.entryDate.includes('/')) {
-                    const entryStr = i.entryDate.split(' ')[0]; 
-                    const parts = entryStr.split('/');
-                    if(parts.length === 3) {
-                        const isoDate = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
-                        document.getElementById('editEntryDate').value = isoDate;
-                    }
-                } else {
-                    document.getElementById('editEntryDate').value = "";
-                }
+                    const parts = i.entryDate.split(' ')[0].split('/');
+                    if(parts.length === 3) document.getElementById('editEntryDate').value = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+                } else document.getElementById('editEntryDate').value = "";
             } catch(e) { console.log(e); }
-
             document.getElementById('editModal').style.display = 'flex';
         }
-        
-        function closeEditModal() { 
-            document.getElementById('editModal').style.display = 'none';
-            currentEditId=null; 
-        }
+        function closeEditModal() { document.getElementById('editModal').style.display = 'none'; currentEditId=null; }
         
         function saveEditItem() {
             if (!currentEditId) return;
-
             let itemIndex = items.findIndex(i => i.id === currentEditId);
             let isExtra = false;
-
-            if (itemIndex === -1) {
-                itemIndex = extraProfits.findIndex(i => i.id === currentEditId);
-                isExtra = true;
-            }
-
+            if (itemIndex === -1) { itemIndex = extraProfits.findIndex(i => i.id === currentEditId); isExtra = true; }
             if (itemIndex > -1) {
                 const newName = document.getElementById('editItemName').value;
                 const newModal = Number(document.getElementById('editItemModal').value);
@@ -2474,348 +2292,73 @@ let lastTapTime = 0; // Untuk deteksi double-tap
                 const dateInput = document.getElementById('editEntryDate').value;
 
                 if (isExtra) {
-                    extraProfits[itemIndex].name = newName;
-                    extraProfits[itemIndex].modal = newModal;
-                    extraProfits[itemIndex].price = newPrice;
-                    extraProfits[itemIndex].profit = newPrice - newModal;
+                    extraProfits[itemIndex].name = newName; extraProfits[itemIndex].modal = newModal;
+                    extraProfits[itemIndex].price = newPrice; extraProfits[itemIndex].profit = newPrice - newModal;
                 } else {
-                    items[itemIndex].name = newName;
-                    items[itemIndex].modal = newModal;
-                    items[itemIndex].price = newPrice;
-                    
-                    if(dateInput) {
-                        const d = new Date(dateInput);
-                        items[itemIndex].entryDate = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} 00:00`;
-                    }
+                    items[itemIndex].name = newName; items[itemIndex].modal = newModal; items[itemIndex].price = newPrice;
+                    if(dateInput) { const d = new Date(dateInput); items[itemIndex].entryDate = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} 00:00`; }
                 }
-
-                calculateAll(); 
-                closeEditModal();
-                alert("Data berhasil diperbarui!");
+                calculateAll(); closeEditModal(); alert("Data diperbarui!");
             }
         }
         
-        function openCostModal(id) { 
-            currentCostId = id; 
-            document.getElementById('costDesc').value=''; 
-            document.getElementById('costAmount').value=''; 
-            document.getElementById('costModal').style.display = 'flex';
-        }
-        
-        function closeCostModal() { 
-            document.getElementById('costModal').style.display = 'none';
-            currentCostId = null; 
-        }
-        
+        function openCostModal(id) { currentCostId = id; document.getElementById('costDesc').value=''; document.getElementById('costAmount').value=''; document.getElementById('costModal').style.display = 'flex'; }
+        function closeCostModal() { document.getElementById('costModal').style.display = 'none'; currentCostId = null; }
         function saveCost() {
             if(!currentCostId) return;
             const amount = Number(document.getElementById('costAmount').value);
             const desc = document.getElementById('costDesc').value;
             const idx = items.findIndex(x => x.id === currentCostId);
-            if(idx > -1 && amount && desc) {
-                items[idx].modal += amount;
-                items[idx].name += ` (+${desc} ${amount/1000}k)`;
-                calculateAll(); 
-                closeCostModal();
-            }
+            if(idx > -1 && amount && desc) { items[idx].modal += amount; items[idx].name += ` (+${desc} ${amount/1000}k)`; calculateAll(); closeCostModal(); }
         }
+        function toggleSold(id) { const i = items.find(x => x.id === id); if(i){ i.status='sold'; i.soldAt=getNow(); calculateAll(); } }
+        function removeItem(id) { if(confirm('Hapus unit ini?')) { items = items.filter(x => x.id !== id); calculateAll(); } }
         
-        function toggleSold(id) { 
-            const i = items.find(x => x.id === id); 
-            if(i){ i.status='sold'; i.soldAt=getNow(); calculateAll(); }
-        }
-        
-        function removeItem(id) { 
-            if(confirm('Hapus unit ini permanen?')) { 
-                items = items.filter(x => x.id !== id); 
-                calculateAll(); 
-            }
-        }
-        
-        function updateTargetBar(profit) {
-            let p = 0;
-            if (targetGoal > 0) {
-                p = (profit / targetGoal) * 100;
-            }
-            if (p > 100) p = 100;
-            if (p < 0) p = 0;
-
-            const bar = document.getElementById('progressBar');
-            bar.style.width = p + "%";
-            
-            if(p >= 100) {
-                bar.className = "bg-emerald-500 h-3 rounded-full relative transition-all duration-1000";
-            } else {
-                bar.className = "bg-indigo-600 h-3 rounded-full relative transition-all duration-1000";
-            }
-
-            document.getElementById('targetPercentage').innerText = p.toFixed(0) + "%";
-            
-            const currentText = document.getElementById('currentProgressText');
-            if(currentText) {
-                currentText.innerText = "Tercapai: Rp " + profit.toLocaleString('id-ID');
-            }
-
-            document.getElementById('targetNameDisplay').innerText = targetName;
-            document.getElementById('targetValueDisplay').innerText = "Target: Rp " + targetGoal.toLocaleString('id-ID');
-        }
-
-        function updateRankBadge(profit) {
-            let r="Pedagang Pemula", c="bg-slate-200 text-slate-500";
-            if(profit>=50000000){r="👑 SULTAN GADGET";c="bg-yellow-100 text-yellow-600 border-yellow-300";}
-            else if(profit>=25000000){r="💎 JURAGAN PRO";c="bg-indigo-100 text-indigo-600 border-indigo-300";}
-            else if(profit>=10000000){r="🔥 STARTUP OWNER";c="bg-emerald-100 text-emerald-600";}
-            else if(profit>=5000000){r="🚀 RISING STAR";c="bg-blue-100 text-blue-600";}
-            document.getElementById('rankBadge').className = `badge-rank ${c} mb-1`;
-            document.getElementById('rankBadge').innerText = r;
-        }
-        
-// ===============================================
-        // --- ANALYTICS VISUALIZATION ---
-        // ===============================================
-        function renderAnalytics() {
-            // Array untuk menampung data 12 bulan di Chart
-            const profitPerMonth = new Array(12).fill(0);
-            const unitPerMonth = new Array(12).fill(0);
-            const brands = {}; // Objek untuk Grafik Brand
-            
-            let unitBulanIni = 0;
-            let unitBulanLalu = 0;
-            let profitBulanIni = 0;
-            let unitReady = 0;
-            
-            let profitTotalAll = 0;
-            let unitAllTime = 0;
-
-            const now = new Date();
-            const currM = now.getMonth();
-            const currY = now.getFullYear();
-            const lastM = currM === 0 ? 11 : currM - 1;
-            const lastMY = currM === 0 ? currY - 1 : currY;
-
-            // 1. PROSES DATA UTAMA (Tabel Items)
-            items.forEach(i => {
-                if (i.status === 'stok') {
-                    unitReady++;
-                } else if (i.status === 'sold') {
-                    unitAllTime++; 
-                    const profit = i.price - i.modal;
-                    profitTotalAll += profit; 
-
-                    // Hitung Dominasi Brand
-                    const brandName = getBrandCategory(i.name);
-                    brands[brandName] = (brands[brandName] || 0) + 1;
-
-                    if (i.soldAt) {
-                        const d = parseDateString(i.soldAt);
-                        const m = d.getMonth();
-                        const y = d.getFullYear();
-
-                        // Masukkan ke Grafik Setahun
-                        if (y === currY) {
-                            profitPerMonth[m] += profit;
-                            unitPerMonth[m] += 1;
-                        }
-
-                        // Deteksi Stat Bulan Ini vs Bulan Lalu
-                        if (y === currY && m === currM) {
-                            unitBulanIni++;
-                            profitBulanIni += profit;
-                        } else if (y === lastMY && m === lastM) {
-                            unitBulanLalu++;
-                        }
-                    }
+        function parseText(type) {
+            const rawText = document.getElementById('bulkInput').value;
+            if (!rawText.trim()) return;
+            rawText.split('\n').forEach(line => {
+                if (line.includes(':') && line.includes('>')) {
+                    const parts = line.split(/[:>]/);
+                    const name = parts[0].trim().replace(/^-\s*/, '').replace(/\[[BL]\]\s*/, '');
+                    const modal = Number(parts[1].replace(/[^0-9]/g, ''));
+                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
+                    if (name && modal) items.unshift({ id: Date.now() + Math.random(), name, modal, price, status: 'stok', type, entryDate: getNow(), soldAt: '' });
                 }
             });
+            document.getElementById('bulkInput').value = ''; calculateAll();
+        }
+        
+        function parseExtraProfitText() {
+            const rawText = document.getElementById('exBulkInput').value;
+            if (!rawText.trim()) return;
+            rawText.split('\n').forEach(line => {
+                if (line.includes(':') && line.includes('>')) {
+                    const parts = line.split(/[:>]/);
+                    const name = parts[0].trim();
+                    const modal = Number(parts[1].replace(/[^0-9]/g, ''));
+                    const price = Number(parts[2].replace(/[^0-9]/g, ''));
+                    if (name && modal && price) extraProfits.push({ id: Date.now() + Math.random(), name, modal, price, profit: price - modal }); 
+                }
+            });
+            document.getElementById('exBulkInput').value = ''; calculateAll();
+        }
 
-            // 2. PROSES DATA EXTRA PROFIT (Agar Masuk ke Grafik & Total)
+        function removeExtraProfit(id) { extraProfits = extraProfits.filter(p => p.id !== id); calculateAll(); }
+
+        function renderExtraProfitList() {
+            const list = document.getElementById('extraProfitList');
+            if(!list) return;
+            list.innerHTML = '';
+            const bClass = isBlurMode ? "blur-sensitive" : "";
             extraProfits.forEach(p => {
-                unitAllTime++;
-                profitTotalAll += p.profit;
-
-                // Hitung Dominasi Brand dari Extra Profit
-                const brandNameEx = getBrandCategory(p.name);
-                brands[brandNameEx] = (brands[brandNameEx] || 0) + 1;
-
-                // Ekstrak waktu dari ID (karena ID digenerate dari Date.now())
-                const d = new Date(Math.floor(p.id));
-                const m = d.getMonth();
-                const y = d.getFullYear();
-
-                // Masukkan Extra Profit ke dalam Grafik jika tahunnya sama!
-                if (y === currY) {
-                    profitPerMonth[m] += p.profit;
-                    unitPerMonth[m] += 1;
-                }
-            });
-
-            // Update UI Angka Statistik Atas
-            document.getElementById('statUnitReady').innerText = unitReady;
-            document.getElementById('statUnitBulanIni').innerText = unitBulanIni;
-            document.getElementById('statUnitBulanLalu').innerText = unitBulanLalu;
-            document.getElementById('statUnitAllTime').innerText = unitAllTime;
-
-            // --- Update UI Bagi Hasil ---
-            // 1. KHUSUS BULAN INI (Hanya profit laku di bulan berjalan)
-            document.getElementById('lblBulanIni').innerText = "Rp " + profitBulanIni.toLocaleString('id-ID');
-            document.getElementById('bhPengelolaBln').innerText = "Rp " + (profitBulanIni * 0.50).toLocaleString('id-ID');
-            document.getElementById('bhInvBln').innerText = "Rp " + (profitBulanIni * 0.40).toLocaleString('id-ID');
-            document.getElementById('bhOpsBln').innerText = "Rp " + (profitBulanIni * 0.07).toLocaleString('id-ID');
-            document.getElementById('bhZakatBln').innerText = "Rp " + (profitBulanIni * 0.03).toLocaleString('id-ID');
-
-            // 2. AKUMULASI KESELURUHAN (Termasuk Extra Profit)
-            document.getElementById('lblTotalAll').innerText = "Rp " + profitTotalAll.toLocaleString('id-ID');
-            document.getElementById('bhPengelolaThn').innerText = "Rp " + (profitTotalAll * 0.50).toLocaleString('id-ID');
-            document.getElementById('bhInvThn').innerText = "Rp " + (profitTotalAll * 0.40).toLocaleString('id-ID');
-            document.getElementById('bhOpsThn').innerText = "Rp " + (profitTotalAll * 0.07).toLocaleString('id-ID');
-            document.getElementById('bhZakatThn').innerText = "Rp " + (profitTotalAll * 0.03).toLocaleString('id-ID');
-
-            // --- Update Grafik Chart.js ---
-            const monthLabels = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
-
-            // Grafik Brand (Pie/Doughnut)
-            const ctxBrand = document.getElementById('brandChart');
-            if (ctxBrand) {
-                if (window.brandChartInstance) window.brandChartInstance.destroy();
-                window.brandChartInstance = new Chart(ctxBrand, {
-                    type: 'doughnut',
-                    data: {
-                        labels: Object.keys(brands),
-                        datasets: [{
-                            data: Object.values(brands),
-                            backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#3b82f6', '#1e293b'],
-                            borderWidth: 0
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { size: 10 } } } } }
-                });
-            }
-
-            // Grafik Profit Bersih
-            const ctxProfit = document.getElementById('profitYearChart');
-            if (window.profitYearChartInstance) window.profitYearChartInstance.destroy();
-            window.profitYearChartInstance = new Chart(ctxProfit, {
-                type: 'bar',
-                data: {
-                    labels: monthLabels,
-                    datasets: [{
-                        label: 'Profit Bersih (Rp)',
-                        data: profitPerMonth,
-                        backgroundColor: '#10b981',
-                        borderRadius: 6
-                    }]
-                },
-                options: { 
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { ticks: { callback: function(value) { return 'Rp ' + (value/1000) + 'k'; } } } }
-                }
-            });
-
-            // Grafik Total Unit
-            const ctxUnit = document.getElementById('unitYearChart');
-            if (window.unitYearChartInstance) window.unitYearChartInstance.destroy();
-            window.unitYearChartInstance = new Chart(ctxUnit, {
-                type: 'line',
-                data: {
-                    labels: monthLabels,
-                    datasets: [{
-                        label: 'Total Unit Terjual',
-                        data: unitPerMonth,
-                        borderColor: '#6366f1',
-                        backgroundColor: 'rgba(99, 102, 241, 0.15)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: '#6366f1'
-                    }]
-                },
-                options: { 
-                    responsive: true, maintainAspectRatio: false, 
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } 
-                }
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center text-[10px] bg-white p-2 rounded-lg border border-emerald-100";
+                div.innerHTML = `<div><b class="text-slate-700">${p.name}</b><p class="text-slate-400 ${bClass}">Profit: Rp ${p.profit.toLocaleString('id-ID')}</p></div><div class="flex gap-2"><button onclick="removeExtraProfit(${p.id})" class="text-red-400 font-bold">✕</button></div>`;
+                list.appendChild(div);
             });
         }
         
-        // ===============================================
-        // 📦 SISTEM ARSIP & PINDAH DATA MANUAL
-        // ===============================================
-        function openArchiveModal() {
-            renderArchiveList();
-            document.getElementById('archiveModal').style.display = 'flex';
-        }
-
-        function closeArchiveModal() {
-            document.getElementById('archiveModal').style.display = 'none';
-        }
-
-        function renderArchiveList() {
-            const container = document.getElementById('archiveListContainer');
-            container.innerHTML = '';
-            
-            // Ambil SEMUA data yang sudah Terjual (sold) tapi BELUM diarsipkan
-            const eligibleItems = items.filter(i => i.status === 'sold' && !i.isArchived);
-            
-            // Urutkan dari yang paling baru laku
-            eligibleItems.sort((a, b) => parseDateString(b.soldAt) - parseDateString(a.soldAt));
-
-            if (eligibleItems.length === 0) {
-                container.innerHTML = `<div class="text-center py-10 text-slate-400 text-xs italic font-bold uppercase">✅ Bersih!<br>Tidak ada data penjualan yang menggantung.</div>`;
-                return;
-            }
-
-            eligibleItems.forEach(i => {
-                const div = document.createElement('div');
-                div.className = "flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-200 hover:border-indigo-300 transition";
-                
-                // Format tanggal laku
-                const soldDate = i.soldAt ? i.soldAt : i.entryDate;
-                const profit = i.price - i.modal;
-                
-                div.innerHTML = `
-                    <div>
-                        <h4 class="font-bold text-slate-800 text-[13px] leading-tight">${i.name}</h4>
-                        <div class="flex items-center gap-2 mt-1 text-[10px] font-bold">
-                            <span class="text-slate-500">🗓️ Laku: <span class="text-indigo-600">${soldDate}</span></span>
-                            <span class="text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded">Profit: Rp ${profit.toLocaleString('id-ID')}</span>
-                        </div>
-                    </div>
-                    <button onclick="archiveSingleItem(${i.id})" class="px-3 py-2 bg-slate-800 text-white rounded-lg text-[10px] font-black uppercase hover:bg-indigo-600 transition shadow-sm flex-shrink-0">
-                        Pindah
-                    </button>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function archiveSingleItem(id) {
-            const item = items.find(i => i.id === id);
-            if (item) {
-                item.isArchived = true;
-                calculateAll(); // Update angka-angka keuangan (background)
-                renderArchiveList(); // Render ulang list di dalam modal agar data yang diklik hilang
-            }
-        }
-
-        function archiveAllEligibleItems() {
-            const eligibleItems = items.filter(i => i.status === 'sold' && !i.isArchived);
-            if (eligibleItems.length === 0) return;
-            
-            if (confirm(`PENTING: Anda akan memindahkan SELURUH DATA (${eligibleItems.length} unit) ini ke Histori Arsip sekaligus. Lanjutkan?`)) {
-                let count = 0;
-                items.forEach(i => {
-                    if (i.status === 'sold' && !i.isArchived) {
-                        i.isArchived = true;
-                        count++;
-                    }
-                });
-                calculateAll(); // Simpan dan kalkulasi ulang
-                closeArchiveModal();
-                alert(`✅ ${count} data berhasil dipindahkan ke histori secara massal!`);
-            }
-        }
-
         function getBrandCategory(itemName) {
             const lower = itemName.toLowerCase();
             if (lower.includes('iphone') || lower.includes('apple') || lower.includes('ipad') || lower.includes('ip ')) return 'APPLE';
@@ -2837,30 +2380,18 @@ let lastTapTime = 0; // Untuk deteksi double-tap
             const currentMonth = now.getMonth();
             const currentYear = now.getFullYear();
 
-            let pengeluaranBulanIni = 0; 
-            let pemasukanBulanIni = 0;   
-            let profitBulanIni = 0;      
-
-            let listTerjual = '';
-            let terjualCount = 0;
+            let pengeluaranBulanIni = 0, pemasukanBulanIni = 0, profitBulanIni = 0; 
+            let listTerjual = '', terjualCount = 0;
 
             items.forEach(i => {
-                // Kalkulasi Pengeluaran Khusus Bulan Ini (Belanja stok baru)
                 const entryDate = parseDateString(i.entryDate);
-                if (entryDate.getMonth() === currentMonth && entryDate.getFullYear() === currentYear) {
-                    if (i.type === 'new') { 
-                        pengeluaranBulanIni += i.modal;
-                    }
-                }
-
-                // Kalkulasi Pemasukan & Profit Khusus Bulan Ini
+                if (entryDate.getMonth() === currentMonth && entryDate.getFullYear() === currentYear && i.type === 'new') pengeluaranBulanIni += i.modal;
                 if (i.status === 'sold' && i.soldAt) {
                     const soldDate = parseDateString(i.soldAt);
                     if (soldDate.getMonth() === currentMonth && soldDate.getFullYear() === currentYear) {
                         pemasukanBulanIni += i.price;
                         const profitItem = i.price - i.modal;
                         profitBulanIni += profitItem;
-                        
                         terjualCount++;
                         listTerjual += `▪ ${i.name} (+Rp ${profitItem.toLocaleString('id-ID')})\n`;
                     }
@@ -2871,159 +2402,191 @@ let lastTapTime = 0; // Untuk deteksi double-tap
             const stokVal = document.getElementById('previewModalStock').innerText;
             const totalAsset = document.getElementById('summaryTotal').innerText;
 
-            // ==========================================
-            // FORMATTING WHATSAPP TEXT
-            // ==========================================
-            let report = `📋 *LAPORAN KEUANGAN FARID STORE*\n`;
-            report += `🗓️ *Periode:* ${currentMonthString}\n`;
-            report += `═════════════════════════\n\n`;
-
-            report += `💼 *POSISI ASET KESELURUHAN*\n`;
-            report += `-------------------------\n`;
-            report += `💵 Saldo Tunai : ${cash}\n`;
-            report += `📦 Nilai Stok  : ${stokVal}\n`;
-            report += `📊 *Total Aset : ${totalAsset}*\n`;
-            report += `═════════════════════════\n\n`;
-
-            report += `🔄 *ARUS KAS KHUSUS BULAN INI*\n`;
-            report += `-------------------------\n`;
-            report += `📉 Pengeluaran Belanja : Rp ${pengeluaranBulanIni.toLocaleString('id-ID')}\n`;
-            report += `📈 Pemasukan Penjualan : Rp ${pemasukanBulanIni.toLocaleString('id-ID')}\n`;
-            report += `✨ *Profit Bulan Ini    : Rp ${profitBulanIni.toLocaleString('id-ID')}*\n`;
-            report += `═════════════════════════\n\n`;
-
-            report += `✅ *RINCIAN TERJUAL BULAN INI*\n`;
-            report += `-------------------------\n`;
-            if (terjualCount > 0) {
-                report += listTerjual;
-                report += `-------------------------\n`;
-                report += `*Total Terjual: ${terjualCount} Unit*\n`;
-            } else {
-                report += `(Belum ada data penjualan)\n`;
-            }
-            report += `═════════════════════════\n\n`;
-
-            report += `_System Auto-Generated by Digital Ledger_`;
+            let report = `📋 *LAPORAN KEUANGAN FARID STORE*\n🗓️ *Periode:* ${currentMonthString}\n═════════════════════════\n\n`;
+            report += `💼 *POSISI ASET KESELURUHAN*\n-------------------------\n💵 Saldo Tunai : ${cash}\n📦 Nilai Stok  : ${stokVal}\n📊 *Total Aset : ${totalAsset}*\n═════════════════════════\n\n`;
+            report += `🔄 *ARUS KAS KHUSUS BULAN INI*\n-------------------------\n📉 Pengeluaran Khusus Bulan Ini : Rp ${pengeluaranBulanIni.toLocaleString('id-ID')}\n📈 Pemasukan Khusus Bulan Ini   : Rp ${pemasukanBulanIni.toLocaleString('id-ID')}\n✨ *Selisih Profit Bulan Ini    : Rp ${profitBulanIni.toLocaleString('id-ID')}*\n═════════════════════════\n\n`;
+            report += `✅ *RINCIAN TERJUAL BULAN INI*\n-------------------------\n`;
+            if (terjualCount > 0) { report += listTerjual + `-------------------------\n*Total Terjual: ${terjualCount} Unit*\n`; } else { report += `(Belum ada data penjualan)\n`; }
+            report += `═════════════════════════\n\n_System Auto-Generated by Digital Ledger_`;
 
             navigator.clipboard.writeText(report).then(() => alert("Format Laporan Bulan Ini berhasil disalin ke clipboard! Siap di-paste ke WhatsApp."));
+        }
+        
+        function updateTargetBar(profit) {
+            let p = 0;
+            if (targetGoal > 0) p = (profit / targetGoal) * 100;
+            if (p > 100) p = 100;
+            if (p < 0) p = 0;
+
+            const bar = document.getElementById('progressBar');
+            if(bar) {
+                bar.style.width = p + "%";
+                bar.className = p >= 100 ? "bg-emerald-500 h-3 rounded-full relative transition-all duration-1000" : "bg-indigo-600 h-3 rounded-full relative transition-all duration-1000";
+            }
+
+            const pct = document.getElementById('targetPercentage');
+            if(pct) pct.innerText = p.toFixed(0) + "%";
+            
+            const currentText = document.getElementById('currentProgressText');
+            if(currentText) currentText.innerText = "Tercapai: Rp " + profit.toLocaleString('id-ID');
+
+            const nameDisp = document.getElementById('targetNameDisplay');
+            if(nameDisp) nameDisp.innerText = targetName;
+            
+            const valDisp = document.getElementById('targetValueDisplay');
+            if(valDisp) valDisp.innerText = "Target: Rp " + targetGoal.toLocaleString('id-ID');
+        }
+
+        function updateRankBadge(profit) {
+            const rb = document.getElementById('rankBadge');
+            if(!rb) return;
+            let r="Pedagang Pemula", c="bg-slate-200 text-slate-500";
+            if(profit>=50000000){r="👑 SULTAN GADGET";c="bg-yellow-100 text-yellow-600 border-yellow-300";}
+            else if(profit>=25000000){r="💎 JURAGAN PRO";c="bg-indigo-100 text-indigo-600 border-indigo-300";}
+            else if(profit>=10000000){r="🔥 STARTUP OWNER";c="bg-emerald-100 text-emerald-600";}
+            else if(profit>=5000000){r="🚀 RISING STAR";c="bg-blue-100 text-blue-600";}
+            rb.className = `badge-rank ${c} mb-1`; rb.innerText = r;
         }
 
         function setMonthlyTarget() {
             if(currentUserMode!=='owner') return alert("Hanya Owner yang bisa set target.");
             const newName = prompt("Nama Target?", targetName);
             const newAmount = prompt("Nominal Target?", targetGoal);
-            if(newName && newAmount) { 
-                targetName = newName; 
-                targetGoal = Number(newAmount); 
-                calculateAll(); 
+            if(newName && newAmount) { targetName = newName; targetGoal = Number(newAmount); calculateAll(); }
+        }
+        
+        function saveNote() { localStorage.setItem('ledger_owner_note', document.getElementById('ownerNote').value); }
+        
+        function openArchiveModal() { renderArchiveList(); document.getElementById('archiveModal').style.display = 'flex'; }
+        function closeArchiveModal() { document.getElementById('archiveModal').style.display = 'none'; }
+        
+        function renderArchiveList() {
+            const container = document.getElementById('archiveListContainer');
+            if(!container) return;
+            container.innerHTML = '';
+            const eligibleItems = items.filter(i => i.status === 'sold' && !i.isArchived);
+            eligibleItems.sort((a, b) => parseDateString(b.soldAt) - parseDateString(a.soldAt));
+
+            if (eligibleItems.length === 0) {
+                container.innerHTML = `<div class="text-center py-10 text-slate-400 text-xs italic font-bold uppercase">✅ Bersih!<br>Tidak ada data penjualan yang menggantung.</div>`;
+                return;
+            }
+            eligibleItems.forEach(i => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-200 hover:border-indigo-300 transition";
+                const soldDate = i.soldAt ? i.soldAt : i.entryDate;
+                const profit = i.price - i.modal;
+                div.innerHTML = `<div><h4 class="font-bold text-slate-800 text-[13px] leading-tight">${i.name}</h4><div class="flex items-center gap-2 mt-1 text-[10px] font-bold"><span class="text-slate-500">🗓️ Laku: <span class="text-indigo-600">${soldDate}</span></span><span class="text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded">Profit: Rp ${profit.toLocaleString('id-ID')}</span></div></div><button onclick="archiveSingleItem(${i.id})" class="px-3 py-2 bg-slate-800 text-white rounded-lg text-[10px] font-black uppercase hover:bg-indigo-600 transition shadow-sm flex-shrink-0">Pindah</button>`;
+                container.appendChild(div);
+            });
+        }
+        function archiveSingleItem(id) { const item = items.find(i => i.id === id); if (item) { item.isArchived = true; calculateAll(); renderArchiveList(); } }
+        function archiveAllEligibleItems() {
+            const eligibleItems = items.filter(i => i.status === 'sold' && !i.isArchived);
+            if (eligibleItems.length === 0) return;
+            if (confirm(`Pindahkan SELURUH DATA (${eligibleItems.length} unit) ini ke Histori Arsip sekaligus?`)) {
+                let count = 0; items.forEach(i => { if (i.status === 'sold' && !i.isArchived) { i.isArchived = true; count++; } });
+                calculateAll(); closeArchiveModal(); alert(`✅ ${count} data berhasil dipindahkan ke histori secara massal!`);
             }
         }
         
-        function saveNote() { 
-            localStorage.setItem('ledger_owner_note', document.getElementById('ownerNote').value); 
-        }
-        
-function exportReport() {
-            const now = new Date();
-            const currentMonth = now.getMonth();
-            const currentYear = now.getFullYear();
-
-            let pengeluaranBulanIni = 0; 
-            let pemasukanBulanIni = 0;   
-            let profitBulanIni = 0;      
-
-            let listTerjual = '';
-            let terjualCount = 0;
+        function renderAnalytics() {
+            const profitPerMonth = new Array(12).fill(0);
+            const unitPerMonth = new Array(12).fill(0);
+            const brands = {}; 
+            
+            let unitBulanIni = 0, unitBulanLalu = 0, profitBulanIni = 0, unitReady = 0, profitTotalAll = 0, unitAllTime = 0;
+            const now = new Date(), currM = now.getMonth(), currY = now.getFullYear();
+            const lastM = currM === 0 ? 11 : currM - 1;
+            const lastMY = currM === 0 ? currY - 1 : currY;
 
             items.forEach(i => {
-                // Kalkulasi Pengeluaran Khusus Bulan Ini (Belanja stok baru)
-                const entryDate = parseDateString(i.entryDate);
-                if (entryDate.getMonth() === currentMonth && entryDate.getFullYear() === currentYear) {
-                    if (i.type === 'new') { 
-                        pengeluaranBulanIni += i.modal;
-                    }
-                }
+                if (i.status === 'stok') { unitReady++; } 
+                else if (i.status === 'sold') {
+                    unitAllTime++; 
+                    const profit = i.price - i.modal;
+                    profitTotalAll += profit; 
+                    const brandName = getBrandCategory(i.name);
+                    brands[brandName] = (brands[brandName] || 0) + 1;
 
-                // Kalkulasi Pemasukan & Profit Khusus Bulan Ini
-                if (i.status === 'sold' && i.soldAt) {
-                    const soldDate = parseDateString(i.soldAt);
-                    if (soldDate.getMonth() === currentMonth && soldDate.getFullYear() === currentYear) {
-                        pemasukanBulanIni += i.price;
-                        const profitItem = i.price - i.modal;
-                        profitBulanIni += profitItem;
-                        
-                        terjualCount++;
-                        listTerjual += `▪ ${i.name} (+Rp ${profitItem.toLocaleString('id-ID')})\n`;
+                    if (i.soldAt) {
+                        const d = parseDateString(i.soldAt);
+                        const m = d.getMonth(), y = d.getFullYear();
+                        if (y === currY) { profitPerMonth[m] += profit; unitPerMonth[m] += 1; }
+                        if (y === currY && m === currM) { unitBulanIni++; profitBulanIni += profit; } 
+                        else if (y === lastMY && m === lastM) { unitBulanLalu++; }
                     }
                 }
             });
 
-            const cash = document.getElementById('summaryCash').innerText;
-            const stokVal = document.getElementById('previewModalStock').innerText;
-            const totalAsset = document.getElementById('summaryTotal').innerText;
+            extraProfits.forEach(p => {
+                unitAllTime++; profitTotalAll += p.profit;
+                const brandNameEx = getBrandCategory(p.name);
+                brands[brandNameEx] = (brands[brandNameEx] || 0) + 1;
+                const d = new Date(Math.floor(p.id)), m = d.getMonth(), y = d.getFullYear();
+                if (y === currY) { profitPerMonth[m] += p.profit; unitPerMonth[m] += 1; }
+            });
 
-            // ==========================================
-            // FORMATTING WHATSAPP TEXT
-            // ==========================================
-            let report = `📋 *LAPORAN KEUANGAN FARID STORE*\n`;
-            report += `🗓️ *Periode:* ${currentMonthString}\n`;
-            report += `═════════════════════════\n\n`;
+            const statEls = ['statUnitReady','statUnitBulanIni','statUnitBulanLalu','statUnitAllTime','lblBulanIni','bhPengelolaBln','bhInvBln','bhOpsBln','bhZakatBln','lblTotalAll','bhPengelolaThn','bhInvThn','bhOpsThn','bhZakatThn'];
+            statEls.forEach(id => { if(!document.getElementById(id)) return; }); // Safecheck
+            
+            if(document.getElementById('statUnitReady')) {
+                document.getElementById('statUnitReady').innerText = unitReady;
+                document.getElementById('statUnitBulanIni').innerText = unitBulanIni;
+                document.getElementById('statUnitBulanLalu').innerText = unitBulanLalu;
+                document.getElementById('statUnitAllTime').innerText = unitAllTime;
 
-            report += `💼 *POSISI ASET KESELURUHAN*\n`;
-            report += `-------------------------\n`;
-            report += `💵 Saldo Tunai : ${cash}\n`;
-            report += `📦 Nilai Stok  : ${stokVal}\n`;
-            report += `📊 *Total Aset : ${totalAsset}*\n`;
-            report += `═════════════════════════\n\n`;
+                document.getElementById('lblBulanIni').innerText = "Rp " + profitBulanIni.toLocaleString('id-ID');
+                document.getElementById('bhPengelolaBln').innerText = "Rp " + (profitBulanIni * 0.50).toLocaleString('id-ID');
+                document.getElementById('bhInvBln').innerText = "Rp " + (profitBulanIni * 0.40).toLocaleString('id-ID');
+                document.getElementById('bhOpsBln').innerText = "Rp " + (profitBulanIni * 0.07).toLocaleString('id-ID');
+                document.getElementById('bhZakatBln').innerText = "Rp " + (profitBulanIni * 0.03).toLocaleString('id-ID');
 
-            report += `🔄 *ARUS KAS KHUSUS BULAN INI*\n`;
-            report += `-------------------------\n`;
-            report += `📉 Pengeluaran Khusus Bulan Ini : Rp ${pengeluaranBulanIni.toLocaleString('id-ID')}\n`;
-            report += `📈 Pemasukan Khusus Bulan Ini   : Rp ${pemasukanBulanIni.toLocaleString('id-ID')}\n`;
-            report += `✨ *Selisih Profit Bulan Ini    : Rp ${profitBulanIni.toLocaleString('id-ID')}*\n`;
-            report += `═════════════════════════\n\n`;
-
-            report += `✅ *RINCIAN TERJUAL BULAN INI*\n`;
-            report += `-------------------------\n`;
-            if (terjualCount > 0) {
-                report += listTerjual;
-                report += `-------------------------\n`;
-                report += `*Total Terjual: ${terjualCount} Unit*\n`;
-            } else {
-                report += `(Belum ada data penjualan)\n`;
+                document.getElementById('lblTotalAll').innerText = "Rp " + profitTotalAll.toLocaleString('id-ID');
+                document.getElementById('bhPengelolaThn').innerText = "Rp " + (profitTotalAll * 0.50).toLocaleString('id-ID');
+                document.getElementById('bhInvThn').innerText = "Rp " + (profitTotalAll * 0.40).toLocaleString('id-ID');
+                document.getElementById('bhOpsThn').innerText = "Rp " + (profitTotalAll * 0.07).toLocaleString('id-ID');
+                document.getElementById('bhZakatThn').innerText = "Rp " + (profitTotalAll * 0.03).toLocaleString('id-ID');
             }
-            report += `═════════════════════════\n\n`;
 
-            report += `_System Auto-Generated by Digital Ledger_`;
+            const monthLabels = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
+            if (typeof Chart !== 'undefined') {
+                const ctxBrand = document.getElementById('brandChart');
+                if (ctxBrand) {
+                    if (window.brandChartInstance) window.brandChartInstance.destroy();
+                    window.brandChartInstance = new Chart(ctxBrand, { type: 'doughnut', data: { labels: Object.keys(brands), datasets: [{ data: Object.values(brands), backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#3b82f6', '#1e293b'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { size: 10 } } } } } });
+                }
 
-            navigator.clipboard.writeText(report).then(() => alert("Format Laporan Bulan Ini berhasil disalin ke clipboard! Siap di-paste ke WhatsApp."));
+                const ctxProfit = document.getElementById('profitYearChart');
+                if(ctxProfit) {
+                    if (window.profitYearChartInstance) window.profitYearChartInstance.destroy();
+                    window.profitYearChartInstance = new Chart(ctxProfit, { type: 'bar', data: { labels: monthLabels, datasets: [{ label: 'Profit Bersih (Rp)', data: profitPerMonth, backgroundColor: '#10b981', borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: function(value) { return 'Rp ' + (value/1000) + 'k'; } } } } } });
+                }
+
+                const ctxUnit = document.getElementById('unitYearChart');
+                if(ctxUnit) {
+                    if (window.unitYearChartInstance) window.unitYearChartInstance.destroy();
+                    window.unitYearChartInstance = new Chart(ctxUnit, { type: 'line', data: { labels: monthLabels, datasets: [{ label: 'Total Unit Terjual', data: unitPerMonth, borderColor: '#6366f1', backgroundColor: 'rgba(99, 102, 241, 0.15)', borderWidth: 3, fill: true, tension: 0.4, pointBackgroundColor: '#6366f1' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } } });
+                }
+            }
         }
-        
+
         function toggleImportModal() { 
             const el = document.getElementById('importModal');
-            el.style.display = (el.style.display === 'none') ? 'flex' : 'none';
+            if(el) el.style.display = (el.style.display === 'none') ? 'flex' : 'none';
         }
         
         function processImport() {
             const text = document.getElementById('importArea').value.trim();
             if(!text) return;
-
             if (text.startsWith('{')) {
                 try {
                     const parsed = JSON.parse(text);
                     if(parsed.items || parsed.startBalance !== undefined) {
-                        applyData(parsed);
-                        localStorage.setItem('ledger_v2_final', text);
-                        alert("Data System berhasil dipulihkan!");
-                        location.reload();
-                        return;
+                        applyData(parsed); localStorage.setItem('ledger_v2_final', text); alert("Data System berhasil dipulihkan!"); location.reload(); return;
                     }
-                } catch (e) {
-                    alert("Kode backup rusak.");
-                }
-            } else {
-                alert("Gunakan format JSON untuk restore penuh.");
-            }
+                } catch (e) { alert("Kode backup rusak."); }
+            } else { alert("Gunakan format JSON untuk restore penuh."); }
         }
         
         function toggleHelpModal() { alert("Gunakan tombol 'Cloud Sync' untuk sinkronisasi data antar device."); }
@@ -3034,266 +2597,11 @@ function exportReport() {
         window.onload = () => {
             const now = new Date();
             currentMonthString = monthNames[now.getMonth()] + " " + now.getFullYear();
-            document.getElementById('currentMonth').innerText = currentMonthString;
-            
-            // Perhatikan bahwa saat ini tidak ada data yang dimuat di window.onload.
-            // Pemuatan data dipindah secara otomatis ke momen di mana Guest/Owner dipilih di menu akses awal.
+            const cmEl = document.getElementById('currentMonth');
+            if(cmEl) cmEl.innerText = currentMonthString;
         };
 
-        // ===============================================
-        // 📋 SISTEM PRICELIST TARIKAN & PARTNER HIDDEN FEATURE
-        // ===============================================
-        
-        let isPartnerMode = false;
-        let lastTapTime = 0;
-
-        function handlePartnerDoubleTap(e) {
-            const currentTime = new Date().getTime();
-            const tapLength = currentTime - lastTapTime;
-            
-            if (tapLength < 500 && tapLength > 0) { // Deteksi ketuk 2x (jeda max 0.5 dtk)
-                openPartnerAuthModal();
-                e.preventDefault();
-            }
-            lastTapTime = currentTime;
-        }
-
-        function openPartnerAuthModal() {
-            if(isPartnerMode) {
-                // Jika sudah aktif, ketuk 2x lagi untuk MENUTUP
-                isPartnerMode = false;
-                alert("🔒 Mode Partner ditutup.");
-                renderPricelist();
-                return;
-            }
-            document.getElementById('partnerPinInput').value = '';
-            document.getElementById('partnerAuthModal').style.display = 'flex';
-            setTimeout(() => document.getElementById('partnerPinInput').focus(), 100);
-        }
-
-        function closePartnerAuthModal() {
-            document.getElementById('partnerAuthModal').style.display = 'none';
-        }
-
-        function checkAutoPartnerPin(el) {
-            if (el.value.length === 6) {
-                if (el.value === '112233') { // PIN Partner
-                    isPartnerMode = true;
-                    closePartnerAuthModal();
-                    alert("💎 Akses Terbuka! Anda sekarang dapat melihat Komisi Partner.");
-                    renderPricelist(); // Render ulang agar UI komisi muncul
-                } else {
-                    alert("⚠️ PIN Salah!");
-                    el.value = '';
-                }
-            }
-        }
-
-        function renderPricelist() {
-            const container = document.getElementById('pricelistContainer');
-            const search = document.getElementById('searchPricelist').value.toLowerCase();
-            const isAdmin = currentUserMode === 'owner' || currentUserMode === 'client_demo';
-            
-            // Atur UI Note untuk Guest
-            if(isAdmin) {
-                document.getElementById('guestPricelistNotice').classList.add('hidden');
-            } else {
-                document.getElementById('guestPricelistNotice').classList.remove('hidden');
-            }
-
-            container.innerHTML = '';
-
-            // Filter pencarian
-            const filteredData = priceList.filter(p => p.name.toLowerCase().includes(search) || p.category.toLowerCase().includes(search));
-
-            // Grouping berdasarkan kategori
-            const grouped = filteredData.reduce((acc, item) => {
-                if (!acc[item.category]) acc[item.category] = [];
-                acc[item.category].push(item);
-                return acc;
-            }, {});
-
-            if (Object.keys(grouped).length === 0) {
-                container.innerHTML = `<div class="text-center py-10 text-slate-400 font-bold text-xs uppercase italic">Data Kosong / Tidak Ditemukan</div>`;
-                return;
-            }
-
-            for (const [category, items] of Object.entries(grouped)) {
-                const catBlock = document.createElement('div');
-                catBlock.className = "mb-6";
-                
-                let listHTML = `<h3 class="font-black text-sm text-slate-800 uppercase bg-slate-100 px-4 py-2 rounded-t-xl border-b border-slate-200">${category}</h3>`;
-                listHTML += `<div class="bg-white border border-slate-200 rounded-b-xl overflow-hidden shadow-sm divide-y divide-slate-100">`;
-
-                items.forEach(item => {
-                    let adminStats = '';
-                    
-                    if (isAdmin) {
-                        // Tampilan Admin Asli: Lihat Modal & Komisi
-                        adminStats = `
-                            <div class="flex gap-4 mb-2 border-b border-slate-50 pb-2">
-                                <div class="flex-1">
-                                    <p class="text-[9px] font-bold text-indigo-400 uppercase">Harga Tampung</p>
-                                    <p class="text-xs font-black text-indigo-700">Rp ${item.modal.toLocaleString('id-ID')}</p>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="text-[9px] font-bold text-amber-500 uppercase">Komisi / Profit</p>
-                                    <p class="text-xs font-black text-amber-600">Rp ${item.komisi.toLocaleString('id-ID')}</p>
-                                </div>
-                            </div>
-                        `;
-                    } else if (isPartnerMode) {
-                        // Tampilan Khusus Partner (Setelah PIN): Hanya lihat Komisi
-                        adminStats = `
-                            <div class="flex mb-2 border-b border-slate-50 pb-2">
-                                <div class="flex-1 bg-amber-50 p-2 rounded-lg border border-amber-100 flex items-center justify-between">
-                                    <p class="text-[10px] font-bold text-amber-600 uppercase flex items-center gap-2"><span>💎</span> Estimasi Komisi Anda</p>
-                                    <p class="text-sm font-black text-amber-700">+ Rp ${item.komisi.toLocaleString('id-ID')}</p>
-                                </div>
-                            </div>
-                        `;
-                    }
-
-                    const adminActions = isAdmin ? `
-                        <div class="flex gap-2 ml-4">
-                            <button onclick="openEditPricelistModal(${item.id})" class="p-1.5 bg-yellow-50 text-yellow-600 rounded hover:bg-yellow-100 transition"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg></button>
-                            <button onclick="deletePricelistItem(${item.id})" class="p-1.5 bg-red-50 text-red-500 rounded hover:bg-red-100 transition"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
-                        </div>
-                    ` : '';
-
-                    listHTML += `
-                        <div class="p-4 hover:bg-slate-50 transition flex justify-between items-center group">
-                            <div class="flex-1 w-full">
-                                <h4 class="font-bold text-slate-800 text-sm mb-2">${item.name}</h4>
-                                ${adminStats}
-                                <div>
-                                    <p class="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Penawaran ke User</p>
-                                    <p class="text-sm font-black text-emerald-600">Rp ${item.offer.toLocaleString('id-ID')}</p>
-                                </div>
-                            </div>
-                            ${adminActions}
-                        </div>
-                    `;
-                });
-
-                listHTML += `</div>`;
-                catBlock.innerHTML = listHTML;
-                container.appendChild(catBlock);
-            }
-        }
-
-        // --- Logika Modal Pricelist (Tambah & Edit) ---
-        function autoCalcPricelist() {
-            const modal = Number(document.getElementById('plModal').value) || 0;
-            const komisi = Number(document.getElementById('plKomisi').value) || 0;
-            document.getElementById('plOffer').value = modal - komisi;
-        }
-
-        function openAddPricelistModal() {
-            currentEditPricelistId = null;
-            document.getElementById('pricelistModalTitle').innerText = "📋 Tambah Pricelist";
-            document.getElementById('plCategory').value = '';
-            document.getElementById('plName').value = '';
-            document.getElementById('plModal').value = '';
-            document.getElementById('plKomisi').value = '';
-            document.getElementById('plOffer').value = '';
-            document.getElementById('pricelistModal').style.display = 'flex';
-        }
-
-        function openEditPricelistModal(id) {
-            const item = priceList.find(p => p.id === id);
-            if(!item) return;
-            currentEditPricelistId = id;
-            document.getElementById('pricelistModalTitle').innerText = "✏️ Edit Pricelist";
-            document.getElementById('plCategory').value = item.category;
-            document.getElementById('plName').value = item.name;
-            document.getElementById('plModal').value = item.modal;
-            document.getElementById('plKomisi').value = item.komisi;
-            document.getElementById('plOffer').value = item.offer;
-            document.getElementById('pricelistModal').style.display = 'flex';
-        }
-
-        function closePricelistModal() {
-            document.getElementById('pricelistModal').style.display = 'none';
-        }
-
-        function savePricelistItem() {
-            const category = document.getElementById('plCategory').value.trim() || "LAIN-LAIN";
-            const name = document.getElementById('plName').value.trim();
-            const modal = Number(document.getElementById('plModal').value) || 0;
-            const komisi = Number(document.getElementById('plKomisi').value) || 0;
-            const offer = modal - komisi;
-
-            if(!name || modal <= 0) return alert("Nama HP dan Harga Modal wajib diisi!");
-
-            if(currentEditPricelistId) {
-                const idx = priceList.findIndex(p => p.id === currentEditPricelistId);
-                if(idx > -1) {
-                    priceList[idx] = { ...priceList[idx], category, name, modal, komisi, offer };
-                }
-            } else {
-                priceList.push({ id: Date.now(), category, name, modal, komisi, offer });
-            }
-
-            calculateAll(); // Simpan ke database
-            renderPricelist(); // Render ulang UI
-            closePricelistModal();
-        }
-
-        function deletePricelistItem(id) {
-            if(confirm("Hapus data pricelist ini?")) {
-                priceList = priceList.filter(p => p.id !== id);
-                calculateAll();
-                renderPricelist();
-            }
-        }
-
-        // ===============================================
-        // 💎 SISTEM PARTNER HIDDEN FEATURE
-        // ===============================================
-        function handlePartnerDoubleTap(e) {
-            const currentTime = new Date().getTime();
-            const tapLength = currentTime - lastTapTime;
-            
-            if (tapLength < 500 && tapLength > 0) { // Deteksi ketuk 2x (jeda max 0.5 dtk)
-                openPartnerAuthModal();
-                e.preventDefault();
-            }
-            lastTapTime = currentTime;
-        }
-
-        function openPartnerAuthModal() {
-            if(isPartnerMode) {
-                // Jika sudah aktif, ketuk 2x lagi untuk MENUTUP (fitur toggle)
-                isPartnerMode = false;
-                alert("🔒 Mode Partner ditutup.");
-                renderPricelist();
-                return;
-            }
-            document.getElementById('partnerPinInput').value = '';
-            document.getElementById('partnerAuthModal').style.display = 'flex';
-            setTimeout(() => document.getElementById('partnerPinInput').focus(), 100);
-        }
-
-        function closePartnerAuthModal() {
-            document.getElementById('partnerAuthModal').style.display = 'none';
-        }
-
-        function checkAutoPartnerPin(el) {
-            if (el.value.length === 6) {
-                if (el.value === '112233') { // PIN Partner
-                    isPartnerMode = true;
-                    closePartnerAuthModal();
-                    alert("💎 Akses Terbuka! Anda sekarang dapat melihat Komisi Partner.");
-                    renderPricelist(); // Render ulang agar UI komisi muncul
-                } else {
-                    alert("⚠️ PIN Salah!");
-                    el.value = '';
-                }
-            }
-        }
-
-                
     </script>
+
 </body>
 </html>
