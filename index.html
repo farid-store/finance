@@ -2174,6 +2174,7 @@ function copyToClipboard(text) {
                 if(isAdmin) notice.classList.add('hidden');
                 else notice.classList.remove('hidden');
             }
+
             container.innerHTML = '';
             if (!Array.isArray(priceList)) priceList = [];
 
@@ -2195,16 +2196,73 @@ function copyToClipboard(text) {
                 let listHTML = `<h3 class="font-black text-sm text-slate-800 uppercase bg-slate-100 px-4 py-2 rounded-t-xl border-b border-slate-200">${category}</h3><div class="bg-white border border-slate-200 rounded-b-xl overflow-hidden shadow-sm divide-y divide-slate-100">`;
 
                 items.forEach(item => {
-                    let adminStats = '';
+                    let topStats = '';
+                    let bottomPricing = '';
+                    
                     if (isAdmin) {
-                        adminStats = `<div class="flex gap-4 mb-2 border-b border-slate-50 pb-2"><div class="flex-1"><p class="text-[9px] font-bold text-indigo-400 uppercase">Tampung</p><p class="text-xs font-black text-indigo-700">Rp ${item.modal.toLocaleString('id-ID')}</p></div><div class="flex-1"><p class="text-[9px] font-bold text-amber-500 uppercase">Komisi</p><p class="text-xs font-black text-amber-600">Rp ${item.komisi.toLocaleString('id-ID')}</p></div></div>`;
+                        // Tampilan Owner: Tampung & Komisi di Atas
+                        topStats = `
+                            <div class="flex gap-4 mb-2 border-b border-slate-50 pb-2">
+                                <div class="flex-1">
+                                    <p class="text-[9px] font-bold text-indigo-400 uppercase">Tampung</p>
+                                    <p class="text-xs font-black text-indigo-700">Rp ${item.modal.toLocaleString('id-ID')}</p>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-[9px] font-bold text-amber-500 uppercase">Komisi</p>
+                                    <p class="text-xs font-black text-amber-600">Rp ${item.komisi.toLocaleString('id-ID')}</p>
+                                </div>
+                            </div>
+                        `;
+                        bottomPricing = `
+                            <div>
+                                <p class="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Penawaran ke User</p>
+                                <p class="text-sm font-black text-emerald-600">Rp ${item.offer.toLocaleString('id-ID')}</p>
+                            </div>
+                        `;
                     } else if (isPartnerMode) {
-                        adminStats = `<div class="flex mb-2 border-b border-slate-50 pb-2"><div class="flex-1 bg-amber-50 p-2 rounded-lg border border-amber-100 flex items-center justify-between"><p class="text-[10px] font-bold text-amber-600 uppercase flex items-center gap-2"><span>💎</span> Estimasi Komisi</p><p class="text-sm font-black text-amber-700">+ Rp ${item.komisi.toLocaleString('id-ID')}</p></div></div>`;
+                        // Tampilan Partner: Komisi di Tengah, Harga User & Tampung berdampingan di bawah
+                        topStats = `
+                            <div class="flex mb-2 border-b border-slate-50 pb-2">
+                                <div class="flex-1 bg-amber-50 p-2 rounded-lg border border-amber-100 flex items-center justify-between">
+                                    <p class="text-[10px] font-bold text-amber-600 uppercase flex items-center gap-2"><span>💎</span> Komisi</p>
+                                    <p class="text-sm font-black text-amber-700">+ Rp ${item.komisi.toLocaleString('id-ID')}</p>
+                                </div>
+                            </div>
+                        `;
+                        bottomPricing = `
+                            <div class="flex justify-between items-end">
+                                <div class="flex-1">
+                                    <p class="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Penawaran User</p>
+                                    <p class="text-sm font-black text-emerald-600">Rp ${item.offer.toLocaleString('id-ID')}</p>
+                                </div>
+                                <div class="flex-1 text-right border-l border-slate-100 pl-3">
+                                    <p class="text-[9px] font-black text-indigo-400 uppercase tracking-widest text-right">Tampung Store</p>
+                                    <p class="text-sm font-black text-indigo-600">Rp ${item.modal.toLocaleString('id-ID')}</p>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // Tampilan Guest Normal
+                        bottomPricing = `
+                            <div>
+                                <p class="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Penawaran ke User</p>
+                                <p class="text-sm font-black text-emerald-600">Rp ${item.offer.toLocaleString('id-ID')}</p>
+                            </div>
+                        `;
                     }
 
                     const adminActions = isAdmin ? `<div class="flex gap-2 ml-4"><button onclick="openEditPricelistModal(${item.id})" class="p-1.5 bg-yellow-50 text-yellow-600 rounded"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg></button><button onclick="deletePricelistItem(${item.id})" class="p-1.5 bg-red-50 text-red-500 rounded"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button></div>` : '';
 
-                    listHTML += `<div class="p-4 hover:bg-slate-50 transition flex justify-between items-center group"><div class="flex-1 w-full"><h4 class="font-bold text-slate-800 text-sm mb-2">${item.name}</h4>${adminStats}<div><p class="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Penawaran ke User</p><p class="text-sm font-black text-emerald-600">Rp ${item.offer.toLocaleString('id-ID')}</p></div></div>${adminActions}</div>`;
+                    listHTML += `
+                        <div class="p-4 hover:bg-slate-50 transition flex justify-between items-center group">
+                            <div class="flex-1 w-full">
+                                <h4 class="font-bold text-slate-800 text-sm mb-2">${item.name}</h4>
+                                ${topStats}
+                                ${bottomPricing}
+                            </div>
+                            ${adminActions}
+                        </div>
+                    `;
                 });
                 listHTML += `</div>`; catBlock.innerHTML = listHTML; container.appendChild(catBlock);
             }
