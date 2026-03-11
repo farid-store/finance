@@ -2434,43 +2434,48 @@ function copyToClipboard(text) {
         }
 
         function exportReport() {
-            // --- VARIABEL KALKULASI ---
             const modalAwal = Number(document.getElementById('startBalance').value) || 0;
             
-            // Pengeluaran dan Pemasukan TOTAL (Arus Kas)
-            let pengeluaranKeseluruhan = 0; 
-            let pemasukanKeseluruhan = 0;   
-            
-            // Profit Murni (Hanya dari barang yang sudah terjual)
+            // Variabel Tampilan (Hanya barang yang laku)
+            let pengeluaranModalLaku = 0; 
+            let pemasukanTerjual = 0;   
             let totalProfitReal = 0; 
+            
+            // Variabel Hitungan Laci (Kas Kasir)
+            let uangKeluarBelanja = 0;
+            let uangMasukKasir = 0;
             
             let listTerjual = '';
             let countTerjual = 0;
             
             let listStok = '';
             let countStok = 0;
-            let floatModal = 0;
-            let floatPrice = 0;
+            let nilaiStokGudang = 0;
+            let potensiUntungStok = 0;
 
             // 1. Proses Data HP Utama
             items.forEach(i => {
                 if (i.status === 'sold') {
-                    // Jika terjual, kita hitung pengeluarannya (modal beli) dan pemasukannya (harga jual)
-                    pengeluaranKeseluruhan += i.modal; 
-                    pemasukanKeseluruhan += i.price; 
+                    // Hitungan Laporan
+                    pengeluaranModalLaku += i.modal; 
+                    pemasukanTerjual += i.price; 
                     
                     const profitItem = i.price - i.modal;
                     totalProfitReal += profitItem;
                     
+                    // Hitungan Uang Laci Real
+                    if (i.type === 'new') uangKeluarBelanja += i.modal; 
+                    uangMasukKasir += i.price;
+                    
                     countTerjual++;
                     listTerjual += `${countTerjual}. *${i.name}* [+${profitItem.toLocaleString('id-ID')}]\n`;
                 } else if (i.status === 'stok') {
-                    // Jika masih stok, ini tetap pengeluaran (uang keluar beli barang)
-                    pengeluaranKeseluruhan += i.modal; 
+                    // Jika masih stok, ini menambah nilai gudang
+                    nilaiStokGudang += i.modal;
+                    potensiUntungStok += (i.price - i.modal);
                     
-                    // Untuk aset melayang (float)
-                    floatModal += i.modal;
-                    floatPrice += i.price;
+                    // Hitungan Uang Laci Real (Uang tertahan di barang)
+                    if (i.type === 'new') uangKeluarBelanja += i.modal; 
                     
                     countStok++;
                     listStok += `${countStok}. ${i.name} [M: ${i.modal.toLocaleString('id-ID')}]\n`;
@@ -2480,25 +2485,25 @@ function copyToClipboard(text) {
             // 2. Proses Data Extra Profit (Aksesoris/Servis)
             let extraProfitTotal = 0;
             extraProfits.forEach(p => {
-                pengeluaranKeseluruhan += p.modal;
-                pemasukanKeseluruhan += p.price;
+                pengeluaranModalLaku += p.modal;
+                pemasukanTerjual += p.price;
                 totalProfitReal += p.profit;
                 extraProfitTotal += p.profit;
+                
+                uangKeluarBelanja += p.modal;
+                uangMasukKasir += p.price;
                 
                 countTerjual++;
                 listTerjual += `${countTerjual}. *${p.name}* [+${p.profit.toLocaleString('id-ID')}]\n`;
             });
 
-            // 3. Kalkulasi Angka Akhir yang Akurat
-            // Selisih Profit di sini adalah profit kotor vs bersih, atau kita ambil langsung dari totalProfitReal
-            // Jika Anda ingin Selisih Profit = Pemasukan Total - Modal Barang yang TERJUAL saja:
-            // Maka rumusnya adalah totalProfitReal.
-            const selisihProfit = totalProfitReal; 
+            // 3. Kalkulasi Angka Akhir
+            // Selisih murni dari Pemasukan vs Modal barang yang laku saja (Pasti Positif jika untung)
+            const selisihProfit = pemasukanTerjual - pengeluaranModalLaku; 
             
-            // Sisa Tunai (Cash di Laci) = Modal Awal - Uang Keluar (Semua) + Uang Masuk
-            const sisaTunai = modalAwal - pengeluaranKeseluruhan + pemasukanKeseluruhan;
-            const potensiUntung = floatPrice - floatModal;
-            const totalAset = sisaTunai + floatModal;
+            // Sisa Tunai (Cash di Laci) = Modal Awal - Uang Keluar Beli Barang + Uang Hasil Jualan
+            const sisaTunai = modalAwal - uangKeluarBelanja + uangMasukKasir;
+            const totalAset = sisaTunai + nilaiStokGudang;
 
             // ==========================================
             // FORMATTING WHATSAPP TEXT
@@ -2509,13 +2514,13 @@ function copyToClipboard(text) {
 
             report += `💰 *RINGKASAN KAS & ASET*\n`;
             report += `▫️ Modal Awal           : Rp ${modalAwal.toLocaleString('id-ID')}\n`;
-            report += `▫️ Pengeluaran          : Rp ${pengeluaranKeseluruhan.toLocaleString('id-ID')}\n`;
-            report += `▫️ Pemasukan            : Rp ${pemasukanKeseluruhan.toLocaleString('id-ID')}\n`;
+            report += `▫️ Pengeluaran          : Rp ${pengeluaranModalLaku.toLocaleString('id-ID')}\n`;
+            report += `▫️ Pemasukan            : Rp ${pemasukanTerjual.toLocaleString('id-ID')}\n`;
             report += `▫️ Selisih Profit       : Rp ${selisihProfit.toLocaleString('id-ID')}\n`;
             report += `------------------------------\n`;
             report += `💵 *Sisa Tunai          : Rp ${sisaTunai.toLocaleString('id-ID')}*\n`;
-            report += `📦 Nilai Stok Gudang   : Rp ${floatModal.toLocaleString('id-ID')}\n`;
-            report += `🎯 Potensi Untung      : Rp ${potensiUntung.toLocaleString('id-ID')}\n`;
+            report += `📦 Nilai Stok Gudang   : Rp ${nilaiStokGudang.toLocaleString('id-ID')}\n`;
+            report += `🎯 Potensi Untung      : Rp ${potensiUntungStok.toLocaleString('id-ID')}\n`;
             report += `------------------------------\n`;
             report += `📈 *TOTAL ASET          : Rp ${totalAset.toLocaleString('id-ID')}*\n\n`;
 
