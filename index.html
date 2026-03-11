@@ -2434,12 +2434,14 @@ function copyToClipboard(text) {
         }
 
         function exportReport() {
-            const now = new Date();
-            
             // --- VARIABEL KALKULASI ---
             const modalAwal = Number(document.getElementById('startBalance').value) || 0;
+            
+            // Pengeluaran dan Pemasukan TOTAL (Arus Kas)
             let pengeluaranKeseluruhan = 0; 
             let pemasukanKeseluruhan = 0;   
+            
+            // Profit Murni (Hanya dari barang yang sudah terjual)
             let totalProfitReal = 0; 
             
             let listTerjual = '';
@@ -2453,7 +2455,8 @@ function copyToClipboard(text) {
             // 1. Proses Data HP Utama
             items.forEach(i => {
                 if (i.status === 'sold') {
-                    if (i.type === 'new') pengeluaranKeseluruhan += i.modal; 
+                    // Jika terjual, kita hitung pengeluarannya (modal beli) dan pemasukannya (harga jual)
+                    pengeluaranKeseluruhan += i.modal; 
                     pemasukanKeseluruhan += i.price; 
                     
                     const profitItem = i.price - i.modal;
@@ -2462,7 +2465,10 @@ function copyToClipboard(text) {
                     countTerjual++;
                     listTerjual += `${countTerjual}. *${i.name}* [+${profitItem.toLocaleString('id-ID')}]\n`;
                 } else if (i.status === 'stok') {
-                    if (i.type === 'new') pengeluaranKeseluruhan += i.modal; 
+                    // Jika masih stok, ini tetap pengeluaran (uang keluar beli barang)
+                    pengeluaranKeseluruhan += i.modal; 
+                    
+                    // Untuk aset melayang (float)
                     floatModal += i.modal;
                     floatPrice += i.price;
                     
@@ -2483,8 +2489,13 @@ function copyToClipboard(text) {
                 listTerjual += `${countTerjual}. *${p.name}* [+${p.profit.toLocaleString('id-ID')}]\n`;
             });
 
-            // 3. Kalkulasi Angka Akhir
-            const selisihProfit = pemasukanKeseluruhan - pengeluaranKeseluruhan;
+            // 3. Kalkulasi Angka Akhir yang Akurat
+            // Selisih Profit di sini adalah profit kotor vs bersih, atau kita ambil langsung dari totalProfitReal
+            // Jika Anda ingin Selisih Profit = Pemasukan Total - Modal Barang yang TERJUAL saja:
+            // Maka rumusnya adalah totalProfitReal.
+            const selisihProfit = totalProfitReal; 
+            
+            // Sisa Tunai (Cash di Laci) = Modal Awal - Uang Keluar (Semua) + Uang Masuk
             const sisaTunai = modalAwal - pengeluaranKeseluruhan + pemasukanKeseluruhan;
             const potensiUntung = floatPrice - floatModal;
             const totalAset = sisaTunai + floatModal;
