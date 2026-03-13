@@ -1,445 +1,323 @@
 <!DOCTYPE html>
-<html lang="id" data-theme="light">
+<html lang="id" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Farid Store | 100M Tracker</title>
+    <title>Farid Store | Neo Tracker</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
     <style>
-        /* =========================================================
-           1. CORE VARIABLES (Fintech Vibe)
-           ========================================================= */
-        :root[data-theme="light"] {
-            --primary: #0F172A; /* Slate 900 */
-            --primary-light: #F1F5F9;
-            --secondary: #10B981; /* Emerald 500 */
-            --bg-body: #F8FAFC; 
-            --card-bg: #FFFFFF;
-            --text-main: #0F172A; 
-            --text-muted: #64748B;
-            --border: #E2E8F0;
-            --danger: #EF4444; 
-            --warning: #F59E0B;
-            --shadow-card: 0 4px 20px rgba(15, 23, 42, 0.03);
-            --skeleton-bg: #F1F5F9;
-            --shimmer: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%);
-        }
-
+        /* CSS Variables - Modern Fintech Theme */
         :root[data-theme="dark"] {
-            --primary: #FFFFFF; 
-            --primary-light: #1E293B;
-            --secondary: #10B981; 
-            --bg-body: #0B1120; 
-            --card-bg: #1E293B;
-            --text-main: #F8FAFC; 
-            --text-muted: #94A3B8;
-            --border: #334155;
-            --danger: #F87171; 
-            --warning: #FBBF24;
-            --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.3);
-            --skeleton-bg: #334155;
-            --shimmer: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.05) 50%, transparent 100%);
+            --bg-color: #0f172a; --card-bg: #1e293b; --nav-bg: #0f172a;
+            --primary: #3b82f6; --primary-dark: #2563eb;
+            --secondary: #10b981; --secondary-dark: #059669;
+            --text-main: #f8fafc; --text-muted: #94a3b8;
+            --border: #334155; --danger: #ef4444; --warning: #f59e0b;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+            --skeleton-bg: rgba(255,255,255,0.05);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s, border-color 0.3s; }
+        :root[data-theme="light"] {
+            --bg-color: #f1f5f9; --card-bg: #ffffff; --nav-bg: #ffffff;
+            --primary: #2563eb; --primary-dark: #1d4ed8;
+            --secondary: #059669; --secondary-dark: #047857;
+            --text-main: #0f172a; --text-muted: #64748b;
+            --border: #e2e8f0; --danger: #dc2626; --warning: #d97706;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --skeleton-bg: rgba(0,0,0,0.05);
+        }
 
-        body { background-color: var(--bg-body); color: var(--text-main); line-height: 1.5; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s ease, color 0.3s ease; }
 
-        /* =========================================================
-           2. MOBILE-FIRST LAYOUT (Safe & No Overlap)
-           ========================================================= */
-        .app-container { max-width: 600px; margin: 0 auto; padding: 20px 16px 100px 16px; /* 100px bottom padding protects content from bottom nav */ }
-        
-        .sidebar { display: none; } /* Hidden by default */
-        
-        #ptr-indicator { text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600; height: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 8px; transition: height 0.2s; }
+        body { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-color); color: var(--text-main); padding-bottom: 70px; overscroll-behavior-y: contain; }
+        .container { max-width: 600px; margin: 0 auto; position: relative; padding: 15px 15px 0 15px; }
 
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-top: 10px;}
-        .header-title h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 2px;}
-        .header-title p { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;}
-        .btn-icon { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-card); }
+        /* Header */
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header-title h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+        .header-title p { color: var(--text-muted); font-size: 12px; font-weight: 500; }
+        .btn-icon { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); padding: 10px; border-radius: 50%; cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); }
 
-        /* Tab Visibility */
-        .tab-content { display: none; animation: fadeIn 0.3s ease forwards; }
+        /* Bottom Navigation */
+        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; background: var(--nav-bg); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0 20px 0; z-index: 1000; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); font-size: 10px; font-weight: 600; gap: 4px; cursor: pointer; width: 33%; }
+        .nav-item i { font-size: 20px; transition: transform 0.2s ease; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item.active i { transform: translateY(-2px); }
+
+        /* Tabs */
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* General Card Style */
-        .card { background: var(--card-bg); border-radius: 24px; border: 1px solid var(--border); box-shadow: var(--shadow-card); padding: 24px; margin-bottom: 20px; }
-        .section-header { font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+        /* Cards & Panels */
+        .card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .card-title { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
         
-        /* Grid Utilities */
-        .grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-
-        /* ----------------------------------
-           TAB 1: Dashboard Elements
-           ---------------------------------- */
-        .hero-section { display: flex; flex-direction: column; align-items: center; text-align: center; }
-        .progress-wrapper { position: relative; width: 180px; height: 180px; margin-bottom: 24px; }
-        .progress-circle { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(var(--primary) var(--progress, 0%), var(--border) 0deg); display: flex; align-items: center; justify-content: center; transition: background 1s ease;}
-        .progress-inner { width: 156px; height: 156px; border-radius: 50%; background: var(--card-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .pct-val { font-size: 32px; font-weight: 800; color: var(--text-main); letter-spacing: -1px; margin-bottom: -4px;}
-        .pct-label { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;}
+        .stat-main { font-size: 32px; font-weight: 800; color: var(--text-main); margin-bottom: 5px; letter-spacing: -1px; }
+        .stat-sub { font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between; }
         
-        .main-balance { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; color: var(--text-main); }
-        .balance-label { font-size: 14px; color: var(--text-muted); font-weight: 600; }
-        .eta-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--primary-light); color: var(--primary); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-top: 16px; }
+        /* Progress & Composition Bars */
+        .bar-container { width: 100%; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin: 12px 0; display: flex; }
+        .bar-fill { height: 100%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        .bg-primary { background: var(--primary); }
+        .bg-secondary { background: var(--secondary); }
+        .comp-legend { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; }
+        .legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
+
+        /* Brand Performance List */
+        .brand-list { display: flex; flex-direction: column; gap: 10px; }
+        .brand-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg-color); border-radius: 12px; border: 1px solid var(--border); }
+        .brand-info { display: flex; align-items: center; gap: 12px; }
+        .brand-rank { font-size: 14px; font-weight: 800; color: var(--primary); width: 20px; }
+        .brand-name { font-size: 14px; font-weight: 700; color: var(--text-main); }
+        .brand-stats { text-align: right; }
+        .brand-profit { font-size: 13px; font-weight: 700; color: var(--secondary); }
+        .brand-count { font-size: 11px; color: var(--text-muted); }
+
+        /* Aging List */
+        .aging-list { display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; }
+        .aging-item { background: var(--bg-color); border: 1px solid var(--border); padding: 10px 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+        .aging-item .name { font-weight: 600; color: var(--text-main); }
+        .aging-item .days { font-weight: 700; }
+        .aging-item.danger .days { color: var(--danger); }
+        .aging-item.warning .days { color: var(--warning); }
+
+        /* Roadmap Cards */
+        .m-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow); }
+        .m-card.active { border: 1px solid var(--primary); background: linear-gradient(to right, var(--card-bg), rgba(59, 130, 246, 0.05)); }
+        .mc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .mc-title { font-size: 15px; font-weight: 800; color: var(--text-main); }
+        .mc-subtitle { font-size: 11px; color: var(--text-muted); }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+        .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--secondary); }
+        .badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .badge-pending { background: var(--border); color: var(--text-muted); }
+        .mc-stat-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 4px; margin-top: 10px;}
+
+        /* Charts */
+        .chart-box { position: relative; height: 200px; width: 100%; }
         
-        .comp-bar { width: 100%; height: 10px; border-radius: 5px; display: flex; overflow: hidden; margin-bottom: 16px; background: var(--border); }
-        .comp-cash { height: 100%; background: var(--secondary); transition: width 1s ease; }
-        .comp-stock { height: 100%; background: var(--primary); transition: width 1s ease; }
-        .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px;}
-
-        .mini-card { background: var(--card-bg); border-radius: 20px; padding: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-card); display: flex; flex-direction: column; }
-        .mini-label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; }
-        .mini-val { font-size: 20px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px;}
-
-        /* ----------------------------------
-           TAB 2: Analytics Elements
-           ---------------------------------- */
-        /* SAFE WRAPPER FOR CHART.JS (Prevents overlap) */
-        .chart-safe-wrapper { position: relative; height: 260px; width: 100%; }
-        
-        .aging-list { display: flex; flex-direction: column; gap: 0; }
-        .aging-item { border-bottom: 1px solid var(--border); padding: 16px 0; display: flex; justify-content: space-between; align-items: center;}
-        .aging-item:last-child { border-bottom: none; padding-bottom: 0; }
-        .cat-badge { font-size: 10px; padding: 4px 10px; border-radius: 12px; font-weight: 700; text-transform: uppercase;}
-        .badge-digital { background: rgba(37, 99, 235, 0.1); color: #3B82F6; }
-        .badge-gadget { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
-        .badge-acc { background: var(--primary-light); color: var(--primary); }
-
-        /* Toggles */
-        .switch-container { display: flex; align-items: center; background: var(--bg-body); padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border);}
-        .switch { position: relative; display: inline-block; width: 36px; height: 20px; margin-left: 8px;}
+        /* Toggle Switch */
+        .switch-container { display: flex; align-items: center; }
+        .toggle-label { font-size: 10px; font-weight: 700; color: var(--text-muted); margin-right: 8px; }
+        .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); border-radius: 20px; transition: .4s;}
-        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: var(--card-bg); border-radius: 50%; transition: .4s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: var(--text-main); transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--primary); }
         input:checked + .slider:before { transform: translateX(16px); }
 
-        /* ----------------------------------
-           TAB 3: History Elements
-           ---------------------------------- */
-        .search-container { position: relative; margin-bottom: 20px; }
-        .search-container i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-        .search-input { width: 100%; padding: 16px 16px 16px 44px; border-radius: 16px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-main); font-size: 14px; outline: none; font-weight: 500;}
-        .search-input:focus { border-color: var(--primary); }
+        /* Pull to Refresh */
+        #ptr-indicator { text-align: center; color: var(--text-muted); font-size: 12px; font-weight: 600; height: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 8px; transition: height 0.2s ease; }
         
-        .month-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
-        .m-card { border: 1px solid var(--border); border-radius: 20px; padding: 20px; background: var(--card-bg); }
-        .m-card.active { border: 2px solid var(--primary); }
-        .bar-bg { width: 100%; background: var(--border); height: 6px; border-radius: 3px; overflow: hidden; margin-top: 8px;}
-        .bar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
-
-        /* ----------------------------------
-           MOBILE BOTTOM NAV & TOAST
-           ---------------------------------- */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 75px; background: var(--card-bg); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); width: 33%; gap: 4px; cursor: pointer; transition: color 0.2s; }
-        .nav-item i { font-size: 20px; }
-        .nav-item span { font-size: 11px; font-weight: 600; }
-        .nav-item.active { color: var(--primary); }
-
-        #toast { visibility: hidden; min-width: 250px; background-color: var(--primary); color: var(--bg-body); text-align: center; border-radius: 12px; padding: 14px 20px; position: fixed; z-index: 1001; left: 50%; bottom: 90px; transform: translateX(-50%); font-size: 13px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
-        #toast.show { visibility: visible; opacity: 1; bottom: 100px; }
-
-        /* Skeletons */
-        .skeleton { overflow: hidden; background-color: var(--skeleton-bg); border-radius: 12px; position: relative;}
-        .skeleton::after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0; transform: translateX(-100%); background: var(--shimmer); animation: shimmer 1.5s infinite; }
-        @keyframes shimmer { 100% { transform: translateX(100%); } }
-
-        /* =========================================================
-           3. DESKTOP LAYOUT (CSS GRID)
-           ========================================================= */
-        @media (min-width: 1024px) {
-            body { display: flex; justify-content: center; padding-bottom: 40px;} /* Allow scroll, center content */
-            .app-container { margin: 0; padding: 40px; max-width: 1200px; width: 100%; margin-left: 280px; }
-            
-            /* Hide mobile elements */
-            .bottom-nav, header, #ptr-indicator { display: none !important; }
-            
-            /* Sidebar Navigation */
-            .sidebar { display: flex; flex-direction: column; width: 280px; position: fixed; left: 0; top: 0; bottom: 0; background: var(--card-bg); border-right: 1px solid var(--border); padding: 40px 24px; z-index: 10; }
-            .sidebar-brand { margin-bottom: 48px; }
-            .sidebar-brand h1 { font-size: 26px; font-weight: 800; color: var(--text-main); margin-bottom: 4px; letter-spacing: -0.5px;}
-            .sidebar-brand p { font-size: 13px; color: var(--text-muted); font-weight: 600; text-transform: uppercase;}
-            
-            .sidebar-nav { display: flex; flex-direction: column; gap: 8px; flex: 1; }
-            .sidebar-item { padding: 16px 20px; border-radius: 16px; color: var(--text-muted); font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.2s; font-size: 15px;}
-            .sidebar-item i { font-size: 20px; width: 24px; text-align: center; }
-            .sidebar-item:hover { background: var(--bg-body); color: var(--text-main); }
-            .sidebar-item.active { background: var(--primary-light); color: var(--primary); }
-            
-            .sidebar-footer { display: flex; flex-direction: column; gap: 12px; }
-            .btn-sidebar { padding: 16px; border-radius: 16px; border: 1px solid var(--border); background: transparent; color: var(--text-main); font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; }
-            .btn-sidebar:hover { background: var(--bg-body); }
-            .btn-sidebar.primary { background: var(--primary); color: var(--bg-body); border: none; }
-            .btn-sidebar.primary:hover { opacity: 0.8; }
-
-            /* Desktop Grid Systems to Prevent Overlap */
-            .desktop-grid-2 { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; align-items: start; }
-            .desktop-grid-chart { display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px; align-items: start; }
-            .desktop-stack { display: flex; flex-direction: column; gap: 24px; }
-            .month-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
-            
-            /* Fix margins inside grids */
-            .card { margin-bottom: 0; } 
-            .grid-2-col { margin-bottom: 0; gap: 24px;}
-            
-            /* Taller Charts for Desktop */
-            .chart-safe-wrapper { height: 350px; }
-
-            #toast.show { bottom: 40px; }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
     </style>
 </head>
 <body>
 
-<aside class="sidebar">
-    <div class="sidebar-brand">
-        <h1>Farid Store</h1>
-        <p>Your Gadget Solution</p>
-    </div>
-    <nav class="sidebar-nav">
-        <div class="sidebar-item active" onclick="switchTab('tab-dashboard', 0)"><i class="fas fa-home"></i> Beranda</div>
-        <div class="sidebar-item" onclick="switchTab('tab-analytics', 1)"><i class="fas fa-chart-pie"></i> Analitik</div>
-        <div class="sidebar-item" onclick="switchTab('tab-history', 2)"><i class="fas fa-list-ul"></i> Riwayat</div>
-    </nav>
-    <div class="sidebar-footer">
-        <button class="btn-sidebar primary" onclick="manualSync()"><i class="fas fa-sync-alt" id="syncIconDesktop"></i> Sinkronisasi</button>
-        <button class="btn-sidebar" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIconDesktop"></i> Ganti Tema</button>
-    </div>
-</aside>
+<div id="ptr-indicator">
+    <i class="fas fa-arrow-down" id="ptr-icon"></i> <span id="ptr-text">Tarik untuk Sync...</span>
+</div>
 
-<main class="app-container">
-    <div id="ptr-indicator"><i class="fas fa-arrow-down ptr-icon" id="ptr-icon"></i> <span id="ptr-text">Tarik untuk Sync...</span></div>
-
+<div class="container">
     <header>
         <div class="header-title">
             <h1>Farid Store</h1>
-            <p>100M Portfolio Tracker</p>
+            <p>Gadget Portfolio Tracker</p>
         </div>
-        <button class="btn-icon" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIconMobile"></i></button>
+        <button class="btn-icon" onclick="toggleTheme()" id="themeBtn" aria-label="Toggle Theme">
+            <i class="fas fa-moon"></i>
+        </button>
     </header>
 
-    <div id="loadingState" style="display: none; width: 100%;">
-        <div class="card" style="height: 300px; display: flex; flex-direction: column; justify-content: center; align-items: center; border:none; box-shadow:none; background:transparent;">
-            <i class="fas fa-circle-notch fa-spin" style="font-size: 40px; color: var(--text-muted); margin-bottom: 20px;"></i>
-            <p style="color: var(--text-muted); font-weight: 600;">Memuat Data Ledger...</p>
-        </div>
-    </div>
-
     <div id="tab-dashboard" class="tab-content active">
-        <div class="desktop-grid-2">
-            <div class="card" style="display: flex; flex-direction: column; justify-content: center;">
-                <div class="hero-section">
-                    <div class="progress-wrapper">
-                        <div class="progress-circle" id="uiProgressCircle" style="--progress: 0%;">
-                            <div class="progress-inner">
-                                <span class="pct-val" id="uiProgressPct">0%</span>
-                                <span class="pct-label">Tercapai</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="balance-label">Total Aset Saat Ini</div>
-                    <div class="main-balance" id="uiTotalAsset">Rp 0</div>
-                    <div class="eta-badge" id="uiEta"><i class="fas fa-clock"></i> Kalkulasi ETA...</div>
+        <div class="card">
+            <div class="card-header" style="margin-bottom: 5px;">
+                <div class="card-title"><i class="fas fa-flag-checkered" style="color: var(--primary)"></i> Target Terdekat</div>
+                <span id="uiMilestoneBadge" class="badge badge-warning">Proses</span>
+            </div>
+            <div class="stat-main" id="uiTotalAsset">Rp 0</div>
+            
+            <div class="bar-container">
+                <div class="bar-fill bg-primary" id="milestoneBar" style="width: 0%;"></div>
+            </div>
+            
+            <div class="comp-legend">
+                <span style="color: var(--text-muted);">Aset Saat Ini</span>
+                <span style="color: var(--text-main); font-weight: 800;" id="uiNextMilestone">Target: Rp 0</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><i class="fas fa-wallet" style="color: var(--secondary)"></i> Alokasi Aset</div>
+            </div>
+            <div class="bar-container" style="height: 12px;">
+                <div class="bar-fill bg-secondary" id="barCash" style="width: 0%;"></div>
+                <div class="bar-fill bg-primary" id="barStock" style="width: 0%;"></div>
+            </div>
+            <div class="comp-legend" style="margin-top: 15px;">
+                <span><i class="legend-dot bg-secondary"></i>Kas Laci: <br><span id="uiValCash" style="font-size:14px; color:var(--text-main)">Rp 0</span></span>
+                <span style="text-align: right;"><i class="legend-dot bg-primary"></i>Stok Gudang: <br><span id="uiValStock" style="font-size:14px; color:var(--text-main)">Rp 0</span></span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><i class="fas fa-chart-line" style="color: var(--secondary)"></i> Total Laba Kotor</div>
+                <div class="switch-container">
+                    <span class="toggle-label">NETTO</span>
+                    <label class="switch">
+                        <input type="checkbox" id="netProfitToggle" onchange="toggleNetProfit()">
+                        <span class="slider"></span>
+                    </label>
                 </div>
             </div>
-
-            <div class="desktop-stack">
-                <div class="card">
-                    <div class="section-header">Komposisi Aset Berjalan</div>
-                    <div class="comp-bar">
-                        <div class="comp-cash" id="barCash" style="width: 0%;"></div>
-                        <div class="comp-stock" id="barStock" style="width: 0%;"></div>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; margin-top: 20px;">
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;"><i class="legend-dot" style="background:var(--secondary);"></i> Kas Laci</span>
-                            <span style="font-size: 16px; font-weight: 800; color:var(--text-main);" id="uiValCash">Rp 0</span>
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 4px; text-align: right;">
-                            <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Stok Gudang <i class="legend-dot" style="background:var(--primary); margin-left:6px; margin-right:0;"></i></span>
-                            <span style="font-size: 16px; font-weight: 800; color:var(--text-main);" id="uiValStock">Rp 0</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="grid-2-col">
-                    <div class="mini-card">
-                        <div class="mini-label">Modal Awal Murni</div>
-                        <div class="mini-val" id="uiAssetStart">Rp 0</div>
-                    </div>
-                    <div class="mini-card">
-                        <div class="mini-label" id="uiProfitTitle">Akumulasi Laba</div>
-                        <div class="mini-val" style="color: var(--secondary);" id="uiTotalProfit">Rp 0</div>
-                    </div>
-                </div>
+            <div class="stat-main" id="uiTotalProfit" style="color: var(--secondary); font-size: 26px;">Rp 0</div>
+            <div class="stat-sub" style="margin-top: 10px;">
+                <span id="uiProfitTitle">Akumulasi sejak awal operasional</span>
+                <span id="uiTotalUnits" style="font-weight: 700;">0 Unit Terjual</span>
             </div>
         </div>
     </div>
 
     <div id="tab-analytics" class="tab-content">
-        <div class="desktop-grid-chart">
-            <div class="card">
-                <div class="section-header">Kinerja 12 Bulan</div>
-                <div class="chart-safe-wrapper">
+        
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><i class="fas fa-fire" style="color: var(--warning)"></i> Top Performer Brand</div>
+            </div>
+            <div class="brand-list" id="topBrandsUI">
+                </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><i class="fas fa-chart-pie" style="color: var(--primary)"></i> Alokasi Laba Bulan Ini</div>
+            </div>
+            <div class="chart-box" style="height: 180px;">
+                <canvas id="doughnutChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><i class="fas fa-box-open" style="color: var(--text-muted)"></i> Radar Stok Mengendap</div>
+            </div>
+            <div class="aging-list" id="agingListUI">
+                </div>
+        </div>
+    </div>
+
+    <div id="tab-performance" class="tab-content">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><i class="fas fa-chart-area" style="color: var(--primary)"></i> Kinerja 12 Bulan</div>
+            </div>
+            <div class="chart-box" style="height: 220px; overflow-x: auto;">
+                <div style="min-width: 500px; height: 100%;">
                     <canvas id="salesChart"></canvas>
                 </div>
             </div>
+        </div>
 
-            <div class="desktop-stack">
-                <div class="card">
-                    <div class="section-header" style="margin-bottom: 10px;">
-                        <span>Alokasi Laba</span>
-                        <div class="switch-container">
-                            <span style="font-size: 10px; font-weight: 700; color: var(--text-main);">NETTO</span>
-                            <label class="switch"><input type="checkbox" id="netProfitToggle" onchange="toggleNetProfit()"><span class="slider"></span></label>
-                        </div>
-                    </div>
-                    <div class="chart-safe-wrapper" style="height: 200px;">
-                        <canvas id="doughnutChart"></canvas>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="section-header">Radar Stok Mengendap</div>
-                    <div class="aging-list" id="agingListUI"></div>
-                </div>
+        <h3 style="font-size: 14px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin: 20px 0 10px 5px;">Roadmap Bulanan</h3>
+        <div id="trackerBody">
             </div>
-        </div>
     </div>
 
-    <div id="tab-history" class="tab-content">
-        <div class="search-container">
-            <i class="fas fa-search"></i>
-            <input type="text" id="searchHistory" class="search-input" placeholder="Cari histori bulan, status, dsb..." onkeyup="filterHistory()">
-        </div>
-        <div class="month-grid" id="trackerBody"></div>
-    </div>
-</main>
-
-<div class="bottom-nav">
-    <div class="nav-item active" onclick="switchTab('tab-dashboard', 0)"><i class="fas fa-home"></i><span>Beranda</span></div>
-    <div class="nav-item" onclick="switchTab('tab-analytics', 1)"><i class="fas fa-chart-pie"></i><span>Analitik</span></div>
-    <div class="nav-item" onclick="switchTab('tab-history', 2)"><i class="fas fa-list-ul"></i><span>Riwayat</span></div>
 </div>
 
-<div id="toast"></div>
+<nav class="bottom-nav">
+    <div class="nav-item active" onclick="switchTab('dashboard', this)">
+        <i class="fas fa-home"></i>
+        <span>Dashboard</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('analytics', this)">
+        <i class="fas fa-microscope"></i>
+        <span>Analitik</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('performance', this)">
+        <i class="fas fa-route"></i>
+        <span>Performa</span>
+    </div>
+</nav>
 
 <script>
     // ==========================================
-    // KREDENSIAL JSONBIN
+    // KONFIGURASI & KREDENSIAL
     // ==========================================
     const BIN_ID = '699644fdae596e708f3582af'; 
     const API_KEY = '$2a$10$tcKHEWwuz2sqRoMCKJfga.1xxTFW0RxpXUPnP.NI4YbivtlK1xxau'; 
 
+    // Milestones (Target Kecil menuju 100M)
+    const MILESTONES = [10000000, 20000000, 30000000, 40000000, 50000000, 60000000, 75000000, 90000000, 100000000];
+
     const formatRp = (num) => {
-        if(num >= 1000000) return (num/1000000).toFixed(2).replace(/\.00$/, '') + ' Jt';
+        if(num >= 1000000) return (num/1000000).toFixed(1).replace(/\.0$/, '') + ' Jt';
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
     };
     const formatRpFull = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
 
     const roadmapTargets = [
-        { month: 1, profit: 4500000 }, { month: 2, profit: 5400000 }, { month: 3, profit: 6075000 }, { month: 4, profit: 6750000 },
-        { month: 5, profit: 6750000 }, { month: 6, profit: 7200000 }, { month: 7, profit: 7200000 }, { month: 8, profit: 7650000 },
-        { month: 9, profit: 7650000 }, { month: 10, profit: 7875000 }, { month: 11, profit: 7875000 }, { month: 12, profit: 6750000 }
+        { month: 1, profit: 4500000 }, { month: 2, profit: 5400000 },
+        { month: 3, profit: 6075000 }, { month: 4, profit: 6750000 },
+        { month: 5, profit: 6750000 }, { month: 6, profit: 7200000 },
+        { month: 7, profit: 7200000 }, { month: 8, profit: 7650000 },
+        { month: 9, profit: 7650000 }, { month: 10, profit: 7875000 },
+        { month: 11, profit: 7875000 }, { month: 12, profit: 6750000 }
     ];
 
-    let salesChartInstance = null; let doughnutChartInstance = null;
-    let currentTheme = localStorage.getItem('theme') || 'light';
-    let globalRawData = null; let isNetProfitMode = false;
+    let salesChartInstance = null;
+    let doughnutChartInstance = null;
+    let currentTheme = localStorage.getItem('theme') || 'dark';
+    let globalRawData = null; 
+    let isNetProfitMode = false;
 
-    // Inisialisasi Tema
+    // --- INIT THEME ---
     document.documentElement.setAttribute('data-theme', currentTheme);
-    updateThemeIcons();
-
-    function showToast(message) {
-        const toast = document.getElementById("toast");
-        toast.innerText = message; toast.className = "show";
-        setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
-    }
-
-    // Fungsi Navigasi Tab
-    function switchTab(tabId, index) {
-        // 1. Sembunyikan semua konten, tampilkan yang dipilih
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        
-        // 2. Update status aktif di Mobile Nav
-        document.querySelectorAll('.bottom-nav .nav-item').forEach((el, i) => {
-            if(i === index) el.classList.add('active'); else el.classList.remove('active');
-        });
-
-        // 3. Update status aktif di Desktop Sidebar
-        document.querySelectorAll('.sidebar-nav .sidebar-item').forEach((el, i) => {
-            if(i === index) el.classList.add('active'); else el.classList.remove('active');
-        });
-
-        // 4. Cegah Chart.js penyok saat ganti tab (PENTING)
-        if(tabId === 'tab-analytics') {
-            setTimeout(() => {
-                if(salesChartInstance) salesChartInstance.resize();
-                if(doughnutChartInstance) doughnutChartInstance.resize();
-            }, 100);
-        }
-    }
+    updateThemeIcon();
 
     function toggleTheme() {
         currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', currentTheme);
         localStorage.setItem('theme', currentTheme);
-        updateThemeIcons();
-        if(salesChartInstance) {
-            salesChartInstance.options.scales.x.grid.color = currentTheme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
-            salesChartInstance.options.scales.y.grid.color = currentTheme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
-            salesChartInstance.update();
-        }
+        updateThemeIcon();
+        if(salesChartInstance) salesChartInstance.update();
+        if(doughnutChartInstance) doughnutChartInstance.update();
     }
 
-    function updateThemeIcons() {
-        const isDark = currentTheme === 'dark';
-        const iconClass = isDark ? 'fas fa-sun' : 'fas fa-moon';
+    function updateThemeIcon() {
+        const icon = document.querySelector('#themeBtn i');
+        if(currentTheme === 'dark') { icon.className = 'fas fa-sun'; icon.style.color = '#f59e0b'; } 
+        else { icon.className = 'fas fa-moon'; icon.style.color = '#2563eb'; }
+    }
+
+    // --- TAB NAVIGATION ---
+    function switchTab(tabId, el) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         
-        const mIcon = document.getElementById('themeIconMobile');
-        const dIcon = document.getElementById('themeIconDesktop');
-        if(mIcon) mIcon.className = iconClass;
-        if(dIcon) dIcon.className = iconClass;
+        document.getElementById(`tab-${tabId}`).classList.add('active');
+        el.classList.add('active');
+
+        // Update charts immediately if switching to their tabs
+        if(tabId === 'analytics' && doughnutChartInstance) doughnutChartInstance.update();
+        if(tabId === 'performance' && salesChartInstance) salesChartInstance.update();
     }
 
-    function filterHistory() {
-        let input = document.getElementById('searchHistory').value.toLowerCase();
-        let cards = document.getElementsByClassName('m-card');
-        for (let i = 0; i < cards.length; i++) {
-            let text = cards[i].innerText.toLowerCase();
-            cards[i].style.display = text.includes(input) ? "" : "none";
-        }
-    }
-
-    function triggerConfetti() {
-        let duration = 3 * 1000; let animationEnd = Date.now() + duration;
-        let defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1002 };
-        let interval = setInterval(function() {
-            let timeLeft = animationEnd - Date.now();
-            if (timeLeft <= 0) return clearInterval(interval);
-            let particleCount = 50 * (timeLeft / duration);
-            confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random(), y: Math.random() - 0.2 } }));
-        }, 250);
-    }
-
-    function toggleNetProfit() { 
-        isNetProfitMode = document.getElementById('netProfitToggle').checked; 
+    function toggleNetProfit() {
+        isNetProfitMode = document.getElementById('netProfitToggle').checked;
         if (globalRawData) processData(globalRawData); 
     }
 
     function animateValue(id, start, end, duration, isCurrency = true) {
         if (start === end) return;
-        const obj = document.getElementById(id); if(!obj) return;
+        const obj = document.getElementById(id);
+        if(!obj) return;
         let startTimestamp = null;
         const step = (timestamp) => {
             if (!startTimestamp) startTimestamp = timestamp;
@@ -453,246 +331,399 @@
         window.requestAnimationFrame(step);
     }
 
-    function showLoading() { document.getElementById('tab-dashboard').style.display = 'none'; document.getElementById('loadingState').style.display = 'block'; }
-    function hideLoading() { document.getElementById('loadingState').style.display = 'none'; document.getElementById('tab-dashboard').style.display = document.getElementById('tab-dashboard').classList.contains('active') ? 'block' : 'none'; }
-
     async function fetchDatabase() {
-        const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { method: 'GET', headers: { 'X-Master-Key': API_KEY, 'X-Access-Key': API_KEY, 'Content-Type': 'application/json' } });
-        if (!response.ok) throw new Error(`HTTP Error`);
-        return (await response.json()).record;
+        const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+            method: 'GET',
+            headers: { 'X-Master-Key': API_KEY, 'X-Access-Key': API_KEY, 'Content-Type': 'application/json' }
+        });
+        if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+        const data = await response.json();
+        return data.record;
+    }
+
+    function parseDateString(s) { 
+        if(!s || s === 'Imported' || s === 'Bulan Lalu') return new Date();
+        const p = s.split(' ');
+        if (p[0].includes('-')) return new Date(p[0]);
+        const d = p[0].split('/');
+        return new Date(d[2], d[1]-1, d[0]); 
     }
 
     function processData(db) {
         let monthlyActuals = {};
+        let brandStats = {};
+        
         let startBalance = Number(db.startBalance) || 0;
-        let belanjaBaru = 0, uangMasuk = 0, profitMain = 0, profitEkstra = 0;
-        let floatPrice = 0, totalUnitTerjual = 0;
+        let belanjaBaru = 0, uangMasuk = 0;
+        let profitMain = 0, profitEkstra = 0;
+        let floatModal = 0, floatPrice = 0, totalUnitTerjual = 0;
         let agingStocks = [];
 
-        // 1. Proses Data HP
+        // 1. Ekstrak Data HP Utama & Brand Performance
         if(db.items) {
             db.items.forEach(i => {
                 if (i.status === 'sold') {
                     totalUnitTerjual++;
                     if (i.type === 'new') belanjaBaru += i.modal;
                     uangMasuk += i.price;
-                    profitMain += (i.price - i.modal);
+                    
+                    const profitItem = i.price - i.modal;
+                    profitMain += profitItem;
+
+                    // Brand Analytics Logic
+                    if(i.name) {
+                        let brand = i.name.split(' ')[0].toUpperCase();
+                        // Normalize common brands
+                        if(brand === 'IPHONE') brand = 'APPLE';
+                        if(!brandStats[brand]) brandStats[brand] = { profit: 0, count: 0 };
+                        brandStats[brand].profit += profitItem;
+                        brandStats[brand].count += 1;
+                    }
+                    
                     if(i.soldAt) {
-                        let p = i.soldAt.split(' '); let d = p[0].includes('-') ? new Date(p[0]) : new Date(p[0].split('/')[2], p[0].split('/')[1]-1, p[0].split('/')[0]);
+                        let d = parseDateString(i.soldAt);
                         let monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
                         if(!monthlyActuals[monthKey]) monthlyActuals[monthKey] = { units: 0, profit: 0 };
-                        monthlyActuals[monthKey].units += 1; monthlyActuals[monthKey].profit += (i.price - i.modal);
+                        monthlyActuals[monthKey].units += 1;
+                        monthlyActuals[monthKey].profit += profitItem;
                     }
                 } else if (i.status === 'stok') {
                     if (i.type === 'new') belanjaBaru += i.modal;
+                    floatModal += i.modal;
                     floatPrice += i.price;
-                    let ageDays = i.id ? Math.floor(Math.abs(new Date() - new Date(Math.floor(i.id))) / (1000 * 60 * 60 * 24)) : 0;
+
+                    let ageDays = 0;
+                    if(i.id) { 
+                        const addedDate = new Date(Math.floor(i.id));
+                        const diffTime = Math.abs(new Date() - addedDate);
+                        ageDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                    }
                     agingStocks.push({ name: i.name, days: ageDays, id: i.id });
                 }
             });
         }
 
-        // 2. Proses Data Ekstra
+        // 2. Ekstrak Data Extra Profit
         if(db.extraProfits) {
             db.extraProfits.forEach(p => {
-                profitEkstra += p.profit; totalUnitTerjual++; 
+                let calcProfit = p.profit;
+                profitEkstra += calcProfit;
+                totalUnitTerjual++; 
+                
                 let d = new Date(Math.floor(p.id)); 
                 let monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
                 if(!monthlyActuals[monthKey]) monthlyActuals[monthKey] = { units: 0, profit: 0 };
-                monthlyActuals[monthKey].profit += p.profit; monthlyActuals[monthKey].units += 1;
+                
+                monthlyActuals[monthKey].profit += calcProfit;
+                monthlyActuals[monthKey].units += 1;
             });
         }
 
-        // 3. Logika Gaji & Netto
+        // 3. Logika Gaji
         let totalBebanGajiGlobal = 0;
+        const BEBAN_BULANAN = 2500000; 
+
         for (let key in monthlyActuals) {
             monthlyActuals[key].profitKotor = monthlyActuals[key].profit; 
-            if (isNetProfitMode) { monthlyActuals[key].profit -= 2500000; totalBebanGajiGlobal += 2500000; }
+            if (isNetProfitMode) {
+                monthlyActuals[key].profit -= BEBAN_BULANAN;
+                totalBebanGajiGlobal += BEBAN_BULANAN;
+            }
         }
 
         let totalProfitBersih = profitMain + profitEkstra;
         if (isNetProfitMode) totalProfitBersih -= totalBebanGajiGlobal;
 
+        // Rumus Aset
         const cashSisa = startBalance - belanjaBaru + uangMasuk;
         const totalAsetReal = cashSisa + floatPrice; 
+
         agingStocks.sort((a, b) => b.days - a.days);
 
-        // Milestone Confetti Trigger
-        let currentMilestone = Math.floor(totalAsetReal / 10000000) * 10000000; 
-        let savedMilestone = parseInt(localStorage.getItem('lastMilestone')) || 0;
-        if (currentMilestone > savedMilestone && currentMilestone > 0) {
-            triggerConfetti();
-            localStorage.setItem('lastMilestone', currentMilestone);
-            setTimeout(() => showToast(`🎉 Aset berhasil menembus ${formatRpFull(currentMilestone)}!`), 1000);
-        }
-
-        updateUI(monthlyActuals, totalAsetReal, totalProfitBersih, totalUnitTerjual, startBalance, cashSisa, floatPrice, agingStocks);
+        updateUI(monthlyActuals, totalAsetReal, totalProfitBersih, totalUnitTerjual, cashSisa, floatPrice, agingStocks, brandStats);
     }
 
-    function updateUI(actualsData, totalAset, globalGrossProfit, globalUnits, startBalance, cashSisa, floatPrice, agingStocks) {
-        hideLoading();
-        const tbody = document.getElementById('trackerBody'); tbody.innerHTML = '';
-        document.getElementById('uiProfitTitle').innerText = isNetProfitMode ? 'Laba Bersih' : 'Laba Kotor';
-
+    function updateUI(actualsData, totalAset, globalGrossProfit, globalUnits, cashSisa, floatPrice, agingStocks, brandStats) {
+        
+        // --- DASHBOARD TAB ---
         const prevAset = parseInt(document.getElementById('uiTotalAsset').innerText.replace(/\D/g,'')) || 0;
         const prevProfit = parseInt(document.getElementById('uiTotalProfit').innerText.replace(/\D/g,'')) || 0;
         
-        animateValue('uiTotalAsset', prevAset, totalAset, 1000); 
+        animateValue('uiTotalAsset', prevAset, totalAset, 1000);
         animateValue('uiTotalProfit', prevProfit, globalGrossProfit, 1000);
-        document.getElementById('uiAssetStart').innerText = formatRpFull(startBalance);
-        
-        const totalAsetAktif = cashSisa + floatPrice;
-        document.getElementById('barCash').style.width = `${totalAsetAktif > 0 ? (cashSisa / totalAsetAktif) * 100 : 0}%`;
-        document.getElementById('barStock').style.width = `${totalAsetAktif > 0 ? (floatPrice / totalAsetAktif) * 100 : 0}%`;
-        document.getElementById('uiValCash').innerText = formatRpFull(cashSisa); 
-        document.getElementById('uiValStock').innerText = formatRpFull(floatPrice);
-        
-        let progressPct = Math.min(Math.max((globalGrossProfit / 80000000) * 100, 0), 100).toFixed(1);
-        document.getElementById('uiProgressCircle').style.setProperty('--progress', `${progressPct}%`);
-        document.getElementById('uiProgressPct').innerText = `${progressPct}%`;
+        document.getElementById('uiTotalUnits').innerText = `${globalUnits} Unit Terjual`;
 
-        let activeKeys = Object.keys(actualsData).sort(); let last3Months = activeKeys.slice(-3);
-        let avgRecentProfit = last3Months.reduce((acc, key) => acc + actualsData[key].profit, 0) / (last3Months.length || 1);
-        let sisaTarget = 100000000 - totalAset;
+        // Milestone Logic
+        let nextMilestone = MILESTONES.find(m => m > totalAset) || 100000000;
+        let milestonePct = Math.min((totalAset / nextMilestone) * 100, 100);
+        document.getElementById('uiNextMilestone').innerText = `Target: ${formatRpFull(nextMilestone)}`;
+        document.getElementById('milestoneBar').style.width = `${milestonePct}%`;
         
-        let etaBadge = document.getElementById('uiEta');
-        if (sisaTarget <= 0) {
-            etaBadge.innerHTML = `<i class="fas fa-award"></i> 100M Tercapai! 🎉`;
-            etaBadge.style.background = "rgba(16, 185, 129, 0.1)"; etaBadge.style.color = "var(--secondary)";
-        } else if (avgRecentProfit > 0) {
-            let d = new Date(); d.setMonth(d.getMonth() + Math.ceil(sisaTarget / avgRecentProfit));
-            etaBadge.innerHTML = `<i class="fas fa-rocket"></i> ETA: ${["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"][d.getMonth()]} ${d.getFullYear()}`;
+        if (totalAset >= 100000000) {
+            document.getElementById('uiMilestoneBadge').className = "badge badge-success";
+            document.getElementById('uiMilestoneBadge').innerHTML = "<i class='fas fa-check'></i> 100M Goal!";
         }
 
-        let currentMonthKey = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
-        renderAnalytics(actualsData[currentMonthKey] ? (actualsData[currentMonthKey].profitKotor || actualsData[currentMonthKey].profit) : 0, agingStocks);
+        // Asset Composition
+        const totalAsetAktif = cashSisa + floatPrice;
+        const cashPct = totalAsetAktif > 0 ? (cashSisa / totalAsetAktif) * 100 : 0;
+        const stockPct = totalAsetAktif > 0 ? (floatPrice / totalAsetAktif) * 100 : 0;
+        
+        document.getElementById('barCash').style.width = `${cashPct}%`;
+        document.getElementById('barStock').style.width = `${stockPct}%`;
+        document.getElementById('uiValCash').innerText = formatRpFull(cashSisa);
+        document.getElementById('uiValStock').innerText = formatRpFull(floatPrice);
 
-        let chartLabels = [], chartProfitData = [], chartActualUnits = []; let accumulatedDeficit = 0;
+        // --- ANALYTICS TAB ---
+        let currentMonthKey = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+        let currentMonthGrossProfit = actualsData[currentMonthKey] ? (actualsData[currentMonthKey].profitKotor !== undefined ? actualsData[currentMonthKey].profitKotor : actualsData[currentMonthKey].profit) : 0;
+        
+        renderAnalytics(currentMonthGrossProfit, agingStocks, brandStats);
+
+        // --- PERFORMANCE TAB (Roadmap) ---
+        const tbody = document.getElementById('trackerBody');
+        tbody.innerHTML = '';
+        
+        let chartLabels = [], chartProfitData = [], chartActualUnits = [];
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+        let startMonth = 2, startYear = 2026;
+        let globalAvgMargin = globalUnits > 0 ? (globalGrossProfit / globalUnits) : 150000;
+        let accumulatedDeficit = 0;
+
         roadmapTargets.forEach((t, index) => {
-            let m = ((1 + index) % 12) + 1; let y = 2026 + Math.floor((1 + index) / 12);
+            let m = ((startMonth - 1 + index) % 12) + 1;
+            let y = startYear + Math.floor((startMonth - 1 + index) / 12);
             let monthKey = `${y}-${String(m).padStart(2, '0')}`;
+            
             let actUnits = actualsData[monthKey] ? actualsData[monthKey].units : 0;
             let actProfit = actualsData[monthKey] ? actualsData[monthKey].profit : 0;
 
-            chartLabels.push(`${["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"][m-1]} ${y}`);
-            chartProfitData.push(actProfit); chartActualUnits.push(actUnits);
+            chartLabels.push(`${monthNames[m-1]} ${y}`);
+            chartProfitData.push(actProfit);
+            chartActualUnits.push(actUnits);
 
-            let smartTarget = t.profit + accumulatedDeficit < 0 ? t.profit : t.profit + accumulatedDeficit; 
-            let dynamicTargetUnit = actProfit >= smartTarget ? actUnits : Math.ceil(smartTarget / (actUnits > 0 ? (actProfit / actUnits) : (globalUnits > 0 ? (globalGrossProfit / globalUnits) : 150000))); 
+            let smartTargetProfit = t.profit + accumulatedDeficit;
+            if (smartTargetProfit < 0) smartTargetProfit = t.profit; 
+            
+            let avgThisMonth = actUnits > 0 ? (actProfit / actUnits) : globalAvgMargin;
+            let dynamicTargetUnit = Math.ceil(smartTargetProfit / avgThisMonth); 
+            if (actProfit >= smartTargetProfit) dynamicTargetUnit = actUnits; 
+            
+            let profitPct = Math.min((actProfit / smartTargetProfit) * 100, 100) || 0;
+            let unitPct = Math.min((actUnits / dynamicTargetUnit) * 100, 100) || 0;
+
             if (monthKey <= currentMonthKey) accumulatedDeficit += (t.profit - actProfit);
 
+            let statusBadge = actProfit >= smartTargetProfit 
+                ? '<span class="badge badge-success"><i class="fas fa-check"></i> Tercapai</span>' 
+                : (actProfit > 0 ? '<span class="badge badge-warning">Proses</span>' : '<span class="badge badge-pending">Pending</span>');
+
             let isCurrent = (monthKey === currentMonthKey);
-            const card = document.createElement('div'); card.className = `m-card ${isCurrent ? 'active' : ''}`;
+            let labelLaba = isNetProfitMode ? 'Laba Bersih' : 'Laba Kotor';
+
+            const card = document.createElement('div');
+            card.className = `m-card ${isCurrent ? 'active' : ''}`;
+            
             card.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-                    <div><div style="font-weight:800; font-size:16px; color:var(--text-main);">Bulan ${t.month}</div><span style="font-size:12px; color:var(--text-muted); font-weight:600;">${["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"][m-1]} ${y}</span></div>
-                    ${actProfit >= smartTarget ? '<span style="font-size:10px; font-weight:800; padding:6px 12px; border-radius:20px; background:rgba(16, 185, 129, 0.1); color:var(--secondary);">TERCAPAI</span>' : (actProfit > 0 ? '<span style="font-size:10px; font-weight:800; padding:6px 12px; border-radius:20px; background:rgba(245, 158, 11, 0.1); color:var(--warning);">PROSES</span>' : '<span style="font-size:10px; font-weight:800; padding:6px 12px; border-radius:20px; background:var(--primary-light); color:var(--text-muted);">PENDING</span>')}
+                <div class="mc-header">
+                    <div>
+                        <div class="mc-title">Bulan ${t.month} ${isCurrent ? '<i class="fas fa-crosshairs fa-spin" style="color:var(--primary); font-size:12px; margin-left:4px;"></i>' : ''}</div>
+                        <span class="mc-subtitle">${monthNames[m-1]} ${y}</span>
+                    </div>
+                    ${statusBadge}
                 </div>
-                <div style="margin-bottom:16px;">
-                    <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px; font-weight:600; color:var(--text-muted);"><span>${isNetProfitMode ? 'Laba Bersih' : 'Laba Kotor'}</span><span><span style="color:var(--text-main); font-weight:800;">${formatRp(actProfit)}</span> / ${formatRp(smartTarget)}</span></div>
-                    <div class="bar-bg"><div class="bar-fill" style="width: ${Math.min((actProfit / smartTarget) * 100 || 0, 100)}%; background:var(--secondary);"></div></div>
+                
+                <div class="mc-stat-header">
+                    <span style="color: var(--secondary)">${labelLaba}</span>
+                    <span>${formatRp(actProfit)} / ${formatRp(smartTargetProfit)}</span>
                 </div>
-                <div>
-                    <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px; font-weight:600; color:var(--text-muted);"><span>Penjualan</span><span><span style="color:var(--text-main); font-weight:800;">${actUnits}</span> / ${dynamicTargetUnit} Unit</span></div>
-                    <div class="bar-bg"><div class="bar-fill" style="width: ${Math.min((actUnits / dynamicTargetUnit) * 100 || 0, 100)}%; background:var(--primary);"></div></div>
+                <div class="bar-container" style="height:6px; margin-top:4px;">
+                    <div class="bar-fill bg-secondary" style="width: ${profitPct}%"></div>
+                </div>
+
+                <div class="mc-stat-header">
+                    <span style="color: var(--primary)">Penjualan Unit</span>
+                    <span>${actUnits} / ${dynamicTargetUnit} Unit</span>
+                </div>
+                <div class="bar-container" style="height:6px; margin-top:4px;">
+                    <div class="bar-fill bg-primary" style="width: ${unitPct}%"></div>
                 </div>
             `;
             tbody.appendChild(card);
         });
+
         renderChart(chartLabels, chartProfitData, chartActualUnits);
     }
 
-    function renderAnalytics(currentMonthProfit, agingStocks) {
-        let pOwner = 1500000, pKaryawan = 1000000, pSisa = currentMonthProfit - 2500000;
-        if (pSisa < 0) { pOwner = Math.min(1500000, currentMonthProfit); pKaryawan = Math.max(0, currentMonthProfit - 1500000); pSisa = 0; }
+    function renderAnalytics(currentMonthProfit, agingStocks, brandStats) {
+        // 1. Top Brands UI
+        const brandsArray = Object.keys(brandStats).map(key => ({
+            name: key, profit: brandStats[key].profit, count: brandStats[key].count
+        })).sort((a, b) => b.profit - a.profit).slice(0, 3);
 
-        if(doughnutChartInstance) doughnutChartInstance.destroy();
-        Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
-        doughnutChartInstance = new Chart(document.getElementById('doughnutChart').getContext('2d'), {
-            type: 'doughnut',
-            data: { labels: ['Owner', 'Karyawan', 'Laba Sisa'], datasets: [{ data: [pOwner, pKaryawan, pSisa], backgroundColor: ['#0F172A', '#F59E0B', '#10B981'], borderWidth: 0, hoverOffset: 4 }] },
-            options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, usePointStyle: true, padding: 15, font: { weight: '600' } } } } }
+        const topBrandsUI = document.getElementById('topBrandsUI');
+        topBrandsUI.innerHTML = '';
+        if(brandsArray.length === 0) topBrandsUI.innerHTML = '<div style="font-size:12px; color:var(--text-muted); text-align:center;">Belum ada data penjualan.</div>';
+        
+        brandsArray.forEach((b, index) => {
+            let iconColor = index === 0 ? '#f59e0b' : (index === 1 ? '#94a3b8' : '#cd7f32');
+            topBrandsUI.innerHTML += `
+                <div class="brand-item">
+                    <div class="brand-info">
+                        <span class="brand-rank"><i class="fas fa-trophy" style="color:${iconColor}"></i></span>
+                        <span class="brand-name">${b.name}</span>
+                    </div>
+                    <div class="brand-stats">
+                        <div class="brand-profit">${formatRpFull(b.profit)}</div>
+                        <div class="brand-count">${b.count} Unit</div>
+                    </div>
+                </div>
+            `;
         });
 
-        const listUI = document.getElementById('agingListUI'); listUI.innerHTML = '';
-        if(agingStocks.length === 0) { listUI.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:13px; font-weight:600; padding:20px;">Gudang Aman & Lancar 🚀</div>`; return; }
+        // 2. Alokasi Gaji Doughnut Chart
+        let pOwner = 1500000;
+        let pKaryawan = 1000000;
+        let pSisa = currentMonthProfit - (pOwner + pKaryawan);
+        
+        if (pSisa < 0) {
+            pOwner = Math.min(1500000, currentMonthProfit);
+            pKaryawan = Math.max(0, currentMonthProfit - 1500000);
+            pSisa = 0;
+        }
+
+        const ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
+        if(doughnutChartInstance) doughnutChartInstance.destroy();
+
+        const gridColor = currentTheme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+        const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#94a3b8';
+        Chart.defaults.color = textColor; 
+
+        doughnutChartInstance = new Chart(ctxDoughnut, {
+            type: 'doughnut',
+            data: {
+                labels: ['Gaji Saya', 'Gaji Karyawan', 'Laba Bersih (Sisa)'],
+                datasets: [{
+                    data: [pOwner, pKaryawan, pSisa],
+                    backgroundColor: ['#f59e0b', '#ef4444', '#10b981'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, cutout: '70%',
+                plugins: {
+                    legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } }
+                }
+            }
+        });
+
+        // 3. Aging Stock UI
+        const listUI = document.getElementById('agingListUI');
+        listUI.innerHTML = '';
+        if(agingStocks.length === 0) {
+            listUI.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:12px; padding:10px;">Gudang Kosong / Lancar</div>`;
+            return;
+        }
 
         agingStocks.forEach(item => {
-            let catBadge = ''; let lower = item.name.toLowerCase();
-            if (lower.includes('vidio') || lower.includes('premier')) catBadge = `<span class="cat-badge badge-digital">Digital</span>`;
-            else if (lower.includes('poco') || lower.includes('samsung') || lower.includes('iphone') || lower.includes('hp')) catBadge = `<span class="cat-badge badge-gadget">Gadget</span>`;
-            else catBadge = `<span class="cat-badge badge-acc">Lainnya</span>`;
-
-            if(listUI.childElementCount < 10) { 
-                listUI.innerHTML += `<div class="aging-item">
-                    <div style="display:flex; flex-direction:column; gap:6px;"><span style="font-weight:700; font-size:13px; color:var(--text-main);">${item.name}</span><div>${catBadge}</div></div>
-                    <span style="font-weight:800; font-size:13px; color:${item.days > 30 ? 'var(--danger)' : 'var(--text-main)'};">${item.days} Hari</span>
-                </div>`;
+            let severityClass = '';
+            if(item.days > 30) severityClass = 'danger';
+            else if(item.days > 14) severityClass = 'warning';
+            
+            if(listUI.childElementCount < 6) {
+                listUI.innerHTML += `
+                    <div class="aging-item ${severityClass}">
+                        <span class="name">${item.name}</span>
+                        <span class="days">${item.days} Hari <i class="${severityClass ? 'fas fa-exclamation-circle' : 'fas fa-check-circle'}" style="color:${severityClass ? 'inherit' : 'var(--secondary)'}"></i></span>
+                    </div>
+                `;
             }
         });
     }
 
     function renderChart(labels, profitData, actualData) {
+        const ctx = document.getElementById('salesChart').getContext('2d');
         if (salesChartInstance) salesChartInstance.destroy(); 
-        Chart.defaults.color = getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim();
-        salesChartInstance = new Chart(document.getElementById('salesChart').getContext('2d'), {
+
+        const gridColor = currentTheme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+
+        salesChartInstance = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: labels,
                 datasets: [
-                    { label: isNetProfitMode ? 'Laba Bersih' : 'Laba Kotor', data: profitData, type: 'line', borderColor: '#10B981', borderWidth: 3, pointBackgroundColor: '#FFFFFF', pointBorderColor: '#10B981', pointBorderWidth: 2, pointRadius: 4, fill: true, backgroundColor: 'rgba(16, 185, 129, 0.05)', tension: 0.4, yAxisID: 'y' },
-                    { label: 'Unit', data: actualData, type: 'bar', backgroundColor: '#E2E8F0', hoverBackgroundColor: '#0F172A', borderRadius: 6, yAxisID: 'y1' }
+                    { label: isNetProfitMode ? 'Laba Bersih' : 'Laba Kotor', data: profitData, type: 'line', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderColor: '#10b981', borderWidth: 2, pointBackgroundColor: '#10b981', pointBorderColor: '#fff', fill: true, tension: 0.4, yAxisID: 'y' },
+                    { label: 'Unit', data: actualData, type: 'bar', backgroundColor: 'rgba(59, 130, 246, 0.8)', borderColor: '#3b82f6', borderWidth: 0, borderRadius: 4, yAxisID: 'y1' }
                 ]
             },
             options: {
-                responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: false } },
-                scales: { x: { grid: { display: false }, ticks: {font: {weight: '600'}} }, y: { display: true, position: 'left', border: {display: false}, grid: { color: currentTheme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', drawBorder: false }, ticks: { callback: v => (v/1000000) + 'M', font: { weight: '600' } } }, y1: { display: false, position: 'right' } }
+                responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+                plugins: { legend: { position: 'top', labels: { boxWidth: 10, font: { size: 11 } } } },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { type: 'linear', display: true, position: 'left', grid: { color: gridColor }, ticks: { callback: function(value) { return (value/1000000) + 'M'; }, font: { size: 10 } } },
+                    y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { font: { size: 10 }, stepSize: 5 } }
+                }
             }
         });
     }
 
-    // Sync Logic
     async function initDashboard(forceSync = false) {
-        if(forceSync) showLoading();
         try {
-            const cachedData = localStorage.getItem('faridStoreCacheV3');
-            if (cachedData && !forceSync) { globalRawData = JSON.parse(cachedData); processData(globalRawData); } 
-            else if (!cachedData && !forceSync) showLoading();
-
+            const cachedData = localStorage.getItem('faridStoreCacheV4');
+            if (cachedData && !forceSync) {
+                globalRawData = JSON.parse(cachedData);
+                processData(globalRawData);
+            }
             const dbData = await fetchDatabase();
-            if(dbData) { localStorage.setItem('faridStoreCacheV3', JSON.stringify(dbData)); globalRawData = dbData; processData(dbData); if(forceSync) showToast("✅ Data Ledger Tersinkronisasi"); }
-        } catch (err) { console.error(err); if(forceSync) showToast("❌ Gagal Terhubung Jaringan"); } finally { if (forceSync) hideLoading(); }
+            if(dbData) {
+                localStorage.setItem('faridStoreCacheV4', JSON.stringify(dbData));
+                globalRawData = dbData;
+                processData(dbData); 
+            }
+        } catch (err) {
+            console.error("Gagal sinkronisasi data:", err);
+        }
     }
 
-    function manualSync() {
-        const icon = document.getElementById('syncIconDesktop');
-        icon.classList.add('fa-spin');
-        initDashboard(true).then(() => { setTimeout(() => icon.classList.remove('fa-spin'), 1000); });
-    }
-
-    // Mobile Pull to Refresh
+    // --- PULL TO REFRESH LOGIC ---
     let startY = 0; let isPulling = false;
-    document.addEventListener('touchstart', (e) => { if (window.scrollY === 0) { startY = e.touches[0].pageY; isPulling = true; } }, {passive: true});
+    const ptrIndicator = document.getElementById('ptr-indicator');
+    const ptrIcon = document.getElementById('ptr-icon');
+    const ptrText = document.getElementById('ptr-text');
+    const THRESHOLD = 80;
+
+    document.addEventListener('touchstart', (e) => {
+        if (window.scrollY === 0) { startY = e.touches[0].pageY; isPulling = true; }
+    }, {passive: true});
+
     document.addEventListener('touchmove', (e) => {
-        if (!isPulling || window.innerWidth >= 1024) return;
+        if (!isPulling) return;
         const diff = e.touches[0].pageY - startY;
         if (diff > 0 && window.scrollY === 0) {
             let height = Math.min(diff * 0.5, 100);
-            document.getElementById('ptr-indicator').style.height = `${height}px`;
-            if (height > 80) { document.getElementById('ptr-icon').style.transform = 'rotate(180deg)'; document.getElementById('ptr-text').innerText = 'Lepas untuk Sync'; } 
-            else { document.getElementById('ptr-icon').style.transform = 'rotate(0deg)'; document.getElementById('ptr-text').innerText = 'Tarik untuk Sync...'; }
+            ptrIndicator.style.height = `${height}px`;
+            if (height > THRESHOLD) { ptrIcon.style.transform = 'rotate(180deg)'; ptrText.innerText = 'Lepas untuk Sync'; } 
+            else { ptrIcon.style.transform = 'rotate(0deg)'; ptrText.innerText = 'Tarik untuk Sync...'; }
         }
     }, {passive: true});
-    document.addEventListener('touchend', () => {
-        if (!isPulling || window.innerWidth >= 1024) return; isPulling = false;
-        if (parseInt(document.getElementById('ptr-indicator').style.height || '0') > 80) {
-            document.getElementById('ptr-icon').className = 'fas fa-circle-notch fa-spin'; document.getElementById('ptr-text').innerText = 'Menyinkronkan...';
-            initDashboard(true).then(() => { document.getElementById('ptr-indicator').style.height = '0px'; setTimeout(() => { document.getElementById('ptr-icon').className = 'fas fa-arrow-down ptr-icon'; document.getElementById('ptr-text').innerText = 'Tarik untuk Sync...'; }, 300); });
-        } else { document.getElementById('ptr-indicator').style.height = '0px'; }
+
+    document.addEventListener('touchend', (e) => {
+        if (!isPulling) return;
+        isPulling = false;
+        if (parseInt(ptrIndicator.style.height || '0') > THRESHOLD) {
+            ptrIcon.className = 'fas fa-circle-notch fa-spin'; ptrText.innerText = 'Menyinkronkan...';
+            initDashboard(true).then(() => setTimeout(resetPTR, 500));
+        } else { resetPTR(); }
     });
+
+    function resetPTR() {
+        ptrIndicator.style.height = '0px';
+        setTimeout(() => { ptrIcon.className = 'fas fa-arrow-down'; ptrIcon.style.transform = 'rotate(0deg)'; ptrText.innerText = 'Tarik untuk Sync...'; }, 300);
+    }
 
     window.onload = () => initDashboard(false);
 </script>
-
 </body>
 </html>
