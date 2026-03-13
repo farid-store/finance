@@ -367,8 +367,8 @@
     function getDeviceBrand(itemName) {
         const name = itemName.toUpperCase();
         if (name.includes('IPHONE') || name.startsWith('IP ') || name.includes('APPLE') || name.includes('IPAD')) return 'APPLE';
-        if (name.includes('SAMSUNG') ||(name.includes('SEIN') ||  name.includes('GALAXY') || name.startsWith('SAM ')) return 'SAMSUNG';
-        if (name.includes('XIAOMI') || (name.includes('NOTE') || name.includes('REDMI') || name.includes('POCO') || name.includes('MI ')) return 'XIAOMI';
+        if (name.includes('SAMSUNG') || name.includes('SEIN') ||  name.includes('GALAXY') || name.startsWith('SAM ')) return 'SAMSUNG';
+        if (name.includes('XIAOMI') || name.includes('NOTE') || name.includes('REDMI') || name.includes('POCO') || name.includes('MI ')) return 'XIAOMI';
         if (name.includes('OPPO') || name.includes('RENO') || name.includes('FIND')) return 'OPPO';
         if (name.includes('VIVO') || name.includes('IQOO')) return 'VIVO';
         if (name.includes('REALME') || name.includes('NARZO')) return 'REALME';
