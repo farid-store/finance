@@ -46,7 +46,7 @@
         .nav-item.active { color: var(--primary); }
         .nav-item.active i { transform: translateY(-2px); }
 
-        /* Tabs - DIREVISI: Transisi fade-in murni tanpa efek membesar/bergerak */
+        /* Tabs */
         .tab-content { display: none; animation: fadeOnly 0.25s ease-in-out; }
         .tab-content.active { display: block; }
         @keyframes fadeOnly { from { opacity: 0; } to { opacity: 1; } }
@@ -92,13 +92,13 @@
         .mc-title { font-size: 15px; font-weight: 800; color: var(--text-main); }
         .mc-subtitle { font-size: 11px; color: var(--text-muted); }
         .badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
-        .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--secondary); }
-        .badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--secondary); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
         .badge-pending { background: var(--border); color: var(--text-muted); }
         .mc-stat-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 4px; margin-top: 10px;}
 
         /* Charts */
-        .chart-box { position: relative; height: 200px; width: 100%; }
+        .chart-box { position: relative; width: 100%; }
         
         /* Toggle Switch */
         .switch-container { display: flex; align-items: center; }
@@ -134,15 +134,34 @@
     </header>
 
     <div id="tab-dashboard" class="tab-content active">
+        
+        <div class="card" style="border-color: var(--primary); background: linear-gradient(145deg, var(--card-bg) 70%, rgba(59, 130, 246, 0.05) 100%);">
+            <div class="card-header" style="margin-bottom: 5px;">
+                <div class="card-title"><i class="fas fa-bullseye" style="color: var(--primary)"></i> Grand Target 100 Juta</div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div class="chart-box" style="height: 110px; width: 110px; flex-shrink: 0;">
+                    <canvas id="goalChart"></canvas>
+                </div>
+                <div style="flex-grow: 1; padding-left: 20px; text-align: right;">
+                    <div style="font-size: 28px; font-weight: 800; color: var(--text-main);" id="uiGoalPct">0%</div>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase;">Tercapai</div>
+                    <div class="badge badge-warning" id="uiEtaBadge" style="display: inline-block; text-align: right; font-size: 10px; line-height: 1.5;">
+                        <i class="fas fa-clock"></i> Kalkulasi ETA...
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="card">
             <div class="card-header" style="margin-bottom: 5px;">
-                <div class="card-title"><i class="fas fa-flag-checkered" style="color: var(--primary)"></i> Target Terdekat</div>
+                <div class="card-title"><i class="fas fa-flag-checkered" style="color: var(--warning)"></i> Milestone Terdekat</div>
                 <span id="uiMilestoneBadge" class="badge badge-warning">Proses</span>
             </div>
             <div class="stat-main" id="uiTotalAsset">Rp 0</div>
             
             <div class="bar-container">
-                <div class="bar-fill bg-primary" id="milestoneBar" style="width: 0%;"></div>
+                <div class="bar-fill bg-warning" id="milestoneBar" style="width: 0%; background: var(--warning);"></div>
             </div>
             
             <div class="comp-legend">
@@ -185,13 +204,11 @@
     </div>
 
     <div id="tab-analytics" class="tab-content">
-        
         <div class="card">
             <div class="card-header">
                 <div class="card-title"><i class="fas fa-fire" style="color: var(--warning)"></i> Top Performer Brand</div>
             </div>
-            <div class="brand-list" id="topBrandsUI">
-                </div>
+            <div class="brand-list" id="topBrandsUI"></div>
         </div>
 
         <div class="card">
@@ -207,8 +224,7 @@
             <div class="card-header">
                 <div class="card-title"><i class="fas fa-box-open" style="color: var(--text-muted)"></i> Radar Stok Mengendap</div>
             </div>
-            <div class="aging-list" id="agingListUI">
-                </div>
+            <div class="aging-list" id="agingListUI"></div>
         </div>
     </div>
 
@@ -225,10 +241,8 @@
         </div>
 
         <h3 style="font-size: 14px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin: 20px 0 10px 5px;">Roadmap Bulanan</h3>
-        <div id="trackerBody">
-            </div>
+        <div id="trackerBody"></div>
     </div>
-
 </div>
 
 <nav class="bottom-nav">
@@ -253,7 +267,6 @@
     const BIN_ID = '699644fdae596e708f3582af'; 
     const API_KEY = '$2a$10$tcKHEWwuz2sqRoMCKJfga.1xxTFW0RxpXUPnP.NI4YbivtlK1xxau'; 
 
-    // Milestones (Target Kecil menuju 100M)
     const MILESTONES = [10000000, 20000000, 30000000, 40000000, 50000000, 60000000, 75000000, 90000000, 100000000];
 
     const formatRp = (num) => {
@@ -273,6 +286,7 @@
 
     let salesChartInstance = null;
     let doughnutChartInstance = null;
+    let goalChartInstance = null;
     let currentTheme = localStorage.getItem('theme') || 'dark';
     let globalRawData = null; 
     let isNetProfitMode = false;
@@ -288,6 +302,7 @@
         updateThemeIcon();
         if(salesChartInstance) salesChartInstance.update();
         if(doughnutChartInstance) doughnutChartInstance.update();
+        if(goalChartInstance) renderGoalChart(goalChartInstance.data.datasets[0].data[0], goalChartInstance.data.datasets[0].data[1]);
     }
 
     function updateThemeIcon() {
@@ -304,7 +319,7 @@
         document.getElementById(`tab-${tabId}`).classList.add('active');
         el.classList.add('active');
 
-        // Update charts immediately if switching to their tabs
+        if(tabId === 'dashboard' && goalChartInstance) goalChartInstance.update();
         if(tabId === 'analytics' && doughnutChartInstance) doughnutChartInstance.update();
         if(tabId === 'performance' && salesChartInstance) salesChartInstance.update();
     }
@@ -349,12 +364,10 @@
         return new Date(d[2], d[1]-1, d[0]); 
     }
 
-    // --- SMART BRAND DETECTION LOGIC ---
     function getDeviceBrand(itemName) {
         const name = itemName.toUpperCase();
-        
         if (name.includes('IPHONE') || name.startsWith('IP ') || name.includes('APPLE') || name.includes('IPAD')) return 'APPLE';
-        if (name.includes('SAMSUNG') || name.includes('GALAXY') || name.startsWith('SAM ')) return 'SAMSUNG';
+        if (name.includes('SAMSUNG') ||(name.includes('SEIN') ||  name.includes('GALAXY') || name.startsWith('SAM ')) return 'SAMSUNG';
         if (name.includes('XIAOMI') || (name.includes('NOTE') || name.includes('REDMI') || name.includes('POCO') || name.includes('MI ')) return 'XIAOMI';
         if (name.includes('OPPO') || name.includes('RENO') || name.includes('FIND')) return 'OPPO';
         if (name.includes('VIVO') || name.includes('IQOO')) return 'VIVO';
@@ -363,8 +376,7 @@
         if (name.includes('TECNO') || name.includes('POVA') || name.includes('SPARK ')) return 'TECNO';
         if (name.includes('ITEL')) return 'ITEL';
         if (name.includes('ASUS') || name.includes('ROG')) return 'ASUS';
-        
-        return name.split(' ')[0]; // Fallback ke kata pertama jika tidak dikenali
+        return name.split(' ')[0]; 
     }
 
     function processData(db) {
@@ -377,18 +389,15 @@
         let floatModal = 0, floatPrice = 0, totalUnitTerjual = 0;
         let agingStocks = [];
 
-        // 1. Ekstrak Data HP Utama & Brand Performance
         if(db.items) {
             db.items.forEach(i => {
                 if (i.status === 'sold') {
                     totalUnitTerjual++;
                     if (i.type === 'new') belanjaBaru += i.modal;
                     uangMasuk += i.price;
-                    
                     const profitItem = i.price - i.modal;
                     profitMain += profitItem;
 
-                    // Brand Analytics Smart Logic
                     if(i.name) {
                         let brand = getDeviceBrand(i.name);
                         if(!brandStats[brand]) brandStats[brand] = { profit: 0, count: 0 };
@@ -419,23 +428,19 @@
             });
         }
 
-        // 2. Ekstrak Data Extra Profit
         if(db.extraProfits) {
             db.extraProfits.forEach(p => {
                 let calcProfit = p.profit;
                 profitEkstra += calcProfit;
                 totalUnitTerjual++; 
-                
                 let d = new Date(Math.floor(p.id)); 
                 let monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
                 if(!monthlyActuals[monthKey]) monthlyActuals[monthKey] = { units: 0, profit: 0 };
-                
                 monthlyActuals[monthKey].profit += calcProfit;
                 monthlyActuals[monthKey].units += 1;
             });
         }
 
-        // 3. Logika Gaji
         let totalBebanGajiGlobal = 0;
         const BEBAN_BULANAN = 2500000; 
 
@@ -450,7 +455,6 @@
         let totalProfitBersih = profitMain + profitEkstra;
         if (isNetProfitMode) totalProfitBersih -= totalBebanGajiGlobal;
 
-        // Rumus Aset
         const cashSisa = startBalance - belanjaBaru + uangMasuk;
         const totalAsetReal = cashSisa + floatPrice; 
 
@@ -459,8 +463,60 @@
         updateUI(monthlyActuals, totalAsetReal, totalProfitBersih, totalUnitTerjual, cashSisa, floatPrice, agingStocks, brandStats);
     }
 
+    function renderGoalChart(current, remaining) {
+        const ctx = document.getElementById('goalChart').getContext('2d');
+        if (goalChartInstance) goalChartInstance.destroy();
+        
+        const emptyColor = currentTheme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+        
+        goalChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Tercapai', 'Sisa Target'],
+                datasets: [{
+                    data: [current, remaining],
+                    backgroundColor: ['#3b82f6', emptyColor],
+                    borderWidth: 0,
+                    borderRadius: 4,
+                    hoverOffset: 2
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, cutout: '80%',
+                plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                animation: { animateScale: true, animateRotate: true }
+            }
+        });
+    }
+
     function updateUI(actualsData, totalAset, globalGrossProfit, globalUnits, cashSisa, floatPrice, agingStocks, brandStats) {
         
+        // --- 100M GOAL & ETA (NEW LOGIC) ---
+        let sisaTarget100 = 100000000 - totalAset;
+        let pctGoal = Math.min((totalAset / 100000000) * 100, 100).toFixed(1);
+        document.getElementById('uiGoalPct').innerText = `${pctGoal}%`;
+
+        let activeMonthsKey = Object.keys(actualsData).sort();
+        let last3Months = activeMonthsKey.slice(-3);
+        let sumRecentProfit = last3Months.reduce((acc, key) => acc + actualsData[key].profit, 0);
+        let avgRecentProfit = sumRecentProfit / (last3Months.length || 1);
+        
+        let etaText = "Data tidak cukup";
+        if (sisaTarget100 <= 0) {
+            etaText = "Target 100M Tercapai! 🎉";
+            document.getElementById('uiEtaBadge').className = "badge badge-success";
+        } else if (avgRecentProfit > 0) {
+            let monthsLeft = Math.ceil(sisaTarget100 / avgRecentProfit);
+            let d = new Date();
+            d.setMonth(d.getMonth() + monthsLeft);
+            let monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+            etaText = `Estimasi: ${monthNamesShort[d.getMonth()]} ${d.getFullYear()}<br>(${monthsLeft} bln lagi)`;
+        }
+        document.getElementById('uiEtaBadge').innerHTML = `<i class="fas fa-clock" style="margin-right:3px;"></i>${etaText}`;
+
+        renderGoalChart(totalAset, sisaTarget100 > 0 ? sisaTarget100 : 0);
+
+
         // --- DASHBOARD TAB ---
         const prevAset = parseInt(document.getElementById('uiTotalAsset').innerText.replace(/\D/g,'')) || 0;
         const prevProfit = parseInt(document.getElementById('uiTotalProfit').innerText.replace(/\D/g,'')) || 0;
@@ -686,14 +742,14 @@
 
     async function initDashboard(forceSync = false) {
         try {
-            const cachedData = localStorage.getItem('faridStoreCacheV5');
+            const cachedData = localStorage.getItem('faridStoreCacheV6');
             if (cachedData && !forceSync) {
                 globalRawData = JSON.parse(cachedData);
                 processData(globalRawData);
             }
             const dbData = await fetchDatabase();
             if(dbData) {
-                localStorage.setItem('faridStoreCacheV5', JSON.stringify(dbData));
+                localStorage.setItem('faridStoreCacheV6', JSON.stringify(dbData));
                 globalRawData = dbData;
                 processData(dbData); 
             }
