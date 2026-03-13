@@ -1,162 +1,174 @@
 <!DOCTYPE html>
-<html lang="id" data-theme="dark">
+<html lang="id" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Farid Store | Mobile 100M Tracker</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* CSS Variables */
-        :root[data-theme="dark"] {
-            --primary: #4FD1C5; --primary-dark: #319795;
-            --secondary: #10b981; --bg-color: #0b1120; 
-            --card-bg: rgba(30, 41, 59, 0.65);
-            --text-main: #f8fafc; --text-muted: #94a3b8;
-            --border: rgba(79, 209, 197, 0.15);
-            --danger: #ef4444; --warning: #f59e0b;
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            --glass-border: rgba(255, 255, 255, 0.05);
-            --shimmer: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0) 100%);
-            --skeleton-bg: rgba(255,255,255,0.05);
-        }
-
+        /* CSS Variables - Modern Fintech Theme */
         :root[data-theme="light"] {
-            --primary: #0d9488; --primary-dark: #0f766e;
-            --secondary: #059669; --bg-color: #f8fafc; 
-            --card-bg: rgba(255, 255, 255, 0.85);
-            --text-main: #0f172a; --text-muted: #64748b;
-            --border: rgba(13, 148, 136, 0.2);
-            --danger: #dc2626; --warning: #d97706;
-            --shadow: 0 8px 32px rgba(148, 163, 184, 0.2);
-            --glass-border: rgba(0, 0, 0, 0.05);
-            --shimmer: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0) 100%);
-            --skeleton-bg: rgba(0,0,0,0.05);
+            --primary: #2563EB; /* Royal Blue */
+            --primary-light: #EFF6FF;
+            --secondary: #10B981; /* Emerald Green */
+            --bg-color: #F8FAFC; 
+            --card-bg: #FFFFFF;
+            --text-main: #0F172A; 
+            --text-muted: #64748B;
+            --border: #E2E8F0;
+            --danger: #EF4444; 
+            --warning: #F59E0B;
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+            --shadow-md: 0 4px 15px rgba(15, 23, 42, 0.05);
+            --shadow-lg: 0 10px 25px rgba(15, 23, 42, 0.08);
+            --nav-bg: rgba(255, 255, 255, 0.9);
+            --skeleton-bg: #F1F5F9;
+            --shimmer: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.6) 50%, transparent 100%);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
+        :root[data-theme="dark"] {
+            --primary: #3B82F6; 
+            --primary-light: #1E3A8A;
+            --secondary: #10B981; 
+            --bg-color: #0F172A; 
+            --card-bg: #1E293B;
+            --text-main: #F8FAFC; 
+            --text-muted: #94A3B8;
+            --border: #334155;
+            --danger: #F87171; 
+            --warning: #FBBF24;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
+            --nav-bg: rgba(30, 41, 59, 0.9);
+            --skeleton-bg: #334155;
+            --shimmer: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.05) 50%, transparent 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s ease, color 0.3s ease; }
 
         body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
             background-color: var(--bg-color); color: var(--text-main);
-            padding: 15px 12px 40px 12px;
+            padding: 20px 16px 90px 16px; /* Extra bottom padding for nav */
             overscroll-behavior-y: contain;
         }
 
         .container { max-width: 600px; margin: 0 auto; position: relative; }
 
-        /* Pull to Refresh Indicator */
-        #ptr-indicator {
-            text-align: center; color: var(--text-muted); font-size: 12px; font-weight: 600;
-            height: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 8px;
-            transition: height 0.2s ease;
-        }
+        /* PTR */
+        #ptr-indicator { text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600; height: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 8px; transition: height 0.2s ease; }
         .ptr-icon { font-size: 16px; transition: transform 0.3s ease; }
 
         /* Header */
-        header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border);
-        }
-        .header-title h1 { font-size: 20px; font-weight: 800; margin-bottom: 2px;}
-        .header-title p { color: var(--primary); font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;}
+        header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+        .header-title h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px;}
+        .header-title p { color: var(--text-muted); font-size: 13px; font-weight: 500; }
         
-        .header-actions { display: flex; gap: 10px; }
-        .btn-icon { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); padding: 10px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        .btn-icon { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); }
 
-        /* Cards & Panels */
-        .summary-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px; }
-        .stat-card, .panel {
-            background: var(--card-bg); border-radius: 16px; border: 1px solid var(--glass-border);
-            position: relative; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            box-shadow: var(--shadow); overflow: hidden; padding: 20px;
-        }
-        .panel { padding: 15px; margin-bottom: 20px; }
+        /* Tabs Logic */
+        .tab-content { display: none; animation: fadeIn 0.4s ease-out forwards; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Cards General */
+        .card { background: var(--card-bg); border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-md); padding: 20px; margin-bottom: 20px; overflow: hidden; position: relative; }
         
-        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: linear-gradient(to bottom, var(--primary), var(--primary-dark)); }
-        .stat-card.success::before { background: linear-gradient(to bottom, var(--secondary), #059669); }
-
-        .stat-icon { position: absolute; top: 20px; right: 20px; font-size: 28px; color: var(--primary); opacity: 0.15; }
-        .stat-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 6px; letter-spacing: 0.5px;}
-        .stat-value { font-size: 28px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; letter-spacing: -0.5px;}
-        .stat-sub { font-size: 12px; color: var(--text-muted); line-height: 1.6; display: flex; justify-content: space-between;}
+        /* Dashboard - Target Hero Section */
+        .hero-section { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px 20px; }
         
-        .eta-badge { display: inline-flex; align-items: center; gap: 5px; background: rgba(245, 158, 11, 0.15); color: var(--warning); padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; margin-top: 8px; }
+        .progress-circle-wrapper { position: relative; width: 160px; height: 160px; margin-bottom: 20px; }
+        .progress-circle { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(var(--primary) var(--progress, 0%), var(--border) 0deg); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); }
+        .progress-circle-inner { width: 135px; height: 135px; border-radius: 50%; background: var(--card-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+        .pct-text { font-size: 28px; font-weight: 800; color: var(--primary); margin-bottom: -4px;}
+        .pct-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;}
 
-        /* Asset Composition Bar */
-        .comp-bar-container { width: 100%; height: 8px; border-radius: 4px; display: flex; overflow: hidden; margin-top: 10px; margin-bottom: 5px; background: rgba(0,0,0,0.2); }
+        .main-balance { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
+        .balance-label { font-size: 13px; color: var(--text-muted); font-weight: 600; }
+        
+        .eta-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--primary-light); color: var(--primary); padding: 8px 16px; border-radius: 30px; font-size: 12px; font-weight: 700; margin-top: 16px; box-shadow: var(--shadow-sm); }
+        .eta-badge.achieved { background: rgba(16, 185, 129, 0.1); color: var(--secondary); }
+
+        /* Asset Detail Section */
+        .asset-detail { border-top: 1px solid var(--border); padding-top: 20px; margin-top: 5px; }
+        .comp-bar-container { width: 100%; height: 8px; border-radius: 4px; display: flex; overflow: hidden; margin-bottom: 12px; background: var(--border); }
         .comp-cash { height: 100%; background: var(--secondary); transition: width 1s ease; }
         .comp-stock { height: 100%; background: var(--primary); transition: width 1s ease; }
-        .comp-legend { display: flex; justify-content: space-between; font-size: 10px; font-weight: 600; }
-        .legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+        
+        .asset-split { display: flex; justify-content: space-between; }
+        .split-item { display: flex; flex-direction: column; gap: 4px; }
+        .split-label { font-size: 11px; color: var(--text-muted); font-weight: 600; display: flex; align-items: center; gap: 4px;}
+        .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .split-val { font-size: 14px; font-weight: 700; }
 
-        /* Panel Header */
-        .panel-header { font-size: 13px; font-weight: 800; color: var(--text-main); margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; text-transform: uppercase; }
+        /* Small Stat Card */
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;}
+        .mini-card { background: var(--card-bg); border-radius: 16px; padding: 16px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; justify-content: center;}
+        .mini-label { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-bottom: 6px; }
+        .mini-val { font-size: 18px; font-weight: 800; color: var(--text-main);}
+
+        /* Section Header */
+        .section-header { font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
         
         /* Analytics Grid */
-        .analytics-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        .chart-box { position: relative; height: 180px; display: flex; justify-content: center; align-items: center; }
-        .aging-list { display: flex; flex-direction: column; gap: 8px; max-height: 160px; overflow-y: auto; padding-right: 5px; }
-        .aging-item { background: rgba(0,0,0,0.1); border: 1px solid var(--glass-border); padding: 8px 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 11px;}
-        .aging-item .name { font-weight: 700; color: var(--text-main); }
-        .aging-item .days { font-weight: 800; }
-        .aging-item.danger .days { color: var(--danger); }
-        .aging-item.warning .days { color: var(--warning); }
+        .analytics-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        .chart-box { height: 200px; display: flex; justify-content: center; align-items: center; }
         
-        /* Main Chart Area */
-        .chart-wrapper { width: 100%; overflow-x: auto; padding-bottom: 10px; }
-        .chart-container { position: relative; height: 220px; min-width: 500px; }
+        .aging-list { display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto; padding-right: 5px; }
+        .aging-item { border: 1px solid var(--border); padding: 12px 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 13px;}
+        .aging-item .name { font-weight: 600; color: var(--text-main); }
+        .aging-item .days { font-weight: 700; font-size: 12px; padding: 4px 10px; border-radius: 20px; background: var(--bg-color);}
+        .aging-item.danger .days { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+        .aging-item.warning .days { color: var(--warning); background: rgba(245, 158, 11, 0.1); }
 
-        /* Month Cards */
-        .month-list { display: flex; flex-direction: column; gap: 12px; }
-        .m-card { background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 14px; padding: 15px; position: relative; }
-        .m-card.active { border-color: var(--primary); box-shadow: 0 0 15px rgba(79, 209, 197, 0.1); }
-        .mc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
-        .mc-title { font-size: 14px; font-weight: 800; color: var(--text-main); }
-        .mc-subtitle { font-size: 11px; color: var(--text-muted); display: block; margin-top: 2px;}
+        /* Month Cards (History) */
+        .month-list { display: flex; flex-direction: column; gap: 16px; }
+        .m-card { border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
+        .m-card.active { border: 2px solid var(--primary); box-shadow: var(--shadow-md); }
+        .mc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .mc-title { font-size: 16px; font-weight: 700; color: var(--text-main); }
+        .mc-subtitle { font-size: 12px; color: var(--text-muted); font-weight: 500;}
         
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
-        .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--secondary); border: 1px solid rgba(16, 185, 129, 0.3); }
-        .badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
-        .badge-pending { background: rgba(148, 163, 184, 0.1); color: var(--text-muted); border: 1px solid rgba(148, 163, 184, 0.2); }
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        .badge-success { background: rgba(16, 185, 129, 0.1); color: var(--secondary); }
+        .badge-warning { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .badge-pending { background: var(--bg-color); color: var(--text-muted); }
 
         .mc-stat { margin-bottom: 12px; }
-        .mc-stat:last-child { margin-bottom: 0; }
-        .mc-stat-header { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 5px; font-weight: 600;}
-        .bar-bg { width: 100%; background: rgba(148, 163, 184, 0.2); height: 6px; border-radius: 3px; overflow: hidden; }
-        .bar-fill { height: 100%; border-radius: 3px; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
-        .fill-profit { background: linear-gradient(90deg, var(--secondary), #059669); }
-        .fill-unit { background: linear-gradient(90deg, var(--primary), var(--primary-dark)); }
+        .mc-stat-header { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; font-weight: 600; color: var(--text-muted);}
+        .bar-bg { width: 100%; background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 4px; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        .fill-profit { background: var(--secondary); }
+        .fill-unit { background: var(--primary); }
+        .val-actual { color: var(--text-main); font-weight: 700; }
 
-        .avg-margin-text { 
-            font-size: 8.5px; color: var(--text-muted); text-align: right; 
-            margin-top: 12px; margin-bottom: -2px; font-style: italic; 
-            opacity: 0.6; letter-spacing: 0.5px;
-        }
+        .avg-margin-text { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 12px; font-weight: 500;}
 
         /* Toggle Switch */
-        .switch-container { position: absolute; right: 0; display: flex; align-items: center; }
-        .toggle-label { font-size: 9px; font-weight: 800; color: var(--text-muted); margin-right: 6px; letter-spacing: 0.5px; }
-        .switch { position: relative; display: inline-block; width: 32px; height: 18px; }
+        .switch-container { display: flex; align-items: center; background: var(--bg-color); padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border);}
+        .toggle-label { font-size: 11px; font-weight: 700; color: var(--text-main); margin-right: 8px; }
+        .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(148, 163, 184, 0.3); transition: .4s; border-radius: 18px; }
-        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: var(--text-main); transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--secondary); }
-        input:checked + .slider:before { transform: translateX(14px); }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: var(--card-bg); transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(16px); }
+
+        /* Bottom Navigation */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: var(--nav-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); text-decoration: none; width: 33%; gap: 4px; cursor: pointer; transition: color 0.2s; }
+        .nav-item i { font-size: 20px; margin-bottom: 2px; }
+        .nav-item span { font-size: 10px; font-weight: 600; }
+        .nav-item.active { color: var(--primary); }
 
         /* Skeletons */
-        .skeleton { position: relative; overflow: hidden; background-color: var(--skeleton-bg); border-radius: 4px; }
+        .skeleton { position: relative; overflow: hidden; background-color: var(--skeleton-bg); border-radius: 8px; }
         .skeleton::after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0; transform: translateX(-100%); background: var(--shimmer); animation: shimmer 1.5s infinite; }
         @keyframes shimmer { 100% { transform: translateX(100%); } }
-        .skel-title { height: 12px; width: 40%; margin-bottom: 8px; }
-        .skel-value { height: 32px; width: 60%; margin-bottom: 12px; border-radius: 6px; }
-        .skel-text { height: 10px; width: 80%; margin-bottom: 6px; }
         
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 4px; }
-        .fade-in { animation: fadeInUp 0.5s ease-out forwards; opacity: 0; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
     </style>
 </head>
 <body>
@@ -168,114 +180,117 @@
 
     <header>
         <div class="header-title">
-            <h1>PORTFOLIO TRACKER</h1>
-            <p>100M Goal | Farid Store</p>
+            <h1>Farid Store</h1>
+            <p>Your Gadget Solution</p>
         </div>
-        <div class="header-actions">
-            <button class="btn-icon" onclick="toggleTheme()" id="themeBtn" aria-label="Toggle Theme">
-                <i class="fas fa-moon"></i>
-            </button>
-        </div>
+        <button class="btn-icon" onclick="toggleTheme()" id="themeBtn" aria-label="Toggle Theme">
+            <i class="fas fa-moon"></i>
+        </button>
     </header>
 
-    <div class="summary-grid" id="mainDashboard">
-        <div id="loadingState" style="display: none;">
-            <div class="stat-card" style="margin-bottom: 15px;">
-                <div class="skeleton skel-title"></div>
-                <div class="skeleton skel-value"></div>
-                <div class="skeleton skel-text"></div>
-                <div class="skeleton skel-text" style="width:50%;"></div>
-            </div>
-            <div class="stat-card">
-                <div class="skeleton skel-title"></div>
-                <div class="skeleton skel-value"></div>
-                <div class="skeleton skel-text"></div>
-            </div>
-        </div>
+    <div id="loadingState" style="display: none;">
+        <div class="card"><div class="skeleton" style="height: 150px; width: 150px; border-radius: 50%; margin: 0 auto 20px;"></div><div class="skeleton" style="height: 30px; width: 60%; margin: 0 auto 10px;"></div><div class="skeleton" style="height: 15px; width: 40%; margin: 0 auto;"></div></div>
+    </div>
 
-        <div id="realState">
-            <div class="stat-card fade-in" id="cardAsset">
-                <i class="fas fa-wallet stat-icon"></i>
-                <div class="stat-title">Aset Saat Ini (Unrealized)</div>
-                <div class="stat-value" id="uiTotalAsset">Rp 0</div>
-                <div class="stat-sub">
-                    <span>Modal Murni: <strong id="uiAssetStart" style="color: var(--text-main);">Rp 0</strong></span>
+    <div id="tab-dashboard" class="tab-content active">
+        <div class="card">
+            <div class="hero-section">
+                <div class="progress-circle-wrapper">
+                    <div class="progress-circle" id="uiProgressCircle" style="--progress: 0%;">
+                        <div class="progress-circle-inner">
+                            <span class="pct-text" id="uiProgressPct">0%</span>
+                            <span class="pct-label">Tercapai</span>
+                        </div>
+                    </div>
                 </div>
                 
+                <div class="balance-label">Total Aset Saat Ini</div>
+                <div class="main-balance" id="uiTotalAsset">Rp 0</div>
+                
+                <div class="eta-badge" id="uiEta">
+                    <i class="fas fa-chart-line"></i> Mengkalkulasi ETA...
+                </div>
+            </div>
+
+            <div class="asset-detail">
+                <div class="section-header" style="font-size: 13px; margin-bottom: 12px;">Komposisi Aset</div>
                 <div class="comp-bar-container">
                     <div class="comp-cash" id="barCash" style="width: 0%;"></div>
                     <div class="comp-stock" id="barStock" style="width: 0%;"></div>
                 </div>
-                <div class="comp-legend">
-                    <span style="color: var(--text-muted);"><i class="legend-dot" style="background:var(--secondary)"></i>Kas Laci: <span id="uiValCash">Rp 0</span></span>
-                    <span style="color: var(--text-muted);"><i class="legend-dot" style="background:var(--primary)"></i>Stok Gudang: <span id="uiValStock">Rp 0</span></span>
-                </div>
-
-                <div class="eta-badge" id="uiEta" style="margin-top: 12px;">
-                    <i class="fas fa-clock"></i> Mengkalkulasi ETA...
-                </div>
-            </div>
-            
-            <div class="stat-card fade-in" style="margin-top: 15px; animation-delay: 0.1s;">
-                <i class="fas fa-chart-line stat-icon"></i>
-                <div class="stat-title" id="uiProfitTitle">Akumulasi Laba Kotor</div>
-                <div class="stat-value" id="uiTotalProfit" style="color: var(--secondary);">Rp 0</div>
-                <div class="bar-bg" style="height: 6px; margin-top: 8px;"><div class="bar-fill fill-profit" id="globalProfitBar" style="width: 0%;"></div></div>
-                <div class="stat-sub" style="margin-top: 8px; display: flex; justify-content: space-between;">
-                    <span id="uiProgressPct" style="font-weight: 700; color: var(--text-main);">0%</span>
-                    <span>Target: Rp 80 Jt</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="panel fade-in" id="panelAnalytics" style="display:none; animation-delay: 0.2s;">
-        <div class="panel-header">
-            <span><i class="fas fa-microscope" style="color: var(--warning)"></i> Business Analytics</span>
-        </div>
-        <div class="analytics-grid">
-            <div>
-                <div style="font-size: 11px; font-weight: 600; text-align: center; margin-bottom: 5px; color: var(--text-muted); position: relative; display: flex; justify-content: center; align-items: center;">
-                    <span>ALOKASI PROFIT (BULAN INI)</span>
-                    <div class="switch-container">
-                        <span class="toggle-label">NETTO</span>
-                        <label class="switch">
-                            <input type="checkbox" id="netProfitToggle" onchange="toggleNetProfit()">
-                            <span class="slider"></span>
-                        </label>
+                <div class="asset-split">
+                    <div class="split-item">
+                        <span class="split-label"><i class="legend-dot" style="background:var(--secondary)"></i> Kas Laci</span>
+                        <span class="split-val" id="uiValCash">Rp 0</span>
+                    </div>
+                    <div class="split-item" style="text-align: right; align-items: flex-end;">
+                        <span class="split-label">Stok Gudang <i class="legend-dot" style="background:var(--primary)"></i></span>
+                        <span class="split-val" id="uiValStock">Rp 0</span>
                     </div>
                 </div>
-                <div class="chart-box">
-                    <canvas id="doughnutChart"></canvas>
-                </div>
             </div>
-            <div style="border-top: 1px solid var(--glass-border); padding-top: 15px; margin-top: 5px;">
-                <div style="font-size: 11px; font-weight: 600; margin-bottom: 10px; color: var(--text-muted); display: flex; justify-content: space-between;">
-                    <span>RADAR STOK MENGENDAP</span>
-                    <i class="fas fa-box-open"></i>
-                </div>
-                <div class="aging-list" id="agingListUI"></div>
+        </div>
+
+        <div class="stat-grid">
+            <div class="mini-card">
+                <div class="mini-label">Modal Murni</div>
+                <div class="mini-val" id="uiAssetStart">Rp 0</div>
+            </div>
+            <div class="mini-card">
+                <div class="mini-label" id="uiProfitTitle">Akumulasi Laba</div>
+                <div class="mini-val" id="uiTotalProfit" style="color: var(--secondary);">Rp 0</div>
             </div>
         </div>
     </div>
 
-    <div class="panel fade-in" style="animation-delay: 0.3s;">
-        <div class="panel-header">
-            <span><i class="fas fa-chart-area" style="color: var(--primary)"></i> Kinerja 12 Bulan</span>
-            <i class="fas fa-arrows-left-right" style="font-size: 10px; color: var(--text-muted);"></i>
+    <div id="tab-analytics" class="tab-content">
+        <div class="card">
+            <div class="section-header">
+                <span>Alokasi Profit Laba</span>
+                <div class="switch-container">
+                    <span class="toggle-label">NETTO</span>
+                    <label class="switch">
+                        <input type="checkbox" id="netProfitToggle" onchange="toggleNetProfit()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="chart-box">
+                <canvas id="doughnutChart"></canvas>
+            </div>
         </div>
-        <div class="chart-wrapper">
-            <div class="chart-container">
+
+        <div class="card">
+            <div class="section-header">Kinerja 12 Bulan</div>
+            <div style="height: 220px; width: 100%;">
                 <canvas id="salesChart"></canvas>
             </div>
         </div>
+
+        <div class="card">
+            <div class="section-header">Radar Stok Mengendap <i class="fas fa-box" style="color: var(--text-muted); font-size: 14px;"></i></div>
+            <div class="aging-list" id="agingListUI"></div>
+        </div>
     </div>
 
-    <div class="panel fade-in" style="padding: 15px 10px; background: transparent; border: none; box-shadow: none; animation-delay: 0.4s;">
-        <div class="panel-header" style="padding-left: 5px;">
-            <span><i class="fas fa-list-check" style="color: var(--primary)"></i> Detail per Bulan</span>
-        </div>
+    <div id="tab-history" class="tab-content">
+        <div class="section-header" style="padding: 0 4px;">Detail Roadmap per Bulan</div>
         <div class="month-list" id="trackerBody"></div>
+    </div>
+</div>
+
+<div class="bottom-nav">
+    <div class="nav-item active" onclick="switchTab('tab-dashboard', this)">
+        <i class="fas fa-home"></i>
+        <span>Beranda</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('tab-analytics', this)">
+        <i class="fas fa-chart-pie"></i>
+        <span>Analitik</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('tab-history', this)">
+        <i class="fas fa-list-ul"></i>
+        <span>Riwayat</span>
     </div>
 </div>
 
@@ -303,8 +318,7 @@
 
     let salesChartInstance = null;
     let doughnutChartInstance = null;
-    let currentTheme = localStorage.getItem('theme') || 'dark';
-    
+    let currentTheme = localStorage.getItem('theme') || 'light';
     let globalRawData = null; 
     let isNetProfitMode = false;
 
@@ -312,26 +326,46 @@
     document.documentElement.setAttribute('data-theme', currentTheme);
     updateThemeIcon();
 
+    // Tab Switching Logic
+    function switchTab(tabId, element) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+
+        // Fix chart rendering bug when tab is hidden
+        if(tabId === 'tab-analytics') {
+            if(salesChartInstance) salesChartInstance.resize();
+            if(doughnutChartInstance) doughnutChartInstance.resize();
+        }
+    }
+
     function toggleTheme() {
         currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', currentTheme);
         localStorage.setItem('theme', currentTheme);
         updateThemeIcon();
-        if(salesChartInstance) salesChartInstance.update();
-        if(doughnutChartInstance) doughnutChartInstance.update();
+        if(salesChartInstance) {
+            salesChartInstance.options.scales.x.grid.color = getGridColor();
+            salesChartInstance.options.scales.y.grid.color = getGridColor();
+            salesChartInstance.update();
+        }
     }
 
     function updateThemeIcon() {
         const icon = document.querySelector('#themeBtn i');
-        if(currentTheme === 'dark') { icon.className = 'fas fa-sun'; icon.style.color = '#f59e0b'; } 
-        else { icon.className = 'fas fa-moon'; icon.style.color = '#3b82f6'; }
+        if(currentTheme === 'dark') { icon.className = 'fas fa-sun'; icon.style.color = '#FBBF24'; } 
+        else { icon.className = 'fas fa-moon'; icon.style.color = '#0F172A'; }
+    }
+
+    function getGridColor() {
+        return currentTheme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
     }
 
     function toggleNetProfit() {
         isNetProfitMode = document.getElementById('netProfitToggle').checked;
-        if (globalRawData) {
-            processData(globalRawData); 
-        }
+        if (globalRawData) processData(globalRawData); 
     }
 
     function animateValue(id, start, end, duration, isCurrency = true) {
@@ -352,25 +386,14 @@
     }
 
     function showSkeleton() {
-        document.getElementById('realState').style.display = 'none';
+        document.getElementById('tab-dashboard').style.display = 'none';
         document.getElementById('loadingState').style.display = 'block';
-        document.getElementById('panelAnalytics').style.display = 'none';
-        
-        let skeletonHTML = '';
-        for(let i=0; i<3; i++) {
-            skeletonHTML += `<div class="m-card" style="margin-bottom:12px;">
-                <div class="skeleton skel-title"></div>
-                <div class="skeleton skel-text" style="width:100%; height:8px; margin-top:15px;"></div>
-                <div class="skeleton skel-text" style="width:100%; height:8px; margin-top:10px;"></div>
-            </div>`;
-        }
-        document.getElementById('trackerBody').innerHTML = skeletonHTML;
     }
 
     function hideSkeleton() {
         document.getElementById('loadingState').style.display = 'none';
-        document.getElementById('realState').style.display = 'block';
-        document.getElementById('panelAnalytics').style.display = 'block';
+        // Hanya tampilkan tab dashboard jika sedang aktif
+        document.getElementById('tab-dashboard').style.display = document.getElementById('tab-dashboard').classList.contains('active') ? 'block' : 'none';
     }
 
     async function fetchDatabase() {
@@ -394,14 +417,12 @@
     function processData(db) {
         let monthlyActuals = {};
         
-        // VARIABEL RUMUS 100% IDENTIK DENGAN DIGITAL LEDGER DASHBOARD
         let startBalance = Number(db.startBalance) || 0;
         let belanjaBaru = 0, uangMasuk = 0;
         let profitMain = 0, profitEkstra = 0;
         let floatModal = 0, floatPrice = 0, totalUnitTerjual = 0;
         let agingStocks = [];
 
-        // 1. Ekstrak Data HP Utama
         if(db.items) {
             db.items.forEach(i => {
                 if (i.status === 'sold') {
@@ -424,7 +445,6 @@
                     floatModal += i.modal;
                     floatPrice += i.price;
 
-                    // Aging Stock Logic
                     let ageDays = 0;
                     if(i.id) { 
                         const addedDate = new Date(Math.floor(i.id));
@@ -436,12 +456,9 @@
             });
         }
 
-        // 2. Ekstrak Data Extra Profit (Penting: Murni ambil profit tanpa edit)
         if(db.extraProfits) {
             db.extraProfits.forEach(p => {
-                // Di sini letak perbaikannya: Ambil murni nilai profit langsung dari database
                 let calcProfit = p.profit;
-                
                 profitEkstra += calcProfit;
                 totalUnitTerjual++; 
                 
@@ -454,13 +471,11 @@
             });
         }
 
-        // 3. Logika Pengurangan Gaji (Terkunci ke Toggle Netto)
         let totalBebanGajiGlobal = 0;
         const BEBAN_BULANAN = 2500000; 
 
         for (let key in monthlyActuals) {
             monthlyActuals[key].profitKotor = monthlyActuals[key].profit; 
-            
             if (isNetProfitMode) {
                 monthlyActuals[key].profit -= BEBAN_BULANAN;
                 totalBebanGajiGlobal += BEBAN_BULANAN;
@@ -468,17 +483,11 @@
         }
 
         let totalProfitBersih = profitMain + profitEkstra;
-        if (isNetProfitMode) {
-            totalProfitBersih -= totalBebanGajiGlobal;
-        }
+        if (isNetProfitMode) totalProfitBersih -= totalBebanGajiGlobal;
 
-        // ==========================================
-        // RUMUS ASET 100% SAMA DENGAN DIGITAL LEDGER
-        // ==========================================
         const cashSisa = startBalance - belanjaBaru + uangMasuk;
         const totalAsetReal = cashSisa + floatPrice; 
 
-        // Sorting radar stok gudang
         agingStocks.sort((a, b) => b.days - a.days);
 
         updateUI(monthlyActuals, totalAsetReal, totalProfitBersih, totalUnitTerjual, startBalance, cashSisa, floatPrice, agingStocks);
@@ -489,17 +498,16 @@
         const tbody = document.getElementById('trackerBody');
         tbody.innerHTML = '';
         
-        document.getElementById('uiProfitTitle').innerText = isNetProfitMode ? 'Akumulasi Laba Bersih' : 'Akumulasi Laba Kotor';
+        document.getElementById('uiProfitTitle').innerText = isNetProfitMode ? 'Laba Bersih' : 'Laba Kotor';
 
         const prevAset = parseInt(document.getElementById('uiTotalAsset').innerText.replace(/\D/g,'')) || 0;
         const prevProfit = parseInt(document.getElementById('uiTotalProfit').innerText.replace(/\D/g,'')) || 0;
         
         animateValue('uiTotalAsset', prevAset, totalAset, 1000);
         animateValue('uiTotalProfit', prevProfit, globalGrossProfit, 1000);
-        
         document.getElementById('uiAssetStart').innerText = formatRpFull(startBalance);
         
-        // Visualisasi Asset Composition Bar
+        // Asset Composition
         const totalAsetAktif = cashSisa + floatPrice;
         const cashPct = totalAsetAktif > 0 ? (cashSisa / totalAsetAktif) * 100 : 0;
         const stockPct = totalAsetAktif > 0 ? (floatPrice / totalAsetAktif) * 100 : 0;
@@ -509,14 +517,13 @@
         document.getElementById('uiValCash').innerText = formatRpFull(cashSisa);
         document.getElementById('uiValStock').innerText = formatRpFull(floatPrice);
         
-        if(totalAset >= 100000000) document.getElementById('cardAsset').classList.add('success');
-        
-        // Persentase Global Laba
+        // Circular Progress Goal
         let progressPctCalc = (globalGrossProfit / 80000000) * 100;
         if (progressPctCalc < 0) progressPctCalc = 0;
         const progressPct = Math.min(progressPctCalc, 100).toFixed(1);
-        document.getElementById('globalProfitBar').style.width = `${progressPct}%`;
-        document.getElementById('uiProgressPct').innerText = `${progressPct}% Selesai`;
+        
+        document.getElementById('uiProgressCircle').style.setProperty('--progress', `${progressPct}%`);
+        document.getElementById('uiProgressPct').innerText = `${progressPct}%`;
 
         // ETA Calc
         let activeMonthsKey = Object.keys(actualsData).sort();
@@ -526,26 +533,27 @@
         
         let sisaTarget = 100000000 - totalAset;
         let etaText = "Data belum cukup";
+        let etaBadge = document.getElementById('uiEta');
         
         if (sisaTarget <= 0) {
-            etaText = "Target Tercapai! 🎉";
-            document.getElementById('uiEta').style.color = "var(--secondary)";
-            document.getElementById('uiEta').style.background = "rgba(16, 185, 129, 0.15)";
+            etaText = "Target 100M Tercapai! 🎉";
+            etaBadge.classList.add('achieved');
         } else if (avgRecentProfit > 0) {
             let monthsLeft = Math.ceil(sisaTarget / avgRecentProfit);
             let d = new Date();
             d.setMonth(d.getMonth() + monthsLeft);
             let monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
             etaText = `Estimasi 100M: ${monthNamesShort[d.getMonth()]} ${d.getFullYear()} (${monthsLeft} bln lagi)`;
+            etaBadge.classList.remove('achieved');
         }
-        document.getElementById('uiEta').innerHTML = `<i class="fas fa-clock"></i> ${etaText}`;
+        etaBadge.innerHTML = `<i class="fas ${sisaTarget <= 0 ? 'fa-award' : 'fa-rocket'}"></i> ${etaText}`;
 
         let currentMonthKey = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
         let currentMonthGrossProfit = actualsData[currentMonthKey] ? (actualsData[currentMonthKey].profitKotor !== undefined ? actualsData[currentMonthKey].profitKotor : actualsData[currentMonthKey].profit) : 0;
 
         renderAnalytics(currentMonthGrossProfit, agingStocks);
 
-        // Tracker Roadmap Logika
+        // Roadmap
         let chartLabels = [], chartProfitData = [], chartActualUnits = [];
         const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
         let startMonth = 2, startYear = 2026;
@@ -571,48 +579,43 @@
             let dynamicTargetUnit = Math.ceil(smartTargetProfit / avgThisMonth); 
             if (actProfit >= smartTargetProfit) dynamicTargetUnit = actUnits; 
             
-            let profitPctCalc = (actProfit / smartTargetProfit) * 100;
-            if (profitPctCalc < 0) profitPctCalc = 0;
-            let profitPct = Math.min(profitPctCalc, 100);
-            let unitPct = Math.min((actUnits / dynamicTargetUnit) * 100, 100);
+            let profitPct = Math.min((actProfit / smartTargetProfit) * 100 || 0, 100);
+            let unitPct = Math.min((actUnits / dynamicTargetUnit) * 100 || 0, 100);
 
             if (monthKey <= currentMonthKey) accumulatedDeficit += (t.profit - actProfit);
 
             let statusBadge = actProfit >= smartTargetProfit 
-                ? '<span class="badge badge-success"><i class="fas fa-check"></i> Tercapai</span>' 
+                ? '<span class="badge badge-success">Tercapai</span>' 
                 : (actProfit > 0 ? '<span class="badge badge-warning">Proses</span>' : '<span class="badge badge-pending">Pending</span>');
 
             let isCurrent = (monthKey === currentMonthKey);
-            let targetNote = accumulatedDeficit > 0 && isCurrent ? `<br><span style="font-size:9px; color:var(--warning);">*Target disesuaikan (defisit lalu)</span>` : '';
             let labelLaba = isNetProfitMode ? 'Laba Bersih' : 'Laba Kotor';
 
             const card = document.createElement('div');
-            card.className = `m-card fade-in ${isCurrent ? 'active' : ''}`;
-            card.style.animationDelay = `${0.3 + (index * 0.1)}s`;
-            
+            card.className = `m-card ${isCurrent ? 'active' : ''}`;
             card.innerHTML = `
                 <div class="mc-header">
                     <div>
-                        <div class="mc-title">Bulan ${t.month} ${isCurrent ? '<i class="fas fa-crosshairs fa-spin" style="color:var(--primary); font-size:12px; margin-left:4px;"></i>' : ''}</div>
+                        <div class="mc-title">Bulan ${t.month}</div>
                         <span class="mc-subtitle">${monthNames[m-1]} ${y}</span>
                     </div>
                     ${statusBadge}
                 </div>
                 <div class="mc-stat">
                     <div class="mc-stat-header">
-                        <span style="color: var(--secondary)">${labelLaba}</span>
-                        <span style="text-align:right;"><span class="val-actual">${formatRp(actProfit)}</span> <span class="val-target">/ ${formatRp(smartTargetProfit)}</span> ${targetNote}</span>
+                        <span>${labelLaba}</span>
+                        <span><span class="val-actual">${formatRp(actProfit)}</span> / ${formatRp(smartTargetProfit)}</span>
                     </div>
                     <div class="bar-bg"><div class="bar-fill fill-profit" style="width: ${profitPct}%"></div></div>
                 </div>
                 <div class="mc-stat">
                     <div class="mc-stat-header">
-                        <span style="color: var(--primary)">Penjualan Unit</span>
-                        <span><span class="val-actual">${actUnits}</span> <span class="val-target">/ ${dynamicTargetUnit} Unit</span></span>
+                        <span>Penjualan</span>
+                        <span><span class="val-actual">${actUnits}</span> / ${dynamicTargetUnit} Unit</span>
                     </div>
                     <div class="bar-bg"><div class="bar-fill fill-unit" style="width: ${unitPct}%"></div></div>
                 </div>
-                <div class="avg-margin-text">Avg margin: ${formatRp(avgThisMonth)} / unit</div>
+                <div class="avg-margin-text">Avg: ${formatRp(avgThisMonth)} / unit</div>
             `;
             tbody.appendChild(card);
         });
@@ -637,26 +640,17 @@
         doughnutChartInstance = new Chart(ctxDoughnut, {
             type: 'doughnut',
             data: {
-                labels: ['Gaji Saya', 'Gaji Karyawan', 'Laba Bersih (Sisa)'],
+                labels: ['Gaji Owner', 'Gaji Karyawan', 'Laba Bersih (Sisa)'],
                 datasets: [{
                     data: [pOwner, pKaryawan, pSisa],
-                    backgroundColor: ['#f59e0b', '#ef4444', '#10b981'],
-                    borderWidth: 0,
-                    hoverOffset: 4
+                    backgroundColor: ['#2563EB', '#F59E0B', '#10B981'],
+                    borderWidth: 0, hoverOffset: 4
                 }]
             },
             options: {
-                responsive: true, maintainAspectRatio: false,
-                cutout: '65%',
+                responsive: true, maintainAspectRatio: false, cutout: '70%',
                 plugins: {
-                    legend: { position: 'bottom', labels: { boxWidth: 10, color: '#94a3b8', font: { size: 10 } } },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return ' ' + context.label + ': ' + new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(context.parsed);
-                            }
-                        }
-                    }
+                    legend: { position: 'bottom', labels: { boxWidth: 12, usePointStyle: true, font: { family: "'Plus Jakarta Sans', sans-serif" } } },
                 }
             }
         });
@@ -664,22 +658,18 @@
         const listUI = document.getElementById('agingListUI');
         listUI.innerHTML = '';
         if(agingStocks.length === 0) {
-            listUI.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:11px; padding:10px;">Gudang Kosong / Lancar</div>`;
+            listUI.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:13px; padding:20px;">Gudang Aman & Lancar 🚀</div>`;
             return;
         }
 
         agingStocks.forEach(item => {
-            let severityClass = '';
-            if(item.days > 30) severityClass = 'danger';
-            else if(item.days > 14) severityClass = 'warning';
-            
+            let severityClass = item.days > 30 ? 'danger' : (item.days > 14 ? 'warning' : '');
             if(listUI.childElementCount < 5) {
                 listUI.innerHTML += `
                     <div class="aging-item ${severityClass}">
                         <span class="name">${item.name}</span>
-                        <span class="days">${item.days} Hari <i class="${severityClass ? 'fas fa-exclamation-circle' : 'fas fa-check-circle'}" style="color:${severityClass ? 'inherit' : 'var(--secondary)'}"></i></span>
-                    </div>
-                `;
+                        <span class="days">${item.days} Hari</span>
+                    </div>`;
             }
         });
     }
@@ -688,26 +678,25 @@
         const ctx = document.getElementById('salesChart').getContext('2d');
         if (salesChartInstance) salesChartInstance.destroy(); 
 
-        const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#94a3b8';
-        const gridColor = currentTheme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
-        Chart.defaults.color = textColor; Chart.defaults.font.family = "'Segoe UI', sans-serif";
+        Chart.defaults.color = getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim();
+        Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
 
         salesChartInstance = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: labels,
                 datasets: [
-                    { label: isNetProfitMode ? 'Laba Bersih (Juta)' : 'Laba Kotor (Juta)', data: profitData, type: 'line', backgroundColor: 'rgba(16, 185, 129, 0.15)', borderColor: '#10b981', borderWidth: 2, pointBackgroundColor: '#10b981', pointBorderColor: '#fff', fill: true, tension: 0.4, yAxisID: 'y' },
-                    { label: 'Unit Terjual', data: actualData, type: 'bar', backgroundColor: 'rgba(79, 209, 197, 0.6)', borderColor: '#4FD1C5', borderWidth: 1, borderRadius: 4, yAxisID: 'y1' }
+                    { label: isNetProfitMode ? 'Laba Bersih' : 'Laba Kotor', data: profitData, type: 'line', borderColor: '#10B981', borderWidth: 3, pointBackgroundColor: '#10B981', pointBorderColor: '#fff', pointRadius: 4, fill: true, backgroundColor: 'rgba(16, 185, 129, 0.1)', tension: 0.4, yAxisID: 'y' },
+                    { label: 'Unit', data: actualData, type: 'bar', backgroundColor: '#E2E8F0', hoverBackgroundColor: '#3B82F6', borderRadius: 4, borderSkipped: false, yAxisID: 'y1' }
                 ]
             },
             options: {
                 responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
-                plugins: { legend: { position: 'top', labels: { boxWidth: 10, font: { size: 11 } } } },
+                plugins: { legend: { display: false } },
                 scales: {
                     x: { grid: { display: false } },
-                    y: { type: 'linear', display: true, position: 'left', grid: { color: gridColor }, ticks: { callback: function(value) { return (value/1000000) + 'M'; }, font: { size: 10 } } },
-                    y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { font: { size: 10 }, stepSize: 5 } }
+                    y: { type: 'linear', display: true, position: 'left', grid: { color: getGridColor() }, ticks: { callback: v => (v/1000000) + 'M', font: { size: 10 } } },
+                    y1: { type: 'linear', display: false, position: 'right' }
                 }
             }
         });
@@ -715,7 +704,6 @@
 
     async function initDashboard(forceSync = false) {
         if(forceSync) showSkeleton();
-        
         try {
             const cachedData = localStorage.getItem('faridStoreCacheV3');
             if (cachedData && !forceSync) {
@@ -730,73 +718,51 @@
                 localStorage.setItem('faridStoreCacheV3', JSON.stringify(dbData));
                 globalRawData = dbData;
                 processData(dbData); 
-                setStatus('Sinkronisasi Berhasil', 'success');
             }
         } catch (err) {
             console.error(err);
-            if(!localStorage.getItem('faridStoreCacheV3')) setStatus('Gagal Terhubung! Periksa Jaringan', 'danger');
         } finally {
             if (forceSync) hideSkeleton();
         }
     }
 
     // --- PULL TO REFRESH LOGIC ---
-    let startY = 0;
-    let isPulling = false;
+    let startY = 0; let isPulling = false;
     const ptrIndicator = document.getElementById('ptr-indicator');
     const ptrIcon = document.getElementById('ptr-icon');
     const ptrText = document.getElementById('ptr-text');
     const THRESHOLD = 80;
 
     document.addEventListener('touchstart', (e) => {
-        if (window.scrollY === 0) {
-            startY = e.touches[0].pageY;
-            isPulling = true;
-        }
+        if (window.scrollY === 0) { startY = e.touches[0].pageY; isPulling = true; }
     }, {passive: true});
 
     document.addEventListener('touchmove', (e) => {
         if (!isPulling) return;
-        const currentY = e.touches[0].pageY;
-        const diff = currentY - startY;
-        
+        const diff = e.touches[0].pageY - startY;
         if (diff > 0 && window.scrollY === 0) {
             let height = Math.min(diff * 0.5, 100);
             ptrIndicator.style.height = `${height}px`;
-            
             if (height > THRESHOLD) {
-                ptrIcon.style.transform = 'rotate(180deg)';
-                ptrText.innerText = 'Lepas untuk Sync';
+                ptrIcon.style.transform = 'rotate(180deg)'; ptrText.innerText = 'Lepas untuk Sync';
             } else {
-                ptrIcon.style.transform = 'rotate(0deg)';
-                ptrText.innerText = 'Tarik untuk Sync...';
+                ptrIcon.style.transform = 'rotate(0deg)'; ptrText.innerText = 'Tarik untuk Sync...';
             }
         }
     }, {passive: true});
 
-    document.addEventListener('touchend', (e) => {
+    document.addEventListener('touchend', () => {
         if (!isPulling) return;
         isPulling = false;
-        
-        const currentHeight = parseInt(ptrIndicator.style.height || '0');
-        if (currentHeight > THRESHOLD) {
-            ptrIcon.className = 'fas fa-circle-notch fa-spin';
-            ptrText.innerText = 'Menyinkronkan...';
-            initDashboard(true).then(() => {
-                setTimeout(() => { resetPTR(); }, 500);
-            });
-        } else {
-            resetPTR();
-        }
+        if (parseInt(ptrIndicator.style.height || '0') > THRESHOLD) {
+            ptrIcon.className = 'fas fa-circle-notch fa-spin'; ptrText.innerText = 'Menyinkronkan...';
+            initDashboard(true).then(() => setTimeout(resetPTR, 500));
+        } else { resetPTR(); }
     });
 
     function resetPTR() {
         ptrIndicator.style.height = '0px';
-        setTimeout(() => {
-            ptrIcon.className = 'fas fa-arrow-down ptr-icon';
-            ptrIcon.style.transform = 'rotate(0deg)';
-            ptrText.innerText = 'Tarik untuk Sync...';
-        }, 300);
+        setTimeout(() => { ptrIcon.className = 'fas fa-arrow-down ptr-icon'; ptrIcon.style.transform = 'rotate(0deg)'; ptrText.innerText = 'Tarik untuk Sync...'; }, 300);
     }
 
     window.onload = () => initDashboard(false);
