@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Farid Store | 100M Dashboard</title>
+    <title>Farid Store | 100M Tracker</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -11,187 +11,189 @@
 
     <style>
         /* =========================================================
-           1. MODERN NATIVE FINTECH VARIABLES
+           1. CORE VARIABLES (Fintech Vibe)
            ========================================================= */
         :root[data-theme="light"] {
-            --primary: #000000; /* Pure Black for Native Vibe */
-            --primary-light: #F3F4F6;
-            --secondary: #10B981; /* Emerald Profit */
-            --bg-body: #F9FAFB; /* Off-white background */
-            --card-bg: #FFFFFF; 
-            --text-main: #111827; 
-            --text-muted: #6B7280;
-            --border: #E5E7EB; 
+            --primary: #0F172A; /* Slate 900 */
+            --primary-light: #F1F5F9;
+            --secondary: #10B981; /* Emerald 500 */
+            --bg-body: #F8FAFC; 
+            --card-bg: #FFFFFF;
+            --text-main: #0F172A; 
+            --text-muted: #64748B;
+            --border: #E2E8F0;
             --danger: #EF4444; 
             --warning: #F59E0B;
-            --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.04);
-            --nav-bg: rgba(255, 255, 255, 0.95); 
-            --skeleton-bg: #F3F4F6;
-            --shimmer: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.8) 50%, transparent 100%);
+            --shadow-card: 0 4px 20px rgba(15, 23, 42, 0.03);
+            --skeleton-bg: #F1F5F9;
+            --shimmer: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%);
         }
 
         :root[data-theme="dark"] {
             --primary: #FFFFFF; 
-            --primary-light: #1F2937;
+            --primary-light: #1E293B;
             --secondary: #10B981; 
-            --bg-body: #030712; /* Pitch black background */
-            --card-bg: #111827; /* Dark Gray Cards */
-            --text-main: #F9FAFB; 
-            --text-muted: #9CA3AF;
-            --border: #1F2937; 
-            --danger: #EF4444; 
-            --warning: #F59E0B;
-            --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
-            --nav-bg: rgba(17, 24, 39, 0.95); 
-            --skeleton-bg: #1F2937;
+            --bg-body: #0B1120; 
+            --card-bg: #1E293B;
+            --text-main: #F8FAFC; 
+            --text-muted: #94A3B8;
+            --border: #334155;
+            --danger: #F87171; 
+            --warning: #FBBF24;
+            --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --skeleton-bg: #334155;
             --shimmer: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.05) 50%, transparent 100%);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s, border-color 0.3s; }
 
-        body { background-color: var(--bg-body); color: var(--text-main); overscroll-behavior-y: auto; padding-bottom: 100px; }
+        body { background-color: var(--bg-body); color: var(--text-main); line-height: 1.5; }
 
         /* =========================================================
-           2. MOBILE-FIRST BASE LAYOUT (CLEAN & SPACIOUS)
+           2. MOBILE-FIRST LAYOUT (Safe & No Overlap)
            ========================================================= */
-        .app-container { max-width: 600px; margin: 0 auto; padding: 24px 20px; position: relative; }
-        .sidebar { display: none; } /* Hidden on mobile */
+        .app-container { max-width: 600px; margin: 0 auto; padding: 20px 16px 100px 16px; /* 100px bottom padding protects content from bottom nav */ }
+        
+        .sidebar { display: none; } /* Hidden by default */
+        
+        #ptr-indicator { text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600; height: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 8px; transition: height 0.2s; }
 
-        #ptr-indicator { text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600; height: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 8px; transition: height 0.2s ease; }
-
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
-        .header-title h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; color: var(--text-main);}
-        .header-title p { color: var(--text-muted); font-size: 13px; font-weight: 500; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-top: 10px;}
+        .header-title h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 2px;}
+        .header-title p { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;}
         .btn-icon { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-card); }
 
-        .tab-content { display: none; animation: fadeIn 0.4s ease-out forwards; }
+        /* Tab Visibility */
+        .tab-content { display: none; animation: fadeIn 0.3s ease forwards; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* UI Elements - Native Feel */
-        .card { background: var(--card-bg); border-radius: 24px; border: 1px solid var(--border); box-shadow: var(--shadow-card); padding: 24px; margin-bottom: 24px; overflow: hidden; }
+        /* General Card Style */
+        .card { background: var(--card-bg); border-radius: 24px; border: 1px solid var(--border); box-shadow: var(--shadow-card); padding: 24px; margin-bottom: 20px; }
         .section-header { font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
         
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;}
-        .mini-card { background: var(--card-bg); border-radius: 20px; padding: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-card); display: flex; flex-direction: column; justify-content: center;}
+        /* Grid Utilities */
+        .grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+
+        /* ----------------------------------
+           TAB 1: Dashboard Elements
+           ---------------------------------- */
+        .hero-section { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .progress-wrapper { position: relative; width: 180px; height: 180px; margin-bottom: 24px; }
+        .progress-circle { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(var(--primary) var(--progress, 0%), var(--border) 0deg); display: flex; align-items: center; justify-content: center; transition: background 1s ease;}
+        .progress-inner { width: 156px; height: 156px; border-radius: 50%; background: var(--card-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .pct-val { font-size: 32px; font-weight: 800; color: var(--text-main); letter-spacing: -1px; margin-bottom: -4px;}
+        .pct-label { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;}
         
-        /* Dashboard Hero Section */
-        .hero-section { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 10px 0; }
-        .progress-circle-wrapper { position: relative; width: 180px; height: 180px; margin-bottom: 24px; }
-        .progress-circle { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(var(--primary) var(--progress, 0%), var(--border) 0deg); display: flex; align-items: center; justify-content: center; transition: background 1s cubic-bezier(0.4, 0, 0.2, 1);}
-        .progress-circle-inner { width: 160px; height: 160px; border-radius: 50%; background: var(--card-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .pct-text { font-size: 36px; font-weight: 800; color: var(--text-main); margin-bottom: -4px; letter-spacing: -1px;}
-        .pct-label { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;}
         .main-balance { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; color: var(--text-main); }
         .balance-label { font-size: 14px; color: var(--text-muted); font-weight: 600; }
-        .eta-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--primary-light); color: var(--primary); padding: 10px 20px; border-radius: 30px; font-size: 13px; font-weight: 700; margin-top: 16px; }
-
-        /* Asset Breakdown */
-        .comp-bar-container { width: 100%; height: 10px; border-radius: 5px; display: flex; overflow: hidden; margin-bottom: 16px; background: var(--border); }
+        .eta-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--primary-light); color: var(--primary); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-top: 16px; }
+        
+        .comp-bar { width: 100%; height: 10px; border-radius: 5px; display: flex; overflow: hidden; margin-bottom: 16px; background: var(--border); }
         .comp-cash { height: 100%; background: var(--secondary); transition: width 1s ease; }
         .comp-stock { height: 100%; background: var(--primary); transition: width 1s ease; }
-        .split-item { display: flex; flex-direction: column; gap: 6px; }
-        .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block;}
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px;}
+
+        .mini-card { background: var(--card-bg); border-radius: 20px; padding: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-card); display: flex; flex-direction: column; }
+        .mini-label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; }
+        .mini-val { font-size: 20px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px;}
+
+        /* ----------------------------------
+           TAB 2: Analytics Elements
+           ---------------------------------- */
+        /* SAFE WRAPPER FOR CHART.JS (Prevents overlap) */
+        .chart-safe-wrapper { position: relative; height: 260px; width: 100%; }
         
-        /* Analytics */
-        .chart-box { position: relative; height: 250px; width: 100%; display: flex; justify-content: center; align-items: center; }
-        .chart-wrapper { position: relative; height: 280px; width: 100%; } /* Crucial to prevent squishing */
-        
-        .aging-list { display: flex; flex-direction: column; gap: 12px; }
+        .aging-list { display: flex; flex-direction: column; gap: 0; }
         .aging-item { border-bottom: 1px solid var(--border); padding: 16px 0; display: flex; justify-content: space-between; align-items: center;}
         .aging-item:last-child { border-bottom: none; padding-bottom: 0; }
         .cat-badge { font-size: 10px; padding: 4px 10px; border-radius: 12px; font-weight: 700; text-transform: uppercase;}
-        .cat-badge.gadget { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
-        .cat-badge.digital { background: rgba(37, 99, 235, 0.1); color: #3B82F6; }
-        .cat-badge.acc { background: var(--primary-light); color: var(--primary); }
-        
-        .search-container { position: relative; margin-bottom: 24px; }
-        .search-container i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-        .search-input { width: 100%; padding: 16px 16px 16px 44px; border-radius: 16px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-main); font-size: 14px; outline: none; font-weight: 500;}
-        .search-input:focus { border-color: var(--text-main); }
-        
-        .month-list { display: grid; grid-template-columns: 1fr; gap: 16px; }
-        .m-card { border: 1px solid var(--border); border-radius: 24px; padding: 24px; background: var(--card-bg); }
-        .m-card.active { border: 2px solid var(--primary); }
-        .bar-bg { width: 100%; background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 8px;}
-        .bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+        .badge-digital { background: rgba(37, 99, 235, 0.1); color: #3B82F6; }
+        .badge-gadget { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .badge-acc { background: var(--primary-light); color: var(--primary); }
 
         /* Toggles */
-        .switch-container { display: flex; align-items: center; background: var(--bg-body); padding: 6px 14px; border-radius: 30px; border: 1px solid var(--border);}
-        .switch { position: relative; display: inline-block; width: 40px; height: 22px; margin-left: 10px;}
+        .switch-container { display: flex; align-items: center; background: var(--bg-body); padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border);}
+        .switch { position: relative; display: inline-block; width: 36px; height: 20px; margin-left: 8px;}
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); border-radius: 30px; transition: .4s;}
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: var(--card-bg); border-radius: 50%; transition: .4s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
-        input:checked + .slider { background-color: var(--text-main); }
-        input:checked + .slider:before { transform: translateX(18px); }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); border-radius: 20px; transition: .4s;}
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: var(--card-bg); border-radius: 50%; transition: .4s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(16px); }
 
-        /* Mobile Bottom Nav */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 80px; background: var(--nav-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); width: 33%; gap: 6px; cursor: pointer; transition: color 0.2s; }
-        .nav-item i { font-size: 22px; }
+        /* ----------------------------------
+           TAB 3: History Elements
+           ---------------------------------- */
+        .search-container { position: relative; margin-bottom: 20px; }
+        .search-container i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .search-input { width: 100%; padding: 16px 16px 16px 44px; border-radius: 16px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-main); font-size: 14px; outline: none; font-weight: 500;}
+        .search-input:focus { border-color: var(--primary); }
+        
+        .month-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+        .m-card { border: 1px solid var(--border); border-radius: 20px; padding: 20px; background: var(--card-bg); }
+        .m-card.active { border: 2px solid var(--primary); }
+        .bar-bg { width: 100%; background: var(--border); height: 6px; border-radius: 3px; overflow: hidden; margin-top: 8px;}
+        .bar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+
+        /* ----------------------------------
+           MOBILE BOTTOM NAV & TOAST
+           ---------------------------------- */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 75px; background: var(--card-bg); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); width: 33%; gap: 4px; cursor: pointer; transition: color 0.2s; }
+        .nav-item i { font-size: 20px; }
         .nav-item span { font-size: 11px; font-weight: 600; }
-        .nav-item.active { color: var(--text-main); }
+        .nav-item.active { color: var(--primary); }
 
-        /* FAB & Toast */
-        .fab-readonly { position: fixed; bottom: 100px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--text-main); color: var(--bg-body); display: flex; justify-content: center; align-items: center; box-shadow: var(--shadow-card); z-index: 999; cursor: pointer; transition: transform 0.2s; font-size: 20px;}
-        .fab-readonly:active { transform: scale(0.9); }
-        #toast { visibility: hidden; min-width: 250px; background-color: var(--text-main); color: var(--bg-body); text-align: center; border-radius: 12px; padding: 14px 20px; position: fixed; z-index: 1001; left: 50%; bottom: 40px; transform: translateX(-50%); font-size: 13px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
-        #toast.show { visibility: visible; opacity: 1; bottom: 120px; }
+        #toast { visibility: hidden; min-width: 250px; background-color: var(--primary); color: var(--bg-body); text-align: center; border-radius: 12px; padding: 14px 20px; position: fixed; z-index: 1001; left: 50%; bottom: 90px; transform: translateX(-50%); font-size: 13px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
+        #toast.show { visibility: visible; opacity: 1; bottom: 100px; }
 
         /* Skeletons */
-        .skeleton { position: relative; overflow: hidden; background-color: var(--skeleton-bg); border-radius: 12px; }
+        .skeleton { overflow: hidden; background-color: var(--skeleton-bg); border-radius: 12px; position: relative;}
         .skeleton::after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0; transform: translateX(-100%); background: var(--shimmer); animation: shimmer 1.5s infinite; }
         @keyframes shimmer { 100% { transform: translateX(100%); } }
 
         /* =========================================================
-           3. DESKTOP LAYOUT (NO OVERLAPPING, SPACIOUS GRID)
+           3. DESKTOP LAYOUT (CSS GRID)
            ========================================================= */
         @media (min-width: 1024px) {
-            body { padding-bottom: 0; display: flex; justify-content: center; }
+            body { display: flex; justify-content: center; padding-bottom: 40px;} /* Allow scroll, center content */
             .app-container { margin: 0; padding: 40px; max-width: 1200px; width: 100%; margin-left: 280px; }
             
-            /* Sidebar takes place of Bottom Nav */
+            /* Hide mobile elements */
             .bottom-nav, header, #ptr-indicator { display: none !important; }
-            .sidebar { display: flex; flex-direction: column; width: 280px; position: fixed; left: 0; top: 0; bottom: 0; background: var(--card-bg); border-right: 1px solid var(--border); padding: 40px 24px; z-index: 10; }
             
+            /* Sidebar Navigation */
+            .sidebar { display: flex; flex-direction: column; width: 280px; position: fixed; left: 0; top: 0; bottom: 0; background: var(--card-bg); border-right: 1px solid var(--border); padding: 40px 24px; z-index: 10; }
             .sidebar-brand { margin-bottom: 48px; }
             .sidebar-brand h1 { font-size: 26px; font-weight: 800; color: var(--text-main); margin-bottom: 4px; letter-spacing: -0.5px;}
-            .sidebar-brand p { font-size: 13px; color: var(--text-muted); font-weight: 600;}
+            .sidebar-brand p { font-size: 13px; color: var(--text-muted); font-weight: 600; text-transform: uppercase;}
             
             .sidebar-nav { display: flex; flex-direction: column; gap: 8px; flex: 1; }
             .sidebar-item { padding: 16px 20px; border-radius: 16px; color: var(--text-muted); font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.2s; font-size: 15px;}
             .sidebar-item i { font-size: 20px; width: 24px; text-align: center; }
             .sidebar-item:hover { background: var(--bg-body); color: var(--text-main); }
-            .sidebar-item.active { background: var(--primary-light); color: var(--text-main); }
+            .sidebar-item.active { background: var(--primary-light); color: var(--primary); }
             
             .sidebar-footer { display: flex; flex-direction: column; gap: 12px; }
             .btn-sidebar { padding: 16px; border-radius: 16px; border: 1px solid var(--border); background: transparent; color: var(--text-main); font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; }
             .btn-sidebar:hover { background: var(--bg-body); }
-            .btn-sidebar.primary { background: var(--text-main); color: var(--bg-body); border: none; }
+            .btn-sidebar.primary { background: var(--primary); color: var(--bg-body); border: none; }
             .btn-sidebar.primary:hover { opacity: 0.8; }
 
-            /* Grid Layouts to prevent overlapping */
-            /* Tab 1 */
-            .desktop-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
-            .card { margin-bottom: 0; } /* Remove bottom margin inside grids */
-            .desktop-stack { display: flex; flex-direction: column; gap: 32px; }
-            .stat-grid { margin-bottom: 0; gap: 32px; }
+            /* Desktop Grid Systems to Prevent Overlap */
+            .desktop-grid-2 { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; align-items: start; }
+            .desktop-grid-chart { display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px; align-items: start; }
+            .desktop-stack { display: flex; flex-direction: column; gap: 24px; }
+            .month-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
             
-            /* Tab 2 */
-            .desktop-grid-chart { display: grid; grid-template-columns: 1.5fr 1fr; gap: 32px; align-items: start; }
-            .chart-wrapper { height: 400px; } /* Taller chart for desktop */
+            /* Fix margins inside grids */
+            .card { margin-bottom: 0; } 
+            .grid-2-col { margin-bottom: 0; gap: 24px;}
+            
+            /* Taller Charts for Desktop */
+            .chart-safe-wrapper { height: 350px; }
 
-            /* Tab 3 */
-            .month-list { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; }
-
-            .fab-readonly { bottom: 40px; right: 40px; }
             #toast.show { bottom: 40px; }
-            
-            /* Clean Scrollbar */
-            ::-webkit-scrollbar { width: 8px; }
-            ::-webkit-scrollbar-track { background: transparent; }
-            ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-            ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
         }
     </style>
 </head>
@@ -217,14 +219,17 @@
     <div id="ptr-indicator"><i class="fas fa-arrow-down ptr-icon" id="ptr-icon"></i> <span id="ptr-text">Tarik untuk Sync...</span></div>
 
     <header>
-        <div class="header-title"><h1>Farid Store</h1><p>Your Gadget Solution</p></div>
+        <div class="header-title">
+            <h1>Farid Store</h1>
+            <p>100M Portfolio Tracker</p>
+        </div>
         <button class="btn-icon" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIconMobile"></i></button>
     </header>
 
     <div id="loadingState" style="display: none; width: 100%;">
-        <div class="card" style="height: 350px; display: flex; flex-direction: column; justify-content: center; align-items: center; border:none; box-shadow:none; background:transparent;">
-            <i class="fas fa-circle-notch fa-spin" style="font-size: 48px; color: var(--text-muted); margin-bottom: 24px;"></i>
-            <p style="color: var(--text-muted); font-weight: 600; font-size: 15px;">Memuat Ledger...</p>
+        <div class="card" style="height: 300px; display: flex; flex-direction: column; justify-content: center; align-items: center; border:none; box-shadow:none; background:transparent;">
+            <i class="fas fa-circle-notch fa-spin" style="font-size: 40px; color: var(--text-muted); margin-bottom: 20px;"></i>
+            <p style="color: var(--text-muted); font-weight: 600;">Memuat Data Ledger...</p>
         </div>
     </div>
 
@@ -232,36 +237,48 @@
         <div class="desktop-grid-2">
             <div class="card" style="display: flex; flex-direction: column; justify-content: center;">
                 <div class="hero-section">
-                    <div class="progress-circle-wrapper">
+                    <div class="progress-wrapper">
                         <div class="progress-circle" id="uiProgressCircle" style="--progress: 0%;">
-                            <div class="progress-circle-inner">
-                                <span class="pct-text" id="uiProgressPct">0%</span>
+                            <div class="progress-inner">
+                                <span class="pct-val" id="uiProgressPct">0%</span>
                                 <span class="pct-label">Tercapai</span>
                             </div>
                         </div>
                     </div>
                     <div class="balance-label">Total Aset Saat Ini</div>
                     <div class="main-balance" id="uiTotalAsset">Rp 0</div>
-                    <div class="eta-badge" id="uiEta"><i class="fas fa-chart-line"></i> Kalkulasi ETA...</div>
+                    <div class="eta-badge" id="uiEta"><i class="fas fa-clock"></i> Kalkulasi ETA...</div>
                 </div>
             </div>
 
             <div class="desktop-stack">
                 <div class="card">
                     <div class="section-header">Komposisi Aset Berjalan</div>
-                    <div class="comp-bar-container">
+                    <div class="comp-bar">
                         <div class="comp-cash" id="barCash" style="width: 0%;"></div>
                         <div class="comp-stock" id="barStock" style="width: 0%;"></div>
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-top: 20px;">
-                        <div class="split-item"><span style="font-size: 12px; color: var(--text-muted); font-weight: 600;"><i class="legend-dot" style="background:var(--secondary); margin-right:6px;"></i> Kas Laci</span><span style="font-size: 18px; font-weight: 800; color:var(--text-main);" id="uiValCash">Rp 0</span></div>
-                        <div class="split-item" style="text-align: right;"><span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Stok Gudang <i class="legend-dot" style="background:var(--primary); margin-left:6px;"></i></span><span style="font-size: 18px; font-weight: 800; color:var(--text-main);" id="uiValStock">Rp 0</span></div>
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;"><i class="legend-dot" style="background:var(--secondary);"></i> Kas Laci</span>
+                            <span style="font-size: 16px; font-weight: 800; color:var(--text-main);" id="uiValCash">Rp 0</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 4px; text-align: right;">
+                            <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Stok Gudang <i class="legend-dot" style="background:var(--primary); margin-left:6px; margin-right:0;"></i></span>
+                            <span style="font-size: 16px; font-weight: 800; color:var(--text-main);" id="uiValStock">Rp 0</span>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="stat-grid">
-                    <div class="mini-card"><div style="font-size: 13px; color: var(--text-muted); font-weight: 600; margin-bottom: 8px;">Modal Murni</div><div style="font-size: 22px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px;" id="uiAssetStart">Rp 0</div></div>
-                    <div class="mini-card"><div style="font-size: 13px; color: var(--text-muted); font-weight: 600; margin-bottom: 8px;" id="uiProfitTitle">Akumulasi Laba</div><div style="font-size: 22px; font-weight: 800; color: var(--secondary); letter-spacing: -0.5px;" id="uiTotalProfit">Rp 0</div></div>
+                <div class="grid-2-col">
+                    <div class="mini-card">
+                        <div class="mini-label">Modal Awal Murni</div>
+                        <div class="mini-val" id="uiAssetStart">Rp 0</div>
+                    </div>
+                    <div class="mini-card">
+                        <div class="mini-label" id="uiProfitTitle">Akumulasi Laba</div>
+                        <div class="mini-val" style="color: var(--secondary);" id="uiTotalProfit">Rp 0</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -271,19 +288,23 @@
         <div class="desktop-grid-chart">
             <div class="card">
                 <div class="section-header">Kinerja 12 Bulan</div>
-                <div class="chart-wrapper"><canvas id="salesChart"></canvas></div>
+                <div class="chart-safe-wrapper">
+                    <canvas id="salesChart"></canvas>
+                </div>
             </div>
 
             <div class="desktop-stack">
                 <div class="card">
-                    <div class="section-header">
+                    <div class="section-header" style="margin-bottom: 10px;">
                         <span>Alokasi Laba</span>
                         <div class="switch-container">
-                            <span style="font-size: 11px; font-weight: 700; color: var(--text-main);">NETTO</span>
+                            <span style="font-size: 10px; font-weight: 700; color: var(--text-main);">NETTO</span>
                             <label class="switch"><input type="checkbox" id="netProfitToggle" onchange="toggleNetProfit()"><span class="slider"></span></label>
                         </div>
                     </div>
-                    <div class="chart-box"><canvas id="doughnutChart"></canvas></div>
+                    <div class="chart-safe-wrapper" style="height: 200px;">
+                        <canvas id="doughnutChart"></canvas>
+                    </div>
                 </div>
                 
                 <div class="card">
@@ -297,19 +318,18 @@
     <div id="tab-history" class="tab-content">
         <div class="search-container">
             <i class="fas fa-search"></i>
-            <input type="text" id="searchHistory" class="search-input" placeholder="Cari histori bulan atau pencapaian..." onkeyup="filterHistory()">
+            <input type="text" id="searchHistory" class="search-input" placeholder="Cari histori bulan, status, dsb..." onkeyup="filterHistory()">
         </div>
-        <div class="month-list" id="trackerBody"></div>
+        <div class="month-grid" id="trackerBody"></div>
     </div>
 </main>
 
 <div class="bottom-nav">
-    <div class="nav-item active" onclick="switchTab('tab-dashboard', 0)"><i class="fas fa-layer-group"></i><span>Beranda</span></div>
+    <div class="nav-item active" onclick="switchTab('tab-dashboard', 0)"><i class="fas fa-home"></i><span>Beranda</span></div>
     <div class="nav-item" onclick="switchTab('tab-analytics', 1)"><i class="fas fa-chart-pie"></i><span>Analitik</span></div>
     <div class="nav-item" onclick="switchTab('tab-history', 2)"><i class="fas fa-list-ul"></i><span>Riwayat</span></div>
 </div>
 
-<div class="fab-readonly" onclick="showToast('Aplikasi Read-Only 🔒. Update data via Ledger Utama.')"><i class="fas fa-shield-alt"></i></div>
 <div id="toast"></div>
 
 <script>
@@ -335,7 +355,7 @@
     let currentTheme = localStorage.getItem('theme') || 'light';
     let globalRawData = null; let isNetProfitMode = false;
 
-    // Set Initial Theme
+    // Inisialisasi Tema
     document.documentElement.setAttribute('data-theme', currentTheme);
     updateThemeIcons();
 
@@ -345,20 +365,23 @@
         setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
     }
 
-    // Unified Navigation Switcher
+    // Fungsi Navigasi Tab
     function switchTab(tabId, index) {
+        // 1. Sembunyikan semua konten, tampilkan yang dipilih
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
         
+        // 2. Update status aktif di Mobile Nav
         document.querySelectorAll('.bottom-nav .nav-item').forEach((el, i) => {
             if(i === index) el.classList.add('active'); else el.classList.remove('active');
         });
 
+        // 3. Update status aktif di Desktop Sidebar
         document.querySelectorAll('.sidebar-nav .sidebar-item').forEach((el, i) => {
             if(i === index) el.classList.add('active'); else el.classList.remove('active');
         });
 
-        // Trigger chart resize after animation to prevent canvas squishing
+        // 4. Cegah Chart.js penyok saat ganti tab (PENTING)
         if(tabId === 'tab-analytics') {
             setTimeout(() => {
                 if(salesChartInstance) salesChartInstance.resize();
@@ -398,16 +421,6 @@
         }
     }
 
-    function checkMilestone(totalAset) {
-        let currentMilestone = Math.floor(totalAset / 10000000) * 10000000; 
-        let savedMilestone = parseInt(localStorage.getItem('lastMilestone')) || 0;
-        if (currentMilestone > savedMilestone && currentMilestone > 0) {
-            triggerConfetti();
-            localStorage.setItem('lastMilestone', currentMilestone);
-            setTimeout(() => showToast(`🎉 Aset berhasil menembus ${formatRpFull(currentMilestone)}!`), 1000);
-        }
-    }
-
     function triggerConfetti() {
         let duration = 3 * 1000; let animationEnd = Date.now() + duration;
         let defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1002 };
@@ -419,7 +432,10 @@
         }, 250);
     }
 
-    function toggleNetProfit() { isNetProfitMode = document.getElementById('netProfitToggle').checked; if (globalRawData) processData(globalRawData); }
+    function toggleNetProfit() { 
+        isNetProfitMode = document.getElementById('netProfitToggle').checked; 
+        if (globalRawData) processData(globalRawData); 
+    }
 
     function animateValue(id, start, end, duration, isCurrency = true) {
         if (start === end) return;
@@ -437,7 +453,7 @@
         window.requestAnimationFrame(step);
     }
 
-    function showLoading() { document.getElementById('tab-dashboard').style.display = 'none'; document.getElementById('loadingState').style.display = 'flex'; }
+    function showLoading() { document.getElementById('tab-dashboard').style.display = 'none'; document.getElementById('loadingState').style.display = 'block'; }
     function hideLoading() { document.getElementById('loadingState').style.display = 'none'; document.getElementById('tab-dashboard').style.display = document.getElementById('tab-dashboard').classList.contains('active') ? 'block' : 'none'; }
 
     async function fetchDatabase() {
@@ -453,6 +469,7 @@
         let floatPrice = 0, totalUnitTerjual = 0;
         let agingStocks = [];
 
+        // 1. Proses Data HP
         if(db.items) {
             db.items.forEach(i => {
                 if (i.status === 'sold') {
@@ -475,6 +492,7 @@
             });
         }
 
+        // 2. Proses Data Ekstra
         if(db.extraProfits) {
             db.extraProfits.forEach(p => {
                 profitEkstra += p.profit; totalUnitTerjual++; 
@@ -485,6 +503,7 @@
             });
         }
 
+        // 3. Logika Gaji & Netto
         let totalBebanGajiGlobal = 0;
         for (let key in monthlyActuals) {
             monthlyActuals[key].profitKotor = monthlyActuals[key].profit; 
@@ -498,7 +517,15 @@
         const totalAsetReal = cashSisa + floatPrice; 
         agingStocks.sort((a, b) => b.days - a.days);
 
-        checkMilestone(totalAsetReal);
+        // Milestone Confetti Trigger
+        let currentMilestone = Math.floor(totalAsetReal / 10000000) * 10000000; 
+        let savedMilestone = parseInt(localStorage.getItem('lastMilestone')) || 0;
+        if (currentMilestone > savedMilestone && currentMilestone > 0) {
+            triggerConfetti();
+            localStorage.setItem('lastMilestone', currentMilestone);
+            setTimeout(() => showToast(`🎉 Aset berhasil menembus ${formatRpFull(currentMilestone)}!`), 1000);
+        }
+
         updateUI(monthlyActuals, totalAsetReal, totalProfitBersih, totalUnitTerjual, startBalance, cashSisa, floatPrice, agingStocks);
     }
 
@@ -510,13 +537,15 @@
         const prevAset = parseInt(document.getElementById('uiTotalAsset').innerText.replace(/\D/g,'')) || 0;
         const prevProfit = parseInt(document.getElementById('uiTotalProfit').innerText.replace(/\D/g,'')) || 0;
         
-        animateValue('uiTotalAsset', prevAset, totalAset, 1000); animateValue('uiTotalProfit', prevProfit, globalGrossProfit, 1000);
+        animateValue('uiTotalAsset', prevAset, totalAset, 1000); 
+        animateValue('uiTotalProfit', prevProfit, globalGrossProfit, 1000);
         document.getElementById('uiAssetStart').innerText = formatRpFull(startBalance);
         
         const totalAsetAktif = cashSisa + floatPrice;
         document.getElementById('barCash').style.width = `${totalAsetAktif > 0 ? (cashSisa / totalAsetAktif) * 100 : 0}%`;
         document.getElementById('barStock').style.width = `${totalAsetAktif > 0 ? (floatPrice / totalAsetAktif) * 100 : 0}%`;
-        document.getElementById('uiValCash').innerText = formatRpFull(cashSisa); document.getElementById('uiValStock').innerText = formatRpFull(floatPrice);
+        document.getElementById('uiValCash').innerText = formatRpFull(cashSisa); 
+        document.getElementById('uiValStock').innerText = formatRpFull(floatPrice);
         
         let progressPct = Math.min(Math.max((globalGrossProfit / 80000000) * 100, 0), 100).toFixed(1);
         document.getElementById('uiProgressCircle').style.setProperty('--progress', `${progressPct}%`);
@@ -555,16 +584,16 @@
             let isCurrent = (monthKey === currentMonthKey);
             const card = document.createElement('div'); card.className = `m-card ${isCurrent ? 'active' : ''}`;
             card.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                    <div><div style="font-weight:800; font-size:16px; color:var(--text-main); margin-bottom:4px;">Bulan ${t.month}</div><span style="font-size:12px; color:var(--text-muted); font-weight:600;">${["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"][m-1]} ${y}</span></div>
-                    ${actProfit >= smartTarget ? '<span style="font-size:10px; font-weight:700; padding:6px 12px; border-radius:20px; background:rgba(16, 185, 129, 0.1); color:var(--secondary); letter-spacing:0.5px;">TERCAPAI</span>' : (actProfit > 0 ? '<span style="font-size:10px; font-weight:700; padding:6px 12px; border-radius:20px; background:rgba(245, 158, 11, 0.1); color:var(--warning); letter-spacing:0.5px;">PROSES</span>' : '<span style="font-size:10px; font-weight:700; padding:6px 12px; border-radius:20px; background:var(--bg-body); color:var(--text-muted); letter-spacing:0.5px;">PENDING</span>')}
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                    <div><div style="font-weight:800; font-size:16px; color:var(--text-main);">Bulan ${t.month}</div><span style="font-size:12px; color:var(--text-muted); font-weight:600;">${["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"][m-1]} ${y}</span></div>
+                    ${actProfit >= smartTarget ? '<span style="font-size:10px; font-weight:800; padding:6px 12px; border-radius:20px; background:rgba(16, 185, 129, 0.1); color:var(--secondary);">TERCAPAI</span>' : (actProfit > 0 ? '<span style="font-size:10px; font-weight:800; padding:6px 12px; border-radius:20px; background:rgba(245, 158, 11, 0.1); color:var(--warning);">PROSES</span>' : '<span style="font-size:10px; font-weight:800; padding:6px 12px; border-radius:20px; background:var(--primary-light); color:var(--text-muted);">PENDING</span>')}
                 </div>
                 <div style="margin-bottom:16px;">
-                    <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:8px; font-weight:600; color:var(--text-muted);"><span>${isNetProfitMode ? 'Laba Bersih' : 'Laba Kotor'}</span><span><span style="color:var(--text-main); font-weight:800;">${formatRp(actProfit)}</span> / ${formatRp(smartTarget)}</span></div>
+                    <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px; font-weight:600; color:var(--text-muted);"><span>${isNetProfitMode ? 'Laba Bersih' : 'Laba Kotor'}</span><span><span style="color:var(--text-main); font-weight:800;">${formatRp(actProfit)}</span> / ${formatRp(smartTarget)}</span></div>
                     <div class="bar-bg"><div class="bar-fill" style="width: ${Math.min((actProfit / smartTarget) * 100 || 0, 100)}%; background:var(--secondary);"></div></div>
                 </div>
                 <div>
-                    <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:8px; font-weight:600; color:var(--text-muted);"><span>Penjualan Unit</span><span><span style="color:var(--text-main); font-weight:800;">${actUnits}</span> / ${dynamicTargetUnit}</span></div>
+                    <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px; font-weight:600; color:var(--text-muted);"><span>Penjualan</span><span><span style="color:var(--text-main); font-weight:800;">${actUnits}</span> / ${dynamicTargetUnit} Unit</span></div>
                     <div class="bar-bg"><div class="bar-fill" style="width: ${Math.min((actUnits / dynamicTargetUnit) * 100 || 0, 100)}%; background:var(--primary);"></div></div>
                 </div>
             `;
@@ -581,22 +610,22 @@
         Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
         doughnutChartInstance = new Chart(document.getElementById('doughnutChart').getContext('2d'), {
             type: 'doughnut',
-            data: { labels: ['Owner', 'Karyawan', 'Laba Sisa'], datasets: [{ data: [pOwner, pKaryawan, pSisa], backgroundColor: ['#000000', '#F59E0B', '#10B981'], borderWidth: 0, hoverOffset: 4 }] },
-            options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, usePointStyle: true, padding: 20, font: { weight: '600', size: 12 } } } } }
+            data: { labels: ['Owner', 'Karyawan', 'Laba Sisa'], datasets: [{ data: [pOwner, pKaryawan, pSisa], backgroundColor: ['#0F172A', '#F59E0B', '#10B981'], borderWidth: 0, hoverOffset: 4 }] },
+            options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, usePointStyle: true, padding: 15, font: { weight: '600' } } } } }
         });
 
         const listUI = document.getElementById('agingListUI'); listUI.innerHTML = '';
-        if(agingStocks.length === 0) { listUI.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:14px; font-weight:600; padding:30px;">Gudang Aman & Lancar 🚀</div>`; return; }
+        if(agingStocks.length === 0) { listUI.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:13px; font-weight:600; padding:20px;">Gudang Aman & Lancar 🚀</div>`; return; }
 
         agingStocks.forEach(item => {
             let catBadge = ''; let lower = item.name.toLowerCase();
-            if (lower.includes('vidio') || lower.includes('premier')) catBadge = `<span class="cat-badge digital">Digital</span>`;
-            else if (lower.includes('poco') || lower.includes('samsung') || lower.includes('iphone') || lower.includes('hp') || lower.includes('infinix')) catBadge = `<span class="cat-badge gadget">Gadget</span>`;
-            else catBadge = `<span class="cat-badge acc">Aksesoris</span>`;
+            if (lower.includes('vidio') || lower.includes('premier')) catBadge = `<span class="cat-badge badge-digital">Digital</span>`;
+            else if (lower.includes('poco') || lower.includes('samsung') || lower.includes('iphone') || lower.includes('hp')) catBadge = `<span class="cat-badge badge-gadget">Gadget</span>`;
+            else catBadge = `<span class="cat-badge badge-acc">Lainnya</span>`;
 
             if(listUI.childElementCount < 10) { 
                 listUI.innerHTML += `<div class="aging-item">
-                    <div style="display:flex; flex-direction:column; gap:6px;"><span style="font-weight:700; font-size:14px; color:var(--text-main);">${item.name}</span><div>${catBadge}</div></div>
+                    <div style="display:flex; flex-direction:column; gap:6px;"><span style="font-weight:700; font-size:13px; color:var(--text-main);">${item.name}</span><div>${catBadge}</div></div>
                     <span style="font-weight:800; font-size:13px; color:${item.days > 30 ? 'var(--danger)' : 'var(--text-main)'};">${item.days} Hari</span>
                 </div>`;
             }
@@ -611,8 +640,8 @@
             data: {
                 labels: labels,
                 datasets: [
-                    { label: isNetProfitMode ? 'Laba Bersih' : 'Laba Kotor', data: profitData, type: 'line', borderColor: '#10B981', borderWidth: 3, pointBackgroundColor: '#FFFFFF', pointBorderColor: '#10B981', pointBorderWidth: 2, pointRadius: 5, fill: true, backgroundColor: 'rgba(16, 185, 129, 0.05)', tension: 0.4, yAxisID: 'y' },
-                    { label: 'Unit', data: actualData, type: 'bar', backgroundColor: '#E5E7EB', hoverBackgroundColor: '#000000', borderRadius: 6, yAxisID: 'y1' }
+                    { label: isNetProfitMode ? 'Laba Bersih' : 'Laba Kotor', data: profitData, type: 'line', borderColor: '#10B981', borderWidth: 3, pointBackgroundColor: '#FFFFFF', pointBorderColor: '#10B981', pointBorderWidth: 2, pointRadius: 4, fill: true, backgroundColor: 'rgba(16, 185, 129, 0.05)', tension: 0.4, yAxisID: 'y' },
+                    { label: 'Unit', data: actualData, type: 'bar', backgroundColor: '#E2E8F0', hoverBackgroundColor: '#0F172A', borderRadius: 6, yAxisID: 'y1' }
                 ]
             },
             options: {
@@ -622,7 +651,7 @@
         });
     }
 
-    // Data Syncing Logic
+    // Sync Logic
     async function initDashboard(forceSync = false) {
         if(forceSync) showLoading();
         try {
