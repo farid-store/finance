@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roadmap 100 Juta - Farid Store</title>
+    <title>Auto-Tracker 100 Juta - Farid Store</title>
     <style>
         :root {
             --primary: #4FD1C5; /* Soft Tosca */
@@ -13,6 +13,8 @@
             --text-main: #2d3748;
             --text-muted: #718096;
             --border: #e2e8f0;
+            --success: #48bb78;
+            --warning: #ecc94b;
         }
 
         body {
@@ -33,15 +35,18 @@
             margin-bottom: 30px;
         }
 
-        h1 {
-            color: var(--text-main);
-            margin-bottom: 5px;
-        }
-
-        .slogan {
-            color: var(--primary-dark);
+        h1 { color: var(--text-main); margin-bottom: 5px; }
+        .slogan { color: var(--primary-dark); font-weight: 600; margin-top: 0; }
+        
+        .status-bar {
+            background-color: #ebf8ff;
+            color: #3182ce;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 14px;
             font-weight: 600;
-            margin-top: 0;
         }
 
         .dashboard {
@@ -68,105 +73,54 @@
             letter-spacing: 1px;
         }
 
-        .card .value {
-            font-size: 28px;
-            font-weight: bold;
-            color: var(--text-main);
-        }
-
-        .table-container {
-            background-color: var(--card-bg);
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            overflow-x: auto;
-            padding: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        th, td {
-            padding: 12px 15px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        th {
-            background-color: #f8fafc;
-            color: var(--text-muted);
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        input[type="number"] {
-            width: 80px;
-            padding: 8px;
-            border: 1px solid var(--border);
-            border-radius: 5px;
-            outline: none;
-            transition: border 0.3s;
-        }
-
-        input[type="number"]:focus {
-            border-color: var(--primary);
-        }
+        .card .value { font-size: 28px; font-weight: bold; color: var(--text-main); }
 
         .progress-bar-container {
-            width: 100%;
-            background-color: var(--border);
-            border-radius: 5px;
-            height: 10px;
-            margin-top: 15px;
-            overflow: hidden;
+            width: 100%; background-color: var(--border);
+            border-radius: 5px; height: 10px; margin-top: 15px; overflow: hidden;
         }
 
         .progress-bar {
-            height: 100%;
-            background-color: var(--primary);
-            width: 0%;
-            transition: width 0.5s ease;
+            height: 100%; background-color: var(--primary);
+            width: 0%; transition: width 1s ease;
         }
 
-        .quote {
-            text-align: center;
-            margin-top: 30px;
-            font-style: italic;
-            color: var(--text-muted);
-            font-size: 14px;
+        .table-container {
+            background-color: var(--card-bg); border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow-x: auto; padding: 20px;
         }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 12px 15px; border-bottom: 1px solid var(--border); }
+        th { background-color: #f8fafc; color: var(--text-muted); font-weight: 600; font-size: 14px; }
         
-        .note {
-            font-size: 12px;
-            color: #e53e3e;
-            display: block;
-            margin-top: 5px;
-        }
+        .val-aktual { font-weight: 600; color: var(--primary-dark); }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>Target Tracker 100 Juta</h1>
+        <h1>Auto-Tracker 100 Juta</h1>
         <p class="slogan">Farid Store - Your Gadget Solution</p>
     </header>
 
+    <div id="apiStatus" class="status-bar">⏳ Menghubungkan ke Database JSONBin...</div>
+
     <div class="dashboard">
         <div class="card">
-            <h3>Total Aset Terkumpul</h3>
-            <div class="value" id="totalAsset">Rp 50.000.000</div>
+            <h3>Estimasi Aset Berjalan</h3>
+            <div class="value" id="totalAsset">Rp 0</div>
             <div class="progress-bar-container">
                 <div class="progress-bar" id="assetProgress"></div>
             </div>
         </div>
         <div class="card">
-            <h3>Total Unit Terjual</h3>
+            <h3>Total Unit Terjual (Aktual)</h3>
             <div class="value" id="totalUnits">0 / 355</div>
         </div>
         <div class="card">
-            <h3>Laba Kotor Aktual</h3>
+            <h3>Laba Kotor (Aktual)</h3>
             <div class="value" id="totalProfit">Rp 0</div>
         </div>
     </div>
@@ -175,27 +129,32 @@
         <table>
             <thead>
                 <tr>
-                    <th>Bulan</th>
+                    <th>Bulan / Periode</th>
                     <th>Target Unit</th>
-                    <th>Unit Laku (Aktual)</th>
-                    <th>Target Laba Kotor</th>
-                    <th>Laba Aktual (Input)</th>
+                    <th>Unit Terjual (Auto)</th>
+                    <th>Target Laba</th>
+                    <th>Laba Aktual (Auto)</th>
                     <th>Status</th>
                 </tr>
             </thead>
             <tbody id="trackerBody">
                 </tbody>
         </table>
-        <small class="note">*Pastikan pencatatan HPP di ledger utama Anda akurat (contoh: Poco M3 modal Rp450.000, jangan dibulatkan).</small>
-    </div>
-
-    <div class="quote">
-        "Kekayaan adalah apa yang tidak Anda lihat. Konsistensi kecil setiap hari akan menghasilkan pertumbuhan eksponensial."
     </div>
 </div>
 
 <script>
-    const targets = [
+    // ==========================================
+    // KONFIGURASI JSONBIN (Isi dengan data Anda)
+    // ==========================================
+    const BIN_ID = '699644fdae596e708f3582af'; 
+    const API_KEY = '$2a$10$tcKHEWwuz2sqRoMCKJfga.1xxTFW0RxpXUPnP.NI4YbivtlK1xxau'; 
+    // ==========================================
+
+    const formatRp = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
+
+    // Target Roadmap 12 Bulan
+    const roadmapTargets = [
         { month: 1, units: 20, profit: 4500000 },
         { month: 2, units: 24, profit: 5400000 },
         { month: 3, units: 27, profit: 6075000 },
@@ -210,92 +169,90 @@
         { month: 12, units: 30, profit: 6750000 }
     ];
 
-    const formatRp = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
-
-    const tbody = document.getElementById('trackerBody');
-    let totalTargetUnits = targets.reduce((acc, curr) => acc + curr.units, 0);
-
-    // Render Table
-    targets.forEach((t, index) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>Bulan ${t.month}</td>
-            <td>${t.units}</td>
-            <td><input type="number" id="unit_${t.month}" placeholder="0" oninput="saveAndCalculate()"></td>
-            <td>${formatRp(t.profit)}</td>
-            <td><input type="number" id="profit_${t.month}" placeholder="0" step="50000" oninput="saveAndCalculate()"></td>
-            <td id="status_${t.month}">⏳</td>
-        `;
-        tbody.appendChild(tr);
-    });
-
-    function saveAndCalculate() {
-        let actualUnits = 0;
-        let actualProfit = 0;
-        let baseAsset = 50000000;
-        let fixedCost = 2500000; // Gaji karyawan + Gaji sendiri per bulan
-
-        targets.forEach(t => {
-            const unitInput = document.getElementById(`unit_${t.month}`);
-            const profitInput = document.getElementById(`profit_${t.month}`);
-            const statusCell = document.getElementById(`status_${t.month}`);
-
-            let uVal = parseInt(unitInput.value) || 0;
-            let pVal = parseInt(profitInput.value) || 0;
-
-            actualUnits += uVal;
-            actualProfit += pVal;
-
-            // Save to localStorage
-            localStorage.setItem(`fs_unit_${t.month}`, uVal);
-            localStorage.setItem(`fs_profit_${t.month}`, pVal);
-
-            // Update Status
-            if (pVal >= t.profit) {
-                statusCell.innerHTML = '✅ Achieved';
-                statusCell.style.color = 'green';
-                statusCell.style.fontWeight = 'bold';
-            } else if (pVal > 0) {
-                statusCell.innerHTML = '🔥 On Progress';
-                statusCell.style.color = '#d69e2e';
-            } else {
-                statusCell.innerHTML = '⏳ Pending';
-                statusCell.style.color = '#718096';
+    async function fetchDatabase() {
+        try {
+            // Jika BIN_ID belum diisi, kita bisa bypass untuk testing menggunakan struktur JSON lokal
+            if (BIN_ID === 'GANTI_DENGAN_BIN_ID_ANDA') {
+                document.getElementById('apiStatus').innerHTML = '⚠️ BIN_ID belum diatur. Menggunakan data lokal/cache.';
+                // Placeholder fallback logic untuk testing visual
+                return null; 
             }
 
-            // Hitung penambahan aset berdasar laba ditahan
-            if(pVal > 0) {
-                let retainedEarnings = pVal - fixedCost;
-                baseAsset += retainedEarnings;
-            }
-        });
-
-        // Update Dashboard
-        document.getElementById('totalUnits').innerText = `${actualUnits} / ${totalTargetUnits}`;
-        document.getElementById('totalProfit').innerText = formatRp(actualProfit);
-        document.getElementById('totalAsset').innerText = formatRp(baseAsset);
-
-        // Progress Bar (Target Aset 100 Juta)
-        let assetPercentage = ((baseAsset - 50000000) / 50000000) * 100;
-        if(assetPercentage > 100) assetPercentage = 100;
-        if(assetPercentage < 0) assetPercentage = 0;
-        document.getElementById('assetProgress').style.width = `${assetPercentage}%`;
+            const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                headers: { 'X-Master-Key': API_KEY }
+            });
+            const data = await response.json();
+            document.getElementById('apiStatus').innerHTML = '✅ Terhubung dan Tersinkronisasi dengan Database';
+            document.getElementById('apiStatus').style.backgroundColor = '#f0fff4';
+            document.getElementById('apiStatus').style.color = '#38a169';
+            return data.record;
+        } catch (error) {
+            document.getElementById('apiStatus').innerHTML = '❌ Gagal menghubungkan ke Database. Periksa API Key / Bin ID.';
+            document.getElementById('apiStatus').style.color = 'red';
+            console.error(error);
+            return null;
+        }
     }
 
-    function loadData() {
-        targets.forEach(t => {
-            let savedUnit = localStorage.getItem(`fs_unit_${t.month}`);
-            let savedProfit = localStorage.getItem(`fs_profit_${t.month}`);
-            
-            if(savedUnit) document.getElementById(`unit_${t.month}`).value = savedUnit;
-            if(savedProfit) document.getElementById(`profit_${t.month}`).value = savedProfit;
-        });
-        saveAndCalculate();
+    function processData(db) {
+        let monthlyActuals = {};
+        
+        // 1. Ekstrak data dari array 'items'
+        if(db.items) {
+            db.items.forEach(item => {
+                if(item.status === 'sold' && item.soldAt) {
+                    // Format soldAt: "10/3/2026 12:45"
+                    let datePart = item.soldAt.split(' ')[0];
+                    let parts = datePart.split('/');
+                    if(parts.length === 3) {
+                        let monthKey = `${parts[1]}-${parts[2]}`; // ex: "3-2026"
+                        
+                        if(!monthlyActuals[monthKey]) monthlyActuals[monthKey] = { units: 0, profit: 0 };
+                        
+                        monthlyActuals[monthKey].units += 1;
+                        monthlyActuals[monthKey].profit += (item.price - item.modal);
+                    }
+                }
+            });
+        }
+
+        // 2. Ekstrak data dari array 'extraProfits'
+        if(db.extraProfits) {
+            db.extraProfits.forEach(extra => {
+                let d = new Date(parseFloat(extra.id)); // ID berupa timestamp
+                let monthKey = `${d.getMonth() + 1}-${d.getFullYear()}`;
+                
+                if(!monthlyActuals[monthKey]) monthlyActuals[monthKey] = { units: 0, profit: 0 };
+                
+                let calcProfit = extra.profit;
+                
+                // Koreksi data masa lalu secara otomatis
+                if(extra.name === 'Poco M3' && extra.modal === 400000) {
+                    calcProfit = extra.price - 450000;
+                }
+
+                monthlyActuals[monthKey].units += 1;
+                monthlyActuals[monthKey].profit += calcProfit;
+            });
+        }
+
+        renderDashboard(monthlyActuals);
     }
 
-    // Load data on start
-    window.onload = loadData;
-</script>
+    function renderDashboard(actualsData) {
+        const tbody = document.getElementById('trackerBody');
+        tbody.innerHTML = '';
+        
+        let totalUnits = 0;
+        let totalProfit = 0;
+        let baseAsset = 50000000; // Mulai dari aset 50jt sesuai roadmap
+        const fixedCost = 2500000; // Gaji karyawan + Anda
+        
+        // Asumsi data dimulai dari Februari 2026
+        let startMonth = 2; 
+        let startYear = 2026;
 
-</body>
-</html>
+        roadmapTargets.forEach((t, index) => {
+            // Kalkulasi key bulan untuk mencocokkan dengan JSON (Mulai Feb 2026)
+            let currentM = ((startMonth - 1 + index) % 12) + 1;
+            let currentY = startYear + Math.floor((startMonth - 1 + index) /
