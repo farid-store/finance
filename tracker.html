@@ -128,17 +128,39 @@
         .fill-profit { background: linear-gradient(90deg, var(--secondary), #059669); }
         .fill-unit { background: linear-gradient(90deg, var(--primary), var(--primary-dark)); }
 
-        /* UPDATED: Avg Margin Text di Pojok Kanan Bawah */
         .avg-margin-text { 
-            font-size: 8.5px; /* Dikecilkan */
+            font-size: 8.5px; 
             color: var(--text-muted); 
-            text-align: right; /* Rata kanan */
+            text-align: right; 
             margin-top: 12px; 
-            margin-bottom: -2px; /* Ditarik ke bawah agar lebih mepet */
+            margin-bottom: -2px; 
             font-style: italic; 
-            opacity: 0.6; /* Dibuat sedikit transparan */
+            opacity: 0.6; 
             letter-spacing: 0.5px;
         }
+
+        /* Custom Toggle Switch Netto */
+        .switch-container {
+            position: absolute; right: 0; display: flex; align-items: center;
+        }
+        .toggle-label { 
+            font-size: 9px; font-weight: 800; color: var(--text-muted); 
+            margin-right: 6px; letter-spacing: 0.5px;
+        }
+        .switch {
+            position: relative; display: inline-block; width: 32px; height: 18px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(148, 163, 184, 0.3); transition: .4s; border-radius: 18px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px;
+            background-color: var(--text-main); transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--secondary); }
+        input:checked + .slider:before { transform: translateX(14px); }
 
         /* Skeleton Shimmer Classes */
         .skeleton { position: relative; overflow: hidden; background-color: var(--skeleton-bg); border-radius: 4px; }
@@ -217,7 +239,7 @@
             
             <div class="stat-card fade-in" style="margin-top: 15px; animation-delay: 0.1s;">
                 <i class="fas fa-chart-line stat-icon"></i>
-                <div class="stat-title">Akumulasi Profit Global</div>
+                <div class="stat-title" id="uiProfitTitle">Akumulasi Laba Kotor</div>
                 <div class="stat-value" id="uiTotalProfit" style="color: var(--secondary);">Rp 0</div>
                 <div class="bar-bg" style="height: 6px; margin-top: 8px;"><div class="bar-fill fill-profit" id="globalProfitBar" style="width: 0%;"></div></div>
                 <div class="stat-sub" style="margin-top: 8px; display: flex; justify-content: space-between;">
@@ -234,7 +256,16 @@
         </div>
         <div class="analytics-grid">
             <div>
-                <div style="font-size: 11px; font-weight: 600; text-align: center; margin-bottom: 5px; color: var(--text-muted);">ALOKASI PROFIT (BULAN INI)</div>
+                <div style="font-size: 11px; font-weight: 600; text-align: center; margin-bottom: 5px; color: var(--text-muted); position: relative; display: flex; justify-content: center; align-items: center;">
+                    <span>ALOKASI PROFIT (BULAN INI)</span>
+                    <div class="switch-container">
+                        <span class="toggle-label">NETTO</span>
+                        <label class="switch">
+                            <input type="checkbox" id="netProfitToggle" onchange="toggleNetProfit()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
                 <div class="chart-box">
                     <canvas id="doughnutChart"></canvas>
                 </div>
@@ -297,6 +328,10 @@
     let salesChartInstance = null;
     let doughnutChartInstance = null;
     let currentTheme = localStorage.getItem('theme') || 'dark';
+    
+    // Variabel Baru untuk Toggle
+    let globalRawData = null; 
+    let isNetProfitMode = false;
 
     // Set Initial Theme
     document.documentElement.setAttribute('data-theme', currentTheme);
@@ -315,6 +350,13 @@
         const icon = document.querySelector('#themeBtn i');
         if(currentTheme === 'dark') { icon.className = 'fas fa-sun'; icon.style.color = '#f59e0b'; } 
         else { icon.className = 'fas fa-moon'; icon.style.color = '#3b82f6'; }
+    }
+
+    function toggleNetProfit() {
+        isNetProfitMode = document.getElementById('netProfitToggle').checked;
+        if (globalRawData) {
+            processData(globalRawData); 
+        }
     }
 
     function animateValue(id, start, end, duration, isCurrency = true) {
@@ -434,7 +476,24 @@
             });
         }
 
-        const totalProfitBersih = profitMain + profitEkstra;
+        // Logika Pengurangan Gaji (Netto Toggle)
+        let totalBebanGajiGlobal = 0;
+        const BEBAN_BULANAN = 2500000; // Total 1.5jt (Owner) + 1jt (Karyawan)
+
+        for (let key in monthlyActuals) {
+            monthlyActuals[key].profitKotor = monthlyActuals[key].profit; // Simpan kotor untuk doughnut chart
+            
+            if (isNetProfitMode) {
+                monthlyActuals[key].profit -= BEBAN_BULANAN;
+                totalBebanGajiGlobal += BEBAN_BULANAN;
+            }
+        }
+
+        let totalProfitBersih = profitMain + profitEkstra;
+        if (isNetProfitMode) {
+            totalProfitBersih -= totalBebanGajiGlobal;
+        }
+
         const cashSisa = startBalance - belanjaBaru + uangMasuk;
         const totalAsetReal = cashSisa + floatPrice; 
 
@@ -449,6 +508,9 @@
         const tbody = document.getElementById('trackerBody');
         tbody.innerHTML = '';
         
+        // Update Title dynamically
+        document.getElementById('uiProfitTitle').innerText = isNetProfitMode ? 'Akumulasi Laba Bersih' : 'Akumulasi Laba Kotor';
+
         // Update Headers & Animasi
         const prevAset = parseInt(document.getElementById('uiTotalAsset').innerText.replace(/\D/g,'')) || 0;
         const prevProfit = parseInt(document.getElementById('uiTotalProfit').innerText.replace(/\D/g,'')) || 0;
@@ -471,7 +533,9 @@
         if(totalAset >= 100000000) document.getElementById('cardAsset').classList.add('success');
         
         // Persentase Global
-        const progressPct = Math.min((globalGrossProfit / 80000000) * 100, 100).toFixed(1);
+        let progressPctCalc = (globalGrossProfit / 80000000) * 100;
+        if (progressPctCalc < 0) progressPctCalc = 0;
+        const progressPct = Math.min(progressPctCalc, 100).toFixed(1);
         document.getElementById('globalProfitBar').style.width = `${progressPct}%`;
         document.getElementById('uiProgressPct').innerText = `${progressPct}% Selesai`;
 
@@ -497,12 +561,12 @@
         }
         document.getElementById('uiEta').innerHTML = `<i class="fas fa-clock"></i> ${etaText}`;
 
-        // Get Current Month Profit For Analytics
+        // Get Current Month Profit For Analytics (Doughnut always uses Gross Profit)
         let currentMonthKey = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
-        let currentMonthProfit = actualsData[currentMonthKey] ? actualsData[currentMonthKey].profit : 0;
+        let currentMonthGrossProfit = actualsData[currentMonthKey] ? (actualsData[currentMonthKey].profitKotor !== undefined ? actualsData[currentMonthKey].profitKotor : actualsData[currentMonthKey].profit) : 0;
 
         // Render Analytics (Doughnut Gaji & Aging Stock)
-        renderAnalytics(currentMonthProfit, agingStocks);
+        renderAnalytics(currentMonthGrossProfit, agingStocks);
 
         // Chart & List Data
         let chartLabels = [], chartProfitData = [], chartActualUnits = [];
@@ -530,7 +594,9 @@
             let dynamicTargetUnit = Math.ceil(smartTargetProfit / avgThisMonth); 
             if (actProfit >= smartTargetProfit) dynamicTargetUnit = actUnits; 
             
-            let profitPct = Math.min((actProfit / smartTargetProfit) * 100, 100);
+            let profitPctCalc = (actProfit / smartTargetProfit) * 100;
+            if (profitPctCalc < 0) profitPctCalc = 0;
+            let profitPct = Math.min(profitPctCalc, 100);
             let unitPct = Math.min((actUnits / dynamicTargetUnit) * 100, 100);
 
             if (monthKey <= currentMonthKey) accumulatedDeficit += (t.profit - actProfit);
@@ -541,6 +607,8 @@
 
             let isCurrent = (monthKey === currentMonthKey);
             let targetNote = accumulatedDeficit > 0 && isCurrent ? `<br><span style="font-size:9px; color:var(--warning);">*Target disesuaikan (defisit lalu)</span>` : '';
+
+            let labelLaba = isNetProfitMode ? 'Laba Bersih' : 'Laba Kotor';
 
             const card = document.createElement('div');
             card.className = `m-card fade-in ${isCurrent ? 'active' : ''}`;
@@ -556,7 +624,7 @@
                 </div>
                 <div class="mc-stat">
                     <div class="mc-stat-header">
-                        <span style="color: var(--secondary)">Laba Kotor</span>
+                        <span style="color: var(--secondary)">${labelLaba}</span>
                         <span style="text-align:right;"><span class="val-actual">${formatRp(actProfit)}</span> <span class="val-target">/ ${formatRp(smartTargetProfit)}</span> ${targetNote}</span>
                     </div>
                     <div class="bar-bg"><div class="bar-fill fill-profit" style="width: ${profitPct}%"></div></div>
@@ -577,7 +645,6 @@
     }
 
     function renderAnalytics(currentMonthProfit, agingStocks) {
-        // Logika Pembagian Gaji & Sisa Profit
         let pOwner = 1500000;
         let pKaryawan = 1000000;
         let pSisa = currentMonthProfit - (pOwner + pKaryawan);
@@ -654,7 +721,7 @@
             data: {
                 labels: labels,
                 datasets: [
-                    { label: 'Laba Kotor (Juta)', data: profitData, type: 'line', backgroundColor: 'rgba(16, 185, 129, 0.15)', borderColor: '#10b981', borderWidth: 2, pointBackgroundColor: '#10b981', pointBorderColor: '#fff', fill: true, tension: 0.4, yAxisID: 'y' },
+                    { label: isNetProfitMode ? 'Laba Bersih (Juta)' : 'Laba Kotor (Juta)', data: profitData, type: 'line', backgroundColor: 'rgba(16, 185, 129, 0.15)', borderColor: '#10b981', borderWidth: 2, pointBackgroundColor: '#10b981', pointBorderColor: '#fff', fill: true, tension: 0.4, yAxisID: 'y' },
                     { label: 'Unit Terjual', data: actualData, type: 'bar', backgroundColor: 'rgba(79, 209, 197, 0.6)', borderColor: '#4FD1C5', borderWidth: 1, borderRadius: 4, yAxisID: 'y1' }
                 ]
             },
@@ -675,12 +742,17 @@
         
         try {
             const cachedData = localStorage.getItem('faridStoreCacheV3');
-            if (cachedData && !forceSync) processData(JSON.parse(cachedData));
-            else if (!cachedData && !forceSync) showSkeleton();
+            if (cachedData && !forceSync) {
+                globalRawData = JSON.parse(cachedData);
+                processData(globalRawData);
+            } else if (!cachedData && !forceSync) {
+                showSkeleton();
+            }
 
             const dbData = await fetchDatabase();
             if(dbData) {
                 localStorage.setItem('faridStoreCacheV3', JSON.stringify(dbData));
+                globalRawData = dbData;
                 processData(dbData); 
             }
         } catch (err) {
