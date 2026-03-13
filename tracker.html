@@ -46,9 +46,10 @@
         .nav-item.active { color: var(--primary); }
         .nav-item.active i { transform: translateY(-2px); }
 
-        /* Tabs */
-        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        /* Tabs - DIREVISI: Transisi fade-in murni tanpa efek membesar/bergerak */
+        .tab-content { display: none; animation: fadeOnly 0.25s ease-in-out; }
         .tab-content.active { display: block; }
+        @keyframes fadeOnly { from { opacity: 0; } to { opacity: 1; } }
 
         /* Cards & Panels */
         .card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); }
@@ -112,7 +113,6 @@
         /* Pull to Refresh */
         #ptr-indicator { text-align: center; color: var(--text-muted); font-size: 12px; font-weight: 600; height: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 8px; transition: height 0.2s ease; }
         
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
     </style>
 </head>
@@ -349,6 +349,24 @@
         return new Date(d[2], d[1]-1, d[0]); 
     }
 
+    // --- SMART BRAND DETECTION LOGIC ---
+    function getDeviceBrand(itemName) {
+        const name = itemName.toUpperCase();
+        
+        if (name.includes('IPHONE') || name.startsWith('IP ') || name.includes('APPLE') || name.includes('IPAD')) return 'APPLE';
+        if (name.includes('SAMSUNG') || name.includes('GALAXY') || name.startsWith('SAM ')) return 'SAMSUNG';
+        if (name.includes('XIAOMI') || name.includes('REDMI') || name.includes('POCO') || name.includes('MI ')) return 'XIAOMI';
+        if (name.includes('OPPO') || name.includes('RENO') || name.includes('FIND')) return 'OPPO';
+        if (name.includes('VIVO') || name.includes('IQOO')) return 'VIVO';
+        if (name.includes('REALME') || name.includes('NARZO')) return 'REALME';
+        if (name.includes('INFINIX') || name.includes('HOT ') || name.includes('SMART ')) return 'INFINIX';
+        if (name.includes('TECNO') || name.includes('POVA') || name.includes('SPARK ')) return 'TECNO';
+        if (name.includes('ITEL')) return 'ITEL';
+        if (name.includes('ASUS') || name.includes('ROG')) return 'ASUS';
+        
+        return name.split(' ')[0]; // Fallback ke kata pertama jika tidak dikenali
+    }
+
     function processData(db) {
         let monthlyActuals = {};
         let brandStats = {};
@@ -370,11 +388,9 @@
                     const profitItem = i.price - i.modal;
                     profitMain += profitItem;
 
-                    // Brand Analytics Logic
+                    // Brand Analytics Smart Logic
                     if(i.name) {
-                        let brand = i.name.split(' ')[0].toUpperCase();
-                        // Normalize common brands
-                        if(brand === 'IPHONE') brand = 'APPLE';
+                        let brand = getDeviceBrand(i.name);
                         if(!brandStats[brand]) brandStats[brand] = { profit: 0, count: 0 };
                         brandStats[brand].profit += profitItem;
                         brandStats[brand].count += 1;
@@ -595,7 +611,6 @@
         const ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
         if(doughnutChartInstance) doughnutChartInstance.destroy();
 
-        const gridColor = currentTheme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
         const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#94a3b8';
         Chart.defaults.color = textColor; 
 
@@ -671,14 +686,14 @@
 
     async function initDashboard(forceSync = false) {
         try {
-            const cachedData = localStorage.getItem('faridStoreCacheV4');
+            const cachedData = localStorage.getItem('faridStoreCacheV5');
             if (cachedData && !forceSync) {
                 globalRawData = JSON.parse(cachedData);
                 processData(globalRawData);
             }
             const dbData = await fetchDatabase();
             if(dbData) {
-                localStorage.setItem('faridStoreCacheV4', JSON.stringify(dbData));
+                localStorage.setItem('faridStoreCacheV5', JSON.stringify(dbData));
                 globalRawData = dbData;
                 processData(dbData); 
             }
