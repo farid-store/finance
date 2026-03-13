@@ -2774,7 +2774,34 @@ function copyToClipboard(text) {
         }
         
         function toggleHelpModal() { alert("Gunakan tombol 'Cloud Sync' untuk sinkronisasi data antar device."); }
-        function clearData() { if(confirm('Hapus permanen?')) { localStorage.clear(); location.reload(); } }
+
+
+        function clearData() { 
+            // VERIFIKASI TAHAP 1 (Peringatan Awal)
+            if(confirm('⚠️ PERINGATAN BAHAYA!\n\nApakah Anda yakin ingin MENGHAPUS SEMUA DATA secara permanen? Data yang sudah dihapus tidak akan bisa dikembalikan!')) { 
+                
+                // VERIFIKASI TAHAP 2 (Wajib Ketik Manual)
+                const konfirmasiKedua = prompt('VERIFIKASI TAHAP 2:\n\nUntuk menghindari ketidaksengajaan, silakan ketik kata "HAPUS" (huruf besar semua) di bawah ini:');
+
+                if (konfirmasiKedua === 'HAPUS') {
+                    if (currentUserMode === 'client_demo') {
+                        // Hanya mereset data Sandbox
+                        localStorage.removeItem('ledger_v2_sandbox');
+                        initDummySandbox();
+                        alert('✅ Data Sandbox berhasil dikembalikan ke pengaturan awal!');
+                    } else {
+                        // Menghapus data asli (Mode Owner)
+                        localStorage.clear(); 
+                        alert('✅ Seluruh database asli telah dihapus permanen!');
+                        location.reload(); 
+                    }
+                } else {
+                    alert('❌ Penghapusan DIBATALKAN. Kata yang Anda ketik salah atau proses dibatalkan.');
+                }
+            } 
+        }
+
+        
         function directImei() { const i=document.getElementById('imeiInput').value; if(i)window.open(`https://www.imei.info/?imei=${i}`, '_blank'); }
 
         // --- INIT ---
