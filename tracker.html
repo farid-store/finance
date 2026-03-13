@@ -40,7 +40,7 @@
             font-family: 'Segoe UI', system-ui, sans-serif;
             background-color: var(--bg-color); color: var(--text-main);
             padding: 15px 12px 40px 12px;
-            overscroll-behavior-y: contain; /* Prevent native refresh to use custom PTR */
+            overscroll-behavior-y: contain;
         }
 
         .container { max-width: 600px; margin: 0 auto; position: relative; }
@@ -93,7 +93,7 @@
         /* Panel Header */
         .panel-header { font-size: 13px; font-weight: 800; color: var(--text-main); margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; text-transform: uppercase; }
         
-        /* Two-Column Analytics Grid for Mobile */
+        /* Analytics Grid */
         .analytics-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
         .chart-box { position: relative; height: 180px; display: flex; justify-content: center; align-items: center; }
         .aging-list { display: flex; flex-direction: column; gap: 8px; max-height: 160px; overflow-y: auto; padding-right: 5px; }
@@ -129,53 +129,32 @@
         .fill-unit { background: linear-gradient(90deg, var(--primary), var(--primary-dark)); }
 
         .avg-margin-text { 
-            font-size: 8.5px; 
-            color: var(--text-muted); 
-            text-align: right; 
-            margin-top: 12px; 
-            margin-bottom: -2px; 
-            font-style: italic; 
-            opacity: 0.6; 
-            letter-spacing: 0.5px;
+            font-size: 8.5px; color: var(--text-muted); text-align: right; 
+            margin-top: 12px; margin-bottom: -2px; font-style: italic; 
+            opacity: 0.6; letter-spacing: 0.5px;
         }
 
-        /* Custom Toggle Switch Netto */
-        .switch-container {
-            position: absolute; right: 0; display: flex; align-items: center;
-        }
-        .toggle-label { 
-            font-size: 9px; font-weight: 800; color: var(--text-muted); 
-            margin-right: 6px; letter-spacing: 0.5px;
-        }
-        .switch {
-            position: relative; display: inline-block; width: 32px; height: 18px;
-        }
+        /* Toggle Switch */
+        .switch-container { position: absolute; right: 0; display: flex; align-items: center; }
+        .toggle-label { font-size: 9px; font-weight: 800; color: var(--text-muted); margin-right: 6px; letter-spacing: 0.5px; }
+        .switch { position: relative; display: inline-block; width: 32px; height: 18px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(148, 163, 184, 0.3); transition: .4s; border-radius: 18px;
-        }
-        .slider:before {
-            position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px;
-            background-color: var(--text-main); transition: .4s; border-radius: 50%;
-        }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(148, 163, 184, 0.3); transition: .4s; border-radius: 18px; }
+        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: var(--text-main); transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--secondary); }
         input:checked + .slider:before { transform: translateX(14px); }
 
-        /* Skeleton Shimmer Classes */
+        /* Skeletons */
         .skeleton { position: relative; overflow: hidden; background-color: var(--skeleton-bg); border-radius: 4px; }
         .skeleton::after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0; transform: translateX(-100%); background: var(--shimmer); animation: shimmer 1.5s infinite; }
         @keyframes shimmer { 100% { transform: translateX(100%); } }
-        
         .skel-title { height: 12px; width: 40%; margin-bottom: 8px; }
         .skel-value { height: 32px; width: 60%; margin-bottom: 12px; border-radius: 6px; }
         .skel-text { height: 10px; width: 80%; margin-bottom: 6px; }
         
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 4px; }
-        
         .fade-in { animation: fadeInUp 0.5s ease-out forwards; opacity: 0; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -228,8 +207,8 @@
                     <div class="comp-stock" id="barStock" style="width: 0%;"></div>
                 </div>
                 <div class="comp-legend">
-                    <span style="color: var(--text-muted);"><i class="legend-dot" style="background:var(--secondary)"></i>Kas: <span id="uiValCash">Rp 0</span></span>
-                    <span style="color: var(--text-muted);"><i class="legend-dot" style="background:var(--primary)"></i>Stok: <span id="uiValStock">Rp 0</span></span>
+                    <span style="color: var(--text-muted);"><i class="legend-dot" style="background:var(--secondary)"></i>Kas Laci: <span id="uiValCash">Rp 0</span></span>
+                    <span style="color: var(--text-muted);"><i class="legend-dot" style="background:var(--primary)"></i>Stok Gudang: <span id="uiValStock">Rp 0</span></span>
                 </div>
 
                 <div class="eta-badge" id="uiEta" style="margin-top: 12px;">
@@ -275,8 +254,7 @@
                     <span>RADAR STOK MENGENDAP</span>
                     <i class="fas fa-box-open"></i>
                 </div>
-                <div class="aging-list" id="agingListUI">
-                    </div>
+                <div class="aging-list" id="agingListUI"></div>
             </div>
         </div>
     </div>
@@ -297,8 +275,7 @@
         <div class="panel-header" style="padding-left: 5px;">
             <span><i class="fas fa-list-check" style="color: var(--primary)"></i> Detail per Bulan</span>
         </div>
-        <div class="month-list" id="trackerBody">
-            </div>
+        <div class="month-list" id="trackerBody"></div>
     </div>
 </div>
 
@@ -308,7 +285,6 @@
     // ==========================================
     const BIN_ID = '699644fdae596e708f3582af'; 
     const API_KEY = '$2a$10$tcKHEWwuz2sqRoMCKJfga.1xxTFW0RxpXUPnP.NI4YbivtlK1xxau'; 
-    // ==========================================
 
     const formatRp = (num) => {
         if(num >= 1000000) return (num/1000000).toFixed(2).replace(/\.00$/, '') + ' Jt';
@@ -329,7 +305,6 @@
     let doughnutChartInstance = null;
     let currentTheme = localStorage.getItem('theme') || 'dark';
     
-    // Variabel Baru untuk Toggle
     let globalRawData = null; 
     let isNetProfitMode = false;
 
@@ -418,19 +393,22 @@
 
     function processData(db) {
         let monthlyActuals = {};
+        
+        // VARIABEL RUMUS 100% IDENTIK DENGAN DIGITAL LEDGER DASHBOARD
         let startBalance = Number(db.startBalance) || 0;
         let belanjaBaru = 0, uangMasuk = 0;
         let profitMain = 0, profitEkstra = 0;
         let floatModal = 0, floatPrice = 0, totalUnitTerjual = 0;
         let agingStocks = [];
 
-        // Main Items Logic
+        // 1. Ekstrak Data HP Utama
         if(db.items) {
             db.items.forEach(i => {
                 if (i.status === 'sold') {
                     totalUnitTerjual++;
                     if (i.type === 'new') belanjaBaru += i.modal;
                     uangMasuk += i.price;
+                    
                     const profitItem = i.price - i.modal;
                     profitMain += profitItem;
                     
@@ -444,7 +422,7 @@
                 } else if (i.status === 'stok') {
                     if (i.type === 'new') belanjaBaru += i.modal;
                     floatModal += i.modal;
-                    floatPrice += i.modal;
+                    floatPrice += i.price; // PERBAIKAN: Menggunakan Harga Jual agar total aset akurat
 
                     // Aging Stock Logic
                     let ageDays = 0;
@@ -458,7 +436,7 @@
             });
         }
 
-        // Extra Profit Logic
+        // 2. Ekstrak Data Extra Profit (Penting: Tidak mempengaruhi belanja/uangMasuk)
         if(db.extraProfits) {
             db.extraProfits.forEach(p => {
                 let calcProfit = p.profit;
@@ -476,12 +454,12 @@
             });
         }
 
-        // Logika Pengurangan Gaji (Netto Toggle)
+        // 3. Logika Pengurangan Gaji (Terkunci ke Toggle Netto)
         let totalBebanGajiGlobal = 0;
-        const BEBAN_BULANAN = 2500000; // Total 1.5jt (Owner) + 1jt (Karyawan)
+        const BEBAN_BULANAN = 2500000; 
 
         for (let key in monthlyActuals) {
-            monthlyActuals[key].profitKotor = monthlyActuals[key].profit; // Simpan kotor untuk doughnut chart
+            monthlyActuals[key].profitKotor = monthlyActuals[key].profit; 
             
             if (isNetProfitMode) {
                 monthlyActuals[key].profit -= BEBAN_BULANAN;
@@ -494,10 +472,13 @@
             totalProfitBersih -= totalBebanGajiGlobal;
         }
 
+        // ==========================================
+        // RUMUS ASET 100% SAMA DENGAN DIGITAL LEDGER
+        // ==========================================
         const cashSisa = startBalance - belanjaBaru + uangMasuk;
         const totalAsetReal = cashSisa + floatPrice; 
 
-        // Sort aging stock based on days
+        // Sorting radar stok gudang
         agingStocks.sort((a, b) => b.days - a.days);
 
         updateUI(monthlyActuals, totalAsetReal, totalProfitBersih, totalUnitTerjual, startBalance, cashSisa, floatPrice, agingStocks);
@@ -508,10 +489,8 @@
         const tbody = document.getElementById('trackerBody');
         tbody.innerHTML = '';
         
-        // Update Title dynamically
         document.getElementById('uiProfitTitle').innerText = isNetProfitMode ? 'Akumulasi Laba Bersih' : 'Akumulasi Laba Kotor';
 
-        // Update Headers & Animasi
         const prevAset = parseInt(document.getElementById('uiTotalAsset').innerText.replace(/\D/g,'')) || 0;
         const prevProfit = parseInt(document.getElementById('uiTotalProfit').innerText.replace(/\D/g,'')) || 0;
         
@@ -532,7 +511,7 @@
         
         if(totalAset >= 100000000) document.getElementById('cardAsset').classList.add('success');
         
-        // Persentase Global
+        // Persentase Global Laba
         let progressPctCalc = (globalGrossProfit / 80000000) * 100;
         if (progressPctCalc < 0) progressPctCalc = 0;
         const progressPct = Math.min(progressPctCalc, 100).toFixed(1);
@@ -561,14 +540,12 @@
         }
         document.getElementById('uiEta').innerHTML = `<i class="fas fa-clock"></i> ${etaText}`;
 
-        // Get Current Month Profit For Analytics (Doughnut always uses Gross Profit)
         let currentMonthKey = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
         let currentMonthGrossProfit = actualsData[currentMonthKey] ? (actualsData[currentMonthKey].profitKotor !== undefined ? actualsData[currentMonthKey].profitKotor : actualsData[currentMonthKey].profit) : 0;
 
-        // Render Analytics (Doughnut Gaji & Aging Stock)
         renderAnalytics(currentMonthGrossProfit, agingStocks);
 
-        // Chart & List Data
+        // Tracker Roadmap Logika
         let chartLabels = [], chartProfitData = [], chartActualUnits = [];
         const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
         let startMonth = 2, startYear = 2026;
@@ -607,7 +584,6 @@
 
             let isCurrent = (monthKey === currentMonthKey);
             let targetNote = accumulatedDeficit > 0 && isCurrent ? `<br><span style="font-size:9px; color:var(--warning);">*Target disesuaikan (defisit lalu)</span>` : '';
-
             let labelLaba = isNetProfitMode ? 'Laba Bersih' : 'Laba Kotor';
 
             const card = document.createElement('div');
@@ -754,11 +730,13 @@
                 localStorage.setItem('faridStoreCacheV3', JSON.stringify(dbData));
                 globalRawData = dbData;
                 processData(dbData); 
+                setStatus('Sinkronisasi Berhasil', 'success');
             }
         } catch (err) {
             console.error(err);
-            if(!localStorage.getItem('faridStoreCacheV3')) alert("Gagal koneksi ke Database!");
-            hideSkeleton();
+            if(!localStorage.getItem('faridStoreCacheV3')) setStatus('Gagal Terhubung! Periksa Jaringan', 'danger');
+        } finally {
+            if (forceSync) hideSkeleton();
         }
     }
 
