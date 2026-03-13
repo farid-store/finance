@@ -49,7 +49,7 @@
         #ptr-indicator {
             text-align: center; color: var(--text-muted); font-size: 12px; font-weight: 600;
             height: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 8px;
-            transition: height 0.2s ease;
+            transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .ptr-icon { font-size: 16px; transition: transform 0.3s ease; }
 
@@ -424,7 +424,6 @@
         let floatModal = 0, floatPrice = 0, totalUnitTerjual = 0;
         let agingStocks = [];
 
-        // Main Items Logic
         if(db.items) {
             db.items.forEach(i => {
                 if (i.status === 'sold') {
@@ -446,7 +445,6 @@
                     floatModal += i.modal;
                     floatPrice += i.price;
 
-                    // Aging Stock Logic
                     let ageDays = 0;
                     if(i.id) { 
                         const addedDate = new Date(Math.floor(i.id));
@@ -458,7 +456,6 @@
             });
         }
 
-        // Extra Profit Logic
         if(db.extraProfits) {
             db.extraProfits.forEach(p => {
                 let calcProfit = p.profit;
@@ -476,12 +473,11 @@
             });
         }
 
-        // Logika Pengurangan Gaji (Netto Toggle)
         let totalBebanGajiGlobal = 0;
-        const BEBAN_BULANAN = 2500000; // Total 1.5jt (Owner) + 1jt (Karyawan)
+        const BEBAN_BULANAN = 2500000; 
 
         for (let key in monthlyActuals) {
-            monthlyActuals[key].profitKotor = monthlyActuals[key].profit; // Simpan kotor untuk doughnut chart
+            monthlyActuals[key].profitKotor = monthlyActuals[key].profit; 
             
             if (isNetProfitMode) {
                 monthlyActuals[key].profit -= BEBAN_BULANAN;
@@ -497,7 +493,6 @@
         const cashSisa = startBalance - belanjaBaru + uangMasuk;
         const totalAsetReal = cashSisa + floatPrice; 
 
-        // Sort aging stock based on days
         agingStocks.sort((a, b) => b.days - a.days);
 
         updateUI(monthlyActuals, totalAsetReal, totalProfitBersih, totalUnitTerjual, startBalance, cashSisa, floatPrice, agingStocks);
@@ -508,10 +503,8 @@
         const tbody = document.getElementById('trackerBody');
         tbody.innerHTML = '';
         
-        // Update Title dynamically
         document.getElementById('uiProfitTitle').innerText = isNetProfitMode ? 'Akumulasi Laba Bersih' : 'Akumulasi Laba Kotor';
 
-        // Update Headers & Animasi
         const prevAset = parseInt(document.getElementById('uiTotalAsset').innerText.replace(/\D/g,'')) || 0;
         const prevProfit = parseInt(document.getElementById('uiTotalProfit').innerText.replace(/\D/g,'')) || 0;
         
@@ -520,7 +513,6 @@
         
         document.getElementById('uiAssetStart').innerText = formatRpFull(startBalance);
         
-        // Visualisasi Asset Composition Bar
         const totalAsetAktif = cashSisa + floatPrice;
         const cashPct = totalAsetAktif > 0 ? (cashSisa / totalAsetAktif) * 100 : 0;
         const stockPct = totalAsetAktif > 0 ? (floatPrice / totalAsetAktif) * 100 : 0;
@@ -532,14 +524,12 @@
         
         if(totalAset >= 100000000) document.getElementById('cardAsset').classList.add('success');
         
-        // Persentase Global
         let progressPctCalc = (globalGrossProfit / 80000000) * 100;
         if (progressPctCalc < 0) progressPctCalc = 0;
         const progressPct = Math.min(progressPctCalc, 100).toFixed(1);
         document.getElementById('globalProfitBar').style.width = `${progressPct}%`;
         document.getElementById('uiProgressPct').innerText = `${progressPct}% Selesai`;
 
-        // ETA Calc
         let activeMonthsKey = Object.keys(actualsData).sort();
         let last3Months = activeMonthsKey.slice(-3);
         let sumRecentProfit = last3Months.reduce((acc, key) => acc + actualsData[key].profit, 0);
@@ -561,14 +551,11 @@
         }
         document.getElementById('uiEta').innerHTML = `<i class="fas fa-clock"></i> ${etaText}`;
 
-        // Get Current Month Profit For Analytics (Doughnut always uses Gross Profit)
         let currentMonthKey = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
         let currentMonthGrossProfit = actualsData[currentMonthKey] ? (actualsData[currentMonthKey].profitKotor !== undefined ? actualsData[currentMonthKey].profitKotor : actualsData[currentMonthKey].profit) : 0;
 
-        // Render Analytics (Doughnut Gaji & Aging Stock)
         renderAnalytics(currentMonthGrossProfit, agingStocks);
 
-        // Chart & List Data
         let chartLabels = [], chartProfitData = [], chartActualUnits = [];
         const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
         let startMonth = 2, startYear = 2026;
@@ -762,16 +749,17 @@
         }
     }
 
-    // --- PULL TO REFRESH LOGIC ---
+    // --- PULL TO REFRESH LOGIC (REVISI) ---
     let startY = 0;
     let isPulling = false;
     const ptrIndicator = document.getElementById('ptr-indicator');
     const ptrIcon = document.getElementById('ptr-icon');
     const ptrText = document.getElementById('ptr-text');
-    const THRESHOLD = 80;
+    const THRESHOLD = 70; // Sensitivitas dinaikkan
 
     document.addEventListener('touchstart', (e) => {
-        if (window.scrollY === 0) {
+        // Toleransi scroll hingga 5px agar lebih sensitif di HP
+        if (window.scrollY <= 5) { 
             startY = e.touches[0].pageY;
             isPulling = true;
         }
@@ -782,13 +770,13 @@
         const currentY = e.touches[0].pageY;
         const diff = currentY - startY;
         
-        if (diff > 0 && window.scrollY === 0) {
-            let height = Math.min(diff * 0.5, 100);
+        if (diff > 0 && window.scrollY <= 5) {
+            let height = Math.min(diff * 0.5, 120);
             ptrIndicator.style.height = `${height}px`;
             
             if (height > THRESHOLD) {
                 ptrIcon.style.transform = 'rotate(180deg)';
-                ptrText.innerText = 'Lepas untuk Sync';
+                ptrText.innerText = 'Lepas untuk Sync...';
             } else {
                 ptrIcon.style.transform = 'rotate(0deg)';
                 ptrText.innerText = 'Tarik untuk Sync...';
@@ -802,10 +790,14 @@
         
         const currentHeight = parseInt(ptrIndicator.style.height || '0');
         if (currentHeight > THRESHOLD) {
+            // Tahan posisi UI loading di atas agar kelihatan
+            ptrIndicator.style.height = '50px'; 
             ptrIcon.className = 'fas fa-circle-notch fa-spin';
             ptrText.innerText = 'Menyinkronkan...';
-            initDashboard(true).then(() => {
-                setTimeout(() => { resetPTR(); }, 500);
+            
+            // Tunggu data selesai diproses, lalu tutup
+            initDashboard(true).finally(() => {
+                setTimeout(() => { resetPTR(); }, 600);
             });
         } else {
             resetPTR();
