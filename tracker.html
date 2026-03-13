@@ -41,31 +41,33 @@
             border-bottom: 1px solid var(--border);
         }
 
-        .header-title h1 { font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 4px; }
-        .header-title p { color: var(--primary); font-size: 14px; font-weight: 500; letter-spacing: 1px; }
+        .header-title h1 { font-size: 24px; font-weight: 900; color: #fff; margin-bottom: 4px; letter-spacing: -0.5px;}
+        .header-title p { color: var(--primary); font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;}
 
         .btn-sync {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             border: none;
             padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 13px;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             gap: 8px;
+            box-shadow: 0 4px 15px -3px rgba(14, 165, 233, 0.4);
         }
 
-        .btn-sync:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4); }
+        .btn-sync:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -3px rgba(14, 165, 233, 0.6); }
         .btn-sync:active { transform: translateY(0); }
         .btn-sync:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; }
 
         .status-badge {
             display: inline-flex; align-items: center; gap: 6px;
-            padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
-            background-color: var(--card-bg); border: 1px solid var(--border); margin-top: 10px;
+            padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
+            background-color: rgba(30, 41, 59, 0.8); border: 1px solid var(--border); margin-top: 12px;
         }
 
         /* Top Cards UI */
@@ -74,9 +76,9 @@
         }
 
         .stat-card {
-            background-color: var(--card-bg); padding: 24px; border-radius: 16px;
+            background-color: var(--card-bg); padding: 24px; border-radius: 20px;
             border: 1px solid var(--border); position: relative; overflow: hidden;
-            transition: all 0.3s ease;
+            transition: all 0.3s ease; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
         }
 
         .stat-card::before {
@@ -87,14 +89,23 @@
         .stat-card.success::before { background-color: var(--secondary); }
 
         .stat-icon {
-            position: absolute; top: 24px; right: 24px; font-size: 24px; color: var(--text-muted); opacity: 0.3;
+            position: absolute; top: 24px; right: 24px; font-size: 28px; color: var(--text-muted); opacity: 0.15;
         }
 
-        .stat-title { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: 600; }
-        .stat-value { font-size: 32px; font-weight: 700; color: #fff; margin-bottom: 12px; }
+        .stat-title { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; font-weight: 700; }
+        .stat-value { font-size: 34px; font-weight: 800; color: #fff; margin-bottom: 12px; letter-spacing: -1px;}
 
-        .progress-wrapper { background-color: var(--border); height: 8px; border-radius: 4px; overflow: hidden; width: 100%; }
+        .progress-wrapper { background-color: var(--border); height: 8px; border-radius: 4px; overflow: hidden; width: 100%; margin-top: 8px;}
         .progress-fill { height: 100%; background-color: var(--primary); border-radius: 4px; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        .sub-text {
+            font-size: 12px; color: var(--text-muted); font-weight: 500;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        
+        .sub-badge {
+            background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 6px; color: #cbd5e1; font-size: 11px; font-weight: 600;
+        }
 
         /* Main Content Grid */
         .content-grid {
@@ -106,11 +117,12 @@
         }
 
         .panel {
-            background-color: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); padding: 24px;
+            background-color: var(--card-bg); border-radius: 20px; border: 1px solid var(--border); padding: 24px;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
         }
 
-        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .panel-title { font-size: 16px; font-weight: 600; color: #fff; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .panel-title { font-size: 16px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 10px;}
 
         /* Chart Canvas */
         .chart-container { position: relative; height: 300px; width: 100%; }
@@ -118,16 +130,14 @@
         /* Table UI */
         .table-responsive { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { color: var(--text-muted); font-size: 12px; text-transform: uppercase; padding: 12px 16px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02); }
-        td { padding: 16px; border-bottom: 1px solid rgba(51, 65, 85, 0.5); font-size: 14px; }
+        th { color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; padding: 12px 16px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02); }
+        td { padding: 16px; border-bottom: 1px solid rgba(51, 65, 85, 0.5); font-size: 14px; font-weight: 500;}
         tr:last-child td { border-bottom: none; }
         tr:hover { background-color: rgba(255,255,255,0.02); }
         
         .text-right { text-align: right; }
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
-        .badge-success { background: rgba(16, 185, 129, 0.1); color: var(--secondary); border: 1px solid rgba(16, 185, 129, 0.2); }
-        .badge-warning { background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
-        .badge-pending { background: rgba(148, 163, 184, 0.1); color: var(--text-muted); border: 1px solid rgba(148, 163, 184, 0.2); }
+        .badge { padding: 5px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
+        .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--secondary); border: 1px solid rgba(16, 185, 129, 0.3); }
 
         /* Animasi Loading */
         .spin { animation: spin 1s linear infinite; }
@@ -146,48 +156,53 @@
             </div>
         </div>
         <button class="btn-sync" onclick="initDashboard()" id="syncBtn">
-            <i class="fas fa-sync-alt"></i> Sinkronisasi Data
+            <i class="fas fa-sync-alt"></i> Sinkronisasi
         </button>
     </header>
 
     <div class="summary-grid">
         <div class="stat-card" id="cardAsset">
             <i class="fas fa-wallet stat-icon"></i>
-            <div class="stat-title">Estimasi Aset Saat Ini</div>
+            <div class="stat-title">Total Aset Saat Ini</div>
             <div class="stat-value" id="uiTotalAsset">Rp 0</div>
-            <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 5px;">
-                <span>Start</span>
-                <span>Target: Rp 100 Juta</span>
+            <div class="sub-text" style="margin-bottom: 10px;">
+                <span class="sub-badge" id="uiDetailAsset">Kas: Rp 0 | Stok: Rp 0</span>
             </div>
             <div class="progress-wrapper">
                 <div class="progress-fill" id="uiAssetProgress" style="width: 0%;"></div>
+            </div>
+            <div class="sub-text" style="margin-top: 8px;">
+                <span id="uiAssetStart">Mulai: Rp 0</span>
+                <span>Target: Rp 100 Juta</span>
             </div>
         </div>
         
         <div class="stat-card">
             <i class="fas fa-mobile-alt stat-icon"></i>
-            <div class="stat-title">Total Gadget Terjual</div>
-            <div class="stat-value" id="uiTotalUnits">0 <span style="font-size: 16px; color: var(--text-muted); font-weight: normal;">/ ... Unit</span></div>
-            <div class="progress-wrapper">
+            <div class="stat-title">Total Unit Terjual</div>
+            <div class="stat-value" id="uiTotalUnits">0 <span style="font-size: 16px; color: var(--text-muted); font-weight: 600;">/ ... Unit</span></div>
+            <div class="progress-wrapper" style="margin-bottom: 10px;">
                 <div class="progress-fill" id="uiUnitProgress" style="width: 0%;"></div>
             </div>
-            <div style="font-size: 11px; color: var(--text-muted); margin-top: 8px;" id="uiEstimasiSisa">
+            <div class="sub-text" style="color: var(--primary); font-weight: 600;" id="uiEstimasiSisa">
                 Menghitung estimasi rata-rata profit...
             </div>
         </div>
 
         <div class="stat-card">
             <i class="fas fa-chart-line stat-icon"></i>
-            <div class="stat-title">Total Laba Bersih</div>
-            <div class="stat-value" id="uiTotalProfit">Rp 0</div>
-            <div style="font-size: 12px; color: var(--text-muted);">Akumulasi profit realisasi dari unit terjual</div>
+            <div class="stat-title">Total Profit / Laba Bersih</div>
+            <div class="stat-value" id="uiTotalProfit" style="color: var(--secondary);">Rp 0</div>
+            <div class="sub-text">
+                Akumulasi margin murni dari seluruh histori penjualan unit dan aksesoris.
+            </div>
         </div>
     </div>
 
     <div class="content-grid">
         <div class="panel">
             <div class="panel-header">
-                <div class="panel-title"><i class="fas fa-chart-bar" style="margin-right: 8px; color: var(--primary);"></i> Performa Penjualan Aktual</div>
+                <div class="panel-title"><i class="fas fa-chart-bar" style="color: var(--primary);"></i> Grafik Pertumbuhan</div>
             </div>
             <div class="chart-container">
                 <canvas id="salesChart"></canvas>
@@ -196,7 +211,7 @@
 
         <div class="panel">
             <div class="panel-header">
-                <div class="panel-title"><i class="fas fa-tasks" style="margin-right: 8px; color: var(--primary);"></i> Rekap Histori Bulanan</div>
+                <div class="panel-title"><i class="fas fa-history" style="color: var(--primary);"></i> Histori Bulanan</div>
             </div>
             <div class="table-responsive">
                 <table>
@@ -255,7 +270,7 @@
         }
     }
 
-    // Fungsi Pembantu Konversi Tanggal
+    // Fungsi Parsing Tanggal Standard
     function parseDateString(s) { 
         if(!s || s === 'Imported' || s === 'Bulan Lalu') return new Date();
         const p = s.split(' ');
@@ -267,49 +282,50 @@
     function processData(db) {
         let monthlyActuals = {};
         
-        // --- 1. KALKULASI ASET MURNI (Sesuai Digital Ledger Utama) ---
+        // --- 1. RUMUS IDENTIK DENGAN DIGITAL LEDGER UTAMA ---
         let startBalance = Number(db.startBalance) || 0;
-        let uangKeluarBelanja = 0;
-        let uangMasukKasir = 0;
+        
+        let belanjaBaru = 0;
+        let uangMasuk = 0;
+        let profit = 0;
+        
         let floatModal = 0;
         let floatPrice = 0;
         
-        let totalProfitBersih = 0;
         let totalUnitTerjual = 0;
 
-        // Proses Item Utama
+        // A. Proses Item Utama
         if(db.items) {
             db.items.forEach(i => {
                 if (i.status === 'sold') {
                     totalUnitTerjual++;
-                    if (i.type === 'new') uangKeluarBelanja += i.modal;
-                    uangMasukKasir += i.price;
+                    if (i.type === 'new') belanjaBaru += i.modal;
+                    uangMasuk += i.price;
                     const profitItem = i.price - i.modal;
-                    totalProfitBersih += profitItem;
+                    profit += profitItem;
                     
-                    // Ekstrak untuk Rekap Bulanan
+                    // Perekaman Grafik Bulanan
                     if(i.soldAt) {
                         let d = parseDateString(i.soldAt);
-                        let monthKey = `${d.getMonth() + 1}-${d.getFullYear()}`; // MM-YYYY
+                        let monthKey = `${d.getMonth() + 1}-${d.getFullYear()}`;
                         if(!monthlyActuals[monthKey]) monthlyActuals[monthKey] = { units: 0, profit: 0 };
                         monthlyActuals[monthKey].units += 1;
                         monthlyActuals[monthKey].profit += profitItem;
                     }
                 } else if (i.status === 'stok') {
-                    if (i.type === 'new') uangKeluarBelanja += i.modal;
+                    if (i.type === 'new') belanjaBaru += i.modal;
                     floatModal += i.modal;
                     floatPrice += i.price;
                 }
             });
         }
 
-        // Proses Extra Profit
+        // B. Proses Extra Profit
+        let extraProfitTotal = 0;
         if(db.extraProfits) {
             db.extraProfits.forEach(p => {
-                uangKeluarBelanja += p.modal;
-                uangMasukKasir += p.price;
-                totalProfitBersih += p.profit;
-                totalUnitTerjual++; // Hitung sbg 1 transaksi
+                extraProfitTotal += p.profit;
+                totalUnitTerjual++; 
                 
                 let d = new Date(Math.floor(p.id)); 
                 let monthKey = `${d.getMonth() + 1}-${d.getFullYear()}`;
@@ -319,46 +335,43 @@
             });
         }
 
-        // Rumus Aset: (Sisa Tunai di Kasir) + (Potensi Total Harga Jual Stok Gudang)
-        let cashSisa = startBalance - uangKeluarBelanja + uangMasukKasir;
-        let totalAsetReal = cashSisa + floatPrice; 
+        // C. Kalkulasi Final Aset (SAMA PERSIS DENGAN KASIR DASHBOARD)
+        const totalProfitBersih = profit + extraProfitTotal;
+        const cashSisa = startBalance - belanjaBaru + uangMasuk;
+        const totalAsetReal = cashSisa + floatPrice; 
 
-        // Update UI
-        updateUI(monthlyActuals, totalAsetReal, totalProfitBersih, totalUnitTerjual);
+        // Update Layar
+        updateUI(monthlyActuals, totalAsetReal, totalProfitBersih, totalUnitTerjual, startBalance, cashSisa, floatPrice);
     }
 
-    function updateUI(actualsData, totalAset, totalProfit, totalUnits) {
+    function updateUI(actualsData, totalAset, totalProfit, totalUnits, startBalance, cashSisa, floatPrice) {
         const tbody = document.getElementById('trackerBody');
         tbody.innerHTML = '';
         
-        // --- LOGIKA TARGET 100 JUTA DINAMIS ---
         const TARGET_ASET_FINAL = 100000000; // 100 Juta
         
-        // 1. Berapa aset yang kurang untuk sampai ke 100jt?
+        // --- LOGIKA COMPOUND & ESTIMASI UNIT ---
         let sisaTargetNominal = TARGET_ASET_FINAL - totalAset;
         if(sisaTargetNominal < 0) sisaTargetNominal = 0;
 
-        // 2. Berapa rata-rata keuntungan per HP Anda selama ini?
         let avgProfitPerUnit = totalUnits > 0 ? (totalProfit / totalUnits) : 150000; 
-        
-        // 3. (Estimasi) Butuh jual berapa HP lagi?
         let estimasiSisaUnitTarget = Math.ceil(sisaTargetNominal / avgProfitPerUnit);
-        
-        // Target Unit Dinamis (Telah terjual + Harus dijual)
         let dinamisTotalUnitTarget = totalUnits + estimasiSisaUnitTarget;
 
-        // --- UPDATE TOP CARDS UI ---
+        // --- RENDER UI TOP CARDS ---
+        document.getElementById('uiAssetStart').innerText = `Mulai: ${formatRp(startBalance)}`;
         document.getElementById('uiTotalAsset').innerText = formatRp(totalAset);
+        document.getElementById('uiDetailAsset').innerText = `Kas: ${formatRp(cashSisa)} | Stok: ${formatRp(floatPrice)}`;
         
-        // Cek jika sudah capai target
         if(totalAset >= TARGET_ASET_FINAL) {
             document.getElementById('cardAsset').classList.add('success');
             document.getElementById('uiAssetProgress').style.backgroundColor = 'var(--secondary)';
-            document.getElementById('uiTotalUnits').innerHTML = `${totalUnits} <span style="font-size: 16px; color: var(--secondary); font-weight: bold;">/ TARGET TERCAPAI 🚀</span>`;
-            document.getElementById('uiEstimasiSisa').innerHTML = `<span style="color: var(--secondary)">Selamat! Target 100 Juta telah tercapai.</span>`;
+            document.getElementById('uiTotalUnits').innerHTML = `${totalUnits} <span style="font-size: 16px; color: var(--secondary); font-weight: 800;">/ TARGET TERCAPAI 🚀</span>`;
+            document.getElementById('uiEstimasiSisa').innerHTML = `<i class="fas fa-star"></i> Selamat! Target 100 Juta telah tercapai!`;
+            document.getElementById('uiEstimasiSisa').style.color = "var(--secondary)";
         } else {
-            document.getElementById('uiTotalUnits').innerHTML = `${totalUnits} <span style="font-size: 16px; color: var(--text-muted); font-weight: normal;">/ Estimasi ${dinamisTotalUnitTarget} Unit</span>`;
-            document.getElementById('uiEstimasiSisa').innerHTML = `💡 Rata-rata profit: <b>${formatRp(avgProfitPerUnit)}/unit</b>. <br>Anda butuh jual sekitar <b>${estimasiSisaUnitTarget} unit lagi</b> untuk mencapai 100 Juta.`;
+            document.getElementById('uiTotalUnits').innerHTML = `${totalUnits} <span style="font-size: 16px; color: var(--text-muted); font-weight: 600;">/ Estimasi ${dinamisTotalUnitTarget} Unit</span>`;
+            document.getElementById('uiEstimasiSisa').innerHTML = `<i class="fas fa-lightbulb" style="color: var(--warning)"></i> Rata-rata margin ${formatRp(avgProfitPerUnit)}/unit. Butuh jual sekitar <b>${estimasiSisaUnitTarget} unit lagi</b>.`;
         }
         
         document.getElementById('uiTotalProfit').innerText = formatRp(totalProfit);
@@ -369,14 +382,13 @@
         document.getElementById('uiAssetProgress').style.width = `${Math.min(assetPct, 100)}%`;
         document.getElementById('uiUnitProgress').style.width = `${Math.min(unitPct, 100)}%`;
 
-        // --- RENDER TABLE & CHART ---
+        // --- RENDER TABEL & GRAFIK (Murni dari Database) ---
         let chartLabels = [];
         let chartProfitData = [];
         let chartActualUnits = [];
         
         const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
         
-        // Ambil semua kunci bulan (MM-YYYY) yang ada di database dan urutkan
         let keys = Object.keys(actualsData);
         keys.sort((a, b) => {
             let [mA, yA] = a.split('-').map(Number);
@@ -396,10 +408,10 @@
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>Bulan ${index + 1} <span style="color: var(--text-muted); font-size: 11px; display:block;">${monthNames[m-1]} ${y}</span></td>
-                <td class="text-right"><strong style="color: #fff">${actUnits}</strong> Unit</td>
-                <td class="text-right" style="color: var(--secondary); font-weight: 600;">+ ${formatRp(actProfit)}</td>
-                <td class="text-right"><span class="badge badge-success">Selesai</span></td>
+                <td><strong style="color: #fff">Bulan ${index + 1}</strong> <span style="color: var(--text-muted); font-size: 11px; display:block;">${monthNames[m-1]} ${y}</span></td>
+                <td class="text-right"><strong style="color: #fff">${actUnits}</strong> <span style="font-size: 11px; color: var(--text-muted)">Unit</span></td>
+                <td class="text-right" style="color: var(--secondary); font-weight: 700;">+ ${formatRp(actProfit)}</td>
+                <td class="text-right"><span class="badge badge-success"><i class="fas fa-check"></i> Selesai</span></td>
             `;
             tbody.appendChild(tr);
         });
@@ -421,22 +433,26 @@
                 labels: labels,
                 datasets: [
                     {
-                        label: 'Total Terjual (Unit)',
+                        label: 'Unit Terjual',
                         data: actualData,
-                        backgroundColor: '#0ea5e9',
-                        borderColor: '#0284c7',
+                        backgroundColor: 'rgba(14, 165, 233, 0.8)',
+                        borderColor: '#0ea5e9',
                         borderWidth: 1,
                         borderRadius: 4,
                         yAxisID: 'y'
                     },
                     {
-                        label: 'Profit Bersih (Rp)',
+                        label: 'Laba (Rupiah)',
                         data: profitData,
                         type: 'line',
                         backgroundColor: '#10b981',
                         borderColor: '#10b981',
-                        borderWidth: 2,
-                        tension: 0.3,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#10b981',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        tension: 0.4,
                         yAxisID: 'y1'
                     }
                 ]
@@ -444,8 +460,10 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
                 plugins: {
-                    legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } }
+                    legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8, font: { weight: 'bold' } } },
+                    tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)', titleColor: '#fff', padding: 12, cornerRadius: 8 }
                 },
                 scales: {
                     x: { grid: { display: false } },
@@ -453,15 +471,15 @@
                         type: 'linear', 
                         display: true, 
                         position: 'left',
-                        title: { display: true, text: 'Total Unit' },
+                        title: { display: false },
                         grid: { color: 'rgba(255,255,255,0.05)' },
-                        ticks: { beginAtZero: true, stepSize: 1 }
+                        ticks: { beginAtZero: true, stepSize: 5 }
                     },
                     y1: { 
                         type: 'linear', 
                         display: true, 
                         position: 'right',
-                        title: { display: true, text: 'Profit (Rp)' },
+                        title: { display: false },
                         grid: { drawOnChartArea: false },
                         ticks: {
                             callback: function(value) {
@@ -478,7 +496,7 @@
     async function initDashboard() {
         const btn = document.getElementById('syncBtn');
         btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner spin"></i> Menarik Data...';
+        btn.innerHTML = '<i class="fas fa-spinner spin"></i> Sinkronisasi...';
         setStatus('Mengambil data dari server...', 'loading');
 
         try {
@@ -491,7 +509,7 @@
             setStatus('Gagal Terhubung! Periksa Koneksi Internet', 'danger');
         } finally {
             btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-sync-alt"></i> Sinkronisasi Ulang';
+            btn.innerHTML = '<i class="fas fa-sync-alt"></i> Sinkronisasi';
         }
     }
 
