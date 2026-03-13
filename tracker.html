@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farid Store | Dynamic 100M Tracker</title>
+    <title>Farid Store | 100M Target Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -39,8 +39,8 @@
         .stat-card.success::before { background-color: var(--secondary); }
         .stat-icon { position: absolute; top: 24px; right: 24px; font-size: 24px; color: var(--text-muted); opacity: 0.3; }
         .stat-title { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: 600; }
-        .stat-value { font-size: 30px; font-weight: 700; color: #fff; margin-bottom: 8px; }
-        .stat-breakdown { font-size: 11px; color: var(--text-muted); background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; line-height: 1.5; }
+        .stat-value { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+        .stat-breakdown { font-size: 12px; color: var(--text-muted); background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; line-height: 1.6; }
 
         .panel { background-color: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); padding: 24px; margin-bottom: 20px;}
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -86,28 +86,31 @@
     <div class="summary-grid">
         <div class="stat-card success">
             <i class="fas fa-wallet stat-icon"></i>
-            <div class="stat-title">Estimasi Aset Berjalan (Unrealized)</div>
+            <div class="stat-title">Unrealized Balance (Aset Aktual)</div>
             <div class="stat-value" id="uiTotalAsset">Rp 0</div>
             <div class="stat-breakdown" id="uiAssetBreakdown">
-                Kalkulasi: Modal (50Jt) + Gross Profit (0) - Beban Gaji (0)
+                <strong>Start Balance:</strong> Rp 0 <br>
+                <strong>Total Profit:</strong> Rp 0
             </div>
         </div>
         
         <div class="stat-card">
             <i class="fas fa-mobile-alt stat-icon"></i>
-            <div class="stat-title">Target Unit Dinamis (Bulan Ini)</div>
-            <div class="stat-value" id="uiMonthlyTarget">0 <span style="font-size: 14px; color: var(--text-muted); font-weight: normal;">Unit</span></div>
-            <div class="stat-breakdown" id="uiMarginInfo">
-                Margin Rata-rata Bulan Ini: Rp 0 / HP
+            <div class="stat-title">Target Laba Global</div>
+            <div class="stat-value" id="uiTotalProfit">Rp 0</div>
+            <div class="stat-breakdown">
+                <strong>Target Tahunan:</strong> Rp 80.000.000<br>
+                <strong>Progress Laba:</strong> <span id="uiProfitProgress">0%</span>
             </div>
         </div>
 
         <div class="stat-card">
-            <i class="fas fa-chart-line stat-icon"></i>
-            <div class="stat-title">Total Laba Kotor Global</div>
-            <div class="stat-value" id="uiTotalProfit">Rp 0</div>
-            <div class="stat-breakdown">
-                Total akumulasi sebelum dipotong biaya operasional.
+            <i class="fas fa-bullseye stat-icon"></i>
+            <div class="stat-title">Fokus Bulan Ini</div>
+            <div class="stat-value" id="uiMonthlyTarget">0 <span style="font-size: 14px; color: var(--text-muted); font-weight: normal;">Unit Sisa</span></div>
+            <div class="stat-breakdown" id="uiMarginInfo">
+                Margin Rata-rata: Rp 0 / HP<br>
+                Laba Kurang: Rp 0
             </div>
         </div>
     </div>
@@ -122,11 +125,11 @@
                     <tr>
                         <th>Bulan / Periode</th>
                         <th>Target Laba</th>
-                        <th>Margin Rata2</th>
-                        <th class="text-center">Target Unit<br><small>(Dinamis)</small></th>
-                        <th class="text-center">Terjual</th>
-                        <th class="text-center">Sisa Unit</th>
-                        <th class="text-right">Laba Aktual</th>
+                        <th>Laba Aktual</th>
+                        <th>Avg Margin</th>
+                        <th class="text-center">Sisa Unit<br><small>(Wajib Laku)</small></th>
+                        <th class="text-center">Unit Laku</th>
+                        <th class="text-center">Total Target<br><small>(Dinamis)</small></th>
                         <th class="text-center">Status</th>
                     </tr>
                 </thead>
@@ -183,7 +186,10 @@
         let globalGrossProfit = 0;
         let globalUnitsSold = 0;
         
-        // 1. Hitung HP Fisik
+        // 1. Ambil Start Balance langsung dari DB Murni
+        let startBalanceDB = parseFloat(db.startBalance) || 0;
+
+        // 2. Hitung HP Fisik
         if(db.items) {
             db.items.forEach(item => {
                 if(item.status === 'sold' && item.soldAt) {
@@ -204,7 +210,7 @@
             });
         }
 
-        // 2. Tambahkan Ekstra Margin 
+        // 3. Tambahkan Ekstra Margin 
         if(db.extraProfits) {
             db.extraProfits.forEach(extra => {
                 let d = new Date(parseFloat(extra.id)); 
@@ -212,41 +218,26 @@
                 if(!monthlyActuals[monthKey]) monthlyActuals[monthKey] = { units: 0, profit: 0 };
                 
                 let calcProfit = extra.profit;
-                if(extra.name === 'Poco M3' && extra.modal === 400000) calcProfit = extra.price - 450000; 
-                
                 monthlyActuals[monthKey].profit += calcProfit;
                 globalGrossProfit += calcProfit;
             });
         }
 
-        updateUI(monthlyActuals, globalGrossProfit, globalUnitsSold);
+        updateUI(startBalanceDB, monthlyActuals, globalGrossProfit, globalUnitsSold);
     }
 
-    function updateUI(actualsData, globalGrossProfit, globalUnitsSold) {
+    function updateUI(startBalanceDB, actualsData, globalGrossProfit, globalUnitsSold) {
         const tbody = document.getElementById('trackerBody');
         tbody.innerHTML = '';
         
-        const baseAsset = 50000000; 
-        const fixedCost = 2500000; // Beban gaji/bulan
-        
-        // Hitung Waktu Berjalan (Mulai Feb 2026)
-        const startDate = new Date(2026, 1, 1); // Bulan indeks 1 = Februari
-        const currentDate = new Date();
-        let monthsElapsed = (currentDate.getFullYear() - startDate.getFullYear()) * 12 + (currentDate.getMonth() - startDate.getMonth()) + 1;
-        
-        // Safety check agar tidak minus jika komputer salah tanggal
-        if (monthsElapsed < 1) monthsElapsed = 1; 
-        if (monthsElapsed > 12) monthsElapsed = 12;
-
-        // Kalkulasi Aset Akurat
-        let totalOperasional = fixedCost * monthsElapsed;
-        let currentRealAsset = baseAsset + globalGrossProfit - totalOperasional;
-
+        // Kalkulasi Aset Murni Tanpa Pemotongan Pengeluaran
+        let currentRealAsset = startBalanceDB + globalGrossProfit;
         let globalAvgProfit = globalUnitsSold > 0 ? (globalGrossProfit / globalUnitsSold) : 225000;
         
-        let startMonth = 2; // Feb
+        // Setup Waktu (Mulai Feb 2026)
+        let startMonth = 2; 
         let startYear = 2026;
-
+        const currentDate = new Date();
         let currentMonthKey = `${currentDate.getMonth() + 1}-${currentDate.getFullYear()}`;
 
         roadmapTargets.forEach((t, index) => {
@@ -261,14 +252,25 @@
             let avgThisMonth = actUnits > 0 ? (actProfit / actUnits) : globalAvgProfit;
             
             // Logika Auto-Adjust Target Unit
-            let dynamicTargetUnits = Math.ceil(t.profit / avgThisMonth);
-            let sisaUnit = dynamicTargetUnits - actUnits;
-            if (sisaUnit < 0) sisaUnit = 0;
+            let labaKurang = t.profit - actProfit;
+            let sisaUnit = 0;
+            let dynamicTargetTotal = 0;
+
+            if (labaKurang > 0) {
+                sisaUnit = Math.ceil(labaKurang / avgThisMonth);
+                dynamicTargetTotal = actUnits + sisaUnit;
+            } else {
+                sisaUnit = 0;
+                dynamicTargetTotal = actUnits; // Sudah tercapai, target disesuaikan dengan yang laku
+            }
 
             let isCurrentMonth = (monthKey === currentMonthKey);
             if(isCurrentMonth) {
-                document.getElementById('uiMonthlyTarget').innerHTML = `${dynamicTargetUnits} <span style="font-size: 14px; color: var(--text-muted); font-weight: normal;">Unit</span>`;
-                document.getElementById('uiMarginInfo').innerHTML = `Margin Rata-rata: ${formatRp(avgThisMonth)} / HP<br>Sisa harus laku: <strong style="color:var(--warning)">${sisaUnit} Unit</strong>`;
+                document.getElementById('uiMonthlyTarget').innerHTML = `${sisaUnit} <span style="font-size: 14px; color: var(--text-muted); font-weight: normal;">Unit Sisa</span>`;
+                document.getElementById('uiMarginInfo').innerHTML = `
+                    Margin Rata-rata: <strong style="color:#fff">${formatRp(avgThisMonth)}</strong> / HP<br>
+                    Laba Kurang: <strong style="color:var(--warning)">${formatRp(Math.max(0, labaKurang))}</strong>
+                `;
             }
 
             let monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
@@ -279,16 +281,16 @@
             else if (actProfit > 0) { badgeClass = 'badge-warning'; statusText = 'On Progress'; }
 
             const tr = document.createElement('tr');
-            if(isCurrentMonth) tr.style.backgroundColor = 'rgba(14, 165, 233, 0.1)'; // Highlight baris bulan ini
+            if(isCurrentMonth) tr.style.backgroundColor = 'rgba(14, 165, 233, 0.1)'; 
             
             tr.innerHTML = `
                 <td>Bulan ${t.month}<br><span style="color: var(--text-muted); font-size: 11px;">${monthNames[currentM-1]} ${currentY}</span></td>
                 <td>${formatRp(t.profit)}</td>
+                <td class="highlight">${formatRp(actProfit)}</td>
                 <td style="color: var(--text-muted);">${formatRp(avgThisMonth)}</td>
-                <td class="text-center" style="font-weight: bold; color: #fff;">${dynamicTargetUnits}</td>
-                <td class="text-center highlight">${actUnits}</td>
-                <td class="text-center ${sisaUnit > 0 ? 'alert-text' : 'highlight'}">${sisaUnit}</td>
-                <td class="text-right highlight">${formatRp(actProfit)}</td>
+                <td class="text-center ${sisaUnit > 0 ? 'alert-text' : 'highlight'}" style="font-size: 15px;">${sisaUnit}</td>
+                <td class="text-center highlight" style="font-size: 15px;">${actUnits}</td>
+                <td class="text-center" style="font-weight: bold; color: #fff;">${dynamicTargetTotal}</td>
                 <td class="text-center"><span class="badge ${badgeClass}">${statusText}</span></td>
             `;
             tbody.appendChild(tr);
@@ -297,11 +299,13 @@
         // Update Dashboard Top Cards
         document.getElementById('uiTotalAsset').innerText = formatRp(currentRealAsset);
         document.getElementById('uiAssetBreakdown').innerHTML = `
-            Modal: ${formatRp(baseAsset)} <br>
-            + Gross Profit: ${formatRp(globalGrossProfit)} <br>
-            - Gaji (${monthsElapsed} Bulan): ${formatRp(totalOperasional)}
+            <strong>Start Balance:</strong> <span style="color:#fff">${formatRp(startBalanceDB)}</span> <br>
+            <strong>Total Profit Global:</strong> <span style="color:var(--secondary)">+ ${formatRp(globalGrossProfit)}</span>
         `;
+        
         document.getElementById('uiTotalProfit').innerText = formatRp(globalGrossProfit);
+        let profitProgress = (globalGrossProfit / 80000000) * 100;
+        document.getElementById('uiProfitProgress').innerText = `${profitProgress.toFixed(1)}%`;
     }
 
     async function initDashboard() {
