@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farid Store | 100M Target Dashboard</title>
+    <title>Farid Store | Dynamic 100M Tracker</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #0ea5e9; /* Modern Blue/Tosca */
+            --primary: #0ea5e9; 
             --primary-dark: #0284c7;
-            --secondary: #10b981; /* Success Green */
-            --bg-color: #0f172a; /* Dark background */
+            --secondary: #10b981; 
+            --bg-color: #0f172a; 
             --card-bg: #1e293b;
             --text-light: #f8fafc;
             --text-muted: #94a3b8;
@@ -21,113 +21,48 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-light);
-            padding: 20px;
-        }
-
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-color); color: var(--text-light); padding: 20px; }
         .container { max-width: 1200px; margin: 0 auto; }
 
-        /* Header UI */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border);
-        }
-
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
         .header-title h1 { font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 4px; }
         .header-title p { color: var(--primary); font-size: 14px; font-weight: 500; letter-spacing: 1px; }
 
-        .btn-sync {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
+        .btn-sync { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
         .btn-sync:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4); }
-        .btn-sync:active { transform: translateY(0); }
+        
+        .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; background-color: var(--card-bg); border: 1px solid var(--border); margin-top: 10px; }
 
-        .status-badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
-            background-color: var(--card-bg); border: 1px solid var(--border); margin-top: 10px;
-        }
-
-        /* Top Cards UI */
-        .summary-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background-color: var(--card-bg); padding: 24px; border-radius: 16px;
-            border: 1px solid var(--border); position: relative; overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
-            background-color: var(--primary);
-        }
-
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background-color: var(--card-bg); padding: 24px; border-radius: 16px; border: 1px solid var(--border); position: relative; overflow: hidden; }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background-color: var(--primary); }
         .stat-card.success::before { background-color: var(--secondary); }
-
-        .stat-icon {
-            position: absolute; top: 24px; right: 24px; font-size: 24px; color: var(--text-muted); opacity: 0.3;
-        }
-
+        .stat-icon { position: absolute; top: 24px; right: 24px; font-size: 24px; color: var(--text-muted); opacity: 0.3; }
         .stat-title { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: 600; }
-        .stat-value { font-size: 32px; font-weight: 700; color: #fff; margin-bottom: 12px; }
+        .stat-value { font-size: 30px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+        .stat-breakdown { font-size: 11px; color: var(--text-muted); background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; line-height: 1.5; }
 
-        .progress-wrapper { background-color: var(--border); height: 8px; border-radius: 4px; overflow: hidden; width: 100%; }
-        .progress-fill { height: 100%; background-color: var(--primary); border-radius: 4px; transition: width 1s ease-in-out; }
-
-        /* Main Content Grid */
-        .content-grid {
-            display: grid; grid-template-columns: 1fr; gap: 20px;
-        }
-
-        @media (min-width: 992px) {
-            .content-grid { grid-template-columns: 1.5fr 1fr; }
-        }
-
-        .panel {
-            background-color: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); padding: 24px;
-        }
-
+        .panel { background-color: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); padding: 24px; margin-bottom: 20px;}
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .panel-title { font-size: 16px; font-weight: 600; color: #fff; }
 
-        /* Chart Canvas */
-        .chart-container { position: relative; height: 300px; width: 100%; }
-
-        /* Table UI */
         .table-responsive { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { color: var(--text-muted); font-size: 12px; text-transform: uppercase; padding: 12px 16px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02); }
-        td { padding: 16px; border-bottom: 1px solid rgba(51, 65, 85, 0.5); font-size: 14px; }
+        th { color: var(--text-muted); font-size: 11px; text-transform: uppercase; padding: 12px 10px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02); }
+        td { padding: 14px 10px; border-bottom: 1px solid rgba(51, 65, 85, 0.5); font-size: 13px; }
         tr:last-child td { border-bottom: none; }
         tr:hover { background-color: rgba(255,255,255,0.02); }
         
+        .text-center { text-align: center; }
         .text-right { text-align: right; }
+        .highlight { color: var(--secondary); font-weight: bold; }
+        .alert-text { color: var(--warning); font-weight: bold; }
+        
         .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
         .badge-success { background: rgba(16, 185, 129, 0.1); color: var(--secondary); border: 1px solid rgba(16, 185, 129, 0.2); }
         .badge-warning { background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
         .badge-pending { background: rgba(148, 163, 184, 0.1); color: var(--text-muted); border: 1px solid rgba(148, 163, 184, 0.2); }
-
-        /* Animasi Loading */
+        
         .spin { animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
@@ -137,7 +72,7 @@
 <div class="container">
     <header>
         <div class="header-title">
-            <h1>Roadmap 100 Juta</h1>
+            <h1>Dynamic Roadmap 100 Juta</h1>
             <p>FARID STORE DASHBOARD</p>
             <div id="apiStatus" class="status-badge">
                 <i class="fas fa-circle" style="color: var(--text-muted)"></i> Menunggu Sinkronisasi
@@ -151,169 +86,168 @@
     <div class="summary-grid">
         <div class="stat-card success">
             <i class="fas fa-wallet stat-icon"></i>
-            <div class="stat-title">Estimasi Aset Saat Ini</div>
+            <div class="stat-title">Estimasi Aset Berjalan (Unrealized)</div>
             <div class="stat-value" id="uiTotalAsset">Rp 0</div>
-            <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 5px;">
-                <span>Rp 50 Juta</span>
-                <span>Target: Rp 100 Juta</span>
-            </div>
-            <div class="progress-wrapper">
-                <div class="progress-fill" id="uiAssetProgress" style="width: 0%; background-color: var(--secondary);"></div>
+            <div class="stat-breakdown" id="uiAssetBreakdown">
+                Kalkulasi: Modal (50Jt) + Gross Profit (0) - Beban Gaji (0)
             </div>
         </div>
         
         <div class="stat-card">
             <i class="fas fa-mobile-alt stat-icon"></i>
-            <div class="stat-title">Total Gadget Terjual</div>
-            <div class="stat-value" id="uiTotalUnits">0 <span style="font-size: 16px; color: var(--text-muted); font-weight: normal;">/ 355 Unit</span></div>
-            <div class="progress-wrapper">
-                <div class="progress-fill" id="uiUnitProgress" style="width: 0%;"></div>
+            <div class="stat-title">Target Unit Dinamis (Bulan Ini)</div>
+            <div class="stat-value" id="uiMonthlyTarget">0 <span style="font-size: 14px; color: var(--text-muted); font-weight: normal;">Unit</span></div>
+            <div class="stat-breakdown" id="uiMarginInfo">
+                Margin Rata-rata Bulan Ini: Rp 0 / HP
             </div>
         </div>
 
         <div class="stat-card">
             <i class="fas fa-chart-line stat-icon"></i>
-            <div class="stat-title">Total Laba Kotor</div>
+            <div class="stat-title">Total Laba Kotor Global</div>
             <div class="stat-value" id="uiTotalProfit">Rp 0</div>
-            <div style="font-size: 12px; color: var(--text-muted);">Dari target Rp 80.000.000 / Tahun</div>
+            <div class="stat-breakdown">
+                Total akumulasi sebelum dipotong biaya operasional.
+            </div>
         </div>
     </div>
 
-    <div class="content-grid">
-        <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title"><i class="fas fa-chart-bar" style="margin-right: 8px; color: var(--primary);"></i> Performa Penjualan (Unit)</div>
-            </div>
-            <div class="chart-container">
-                <canvas id="salesChart"></canvas>
-            </div>
+    <div class="panel">
+        <div class="panel-header">
+            <div class="panel-title"><i class="fas fa-tasks" style="margin-right: 8px; color: var(--primary);"></i> Tabel Kompon Dinamis (Auto-Adjust)</div>
         </div>
-
-        <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title"><i class="fas fa-tasks" style="margin-right: 8px; color: var(--primary);"></i> Pencapaian Bulanan</div>
-            </div>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Bulan</th>
-                            <th class="text-right">Unit Laku</th>
-                            <th class="text-right">Laba</th>
-                            <th class="text-right">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="trackerBody">
-                        </tbody>
-                </table>
-            </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Bulan / Periode</th>
+                        <th>Target Laba</th>
+                        <th>Margin Rata2</th>
+                        <th class="text-center">Target Unit<br><small>(Dinamis)</small></th>
+                        <th class="text-center">Terjual</th>
+                        <th class="text-center">Sisa Unit</th>
+                        <th class="text-right">Laba Aktual</th>
+                        <th class="text-center">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="trackerBody">
+                    </tbody>
+            </table>
         </div>
     </div>
 </div>
 
 <script>
-    // ==========================================
-    // KREDENSIAL JSONBIN
-    // ==========================================
     const BIN_ID = '699644fdae596e708f3582af'; 
     const API_KEY = '$2a$10$tcKHEWwuz2sqRoMCKJfga.1xxTFW0RxpXUPnP.NI4YbivtlK1xxau'; 
-    // ==========================================
 
     const formatRp = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
 
     const roadmapTargets = [
-        { month: 1, units: 20, profit: 4500000 }, { month: 2, units: 24, profit: 5400000 },
-        { month: 3, units: 27, profit: 6075000 }, { month: 4, units: 30, profit: 6750000 },
-        { month: 5, units: 30, profit: 6750000 }, { month: 6, units: 32, profit: 7200000 },
-        { month: 7, units: 32, profit: 7200000 }, { month: 8, units: 34, profit: 7650000 },
-        { month: 9, units: 34, profit: 7650000 }, { month: 10, units: 35, profit: 7875000 },
-        { month: 11, units: 35, profit: 7875000 }, { month: 12, units: 30, profit: 6750000 }
+        { month: 1, profit: 4500000 }, { month: 2, profit: 5400000 },
+        { month: 3, profit: 6075000 }, { month: 4, profit: 6750000 },
+        { month: 5, profit: 6750000 }, { month: 6, profit: 7200000 },
+        { month: 7, profit: 7200000 }, { month: 8, profit: 7650000 },
+        { month: 9, profit: 7650000 }, { month: 10, profit: 7875000 },
+        { month: 11, profit: 7875000 }, { month: 12, profit: 6750000 }
     ];
-
-    let salesChartInstance = null;
 
     function setStatus(msg, type) {
         const statusEl = document.getElementById('apiStatus');
         let color = type === 'loading' ? 'var(--warning)' : (type === 'success' ? 'var(--secondary)' : 'var(--danger)');
         let icon = type === 'loading' ? 'fa-spinner spin' : (type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle');
-        
         statusEl.innerHTML = `<i class="fas ${icon}" style="color: ${color}"></i> <span style="color: #fff">${msg}</span>`;
     }
 
     async function fetchDatabase() {
         try {
-            // Perbaikan URL Fetch: Dibuat lebih aman dengan header Access-Key atau Master-Key
             const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                 method: 'GET',
                 headers: {
                     'X-Master-Key': API_KEY,
-                    'X-Access-Key': API_KEY, // Menambahkan antisipasi jika key yang digenerate adalah Access Key
+                    'X-Access-Key': API_KEY,
                     'Content-Type': 'application/json'
                 }
             });
-
             if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-
             const data = await response.json();
             return data.record;
         } catch (error) {
-            console.error("Fetch Error:", error);
+            console.error(error);
             throw error;
         }
     }
 
     function processData(db) {
         let monthlyActuals = {};
+        let globalGrossProfit = 0;
+        let globalUnitsSold = 0;
         
-        // 1. Hitung Gadget Fisik Terjual
+        // 1. Hitung HP Fisik
         if(db.items) {
             db.items.forEach(item => {
                 if(item.status === 'sold' && item.soldAt) {
                     let datePart = item.soldAt.split(' ')[0];
-                    let parts = datePart.split('/'); // Asumsi format DD/MM/YYYY
+                    let parts = datePart.split('/');
                     if(parts.length === 3) {
-                        let monthKey = `${parts[1]}-${parts[2]}`; // MM-YYYY
+                        let monthKey = `${parts[1]}-${parts[2]}`; 
                         if(!monthlyActuals[monthKey]) monthlyActuals[monthKey] = { units: 0, profit: 0 };
                         
+                        let profit = (item.price - item.modal);
                         monthlyActuals[monthKey].units += 1;
-                        monthlyActuals[monthKey].profit += (item.price - item.modal);
+                        monthlyActuals[monthKey].profit += profit;
+                        
+                        globalUnitsSold += 1;
+                        globalGrossProfit += profit;
                     }
                 }
             });
         }
 
-        // 2. Tambahkan Ekstra Margin (Langganan, Servis, Aksesori)
+        // 2. Tambahkan Ekstra Margin 
         if(db.extraProfits) {
             db.extraProfits.forEach(extra => {
                 let d = new Date(parseFloat(extra.id)); 
                 let monthKey = `${d.getMonth() + 1}-${d.getFullYear()}`;
-                
                 if(!monthlyActuals[monthKey]) monthlyActuals[monthKey] = { units: 0, profit: 0 };
                 
                 let calcProfit = extra.profit;
-                if(extra.name === 'Poco M3' && extra.modal === 400000) calcProfit = extra.price - 450000; // Koreksi historis
+                if(extra.name === 'Poco M3' && extra.modal === 400000) calcProfit = extra.price - 450000; 
+                
                 monthlyActuals[monthKey].profit += calcProfit;
+                globalGrossProfit += calcProfit;
             });
         }
 
-        updateUI(monthlyActuals);
+        updateUI(monthlyActuals, globalGrossProfit, globalUnitsSold);
     }
 
-    function updateUI(actualsData) {
+    function updateUI(actualsData, globalGrossProfit, globalUnitsSold) {
         const tbody = document.getElementById('trackerBody');
         tbody.innerHTML = '';
         
-        let totalUnits = 0;
-        let totalProfit = 0;
-        let baseAsset = 50000000; 
-        const fixedCost = 2500000; 
+        const baseAsset = 50000000; 
+        const fixedCost = 2500000; // Beban gaji/bulan
         
-        let startMonth = 2; // Februari 
+        // Hitung Waktu Berjalan (Mulai Feb 2026)
+        const startDate = new Date(2026, 1, 1); // Bulan indeks 1 = Februari
+        const currentDate = new Date();
+        let monthsElapsed = (currentDate.getFullYear() - startDate.getFullYear()) * 12 + (currentDate.getMonth() - startDate.getMonth()) + 1;
+        
+        // Safety check agar tidak minus jika komputer salah tanggal
+        if (monthsElapsed < 1) monthsElapsed = 1; 
+        if (monthsElapsed > 12) monthsElapsed = 12;
+
+        // Kalkulasi Aset Akurat
+        let totalOperasional = fixedCost * monthsElapsed;
+        let currentRealAsset = baseAsset + globalGrossProfit - totalOperasional;
+
+        let globalAvgProfit = globalUnitsSold > 0 ? (globalGrossProfit / globalUnitsSold) : 225000;
+        
+        let startMonth = 2; // Feb
         let startYear = 2026;
 
-        let chartLabels = [];
-        let chartTargetData = [];
-        let chartActualData = [];
+        let currentMonthKey = `${currentDate.getMonth() + 1}-${currentDate.getFullYear()}`;
 
         roadmapTargets.forEach((t, index) => {
             let currentM = ((startMonth - 1 + index) % 12) + 1;
@@ -323,94 +257,51 @@
             let actUnits = actualsData[monthKey] ? actualsData[monthKey].units : 0;
             let actProfit = actualsData[monthKey] ? actualsData[monthKey].profit : 0;
 
-            totalUnits += actUnits;
-            totalProfit += actProfit;
+            // Rata-rata margin dinamis bulan ini
+            let avgThisMonth = actUnits > 0 ? (actProfit / actUnits) : globalAvgProfit;
+            
+            // Logika Auto-Adjust Target Unit
+            let dynamicTargetUnits = Math.ceil(t.profit / avgThisMonth);
+            let sisaUnit = dynamicTargetUnits - actUnits;
+            if (sisaUnit < 0) sisaUnit = 0;
 
-            if(actProfit > 0) {
-                let retainedEarnings = actProfit - fixedCost;
-                baseAsset += retainedEarnings;
+            let isCurrentMonth = (monthKey === currentMonthKey);
+            if(isCurrentMonth) {
+                document.getElementById('uiMonthlyTarget').innerHTML = `${dynamicTargetUnits} <span style="font-size: 14px; color: var(--text-muted); font-weight: normal;">Unit</span>`;
+                document.getElementById('uiMarginInfo').innerHTML = `Margin Rata-rata: ${formatRp(avgThisMonth)} / HP<br>Sisa harus laku: <strong style="color:var(--warning)">${sisaUnit} Unit</strong>`;
             }
 
-            // Persiapan Data Chart
             let monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
-            chartLabels.push(monthNames[currentM-1]);
-            chartTargetData.push(t.units);
-            chartActualData.push(actUnits);
-
-            // Render Table
+            
             let badgeClass = 'badge-pending';
             let statusText = 'Pending';
             if (actProfit >= t.profit) { badgeClass = 'badge-success'; statusText = 'Achieved'; }
             else if (actProfit > 0) { badgeClass = 'badge-warning'; statusText = 'On Progress'; }
 
             const tr = document.createElement('tr');
+            if(isCurrentMonth) tr.style.backgroundColor = 'rgba(14, 165, 233, 0.1)'; // Highlight baris bulan ini
+            
             tr.innerHTML = `
-                <td>Bulan ${t.month} <span style="color: var(--text-muted); font-size: 11px; display:block;">${monthNames[currentM-1]} ${currentY}</span></td>
-                <td class="text-right"><strong style="color: #fff">${actUnits}</strong> <span style="color: var(--text-muted); font-size: 11px;">/ ${t.units}</span></td>
-                <td class="text-right" style="color: var(--secondary); font-weight: 600;">${formatRp(actProfit)}</td>
-                <td class="text-right"><span class="badge ${badgeClass}">${statusText}</span></td>
+                <td>Bulan ${t.month}<br><span style="color: var(--text-muted); font-size: 11px;">${monthNames[currentM-1]} ${currentY}</span></td>
+                <td>${formatRp(t.profit)}</td>
+                <td style="color: var(--text-muted);">${formatRp(avgThisMonth)}</td>
+                <td class="text-center" style="font-weight: bold; color: #fff;">${dynamicTargetUnits}</td>
+                <td class="text-center highlight">${actUnits}</td>
+                <td class="text-center ${sisaUnit > 0 ? 'alert-text' : 'highlight'}">${sisaUnit}</td>
+                <td class="text-right highlight">${formatRp(actProfit)}</td>
+                <td class="text-center"><span class="badge ${badgeClass}">${statusText}</span></td>
             `;
             tbody.appendChild(tr);
         });
 
-        // Update Top Cards
-        document.getElementById('uiTotalUnits').innerHTML = `${totalUnits} <span style="font-size: 16px; color: var(--text-muted); font-weight: normal;">/ 355 Unit</span>`;
-        document.getElementById('uiTotalProfit').innerText = formatRp(totalProfit);
-        document.getElementById('uiTotalAsset').innerText = formatRp(baseAsset);
-
-        // Progress Bars
-        let assetPct = ((baseAsset - 50000000) / 50000000) * 100;
-        let unitPct = (totalUnits / 355) * 100;
-        document.getElementById('uiAssetProgress').style.width = `${Math.min(Math.max(assetPct, 0), 100)}%`;
-        document.getElementById('uiUnitProgress').style.width = `${Math.min(unitPct, 100)}%`;
-
-        // Render Chart
-        renderChart(chartLabels, chartTargetData, chartActualData);
-    }
-
-    function renderChart(labels, targetData, actualData) {
-        const ctx = document.getElementById('salesChart').getContext('2d');
-        
-        if (salesChartInstance) { salesChartInstance.destroy(); }
-
-        Chart.defaults.color = '#94a3b8';
-        Chart.defaults.font.family = "'Segoe UI', sans-serif";
-
-        salesChartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'Target Unit',
-                        data: targetData,
-                        backgroundColor: 'rgba(51, 65, 85, 0.5)',
-                        borderColor: '#334155',
-                        borderWidth: 1,
-                        borderRadius: 4
-                    },
-                    {
-                        label: 'Aktual Terjual',
-                        data: actualData,
-                        backgroundColor: '#0ea5e9',
-                        borderColor: '#0284c7',
-                        borderWidth: 1,
-                        borderRadius: 4
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } }
-                },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
-                    x: { grid: { display: false } }
-                }
-            }
-        });
+        // Update Dashboard Top Cards
+        document.getElementById('uiTotalAsset').innerText = formatRp(currentRealAsset);
+        document.getElementById('uiAssetBreakdown').innerHTML = `
+            Modal: ${formatRp(baseAsset)} <br>
+            + Gross Profit: ${formatRp(globalGrossProfit)} <br>
+            - Gaji (${monthsElapsed} Bulan): ${formatRp(totalOperasional)}
+        `;
+        document.getElementById('uiTotalProfit').innerText = formatRp(globalGrossProfit);
     }
 
     async function initDashboard() {
@@ -426,14 +317,13 @@
                 setStatus('Sinkronisasi Berhasil', 'success');
             }
         } catch (err) {
-            setStatus('Gagal Terhubung! Periksa API Key / Jaringan', 'danger');
+            setStatus('Gagal Terhubung! Periksa API Key', 'danger');
         } finally {
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-sync-alt"></i> Sinkronisasi Ulang';
         }
     }
 
-    // Auto-load saat pertama dibuka
     window.onload = initDashboard;
 </script>
 
