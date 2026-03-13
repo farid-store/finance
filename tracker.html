@@ -7,54 +7,37 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
     <style>
         /* CSS Variables - Modern Fintech Theme */
         :root[data-theme="light"] {
-            --primary: #2563EB; /* Royal Blue */
-            --primary-light: #EFF6FF;
-            --secondary: #10B981; /* Emerald Green */
-            --bg-color: #F8FAFC; 
-            --card-bg: #FFFFFF;
-            --text-main: #0F172A; 
-            --text-muted: #64748B;
-            --border: #E2E8F0;
-            --danger: #EF4444; 
-            --warning: #F59E0B;
+            --primary: #2563EB; --primary-light: #EFF6FF;
+            --secondary: #10B981; --bg-color: #F8FAFC; 
+            --card-bg: #FFFFFF; --text-main: #0F172A; --text-muted: #64748B;
+            --border: #E2E8F0; --danger: #EF4444; --warning: #F59E0B;
             --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
             --shadow-md: 0 4px 15px rgba(15, 23, 42, 0.05);
-            --shadow-lg: 0 10px 25px rgba(15, 23, 42, 0.08);
             --nav-bg: rgba(255, 255, 255, 0.9);
             --skeleton-bg: #F1F5F9;
             --shimmer: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.6) 50%, transparent 100%);
         }
 
         :root[data-theme="dark"] {
-            --primary: #3B82F6; 
-            --primary-light: #1E3A8A;
-            --secondary: #10B981; 
-            --bg-color: #0F172A; 
-            --card-bg: #1E293B;
-            --text-main: #F8FAFC; 
-            --text-muted: #94A3B8;
-            --border: #334155;
-            --danger: #F87171; 
-            --warning: #FBBF24;
+            --primary: #3B82F6; --primary-light: #1E3A8A;
+            --secondary: #10B981; --bg-color: #0F172A; 
+            --card-bg: #1E293B; --text-main: #F8FAFC; --text-muted: #94A3B8;
+            --border: #334155; --danger: #F87171; --warning: #FBBF24;
             --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
             --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.4);
-            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
             --nav-bg: rgba(30, 41, 59, 0.9);
             --skeleton-bg: #334155;
             --shimmer: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.05) 50%, transparent 100%);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s ease, color 0.3s ease; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s ease, border-color 0.3s ease; }
 
-        body {
-            background-color: var(--bg-color); color: var(--text-main);
-            padding: 20px 16px 90px 16px; /* Extra bottom padding for nav */
-            overscroll-behavior-y: contain;
-        }
-
+        body { background-color: var(--bg-color); color: var(--text-main); padding: 20px 16px 90px 16px; overscroll-behavior-y: contain; }
         .container { max-width: 600px; margin: 0 auto; position: relative; }
 
         /* PTR */
@@ -65,7 +48,6 @@
         header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
         .header-title h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px;}
         .header-title p { color: var(--text-muted); font-size: 13px; font-weight: 500; }
-        
         .btn-icon { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); }
 
         /* Tabs Logic */
@@ -74,34 +56,29 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Cards General */
-        .card { background: var(--card-bg); border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-md); padding: 20px; margin-bottom: 20px; overflow: hidden; position: relative; }
+        .card { background: var(--card-bg); border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-md); padding: 20px; margin-bottom: 20px; position: relative; }
         
         /* Dashboard - Target Hero Section */
-        .hero-section { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px 20px; }
-        
+        .hero-section { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 10px 0 20px; }
         .progress-circle-wrapper { position: relative; width: 160px; height: 160px; margin-bottom: 20px; }
-        .progress-circle { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(var(--primary) var(--progress, 0%), var(--border) 0deg); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); }
+        .progress-circle { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(var(--primary) var(--progress, 0%), var(--border) 0deg); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); transition: background 1s ease;}
         .progress-circle-inner { width: 135px; height: 135px; border-radius: 50%; background: var(--card-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
         .pct-text { font-size: 28px; font-weight: 800; color: var(--primary); margin-bottom: -4px;}
         .pct-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;}
-
-        .main-balance { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
+        .main-balance { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; color: var(--text-main); }
         .balance-label { font-size: 13px; color: var(--text-muted); font-weight: 600; }
-        
         .eta-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--primary-light); color: var(--primary); padding: 8px 16px; border-radius: 30px; font-size: 12px; font-weight: 700; margin-top: 16px; box-shadow: var(--shadow-sm); }
-        .eta-badge.achieved { background: rgba(16, 185, 129, 0.1); color: var(--secondary); }
-
+        
         /* Asset Detail Section */
         .asset-detail { border-top: 1px solid var(--border); padding-top: 20px; margin-top: 5px; }
         .comp-bar-container { width: 100%; height: 8px; border-radius: 4px; display: flex; overflow: hidden; margin-bottom: 12px; background: var(--border); }
         .comp-cash { height: 100%; background: var(--secondary); transition: width 1s ease; }
         .comp-stock { height: 100%; background: var(--primary); transition: width 1s ease; }
-        
         .asset-split { display: flex; justify-content: space-between; }
         .split-item { display: flex; flex-direction: column; gap: 4px; }
         .split-label { font-size: 11px; color: var(--text-muted); font-weight: 600; display: flex; align-items: center; gap: 4px;}
         .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
-        .split-val { font-size: 14px; font-weight: 700; }
+        .split-val { font-size: 14px; font-weight: 700; color: var(--text-main); }
 
         /* Small Stat Card */
         .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;}
@@ -109,28 +86,35 @@
         .mini-label { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-bottom: 6px; }
         .mini-val { font-size: 18px; font-weight: 800; color: var(--text-main);}
 
-        /* Section Header */
+        /* Analytics Section */
         .section-header { font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
-        
-        /* Analytics Grid */
-        .analytics-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
         .chart-box { height: 200px; display: flex; justify-content: center; align-items: center; }
         
-        .aging-list { display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto; padding-right: 5px; }
-        .aging-item { border: 1px solid var(--border); padding: 12px 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 13px;}
-        .aging-item .name { font-weight: 600; color: var(--text-main); }
-        .aging-item .days { font-weight: 700; font-size: 12px; padding: 4px 10px; border-radius: 20px; background: var(--bg-color);}
+        /* Aging List & Badges */
+        .aging-list { display: flex; flex-direction: column; gap: 10px; max-height: 250px; overflow-y: auto; padding-right: 5px; }
+        .aging-item { border: 1px solid var(--border); padding: 12px 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;}
+        .aging-info { display: flex; flex-direction: column; gap: 6px; }
+        .aging-item .name { font-weight: 600; color: var(--text-main); font-size: 13px; }
+        .cat-badge { font-size: 9px; padding: 2px 8px; border-radius: 10px; font-weight: 700; width: fit-content; text-transform: uppercase;}
+        .cat-badge.gadget { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .cat-badge.digital { background: rgba(37, 99, 235, 0.15); color: var(--primary); }
+        .cat-badge.acc { background: var(--bg-color); color: var(--text-muted); border: 1px solid var(--border);}
+        .aging-item .days { font-weight: 700; font-size: 12px; padding: 4px 10px; border-radius: 20px; background: var(--bg-color); color: var(--text-main);}
         .aging-item.danger .days { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
         .aging-item.warning .days { color: var(--warning); background: rgba(245, 158, 11, 0.1); }
 
-        /* Month Cards (History) */
+        /* Search & Month Cards */
+        .search-container { position: relative; margin-bottom: 16px; }
+        .search-container i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .search-input { width: 100%; padding: 12px 16px 12px 40px; border-radius: 12px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-main); font-size: 13px; outline: none; transition: border-color 0.3s; }
+        .search-input:focus { border-color: var(--primary); }
+
         .month-list { display: flex; flex-direction: column; gap: 16px; }
-        .m-card { border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
+        .m-card { border: 1px solid var(--border); border-radius: 16px; padding: 20px; background: var(--card-bg); transition: display 0.3s ease; }
         .m-card.active { border: 2px solid var(--primary); box-shadow: var(--shadow-md); }
         .mc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .mc-title { font-size: 16px; font-weight: 700; color: var(--text-main); }
         .mc-subtitle { font-size: 12px; color: var(--text-muted); font-weight: 500;}
-        
         .badge { padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
         .badge-success { background: rgba(16, 185, 129, 0.1); color: var(--secondary); }
         .badge-warning { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
@@ -143,7 +127,6 @@
         .fill-profit { background: var(--secondary); }
         .fill-unit { background: var(--primary); }
         .val-actual { color: var(--text-main); font-weight: 700; }
-
         .avg-margin-text { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 12px; font-weight: 500;}
 
         /* Toggle Switch */
@@ -156,6 +139,14 @@
         input:checked + .slider { background-color: var(--primary); }
         input:checked + .slider:before { transform: translateX(16px); }
 
+        /* Read-Only FAB */
+        .fab-readonly { position: fixed; bottom: 90px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: var(--card-bg); border: 1px solid var(--border); color: var(--text-muted); display: flex; justify-content: center; align-items: center; box-shadow: var(--shadow-md); z-index: 999; cursor: pointer; transition: transform 0.2s; }
+        .fab-readonly:active { transform: scale(0.9); }
+
+        /* Toast Notification */
+        #toast { visibility: hidden; min-width: 250px; background-color: var(--text-main); color: var(--bg-color); text-align: center; border-radius: 8px; padding: 12px 16px; position: fixed; z-index: 1001; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 12px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
+        #toast.show { visibility: visible; opacity: 1; bottom: 100px; }
+
         /* Bottom Navigation */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: var(--nav-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
         .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); text-decoration: none; width: 33%; gap: 4px; cursor: pointer; transition: color 0.2s; }
@@ -167,29 +158,35 @@
         .skeleton { position: relative; overflow: hidden; background-color: var(--skeleton-bg); border-radius: 8px; }
         .skeleton::after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0; transform: translateX(-100%); background: var(--shimmer); animation: shimmer 1.5s infinite; }
         @keyframes shimmer { 100% { transform: translateX(100%); } }
-        
         ::-webkit-scrollbar { width: 0px; background: transparent; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div id="ptr-indicator">
-        <i class="fas fa-arrow-down ptr-icon" id="ptr-icon"></i> <span id="ptr-text">Tarik untuk Sync...</span>
-    </div>
+    <div id="ptr-indicator"><i class="fas fa-arrow-down ptr-icon" id="ptr-icon"></i> <span id="ptr-text">Tarik untuk Sync...</span></div>
 
     <header>
         <div class="header-title">
             <h1>Farid Store</h1>
             <p>Your Gadget Solution</p>
         </div>
-        <button class="btn-icon" onclick="toggleTheme()" id="themeBtn" aria-label="Toggle Theme">
-            <i class="fas fa-moon"></i>
-        </button>
+        <button class="btn-icon" onclick="toggleTheme()" id="themeBtn" aria-label="Toggle Theme"><i class="fas fa-moon"></i></button>
     </header>
 
     <div id="loadingState" style="display: none;">
-        <div class="card"><div class="skeleton" style="height: 150px; width: 150px; border-radius: 50%; margin: 0 auto 20px;"></div><div class="skeleton" style="height: 30px; width: 60%; margin: 0 auto 10px;"></div><div class="skeleton" style="height: 15px; width: 40%; margin: 0 auto;"></div></div>
+        <div class="card">
+            <div class="hero-section">
+                <div class="skeleton" style="width: 160px; height: 160px; border-radius: 50%; margin-bottom: 20px;"></div>
+                <div class="skeleton" style="width: 120px; height: 14px; margin-bottom: 12px;"></div>
+                <div class="skeleton" style="width: 200px; height: 36px; border-radius: 8px;"></div>
+            </div>
+            <div class="asset-detail"><div class="skeleton" style="width: 100%; height: 8px; border-radius: 4px; margin-bottom: 12px;"></div></div>
+        </div>
+        <div class="stat-grid">
+            <div class="mini-card"><div class="skeleton" style="height: 12px; width: 60%; margin-bottom: 8px;"></div><div class="skeleton" style="height: 24px; width: 80%;"></div></div>
+            <div class="mini-card"><div class="skeleton" style="height: 12px; width: 60%; margin-bottom: 8px;"></div><div class="skeleton" style="height: 24px; width: 80%;"></div></div>
+        </div>
     </div>
 
     <div id="tab-dashboard" class="tab-content active">
@@ -203,15 +200,10 @@
                         </div>
                     </div>
                 </div>
-                
                 <div class="balance-label">Total Aset Saat Ini</div>
                 <div class="main-balance" id="uiTotalAsset">Rp 0</div>
-                
-                <div class="eta-badge" id="uiEta">
-                    <i class="fas fa-chart-line"></i> Mengkalkulasi ETA...
-                </div>
+                <div class="eta-badge" id="uiEta"><i class="fas fa-chart-line"></i> Kalkulasi ETA...</div>
             </div>
-
             <div class="asset-detail">
                 <div class="section-header" style="font-size: 13px; margin-bottom: 12px;">Komposisi Aset</div>
                 <div class="comp-bar-container">
@@ -219,27 +211,14 @@
                     <div class="comp-stock" id="barStock" style="width: 0%;"></div>
                 </div>
                 <div class="asset-split">
-                    <div class="split-item">
-                        <span class="split-label"><i class="legend-dot" style="background:var(--secondary)"></i> Kas Laci</span>
-                        <span class="split-val" id="uiValCash">Rp 0</span>
-                    </div>
-                    <div class="split-item" style="text-align: right; align-items: flex-end;">
-                        <span class="split-label">Stok Gudang <i class="legend-dot" style="background:var(--primary)"></i></span>
-                        <span class="split-val" id="uiValStock">Rp 0</span>
-                    </div>
+                    <div class="split-item"><span class="split-label"><i class="legend-dot" style="background:var(--secondary)"></i> Kas Laci</span><span class="split-val" id="uiValCash">Rp 0</span></div>
+                    <div class="split-item" style="text-align: right; align-items: flex-end;"><span class="split-label">Stok Gudang <i class="legend-dot" style="background:var(--primary)"></i></span><span class="split-val" id="uiValStock">Rp 0</span></div>
                 </div>
             </div>
         </div>
-
         <div class="stat-grid">
-            <div class="mini-card">
-                <div class="mini-label">Modal Murni</div>
-                <div class="mini-val" id="uiAssetStart">Rp 0</div>
-            </div>
-            <div class="mini-card">
-                <div class="mini-label" id="uiProfitTitle">Akumulasi Laba</div>
-                <div class="mini-val" id="uiTotalProfit" style="color: var(--secondary);">Rp 0</div>
-            </div>
+            <div class="mini-card"><div class="mini-label">Modal Murni</div><div class="mini-val" id="uiAssetStart">Rp 0</div></div>
+            <div class="mini-card"><div class="mini-label" id="uiProfitTitle">Akumulasi Laba</div><div class="mini-val" id="uiTotalProfit" style="color: var(--secondary);">Rp 0</div></div>
         </div>
     </div>
 
@@ -249,49 +228,40 @@
                 <span>Alokasi Profit Laba</span>
                 <div class="switch-container">
                     <span class="toggle-label">NETTO</span>
-                    <label class="switch">
-                        <input type="checkbox" id="netProfitToggle" onchange="toggleNetProfit()">
-                        <span class="slider"></span>
-                    </label>
+                    <label class="switch"><input type="checkbox" id="netProfitToggle" onchange="toggleNetProfit()"><span class="slider"></span></label>
                 </div>
             </div>
-            <div class="chart-box">
-                <canvas id="doughnutChart"></canvas>
-            </div>
+            <div class="chart-box"><canvas id="doughnutChart"></canvas></div>
         </div>
-
         <div class="card">
             <div class="section-header">Kinerja 12 Bulan</div>
-            <div style="height: 220px; width: 100%;">
-                <canvas id="salesChart"></canvas>
-            </div>
+            <div style="height: 220px; width: 100%;"><canvas id="salesChart"></canvas></div>
         </div>
-
         <div class="card">
-            <div class="section-header">Radar Stok Mengendap <i class="fas fa-box" style="color: var(--text-muted); font-size: 14px;"></i></div>
+            <div class="section-header">Radar Stok Mengendap</div>
             <div class="aging-list" id="agingListUI"></div>
         </div>
     </div>
 
     <div id="tab-history" class="tab-content">
-        <div class="section-header" style="padding: 0 4px;">Detail Roadmap per Bulan</div>
+        <div class="search-container">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchHistory" class="search-input" placeholder="Cari bulan atau status (misal: Jan, Tercapai)..." onkeyup="filterHistory()">
+        </div>
         <div class="month-list" id="trackerBody"></div>
     </div>
 </div>
 
+<div class="fab-readonly" onclick="showToast('Aplikasi dalam Mode Read-Only 🔒. Update data dilakukan via Ledger Utama.')">
+    <i class="fas fa-shield-alt"></i>
+</div>
+
+<div id="toast"></div>
+
 <div class="bottom-nav">
-    <div class="nav-item active" onclick="switchTab('tab-dashboard', this)">
-        <i class="fas fa-home"></i>
-        <span>Beranda</span>
-    </div>
-    <div class="nav-item" onclick="switchTab('tab-analytics', this)">
-        <i class="fas fa-chart-pie"></i>
-        <span>Analitik</span>
-    </div>
-    <div class="nav-item" onclick="switchTab('tab-history', this)">
-        <i class="fas fa-list-ul"></i>
-        <span>Riwayat</span>
-    </div>
+    <div class="nav-item active" onclick="switchTab('tab-dashboard', this)"><i class="fas fa-home"></i><span>Beranda</span></div>
+    <div class="nav-item" onclick="switchTab('tab-analytics', this)"><i class="fas fa-chart-pie"></i><span>Analitik</span></div>
+    <div class="nav-item" onclick="switchTab('tab-history', this)"><i class="fas fa-list-ul"></i><span>Riwayat</span></div>
 </div>
 
 <script>
@@ -316,25 +286,64 @@
         { month: 11, profit: 7875000 }, { month: 12, profit: 6750000 }
     ];
 
-    let salesChartInstance = null;
-    let doughnutChartInstance = null;
+    let salesChartInstance = null; let doughnutChartInstance = null;
     let currentTheme = localStorage.getItem('theme') || 'light';
-    let globalRawData = null; 
-    let isNetProfitMode = false;
+    let globalRawData = null; let isNetProfitMode = false;
 
-    // Set Initial Theme
+    // Set Theme
     document.documentElement.setAttribute('data-theme', currentTheme);
     updateThemeIcon();
 
-    // Tab Switching Logic
+    // Show Toast Function
+    function showToast(message) {
+        const toast = document.getElementById("toast");
+        toast.innerText = message;
+        toast.className = "show";
+        setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+    }
+
+    // Live Search Logic
+    function filterHistory() {
+        let input = document.getElementById('searchHistory').value.toLowerCase();
+        let cards = document.getElementsByClassName('m-card');
+        for (let i = 0; i < cards.length; i++) {
+            let text = cards[i].innerText.toLowerCase();
+            cards[i].style.display = text.includes(input) ? "" : "none";
+        }
+    }
+
+    // Gamification Milestone Logic
+    function checkMilestone(totalAset) {
+        // Cek kelipatan 10 Juta terdekat ke bawah (Misal 34 Juta -> 30 Juta)
+        let currentMilestone = Math.floor(totalAset / 10000000) * 10000000; 
+        let savedMilestone = parseInt(localStorage.getItem('lastMilestone')) || 0;
+
+        if (currentMilestone > savedMilestone && currentMilestone > 0) {
+            triggerConfetti();
+            localStorage.setItem('lastMilestone', currentMilestone);
+            setTimeout(() => { showToast(`🎉 Selamat! Aset menembus ${formatRpFull(currentMilestone)}!`); }, 1000);
+        }
+    }
+
+    function triggerConfetti() {
+        let duration = 3 * 1000;
+        let animationEnd = Date.now() + duration;
+        let defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1002 };
+
+        let interval = setInterval(function() {
+            let timeLeft = animationEnd - Date.now();
+            if (timeLeft <= 0) return clearInterval(interval);
+            let particleCount = 50 * (timeLeft / duration);
+            confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random(), y: Math.random() - 0.2 } }));
+        }, 250);
+    }
+
+    // UI Controls
     function switchTab(tabId, element) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
-        
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         element.classList.add('active');
-
-        // Fix chart rendering bug when tab is hidden
         if(tabId === 'tab-analytics') {
             if(salesChartInstance) salesChartInstance.resize();
             if(doughnutChartInstance) doughnutChartInstance.resize();
@@ -347,8 +356,8 @@
         localStorage.setItem('theme', currentTheme);
         updateThemeIcon();
         if(salesChartInstance) {
-            salesChartInstance.options.scales.x.grid.color = getGridColor();
-            salesChartInstance.options.scales.y.grid.color = getGridColor();
+            salesChartInstance.options.scales.x.grid.color = currentTheme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+            salesChartInstance.options.scales.y.grid.color = currentTheme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
             salesChartInstance.update();
         }
     }
@@ -359,14 +368,7 @@
         else { icon.className = 'fas fa-moon'; icon.style.color = '#0F172A'; }
     }
 
-    function getGridColor() {
-        return currentTheme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
-    }
-
-    function toggleNetProfit() {
-        isNetProfitMode = document.getElementById('netProfitToggle').checked;
-        if (globalRawData) processData(globalRawData); 
-    }
+    function toggleNetProfit() { isNetProfitMode = document.getElementById('netProfitToggle').checked; if (globalRawData) processData(globalRawData); }
 
     function animateValue(id, start, end, duration, isCurrency = true) {
         if (start === end) return;
@@ -385,25 +387,13 @@
         window.requestAnimationFrame(step);
     }
 
-    function showSkeleton() {
-        document.getElementById('tab-dashboard').style.display = 'none';
-        document.getElementById('loadingState').style.display = 'block';
-    }
-
-    function hideSkeleton() {
-        document.getElementById('loadingState').style.display = 'none';
-        // Hanya tampilkan tab dashboard jika sedang aktif
-        document.getElementById('tab-dashboard').style.display = document.getElementById('tab-dashboard').classList.contains('active') ? 'block' : 'none';
-    }
+    function showSkeleton() { document.getElementById('tab-dashboard').style.display = 'none'; document.getElementById('loadingState').style.display = 'block'; }
+    function hideSkeleton() { document.getElementById('loadingState').style.display = 'none'; document.getElementById('tab-dashboard').style.display = document.getElementById('tab-dashboard').classList.contains('active') ? 'block' : 'none'; }
 
     async function fetchDatabase() {
-        const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-            method: 'GET',
-            headers: { 'X-Master-Key': API_KEY, 'X-Access-Key': API_KEY, 'Content-Type': 'application/json' }
-        });
+        const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { method: 'GET', headers: { 'X-Master-Key': API_KEY, 'X-Access-Key': API_KEY, 'Content-Type': 'application/json' } });
         if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-        const data = await response.json();
-        return data.record;
+        return (await response.json()).record;
     }
 
     function parseDateString(s) { 
@@ -414,13 +404,12 @@
         return new Date(d[2], d[1]-1, d[0]); 
     }
 
+    // Data Processing
     function processData(db) {
         let monthlyActuals = {};
-        
         let startBalance = Number(db.startBalance) || 0;
-        let belanjaBaru = 0, uangMasuk = 0;
-        let profitMain = 0, profitEkstra = 0;
-        let floatModal = 0, floatPrice = 0, totalUnitTerjual = 0;
+        let belanjaBaru = 0, uangMasuk = 0, profitMain = 0, profitEkstra = 0;
+        let floatPrice = 0, totalUnitTerjual = 0;
         let agingStocks = [];
 
         if(db.items) {
@@ -429,27 +418,21 @@
                     totalUnitTerjual++;
                     if (i.type === 'new') belanjaBaru += i.modal;
                     uangMasuk += i.price;
-                    
-                    const profitItem = i.price - i.modal;
-                    profitMain += profitItem;
+                    profitMain += (i.price - i.modal);
                     
                     if(i.soldAt) {
                         let d = parseDateString(i.soldAt);
                         let monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
                         if(!monthlyActuals[monthKey]) monthlyActuals[monthKey] = { units: 0, profit: 0 };
                         monthlyActuals[monthKey].units += 1;
-                        monthlyActuals[monthKey].profit += profitItem;
+                        monthlyActuals[monthKey].profit += (i.price - i.modal);
                     }
                 } else if (i.status === 'stok') {
                     if (i.type === 'new') belanjaBaru += i.modal;
-                    floatModal += i.modal;
                     floatPrice += i.price;
-
                     let ageDays = 0;
                     if(i.id) { 
-                        const addedDate = new Date(Math.floor(i.id));
-                        const diffTime = Math.abs(new Date() - addedDate);
-                        ageDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                        ageDays = Math.floor(Math.abs(new Date() - new Date(Math.floor(i.id))) / (1000 * 60 * 60 * 24));
                     }
                     agingStocks.push({ name: i.name, days: ageDays, id: i.id });
                 }
@@ -458,15 +441,12 @@
 
         if(db.extraProfits) {
             db.extraProfits.forEach(p => {
-                let calcProfit = p.profit;
-                profitEkstra += calcProfit;
+                profitEkstra += p.profit;
                 totalUnitTerjual++; 
-                
                 let d = new Date(Math.floor(p.id)); 
                 let monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
                 if(!monthlyActuals[monthKey]) monthlyActuals[monthKey] = { units: 0, profit: 0 };
-                
-                monthlyActuals[monthKey].profit += calcProfit;
+                monthlyActuals[monthKey].profit += p.profit;
                 monthlyActuals[monthKey].units += 1;
             });
         }
@@ -476,10 +456,7 @@
 
         for (let key in monthlyActuals) {
             monthlyActuals[key].profitKotor = monthlyActuals[key].profit; 
-            if (isNetProfitMode) {
-                monthlyActuals[key].profit -= BEBAN_BULANAN;
-                totalBebanGajiGlobal += BEBAN_BULANAN;
-            }
+            if (isNetProfitMode) { monthlyActuals[key].profit -= BEBAN_BULANAN; totalBebanGajiGlobal += BEBAN_BULANAN; }
         }
 
         let totalProfitBersih = profitMain + profitEkstra;
@@ -489,6 +466,9 @@
         const totalAsetReal = cashSisa + floatPrice; 
 
         agingStocks.sort((a, b) => b.days - a.days);
+
+        // Call gamification check
+        checkMilestone(totalAsetReal);
 
         updateUI(monthlyActuals, totalAsetReal, totalProfitBersih, totalUnitTerjual, startBalance, cashSisa, floatPrice, agingStocks);
     }
@@ -507,115 +487,70 @@
         animateValue('uiTotalProfit', prevProfit, globalGrossProfit, 1000);
         document.getElementById('uiAssetStart').innerText = formatRpFull(startBalance);
         
-        // Asset Composition
         const totalAsetAktif = cashSisa + floatPrice;
-        const cashPct = totalAsetAktif > 0 ? (cashSisa / totalAsetAktif) * 100 : 0;
-        const stockPct = totalAsetAktif > 0 ? (floatPrice / totalAsetAktif) * 100 : 0;
-        
-        document.getElementById('barCash').style.width = `${cashPct}%`;
-        document.getElementById('barStock').style.width = `${stockPct}%`;
+        document.getElementById('barCash').style.width = `${totalAsetAktif > 0 ? (cashSisa / totalAsetAktif) * 100 : 0}%`;
+        document.getElementById('barStock').style.width = `${totalAsetAktif > 0 ? (floatPrice / totalAsetAktif) * 100 : 0}%`;
         document.getElementById('uiValCash').innerText = formatRpFull(cashSisa);
         document.getElementById('uiValStock').innerText = formatRpFull(floatPrice);
         
-        // Circular Progress Goal
-        let progressPctCalc = (globalGrossProfit / 80000000) * 100;
-        if (progressPctCalc < 0) progressPctCalc = 0;
-        const progressPct = Math.min(progressPctCalc, 100).toFixed(1);
-        
+        let progressPct = Math.min(Math.max((globalGrossProfit / 80000000) * 100, 0), 100).toFixed(1);
         document.getElementById('uiProgressCircle').style.setProperty('--progress', `${progressPct}%`);
         document.getElementById('uiProgressPct').innerText = `${progressPct}%`;
 
-        // ETA Calc
-        let activeMonthsKey = Object.keys(actualsData).sort();
-        let last3Months = activeMonthsKey.slice(-3);
-        let sumRecentProfit = last3Months.reduce((acc, key) => acc + actualsData[key].profit, 0);
-        let avgRecentProfit = sumRecentProfit / (last3Months.length || 1);
-        
+        let activeKeys = Object.keys(actualsData).sort();
+        let last3Months = activeKeys.slice(-3);
+        let avgRecentProfit = last3Months.reduce((acc, key) => acc + actualsData[key].profit, 0) / (last3Months.length || 1);
         let sisaTarget = 100000000 - totalAset;
-        let etaText = "Data belum cukup";
-        let etaBadge = document.getElementById('uiEta');
         
+        let etaBadge = document.getElementById('uiEta');
         if (sisaTarget <= 0) {
-            etaText = "Target 100M Tercapai! 🎉";
-            etaBadge.classList.add('achieved');
+            etaBadge.innerHTML = `<i class="fas fa-award"></i> Target 100M Tercapai! 🎉`;
+            etaBadge.style.background = "rgba(16, 185, 129, 0.1)"; etaBadge.style.color = "var(--secondary)";
         } else if (avgRecentProfit > 0) {
             let monthsLeft = Math.ceil(sisaTarget / avgRecentProfit);
-            let d = new Date();
-            d.setMonth(d.getMonth() + monthsLeft);
-            let monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
-            etaText = `Estimasi 100M: ${monthNamesShort[d.getMonth()]} ${d.getFullYear()} (${monthsLeft} bln lagi)`;
-            etaBadge.classList.remove('achieved');
+            let d = new Date(); d.setMonth(d.getMonth() + monthsLeft);
+            etaBadge.innerHTML = `<i class="fas fa-rocket"></i> Estimasi 100M: ${["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"][d.getMonth()]} ${d.getFullYear()} (${monthsLeft} bln)`;
         }
-        etaBadge.innerHTML = `<i class="fas ${sisaTarget <= 0 ? 'fa-award' : 'fa-rocket'}"></i> ${etaText}`;
 
         let currentMonthKey = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
         let currentMonthGrossProfit = actualsData[currentMonthKey] ? (actualsData[currentMonthKey].profitKotor !== undefined ? actualsData[currentMonthKey].profitKotor : actualsData[currentMonthKey].profit) : 0;
 
         renderAnalytics(currentMonthGrossProfit, agingStocks);
 
-        // Roadmap
         let chartLabels = [], chartProfitData = [], chartActualUnits = [];
-        const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
-        let startMonth = 2, startYear = 2026;
-        let globalAvgMargin = globalUnits > 0 ? (globalGrossProfit / globalUnits) : 150000;
         let accumulatedDeficit = 0;
 
         roadmapTargets.forEach((t, index) => {
-            let m = ((startMonth - 1 + index) % 12) + 1;
-            let y = startYear + Math.floor((startMonth - 1 + index) / 12);
+            let m = ((1 + index) % 12) + 1; let y = 2026 + Math.floor((1 + index) / 12);
             let monthKey = `${y}-${String(m).padStart(2, '0')}`;
             
             let actUnits = actualsData[monthKey] ? actualsData[monthKey].units : 0;
             let actProfit = actualsData[monthKey] ? actualsData[monthKey].profit : 0;
 
-            chartLabels.push(`${monthNames[m-1]} ${y}`);
-            chartProfitData.push(actProfit);
-            chartActualUnits.push(actUnits);
+            chartLabels.push(`${["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"][m-1]} ${y}`);
+            chartProfitData.push(actProfit); chartActualUnits.push(actUnits);
 
-            let smartTargetProfit = t.profit + accumulatedDeficit;
-            if (smartTargetProfit < 0) smartTargetProfit = t.profit; 
+            let smartTarget = t.profit + accumulatedDeficit < 0 ? t.profit : t.profit + accumulatedDeficit; 
+            let dynamicTargetUnit = actProfit >= smartTarget ? actUnits : Math.ceil(smartTarget / (actUnits > 0 ? (actProfit / actUnits) : (globalUnits > 0 ? (globalGrossProfit / globalUnits) : 150000))); 
             
-            let avgThisMonth = actUnits > 0 ? (actProfit / actUnits) : globalAvgMargin;
-            let dynamicTargetUnit = Math.ceil(smartTargetProfit / avgThisMonth); 
-            if (actProfit >= smartTargetProfit) dynamicTargetUnit = actUnits; 
-            
-            let profitPct = Math.min((actProfit / smartTargetProfit) * 100 || 0, 100);
-            let unitPct = Math.min((actUnits / dynamicTargetUnit) * 100 || 0, 100);
-
             if (monthKey <= currentMonthKey) accumulatedDeficit += (t.profit - actProfit);
 
-            let statusBadge = actProfit >= smartTargetProfit 
-                ? '<span class="badge badge-success">Tercapai</span>' 
-                : (actProfit > 0 ? '<span class="badge badge-warning">Proses</span>' : '<span class="badge badge-pending">Pending</span>');
-
             let isCurrent = (monthKey === currentMonthKey);
-            let labelLaba = isNetProfitMode ? 'Laba Bersih' : 'Laba Kotor';
-
             const card = document.createElement('div');
             card.className = `m-card ${isCurrent ? 'active' : ''}`;
             card.innerHTML = `
                 <div class="mc-header">
-                    <div>
-                        <div class="mc-title">Bulan ${t.month}</div>
-                        <span class="mc-subtitle">${monthNames[m-1]} ${y}</span>
-                    </div>
-                    ${statusBadge}
+                    <div><div class="mc-title">Bulan ${t.month}</div><span class="mc-subtitle">${["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"][m-1]} ${y}</span></div>
+                    ${actProfit >= smartTarget ? '<span class="badge badge-success">Tercapai</span>' : (actProfit > 0 ? '<span class="badge badge-warning">Proses</span>' : '<span class="badge badge-pending">Pending</span>')}
                 </div>
                 <div class="mc-stat">
-                    <div class="mc-stat-header">
-                        <span>${labelLaba}</span>
-                        <span><span class="val-actual">${formatRp(actProfit)}</span> / ${formatRp(smartTargetProfit)}</span>
-                    </div>
-                    <div class="bar-bg"><div class="bar-fill fill-profit" style="width: ${profitPct}%"></div></div>
+                    <div class="mc-stat-header"><span>${isNetProfitMode ? 'Laba Bersih' : 'Laba Kotor'}</span><span><span class="val-actual">${formatRp(actProfit)}</span> / ${formatRp(smartTarget)}</span></div>
+                    <div class="bar-bg"><div class="bar-fill fill-profit" style="width: ${Math.min((actProfit / smartTarget) * 100 || 0, 100)}%"></div></div>
                 </div>
                 <div class="mc-stat">
-                    <div class="mc-stat-header">
-                        <span>Penjualan</span>
-                        <span><span class="val-actual">${actUnits}</span> / ${dynamicTargetUnit} Unit</span>
-                    </div>
-                    <div class="bar-bg"><div class="bar-fill fill-unit" style="width: ${unitPct}%"></div></div>
+                    <div class="mc-stat-header"><span>Penjualan</span><span><span class="val-actual">${actUnits}</span> / ${dynamicTargetUnit} Unit</span></div>
+                    <div class="bar-bg"><div class="bar-fill fill-unit" style="width: ${Math.min((actUnits / dynamicTargetUnit) * 100 || 0, 100)}%"></div></div>
                 </div>
-                <div class="avg-margin-text">Avg: ${formatRp(avgThisMonth)} / unit</div>
             `;
             tbody.appendChild(card);
         });
@@ -624,50 +559,39 @@
     }
 
     function renderAnalytics(currentMonthProfit, agingStocks) {
-        let pOwner = 1500000;
-        let pKaryawan = 1000000;
-        let pSisa = currentMonthProfit - (pOwner + pKaryawan);
-        
-        if (pSisa < 0) {
-            pOwner = Math.min(1500000, currentMonthProfit);
-            pKaryawan = Math.max(0, currentMonthProfit - 1500000);
-            pSisa = 0;
-        }
+        let pOwner = 1500000, pKaryawan = 1000000, pSisa = currentMonthProfit - 2500000;
+        if (pSisa < 0) { pOwner = Math.min(1500000, currentMonthProfit); pKaryawan = Math.max(0, currentMonthProfit - 1500000); pSisa = 0; }
 
-        const ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
         if(doughnutChartInstance) doughnutChartInstance.destroy();
-
-        doughnutChartInstance = new Chart(ctxDoughnut, {
+        doughnutChartInstance = new Chart(document.getElementById('doughnutChart').getContext('2d'), {
             type: 'doughnut',
-            data: {
-                labels: ['Gaji Owner', 'Gaji Karyawan', 'Laba Bersih (Sisa)'],
-                datasets: [{
-                    data: [pOwner, pKaryawan, pSisa],
-                    backgroundColor: ['#2563EB', '#F59E0B', '#10B981'],
-                    borderWidth: 0, hoverOffset: 4
-                }]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false, cutout: '70%',
-                plugins: {
-                    legend: { position: 'bottom', labels: { boxWidth: 12, usePointStyle: true, font: { family: "'Plus Jakarta Sans', sans-serif" } } },
-                }
-            }
+            data: { labels: ['Gaji Owner', 'Gaji Karyawan', 'Laba Bersih'], datasets: [{ data: [pOwner, pKaryawan, pSisa], backgroundColor: ['#2563EB', '#F59E0B', '#10B981'], borderWidth: 0 }] },
+            options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, usePointStyle: true, font: { family: "'Plus Jakarta Sans', sans-serif" } } } } }
         });
 
-        const listUI = document.getElementById('agingListUI');
-        listUI.innerHTML = '';
-        if(agingStocks.length === 0) {
-            listUI.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:13px; padding:20px;">Gudang Aman & Lancar 🚀</div>`;
-            return;
-        }
+        const listUI = document.getElementById('agingListUI'); listUI.innerHTML = '';
+        if(agingStocks.length === 0) { listUI.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:13px; padding:20px;">Gudang Aman & Lancar 🚀</div>`; return; }
 
         agingStocks.forEach(item => {
             let severityClass = item.days > 30 ? 'danger' : (item.days > 14 ? 'warning' : '');
-            if(listUI.childElementCount < 5) {
+            
+            // Smart Badge Categorization Logic
+            let catBadge = ''; let nameLower = item.name.toLowerCase();
+            if (nameLower.includes('vidio') || nameLower.includes('premier')) {
+                catBadge = `<span class="cat-badge digital">Digital</span>`;
+            } else if (nameLower.includes('poco') || nameLower.includes('samsung') || nameLower.includes('iphone') || nameLower.includes('hp')) {
+                catBadge = `<span class="cat-badge gadget">Gadget</span>`;
+            } else {
+                catBadge = `<span class="cat-badge acc">Lainnya</span>`;
+            }
+
+            if(listUI.childElementCount < 10) { // Limit to 10 for neatness
                 listUI.innerHTML += `
                     <div class="aging-item ${severityClass}">
-                        <span class="name">${item.name}</span>
+                        <div class="aging-info">
+                            <span class="name">${item.name}</span>
+                            ${catBadge}
+                        </div>
                         <span class="days">${item.days} Hari</span>
                     </div>`;
             }
@@ -675,29 +599,21 @@
     }
 
     function renderChart(labels, profitData, actualData) {
-        const ctx = document.getElementById('salesChart').getContext('2d');
         if (salesChartInstance) salesChartInstance.destroy(); 
-
         Chart.defaults.color = getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim();
         Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
-
-        salesChartInstance = new Chart(ctx, {
+        salesChartInstance = new Chart(document.getElementById('salesChart').getContext('2d'), {
             type: 'line',
             data: {
                 labels: labels,
                 datasets: [
-                    { label: isNetProfitMode ? 'Laba Bersih' : 'Laba Kotor', data: profitData, type: 'line', borderColor: '#10B981', borderWidth: 3, pointBackgroundColor: '#10B981', pointBorderColor: '#fff', pointRadius: 4, fill: true, backgroundColor: 'rgba(16, 185, 129, 0.1)', tension: 0.4, yAxisID: 'y' },
-                    { label: 'Unit', data: actualData, type: 'bar', backgroundColor: '#E2E8F0', hoverBackgroundColor: '#3B82F6', borderRadius: 4, borderSkipped: false, yAxisID: 'y1' }
+                    { label: isNetProfitMode ? 'Laba Bersih' : 'Laba Kotor', data: profitData, type: 'line', borderColor: '#10B981', borderWidth: 3, pointBackgroundColor: '#10B981', pointRadius: 4, fill: true, backgroundColor: 'rgba(16, 185, 129, 0.1)', tension: 0.4, yAxisID: 'y' },
+                    { label: 'Unit', data: actualData, type: 'bar', backgroundColor: '#E2E8F0', hoverBackgroundColor: '#3B82F6', borderRadius: 4, yAxisID: 'y1' }
                 ]
             },
             options: {
-                responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { grid: { display: false } },
-                    y: { type: 'linear', display: true, position: 'left', grid: { color: getGridColor() }, ticks: { callback: v => (v/1000000) + 'M', font: { size: 10 } } },
-                    y1: { type: 'linear', display: false, position: 'right' }
-                }
+                responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: false } },
+                scales: { x: { grid: { display: false } }, y: { display: true, position: 'left', grid: { color: currentTheme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }, ticks: { callback: v => (v/1000000) + 'M', font: { size: 10 } } }, y1: { display: false, position: 'right' } }
             }
         });
     }
@@ -706,64 +622,34 @@
         if(forceSync) showSkeleton();
         try {
             const cachedData = localStorage.getItem('faridStoreCacheV3');
-            if (cachedData && !forceSync) {
-                globalRawData = JSON.parse(cachedData);
-                processData(globalRawData);
-            } else if (!cachedData && !forceSync) {
-                showSkeleton();
-            }
+            if (cachedData && !forceSync) { globalRawData = JSON.parse(cachedData); processData(globalRawData); } 
+            else if (!cachedData && !forceSync) showSkeleton();
 
             const dbData = await fetchDatabase();
-            if(dbData) {
-                localStorage.setItem('faridStoreCacheV3', JSON.stringify(dbData));
-                globalRawData = dbData;
-                processData(dbData); 
-            }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            if (forceSync) hideSkeleton();
-        }
+            if(dbData) { localStorage.setItem('faridStoreCacheV3', JSON.stringify(dbData)); globalRawData = dbData; processData(dbData); }
+        } catch (err) { console.error(err); } finally { if (forceSync) hideSkeleton(); }
     }
 
-    // --- PULL TO REFRESH LOGIC ---
+    // Pull to Refresh
     let startY = 0; let isPulling = false;
-    const ptrIndicator = document.getElementById('ptr-indicator');
-    const ptrIcon = document.getElementById('ptr-icon');
-    const ptrText = document.getElementById('ptr-text');
-    const THRESHOLD = 80;
-
-    document.addEventListener('touchstart', (e) => {
-        if (window.scrollY === 0) { startY = e.touches[0].pageY; isPulling = true; }
-    }, {passive: true});
-
+    document.addEventListener('touchstart', (e) => { if (window.scrollY === 0) { startY = e.touches[0].pageY; isPulling = true; } }, {passive: true});
     document.addEventListener('touchmove', (e) => {
         if (!isPulling) return;
         const diff = e.touches[0].pageY - startY;
         if (diff > 0 && window.scrollY === 0) {
             let height = Math.min(diff * 0.5, 100);
-            ptrIndicator.style.height = `${height}px`;
-            if (height > THRESHOLD) {
-                ptrIcon.style.transform = 'rotate(180deg)'; ptrText.innerText = 'Lepas untuk Sync';
-            } else {
-                ptrIcon.style.transform = 'rotate(0deg)'; ptrText.innerText = 'Tarik untuk Sync...';
-            }
+            document.getElementById('ptr-indicator').style.height = `${height}px`;
+            if (height > 80) { document.getElementById('ptr-icon').style.transform = 'rotate(180deg)'; document.getElementById('ptr-text').innerText = 'Lepas untuk Sync'; } 
+            else { document.getElementById('ptr-icon').style.transform = 'rotate(0deg)'; document.getElementById('ptr-text').innerText = 'Tarik untuk Sync...'; }
         }
     }, {passive: true});
-
     document.addEventListener('touchend', () => {
-        if (!isPulling) return;
-        isPulling = false;
-        if (parseInt(ptrIndicator.style.height || '0') > THRESHOLD) {
-            ptrIcon.className = 'fas fa-circle-notch fa-spin'; ptrText.innerText = 'Menyinkronkan...';
-            initDashboard(true).then(() => setTimeout(resetPTR, 500));
-        } else { resetPTR(); }
+        if (!isPulling) return; isPulling = false;
+        if (parseInt(document.getElementById('ptr-indicator').style.height || '0') > 80) {
+            document.getElementById('ptr-icon').className = 'fas fa-circle-notch fa-spin'; document.getElementById('ptr-text').innerText = 'Menyinkronkan...';
+            initDashboard(true).then(() => { document.getElementById('ptr-indicator').style.height = '0px'; setTimeout(() => { document.getElementById('ptr-icon').className = 'fas fa-arrow-down ptr-icon'; document.getElementById('ptr-text').innerText = 'Tarik untuk Sync...'; }, 300); });
+        } else { document.getElementById('ptr-indicator').style.height = '0px'; }
     });
-
-    function resetPTR() {
-        ptrIndicator.style.height = '0px';
-        setTimeout(() => { ptrIcon.className = 'fas fa-arrow-down ptr-icon'; ptrIcon.style.transform = 'rotate(0deg)'; ptrText.innerText = 'Tarik untuk Sync...'; }, 300);
-    }
 
     window.onload = () => initDashboard(false);
 </script>
