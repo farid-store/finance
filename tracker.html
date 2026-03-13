@@ -128,6 +128,18 @@
         .fill-profit { background: linear-gradient(90deg, var(--secondary), #059669); }
         .fill-unit { background: linear-gradient(90deg, var(--primary), var(--primary-dark)); }
 
+        /* UPDATED: Avg Margin Text di Pojok Kanan Bawah */
+        .avg-margin-text { 
+            font-size: 8.5px; /* Dikecilkan */
+            color: var(--text-muted); 
+            text-align: right; /* Rata kanan */
+            margin-top: 12px; 
+            margin-bottom: -2px; /* Ditarik ke bawah agar lebih mepet */
+            font-style: italic; 
+            opacity: 0.6; /* Dibuat sedikit transparan */
+            letter-spacing: 0.5px;
+        }
+
         /* Skeleton Shimmer Classes */
         .skeleton { position: relative; overflow: hidden; background-color: var(--skeleton-bg); border-radius: 4px; }
         .skeleton::after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0; transform: translateX(-100%); background: var(--shimmer); animation: shimmer 1.5s infinite; }
@@ -570,14 +582,12 @@
         let pKaryawan = 1000000;
         let pSisa = currentMonthProfit - (pOwner + pKaryawan);
         
-        // Jika profit kotor bulan ini belum sampai 2.5 juta
         if (pSisa < 0) {
             pOwner = Math.min(1500000, currentMonthProfit);
             pKaryawan = Math.max(0, currentMonthProfit - 1500000);
             pSisa = 0;
         }
 
-        // Render Doughnut
         const ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
         if(doughnutChartInstance) doughnutChartInstance.destroy();
 
@@ -608,7 +618,6 @@
             }
         });
 
-        // Render Aging Stock List
         const listUI = document.getElementById('agingListUI');
         listUI.innerHTML = '';
         if(agingStocks.length === 0) {
@@ -621,7 +630,6 @@
             if(item.days > 30) severityClass = 'danger';
             else if(item.days > 14) severityClass = 'warning';
             
-            // Limit to max 5 to save space
             if(listUI.childElementCount < 5) {
                 listUI.innerHTML += `
                     <div class="aging-item ${severityClass}">
