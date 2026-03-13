@@ -3,130 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Farid Store | Neo Tracker</title>
+    <title>Farid Store | Minimalist Tracker</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        /* CSS Variables - Modern Fintech Theme */
+        /* CSS Variables - Minimalist Clean Theme */
         :root[data-theme="dark"] {
-            --bg-color: #0f172a; --card-bg: #1e293b; --nav-bg: #0f172a;
-            --primary: #3b82f6; --primary-dark: #2563eb;
-            --secondary: #10b981; --secondary-dark: #059669;
-            --text-main: #f8fafc; --text-muted: #94a3b8;
-            --border: #334155; --danger: #ef4444; --warning: #f59e0b;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-            --skeleton-bg: rgba(255,255,255,0.05);
+            --bg-color: #0b0f19;         /* Softer, deeper background */
+            --card-bg: #151e2f;          /* Slightly lighter card */
+            --nav-bg: rgba(21, 30, 47, 0.85); /* Glass effect nav */
+            --primary: #3b82f6; 
+            --secondary: #10b981; 
+            --text-main: #f8fafc; 
+            --text-muted: #8b9bb4;       /* More elegant muted text */
+            --border: rgba(255, 255, 255, 0.04);
+            --danger: #ef4444; 
+            --warning: #f59e0b;
+            --shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+            --glass-blur: blur(12px);
         }
 
         :root[data-theme="light"] {
-            --bg-color: #f1f5f9; --card-bg: #ffffff; --nav-bg: #ffffff;
-            --primary: #2563eb; --primary-dark: #1d4ed8;
-            --secondary: #059669; --secondary-dark: #047857;
-            --text-main: #0f172a; --text-muted: #64748b;
-            --border: #e2e8f0; --danger: #dc2626; --warning: #d97706;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            --skeleton-bg: rgba(0,0,0,0.05);
+            --bg-color: #f8fafc;         /* Off-white, easier on eyes */
+            --card-bg: #ffffff; 
+            --nav-bg: rgba(255, 255, 255, 0.9);
+            --primary: #2563eb; 
+            --secondary: #059669; 
+            --text-main: #0f172a; 
+            --text-muted: #64748b; 
+            --border: rgba(0, 0, 0, 0.04);
+            --danger: #dc2626; 
+            --warning: #d97706;
+            --shadow: 0 12px 24px -10px rgba(15, 23, 42, 0.08);
+            --glass-blur: blur(12px);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s ease, color 0.3s ease; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        /* Smooth transition for theme switching */
+        body, .card, .bottom-nav { transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease; }
 
-        body { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-color); color: var(--text-main); padding-bottom: 70px; overscroll-behavior-y: contain; }
-        .container { max-width: 600px; margin: 0 auto; position: relative; padding: 15px 15px 0 15px; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            padding-bottom: 90px; 
+            overscroll-behavior-y: contain; 
+            line-height: 1.5;
+        }
 
-        /* Header */
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .header-title h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-        .header-title p { color: var(--text-muted); font-size: 12px; font-weight: 500; }
-        .btn-icon { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); padding: 10px; border-radius: 50%; cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); }
+        .container { max-width: 500px; margin: 0 auto; position: relative; padding: 20px 20px 0 20px; }
 
-        /* Bottom Navigation */
-        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; background: var(--nav-bg); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0 20px 0; z-index: 1000; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); font-size: 10px; font-weight: 600; gap: 4px; cursor: pointer; width: 33%; }
-        .nav-item i { font-size: 20px; transition: transform 0.2s ease; }
-        .nav-item.active { color: var(--primary); }
-        .nav-item.active i { transform: translateY(-2px); }
+        /* Typography & Header */
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; padding-top: 10px; }
+        .header-title h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 2px;}
+        .header-title p { color: var(--text-muted); font-size: 13px; font-weight: 500; }
+        
+        .btn-icon { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); border-radius: 14px; cursor: pointer; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); }
+
+        /* Floating Bottom Navigation */
+        .bottom-nav { 
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+            width: calc(100% - 40px); max-width: 460px; 
+            background: var(--nav-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border); border-radius: 24px;
+            display: flex; justify-content: space-between; padding: 8px; z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+        .nav-item { 
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            color: var(--text-muted); font-size: 13px; font-weight: 600; 
+            padding: 12px 16px; border-radius: 18px; cursor: pointer; transition: all 0.3s ease;
+            flex: 1; text-align: center;
+        }
+        .nav-item i { font-size: 18px; }
+        .nav-item span { display: none; } /* Hide text by default for minimalism */
+        .nav-item.active { background: var(--primary); color: #fff; }
+        .nav-item.active span { display: inline-block; animation: fadeInRight 0.3s ease forwards; }
 
         /* Tabs */
-        .tab-content { display: none; animation: fadeOnly 0.25s ease-in-out; }
+        .tab-content { display: none; animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .tab-content.active { display: block; }
-        @keyframes fadeOnly { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInRight { from { opacity: 0; transform: translateX(-5px); } to { opacity: 1; transform: translateX(0); } }
 
-        /* Cards & Panels */
-        .card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .card-title { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+        /* Minimalist Cards */
+        .card { 
+            background: var(--card-bg); border-radius: 24px; border: 1px solid var(--border); 
+            padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow); 
+            position: relative; overflow: hidden;
+        }
         
-        .stat-main { font-size: 32px; font-weight: 800; color: var(--text-main); margin-bottom: 5px; letter-spacing: -1px; }
-        .stat-sub { font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .card-title { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 8px; }
         
-        /* Progress & Composition Bars */
-        .bar-container { width: 100%; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin: 12px 0; display: flex; }
-        .bar-fill { height: 100%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        .stat-main { font-size: 34px; font-weight: 800; color: var(--text-main); letter-spacing: -1px; line-height: 1.1; margin-bottom: 6px; }
+        .stat-sub { font-size: 13px; color: var(--text-muted); font-weight: 500;}
+        
+        /* Thin, elegant progress bars */
+        .bar-container { width: 100%; height: 6px; background: var(--border); border-radius: 6px; overflow: hidden; margin: 16px 0; display: flex; }
+        .bar-fill { height: 100%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 6px; }
         .bg-primary { background: var(--primary); }
         .bg-secondary { background: var(--secondary); }
-        .comp-legend { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; }
-        .legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
+        .bg-warning { background: var(--warning); }
+        
+        .comp-legend { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--text-muted); }
+        .legend-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
 
-        /* Brand Performance List */
-        .brand-list { display: flex; flex-direction: column; gap: 10px; }
-        .brand-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg-color); border-radius: 12px; border: 1px solid var(--border); }
-        .brand-info { display: flex; align-items: center; gap: 12px; }
-        .brand-rank { font-size: 14px; font-weight: 800; color: var(--primary); width: 20px; }
-        .brand-name { font-size: 14px; font-weight: 700; color: var(--text-main); }
-        .brand-stats { text-align: right; }
-        .brand-profit { font-size: 13px; font-weight: 700; color: var(--secondary); }
-        .brand-count { font-size: 11px; color: var(--text-muted); }
+        /* Lists (Brands & Aging) */
+        .list-item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 14px 0; border-bottom: 1px solid var(--border); 
+        }
+        .list-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .list-item:first-child { padding-top: 0; }
+        
+        .item-info { display: flex; align-items: center; gap: 14px; }
+        .item-rank { font-size: 14px; color: var(--text-muted); width: 16px; text-align: center; }
+        .item-name { font-size: 15px; font-weight: 600; color: var(--text-main); }
+        .item-stats { text-align: right; }
+        .item-val { font-size: 14px; font-weight: 700; color: var(--text-main); }
+        .item-sub { font-size: 12px; color: var(--text-muted); font-weight: 500;}
 
-        /* Aging List */
-        .aging-list { display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; }
-        .aging-item { background: var(--bg-color); border: 1px solid var(--border); padding: 10px 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
-        .aging-item .name { font-weight: 600; color: var(--text-main); }
-        .aging-item .days { font-weight: 700; }
-        .aging-item.danger .days { color: var(--danger); }
-        .aging-item.warning .days { color: var(--warning); }
+        /* Badges */
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .badge-success { background: rgba(16, 185, 129, 0.1); color: var(--secondary); }
+        .badge-warning { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .badge-pending { background: var(--border); color: var(--text-muted); }
 
         /* Roadmap Cards */
-        .m-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow); }
-        .m-card.active { border: 1px solid var(--primary); background: linear-gradient(to right, var(--card-bg), rgba(59, 130, 246, 0.05)); }
-        .mc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-        .mc-title { font-size: 15px; font-weight: 800; color: var(--text-main); }
-        .mc-subtitle { font-size: 11px; color: var(--text-muted); }
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
-        .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--secondary); border: 1px solid rgba(16, 185, 129, 0.3); }
-        .badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
-        .badge-pending { background: var(--border); color: var(--text-muted); }
-        .mc-stat-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 4px; margin-top: 10px;}
+        .m-card { 
+            background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; 
+            padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); 
+        }
+        .m-card.active { border: 1px solid var(--primary); }
+        .mc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .mc-title { font-size: 16px; font-weight: 700; color: var(--text-main); }
+        .mc-subtitle { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+        .mc-stat-row { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 6px; margin-top: 14px; color: var(--text-muted); }
 
         /* Charts */
         .chart-box { position: relative; width: 100%; }
         
-        /* Toggle Switch */
-        .switch-container { display: flex; align-items: center; }
-        .toggle-label { font-size: 10px; font-weight: 700; color: var(--text-muted); margin-right: 8px; }
-        .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
+        /* Clean Toggle Switch */
+        .switch-container { display: flex; align-items: center; gap: 10px; }
+        .toggle-label { font-size: 11px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.5px; }
+        .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: .4s; border-radius: 20px; }
-        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: var(--text-main); transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--primary); }
-        input:checked + .slider:before { transform: translateX(16px); }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); border-radius: 22px; transition: .3s; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: var(--text-muted); border-radius: 50%; transition: .3s; }
+        input:checked + .slider { background-color: rgba(59, 130, 246, 0.2); border: 1px solid var(--primary); }
+        input:checked + .slider:before { transform: translateX(18px); background-color: var(--primary); }
 
-        /* Pull to Refresh */
+        /* PTR */
         #ptr-indicator { text-align: center; color: var(--text-muted); font-size: 12px; font-weight: 600; height: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 8px; transition: height 0.2s ease; }
-        
-        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar { display: none; } /* Hide scrollbar for extreme clean look */
     </style>
 </head>
 <body>
 
 <div id="ptr-indicator">
-    <i class="fas fa-arrow-down" id="ptr-icon"></i> <span id="ptr-text">Tarik untuk Sync...</span>
+    <i class="fas fa-arrow-down" id="ptr-icon"></i> <span id="ptr-text">Syncing data...</span>
 </div>
 
 <div class="container">
     <header>
         <div class="header-title">
-            <h1>Farid Store</h1>
-            <p>Gadget Portfolio Tracker</p>
+            <h1>Farid Store.</h1>
+            <p>Portfolio Tracker</p>
         </div>
         <button class="btn-icon" onclick="toggleTheme()" id="themeBtn" aria-label="Toggle Theme">
             <i class="fas fa-moon"></i>
@@ -135,70 +185,78 @@
 
     <div id="tab-dashboard" class="tab-content active">
         
-        <div class="card" style="border-color: var(--primary); background: linear-gradient(145deg, var(--card-bg) 70%, rgba(59, 130, 246, 0.05) 100%);">
-            <div class="card-header" style="margin-bottom: 5px;">
-                <div class="card-title"><i class="fas fa-bullseye" style="color: var(--primary)"></i> Grand Target 100 Juta</div>
-            </div>
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-                <div class="chart-box" style="height: 110px; width: 110px; flex-shrink: 0;">
-                    <canvas id="goalChart"></canvas>
+        <div class="card">
+            <div class="card-header" style="margin-bottom: 10px;">
+                <div class="card-title" style="color: var(--primary);"><i class="fas fa-bullseye"></i> Grand Target</div>
+                <div class="badge badge-warning" id="uiEtaBadge">
+                    <i class="fas fa-clock"></i> ETA
                 </div>
-                <div style="flex-grow: 1; padding-left: 20px; text-align: right;">
-                    <div style="font-size: 28px; font-weight: 800; color: var(--text-main);" id="uiGoalPct">0%</div>
-                    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase;">Tercapai</div>
-                    <div class="badge badge-warning" id="uiEtaBadge" style="display: inline-block; text-align: right; font-size: 10px; line-height: 1.5;">
-                        <i class="fas fa-clock"></i> Kalkulasi ETA...
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 24px;">
+                <div class="chart-box" style="height: 100px; width: 100px; flex-shrink: 0;">
+                    <canvas id="goalChart"></canvas>
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                        <span id="uiGoalPct" style="font-size: 18px; font-weight: 800; color: var(--text-main);">0%</span>
                     </div>
+                </div>
+                <div style="flex-grow: 1;">
+                    <div class="stat-sub" style="margin-bottom: 4px;">Pencapaian</div>
+                    <div class="stat-main" id="uiTotalAsset" style="font-size: 26px;">Rp 0</div>
+                    <div class="stat-sub" style="font-size: 11px;">dari Rp 100 Jt</div>
                 </div>
             </div>
         </div>
 
         <div class="card">
             <div class="card-header" style="margin-bottom: 5px;">
-                <div class="card-title"><i class="fas fa-flag-checkered" style="color: var(--warning)"></i> Milestone Terdekat</div>
+                <div class="card-title"><i class="fas fa-flag-checkered"></i> Next Milestone</div>
                 <span id="uiMilestoneBadge" class="badge badge-warning">Proses</span>
             </div>
-            <div class="stat-main" id="uiTotalAsset">Rp 0</div>
-            
             <div class="bar-container">
-                <div class="bar-fill bg-warning" id="milestoneBar" style="width: 0%; background: var(--warning);"></div>
+                <div class="bar-fill bg-warning" id="milestoneBar" style="width: 0%;"></div>
             </div>
-            
             <div class="comp-legend">
-                <span style="color: var(--text-muted);">Aset Saat Ini</span>
-                <span style="color: var(--text-main); font-weight: 800;" id="uiNextMilestone">Target: Rp 0</span>
+                <span>Progress saat ini</span>
+                <span style="color: var(--text-main); font-weight: 700;" id="uiNextMilestone">Rp 0</span>
             </div>
         </div>
 
         <div class="card">
             <div class="card-header">
-                <div class="card-title"><i class="fas fa-wallet" style="color: var(--secondary)"></i> Alokasi Aset</div>
+                <div class="card-title"><i class="fas fa-wallet"></i> Alokasi Aset</div>
             </div>
-            <div class="bar-container" style="height: 12px;">
+            <div class="bar-container" style="height: 10px;">
                 <div class="bar-fill bg-secondary" id="barCash" style="width: 0%;"></div>
                 <div class="bar-fill bg-primary" id="barStock" style="width: 0%;"></div>
             </div>
-            <div class="comp-legend" style="margin-top: 15px;">
-                <span><i class="legend-dot bg-secondary"></i>Kas Laci: <br><span id="uiValCash" style="font-size:14px; color:var(--text-main)">Rp 0</span></span>
-                <span style="text-align: right;"><i class="legend-dot bg-primary"></i>Stok Gudang: <br><span id="uiValStock" style="font-size:14px; color:var(--text-main)">Rp 0</span></span>
+            <div style="display: flex; justify-content: space-between; margin-top: 16px;">
+                <div>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;"><i class="legend-dot bg-secondary"></i>Kas Laci</div>
+                    <div id="uiValCash" style="font-size: 16px; font-weight: 700; color: var(--text-main);">Rp 0</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;"><i class="legend-dot bg-primary"></i>Stok Gudang</div>
+                    <div id="uiValStock" style="font-size: 16px; font-weight: 700; color: var(--text-main);">Rp 0</div>
+                </div>
             </div>
         </div>
 
         <div class="card">
             <div class="card-header">
-                <div class="card-title"><i class="fas fa-chart-line" style="color: var(--secondary)"></i> Total Laba Kotor</div>
+                <div class="card-title"><i class="fas fa-chart-line"></i> Total Laba</div>
                 <div class="switch-container">
-                    <span class="toggle-label">NETTO</span>
+                    <span class="toggle-label" id="labelNetto">KOTOR</span>
                     <label class="switch">
                         <input type="checkbox" id="netProfitToggle" onchange="toggleNetProfit()">
                         <span class="slider"></span>
                     </label>
                 </div>
             </div>
-            <div class="stat-main" id="uiTotalProfit" style="color: var(--secondary); font-size: 26px;">Rp 0</div>
-            <div class="stat-sub" style="margin-top: 10px;">
-                <span id="uiProfitTitle">Akumulasi sejak awal operasional</span>
-                <span id="uiTotalUnits" style="font-weight: 700;">0 Unit Terjual</span>
+            <div class="stat-main" id="uiTotalProfit" style="color: var(--secondary); font-size: 28px;">Rp 0</div>
+            <div class="stat-sub" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);">
+                <span>Total penjualan</span>
+                <span id="uiTotalUnits" style="font-weight: 700; color: var(--text-main);">0 Unit</span>
             </div>
         </div>
     </div>
@@ -206,32 +264,32 @@
     <div id="tab-analytics" class="tab-content">
         <div class="card">
             <div class="card-header">
-                <div class="card-title"><i class="fas fa-fire" style="color: var(--warning)"></i> Top Performer Brand</div>
+                <div class="card-title"><i class="fas fa-fire" style="color: var(--warning)"></i> Top Brands</div>
             </div>
-            <div class="brand-list" id="topBrandsUI"></div>
+            <div id="topBrandsUI"></div>
         </div>
 
         <div class="card">
             <div class="card-header">
-                <div class="card-title"><i class="fas fa-chart-pie" style="color: var(--primary)"></i> Alokasi Laba Bulan Ini</div>
+                <div class="card-title"><i class="fas fa-chart-pie"></i> Alokasi Laba</div>
             </div>
-            <div class="chart-box" style="height: 180px;">
+            <div class="chart-box" style="height: 200px; display: flex; align-items: center; justify-content: center;">
                 <canvas id="doughnutChart"></canvas>
             </div>
         </div>
 
         <div class="card">
             <div class="card-header">
-                <div class="card-title"><i class="fas fa-box-open" style="color: var(--text-muted)"></i> Radar Stok Mengendap</div>
+                <div class="card-title"><i class="fas fa-box-open"></i> Aging Stock</div>
             </div>
-            <div class="aging-list" id="agingListUI"></div>
+            <div id="agingListUI"></div>
         </div>
     </div>
 
     <div id="tab-performance" class="tab-content">
         <div class="card">
             <div class="card-header">
-                <div class="card-title"><i class="fas fa-chart-area" style="color: var(--primary)"></i> Kinerja 12 Bulan</div>
+                <div class="card-title"><i class="fas fa-chart-area"></i> Kinerja Tahunan</div>
             </div>
             <div class="chart-box" style="height: 220px; overflow-x: auto;">
                 <div style="min-width: 500px; height: 100%;">
@@ -240,22 +298,24 @@
             </div>
         </div>
 
-        <h3 style="font-size: 14px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin: 20px 0 10px 5px;">Roadmap Bulanan</h3>
+        <div style="padding-left: 8px; margin-bottom: 16px;">
+            <div style="font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Roadmap Bulanan</div>
+        </div>
         <div id="trackerBody"></div>
     </div>
 </div>
 
 <nav class="bottom-nav">
     <div class="nav-item active" onclick="switchTab('dashboard', this)">
-        <i class="fas fa-home"></i>
+        <i class="fas fa-layer-group"></i>
         <span>Dashboard</span>
     </div>
     <div class="nav-item" onclick="switchTab('analytics', this)">
-        <i class="fas fa-microscope"></i>
+        <i class="fas fa-compass"></i>
         <span>Analitik</span>
     </div>
     <div class="nav-item" onclick="switchTab('performance', this)">
-        <i class="fas fa-route"></i>
+        <i class="fas fa-chart-bar"></i>
         <span>Performa</span>
     </div>
 </nav>
@@ -284,12 +344,12 @@
         { month: 11, profit: 7875000 }, { month: 12, profit: 6750000 }
     ];
 
-    let salesChartInstance = null;
-    let doughnutChartInstance = null;
-    let goalChartInstance = null;
+    let salesChartInstance = null, doughnutChartInstance = null, goalChartInstance = null;
     let currentTheme = localStorage.getItem('theme') || 'dark';
-    let globalRawData = null; 
-    let isNetProfitMode = false;
+    let globalRawData = null, isNetProfitMode = false;
+
+    // Apply font globally to Chart.js
+    Chart.defaults.font.family = "'Inter', sans-serif";
 
     // --- INIT THEME ---
     document.documentElement.setAttribute('data-theme', currentTheme);
@@ -307,15 +367,14 @@
 
     function updateThemeIcon() {
         const icon = document.querySelector('#themeBtn i');
-        if(currentTheme === 'dark') { icon.className = 'fas fa-sun'; icon.style.color = '#f59e0b'; } 
-        else { icon.className = 'fas fa-moon'; icon.style.color = '#2563eb'; }
+        if(currentTheme === 'dark') { icon.className = 'fas fa-sun'; icon.style.color = 'var(--warning)'; } 
+        else { icon.className = 'fas fa-moon'; icon.style.color = 'var(--text-main)'; }
     }
 
     // --- TAB NAVIGATION ---
     function switchTab(tabId, el) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        
         document.getElementById(`tab-${tabId}`).classList.add('active');
         el.classList.add('active');
 
@@ -326,6 +385,7 @@
 
     function toggleNetProfit() {
         isNetProfitMode = document.getElementById('netProfitToggle').checked;
+        document.getElementById('labelNetto').innerText = isNetProfitMode ? 'BERSIH' : 'KOTOR';
         if (globalRawData) processData(globalRawData); 
     }
 
@@ -367,7 +427,7 @@
     function getDeviceBrand(itemName) {
         const name = itemName.toUpperCase();
         if (name.includes('IPHONE') || name.startsWith('IP ') || name.includes('APPLE') || name.includes('IPAD')) return 'APPLE';
-        if (name.includes('SAMSUNG') || name.includes('SEIN') ||  name.includes('GALAXY') || name.startsWith('SAM ')) return 'SAMSUNG';
+        if (name.includes('SAMSUNG') || name.includes('SEIN') || name.includes('GALAXY') || name.startsWith('SAM ')) return 'SAMSUNG';
         if (name.includes('XIAOMI') || name.includes('NOTE') || name.includes('REDMI') || name.includes('POCO') || name.includes('MI ')) return 'XIAOMI';
         if (name.includes('OPPO') || name.includes('RENO') || name.includes('FIND')) return 'OPPO';
         if (name.includes('VIVO') || name.includes('IQOO')) return 'VIVO';
@@ -380,12 +440,9 @@
     }
 
     function processData(db) {
-        let monthlyActuals = {};
-        let brandStats = {};
-        
+        let monthlyActuals = {}, brandStats = {};
         let startBalance = Number(db.startBalance) || 0;
-        let belanjaBaru = 0, uangMasuk = 0;
-        let profitMain = 0, profitEkstra = 0;
+        let belanjaBaru = 0, uangMasuk = 0, profitMain = 0, profitEkstra = 0;
         let floatModal = 0, floatPrice = 0, totalUnitTerjual = 0;
         let agingStocks = [];
 
@@ -420,8 +477,7 @@
                     let ageDays = 0;
                     if(i.id) { 
                         const addedDate = new Date(Math.floor(i.id));
-                        const diffTime = Math.abs(new Date() - addedDate);
-                        ageDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                        ageDays = Math.floor(Math.abs(new Date() - addedDate) / (1000 * 60 * 60 * 24));
                     }
                     agingStocks.push({ name: i.name, days: ageDays, id: i.id });
                 }
@@ -430,20 +486,17 @@
 
         if(db.extraProfits) {
             db.extraProfits.forEach(p => {
-                let calcProfit = p.profit;
-                profitEkstra += calcProfit;
+                profitEkstra += p.profit;
                 totalUnitTerjual++; 
                 let d = new Date(Math.floor(p.id)); 
                 let monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
                 if(!monthlyActuals[monthKey]) monthlyActuals[monthKey] = { units: 0, profit: 0 };
-                monthlyActuals[monthKey].profit += calcProfit;
+                monthlyActuals[monthKey].profit += p.profit;
                 monthlyActuals[monthKey].units += 1;
             });
         }
 
-        let totalBebanGajiGlobal = 0;
-        const BEBAN_BULANAN = 2500000; 
-
+        let totalBebanGajiGlobal = 0; const BEBAN_BULANAN = 2500000; 
         for (let key in monthlyActuals) {
             monthlyActuals[key].profitKotor = monthlyActuals[key].profit; 
             if (isNetProfitMode) {
@@ -457,7 +510,6 @@
 
         const cashSisa = startBalance - belanjaBaru + uangMasuk;
         const totalAsetReal = cashSisa + floatPrice; 
-
         agingStocks.sort((a, b) => b.days - a.days);
 
         updateUI(monthlyActuals, totalAsetReal, totalProfitBersih, totalUnitTerjual, cashSisa, floatPrice, agingStocks, brandStats);
@@ -472,17 +524,15 @@
         goalChartInstance = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: ['Tercapai', 'Sisa Target'],
+                labels: ['Tercapai', 'Sisa'],
                 datasets: [{
                     data: [current, remaining],
                     backgroundColor: ['#3b82f6', emptyColor],
-                    borderWidth: 0,
-                    borderRadius: 4,
-                    hoverOffset: 2
+                    borderWidth: 0, borderRadius: 20, hoverOffset: 0
                 }]
             },
             options: {
-                responsive: true, maintainAspectRatio: false, cutout: '80%',
+                responsive: true, maintainAspectRatio: false, cutout: '85%',
                 plugins: { legend: { display: false }, tooltip: { enabled: false } },
                 animation: { animateScale: true, animateRotate: true }
             }
@@ -491,7 +541,7 @@
 
     function updateUI(actualsData, totalAset, globalGrossProfit, globalUnits, cashSisa, floatPrice, agingStocks, brandStats) {
         
-        // --- 100M GOAL & ETA (NEW LOGIC) ---
+        // --- 100M GOAL & ETA ---
         let sisaTarget100 = 100000000 - totalAset;
         let pctGoal = Math.min((totalAset / 100000000) * 100, 100).toFixed(1);
         document.getElementById('uiGoalPct').innerText = `${pctGoal}%`;
@@ -503,56 +553,48 @@
         
         let etaText = "Data tidak cukup";
         if (sisaTarget100 <= 0) {
-            etaText = "Target 100M Tercapai! 🎉";
+            etaText = "Tercapai!";
             document.getElementById('uiEtaBadge').className = "badge badge-success";
         } else if (avgRecentProfit > 0) {
             let monthsLeft = Math.ceil(sisaTarget100 / avgRecentProfit);
-            let d = new Date();
-            d.setMonth(d.getMonth() + monthsLeft);
+            let d = new Date(); d.setMonth(d.getMonth() + monthsLeft);
             let monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
-            etaText = `Estimasi: ${monthNamesShort[d.getMonth()]} ${d.getFullYear()}<br>(${monthsLeft} bln lagi)`;
+            etaText = `${monthNamesShort[d.getMonth()]} ${d.getFullYear()}`;
         }
-        document.getElementById('uiEtaBadge').innerHTML = `<i class="fas fa-clock" style="margin-right:3px;"></i>${etaText}`;
+        document.getElementById('uiEtaBadge').innerHTML = `<i class="fas fa-clock" style="margin-right:4px;"></i>${etaText}`;
 
         renderGoalChart(totalAset, sisaTarget100 > 0 ? sisaTarget100 : 0);
 
-
-        // --- DASHBOARD TAB ---
+        // --- DASHBOARD ---
         const prevAset = parseInt(document.getElementById('uiTotalAsset').innerText.replace(/\D/g,'')) || 0;
         const prevProfit = parseInt(document.getElementById('uiTotalProfit').innerText.replace(/\D/g,'')) || 0;
         
         animateValue('uiTotalAsset', prevAset, totalAset, 1000);
         animateValue('uiTotalProfit', prevProfit, globalGrossProfit, 1000);
-        document.getElementById('uiTotalUnits').innerText = `${globalUnits} Unit Terjual`;
+        document.getElementById('uiTotalUnits').innerText = `${globalUnits} Unit`;
 
-        // Milestone Logic
         let nextMilestone = MILESTONES.find(m => m > totalAset) || 100000000;
         let milestonePct = Math.min((totalAset / nextMilestone) * 100, 100);
-        document.getElementById('uiNextMilestone').innerText = `Target: ${formatRpFull(nextMilestone)}`;
+        document.getElementById('uiNextMilestone').innerText = formatRpFull(nextMilestone);
         document.getElementById('milestoneBar').style.width = `${milestonePct}%`;
         
         if (totalAset >= 100000000) {
             document.getElementById('uiMilestoneBadge').className = "badge badge-success";
-            document.getElementById('uiMilestoneBadge').innerHTML = "<i class='fas fa-check'></i> 100M Goal!";
+            document.getElementById('uiMilestoneBadge').innerHTML = "<i class='fas fa-check'></i> DONE";
         }
 
-        // Asset Composition
         const totalAsetAktif = cashSisa + floatPrice;
-        const cashPct = totalAsetAktif > 0 ? (cashSisa / totalAsetAktif) * 100 : 0;
-        const stockPct = totalAsetAktif > 0 ? (floatPrice / totalAsetAktif) * 100 : 0;
-        
-        document.getElementById('barCash').style.width = `${cashPct}%`;
-        document.getElementById('barStock').style.width = `${stockPct}%`;
+        document.getElementById('barCash').style.width = `${totalAsetAktif > 0 ? (cashSisa / totalAsetAktif) * 100 : 0}%`;
+        document.getElementById('barStock').style.width = `${totalAsetAktif > 0 ? (floatPrice / totalAsetAktif) * 100 : 0}%`;
         document.getElementById('uiValCash').innerText = formatRpFull(cashSisa);
         document.getElementById('uiValStock').innerText = formatRpFull(floatPrice);
 
-        // --- ANALYTICS TAB ---
+        // --- ANALYTICS ---
         let currentMonthKey = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
         let currentMonthGrossProfit = actualsData[currentMonthKey] ? (actualsData[currentMonthKey].profitKotor !== undefined ? actualsData[currentMonthKey].profitKotor : actualsData[currentMonthKey].profit) : 0;
-        
         renderAnalytics(currentMonthGrossProfit, agingStocks, brandStats);
 
-        // --- PERFORMANCE TAB (Roadmap) ---
+        // --- PERFORMANCE ---
         const tbody = document.getElementById('trackerBody');
         tbody.innerHTML = '';
         
@@ -570,7 +612,7 @@
             let actUnits = actualsData[monthKey] ? actualsData[monthKey].units : 0;
             let actProfit = actualsData[monthKey] ? actualsData[monthKey].profit : 0;
 
-            chartLabels.push(`${monthNames[m-1]} ${y}`);
+            chartLabels.push(`${monthNames[m-1]} '${String(y).slice(-2)}`);
             chartProfitData.push(actProfit);
             chartActualUnits.push(actUnits);
 
@@ -591,7 +633,6 @@
                 : (actProfit > 0 ? '<span class="badge badge-warning">Proses</span>' : '<span class="badge badge-pending">Pending</span>');
 
             let isCurrent = (monthKey === currentMonthKey);
-            let labelLaba = isNetProfitMode ? 'Laba Bersih' : 'Laba Kotor';
 
             const card = document.createElement('div');
             card.className = `m-card ${isCurrent ? 'active' : ''}`;
@@ -599,25 +640,25 @@
             card.innerHTML = `
                 <div class="mc-header">
                     <div>
-                        <div class="mc-title">Bulan ${t.month} ${isCurrent ? '<i class="fas fa-crosshairs fa-spin" style="color:var(--primary); font-size:12px; margin-left:4px;"></i>' : ''}</div>
-                        <span class="mc-subtitle">${monthNames[m-1]} ${y}</span>
+                        <div class="mc-title">Bulan ${t.month} ${isCurrent ? '<i class="fas fa-circle" style="color:var(--primary); font-size:8px; vertical-align:middle; margin-left:4px;"></i>' : ''}</div>
+                        <div class="mc-subtitle">${monthNames[m-1]} ${y}</div>
                     </div>
                     ${statusBadge}
                 </div>
                 
-                <div class="mc-stat-header">
-                    <span style="color: var(--secondary)">${labelLaba}</span>
-                    <span>${formatRp(actProfit)} / ${formatRp(smartTargetProfit)}</span>
+                <div class="mc-stat-row">
+                    <span style="color: var(--text-main);">Laba Target</span>
+                    <span>${formatRp(actProfit)} <span style="color:var(--text-muted); font-weight:500;">/ ${formatRp(smartTargetProfit)}</span></span>
                 </div>
-                <div class="bar-container" style="height:6px; margin-top:4px;">
+                <div class="bar-container" style="height:4px; margin: 8px 0 16px 0;">
                     <div class="bar-fill bg-secondary" style="width: ${profitPct}%"></div>
                 </div>
 
-                <div class="mc-stat-header">
-                    <span style="color: var(--primary)">Penjualan Unit</span>
-                    <span>${actUnits} / ${dynamicTargetUnit} Unit</span>
+                <div class="mc-stat-row">
+                    <span style="color: var(--text-main);">Volume Unit</span>
+                    <span>${actUnits} <span style="color:var(--text-muted); font-weight:500;">/ ${dynamicTargetUnit}</span></span>
                 </div>
-                <div class="bar-container" style="height:6px; margin-top:4px;">
+                <div class="bar-container" style="height:4px; margin: 8px 0 0 0;">
                     <div class="bar-fill bg-primary" style="width: ${unitPct}%"></div>
                 </div>
             `;
@@ -628,32 +669,32 @@
     }
 
     function renderAnalytics(currentMonthProfit, agingStocks, brandStats) {
-        // 1. Top Brands UI
+        // 1. Top Brands
         const brandsArray = Object.keys(brandStats).map(key => ({
             name: key, profit: brandStats[key].profit, count: brandStats[key].count
         })).sort((a, b) => b.profit - a.profit).slice(0, 3);
 
         const topBrandsUI = document.getElementById('topBrandsUI');
         topBrandsUI.innerHTML = '';
-        if(brandsArray.length === 0) topBrandsUI.innerHTML = '<div style="font-size:12px; color:var(--text-muted); text-align:center;">Belum ada data penjualan.</div>';
+        if(brandsArray.length === 0) topBrandsUI.innerHTML = '<div style="font-size:13px; color:var(--text-muted); text-align:center; padding:10px;">Belum ada data.</div>';
         
         brandsArray.forEach((b, index) => {
             let iconColor = index === 0 ? '#f59e0b' : (index === 1 ? '#94a3b8' : '#cd7f32');
             topBrandsUI.innerHTML += `
-                <div class="brand-item">
-                    <div class="brand-info">
-                        <span class="brand-rank"><i class="fas fa-trophy" style="color:${iconColor}"></i></span>
-                        <span class="brand-name">${b.name}</span>
+                <div class="list-item">
+                    <div class="item-info">
+                        <span class="item-rank"><i class="fas fa-trophy" style="color:${iconColor}"></i></span>
+                        <span class="item-name">${b.name}</span>
                     </div>
-                    <div class="brand-stats">
-                        <div class="brand-profit">${formatRpFull(b.profit)}</div>
-                        <div class="brand-count">${b.count} Unit</div>
+                    <div class="item-stats">
+                        <div class="item-val">${formatRpFull(b.profit)}</div>
+                        <div class="item-sub">${b.count} Unit terjual</div>
                     </div>
                 </div>
             `;
         });
 
-        // 2. Alokasi Gaji Doughnut Chart
+        // 2. Alokasi Laba
         let pOwner = 1500000;
         let pKaryawan = 1000000;
         let pSisa = currentMonthProfit - (pOwner + pKaryawan);
@@ -667,49 +708,49 @@
         const ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
         if(doughnutChartInstance) doughnutChartInstance.destroy();
 
-        const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#94a3b8';
-        Chart.defaults.color = textColor; 
+        const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-main').trim() || '#f8fafc';
 
         doughnutChartInstance = new Chart(ctxDoughnut, {
             type: 'doughnut',
             data: {
-                labels: ['Gaji Saya', 'Gaji Karyawan', 'Laba Bersih (Sisa)'],
+                labels: ['Gaji Owner', 'Karyawan', 'Laba Ditahan'],
                 datasets: [{
                     data: [pOwner, pKaryawan, pSisa],
-                    backgroundColor: ['#f59e0b', '#ef4444', '#10b981'],
+                    backgroundColor: ['#3b82f6', '#10b981', '#6366f1'],
                     borderWidth: 0,
                     hoverOffset: 4
                 }]
             },
             options: {
-                responsive: true, maintainAspectRatio: false, cutout: '70%',
+                responsive: true, maintainAspectRatio: false, cutout: '75%',
                 plugins: {
-                    legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } }
+                    legend: { 
+                        position: 'right', 
+                        labels: { boxWidth: 10, color: textColor, font: { size: 12, weight: '500' } } 
+                    }
                 }
             }
         });
 
-        // 3. Aging Stock UI
+        // 3. Aging Stock
         const listUI = document.getElementById('agingListUI');
         listUI.innerHTML = '';
         if(agingStocks.length === 0) {
-            listUI.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:12px; padding:10px;">Gudang Kosong / Lancar</div>`;
+            listUI.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:13px; padding:10px;">Gudang Kosong / Lancar</div>`;
             return;
         }
 
-        agingStocks.forEach(item => {
-            let severityClass = '';
-            if(item.days > 30) severityClass = 'danger';
-            else if(item.days > 14) severityClass = 'warning';
+        agingStocks.slice(0, 6).forEach(item => {
+            let isDanger = item.days > 30;
+            let isWarning = item.days > 14 && item.days <= 30;
+            let color = isDanger ? 'var(--danger)' : (isWarning ? 'var(--warning)' : 'var(--text-muted)');
             
-            if(listUI.childElementCount < 6) {
-                listUI.innerHTML += `
-                    <div class="aging-item ${severityClass}">
-                        <span class="name">${item.name}</span>
-                        <span class="days">${item.days} Hari <i class="${severityClass ? 'fas fa-exclamation-circle' : 'fas fa-check-circle'}" style="color:${severityClass ? 'inherit' : 'var(--secondary)'}"></i></span>
-                    </div>
-                `;
-            }
+            listUI.innerHTML += `
+                <div class="list-item">
+                    <span class="item-name" style="font-size:13px;">${item.name}</span>
+                    <span class="item-val" style="font-size:13px; color:${color};">${item.days} Hari</span>
+                </div>
+            `;
         });
     }
 
@@ -717,24 +758,25 @@
         const ctx = document.getElementById('salesChart').getContext('2d');
         if (salesChartInstance) salesChartInstance.destroy(); 
 
-        const gridColor = currentTheme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+        const gridColor = currentTheme === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)';
+        const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#8b9bb4';
 
         salesChartInstance = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: labels,
                 datasets: [
-                    { label: isNetProfitMode ? 'Laba Bersih' : 'Laba Kotor', data: profitData, type: 'line', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderColor: '#10b981', borderWidth: 2, pointBackgroundColor: '#10b981', pointBorderColor: '#fff', fill: true, tension: 0.4, yAxisID: 'y' },
-                    { label: 'Unit', data: actualData, type: 'bar', backgroundColor: 'rgba(59, 130, 246, 0.8)', borderColor: '#3b82f6', borderWidth: 0, borderRadius: 4, yAxisID: 'y1' }
+                    { label: isNetProfitMode ? 'Bersih' : 'Kotor', data: profitData, type: 'line', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderColor: '#3b82f6', borderWidth: 2, pointBackgroundColor: '#3b82f6', pointBorderColor: '#fff', pointRadius: 3, fill: true, tension: 0.4, yAxisID: 'y' },
+                    { label: 'Unit', data: actualData, type: 'bar', backgroundColor: 'rgba(16, 185, 129, 0.8)', borderRadius: 4, barThickness: 12, yAxisID: 'y1' }
                 ]
             },
             options: {
                 responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
-                plugins: { legend: { position: 'top', labels: { boxWidth: 10, font: { size: 11 } } } },
+                plugins: { legend: { position: 'top', labels: { boxWidth: 8, usePointStyle: true, color: textColor, font: { size: 11, weight: '600' } } } },
                 scales: {
-                    x: { grid: { display: false } },
-                    y: { type: 'linear', display: true, position: 'left', grid: { color: gridColor }, ticks: { callback: function(value) { return (value/1000000) + 'M'; }, font: { size: 10 } } },
-                    y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { font: { size: 10 }, stepSize: 5 } }
+                    x: { grid: { display: false }, ticks: { color: textColor, font: { size: 10 } } },
+                    y: { type: 'linear', display: true, position: 'left', grid: { color: gridColor }, ticks: { color: textColor, callback: function(value) { return (value/1000000) + 'M'; }, font: { size: 10 } } },
+                    y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { color: textColor, font: { size: 10 }, stepSize: 5 } }
                 }
             }
         });
@@ -742,14 +784,14 @@
 
     async function initDashboard(forceSync = false) {
         try {
-            const cachedData = localStorage.getItem('faridStoreCacheV6');
+            const cachedData = localStorage.getItem('faridStoreCacheV8');
             if (cachedData && !forceSync) {
                 globalRawData = JSON.parse(cachedData);
                 processData(globalRawData);
             }
             const dbData = await fetchDatabase();
             if(dbData) {
-                localStorage.setItem('faridStoreCacheV6', JSON.stringify(dbData));
+                localStorage.setItem('faridStoreCacheV8', JSON.stringify(dbData));
                 globalRawData = dbData;
                 processData(dbData); 
             }
@@ -758,40 +800,35 @@
         }
     }
 
-    // --- PULL TO REFRESH LOGIC ---
+    // --- PULL TO REFRESH ---
     let startY = 0; let isPulling = false;
     const ptrIndicator = document.getElementById('ptr-indicator');
     const ptrIcon = document.getElementById('ptr-icon');
     const ptrText = document.getElementById('ptr-text');
     const THRESHOLD = 80;
 
-    document.addEventListener('touchstart', (e) => {
-        if (window.scrollY === 0) { startY = e.touches[0].pageY; isPulling = true; }
-    }, {passive: true});
-
+    document.addEventListener('touchstart', (e) => { if (window.scrollY === 0) { startY = e.touches[0].pageY; isPulling = true; } }, {passive: true});
     document.addEventListener('touchmove', (e) => {
         if (!isPulling) return;
         const diff = e.touches[0].pageY - startY;
         if (diff > 0 && window.scrollY === 0) {
             let height = Math.min(diff * 0.5, 100);
             ptrIndicator.style.height = `${height}px`;
-            if (height > THRESHOLD) { ptrIcon.style.transform = 'rotate(180deg)'; ptrText.innerText = 'Lepas untuk Sync'; } 
-            else { ptrIcon.style.transform = 'rotate(0deg)'; ptrText.innerText = 'Tarik untuk Sync...'; }
+            if (height > THRESHOLD) { ptrIcon.style.transform = 'rotate(180deg)'; ptrText.innerText = 'Release to Sync'; } 
+            else { ptrIcon.style.transform = 'rotate(0deg)'; ptrText.innerText = 'Pull to Sync...'; }
         }
     }, {passive: true});
-
     document.addEventListener('touchend', (e) => {
-        if (!isPulling) return;
-        isPulling = false;
+        if (!isPulling) return; isPulling = false;
         if (parseInt(ptrIndicator.style.height || '0') > THRESHOLD) {
-            ptrIcon.className = 'fas fa-circle-notch fa-spin'; ptrText.innerText = 'Menyinkronkan...';
+            ptrIcon.className = 'fas fa-circle-notch fa-spin'; ptrText.innerText = 'Syncing...';
             initDashboard(true).then(() => setTimeout(resetPTR, 500));
         } else { resetPTR(); }
     });
 
     function resetPTR() {
         ptrIndicator.style.height = '0px';
-        setTimeout(() => { ptrIcon.className = 'fas fa-arrow-down'; ptrIcon.style.transform = 'rotate(0deg)'; ptrText.innerText = 'Tarik untuk Sync...'; }, 300);
+        setTimeout(() => { ptrIcon.className = 'fas fa-arrow-down'; ptrIcon.style.transform = 'rotate(0deg)'; ptrText.innerText = 'Pull to Sync...'; }, 300);
     }
 
     window.onload = () => initDashboard(false);
