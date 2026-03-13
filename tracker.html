@@ -422,7 +422,7 @@
                 } else if (i.status === 'stok') {
                     if (i.type === 'new') belanjaBaru += i.modal;
                     floatModal += i.modal;
-                    floatPrice += i.price; // PERBAIKAN: Menggunakan Harga Jual agar total aset akurat
+                    floatPrice += i.price;
 
                     // Aging Stock Logic
                     let ageDays = 0;
@@ -436,11 +436,11 @@
             });
         }
 
-        // 2. Ekstrak Data Extra Profit (Penting: Tidak mempengaruhi belanja/uangMasuk)
+        // 2. Ekstrak Data Extra Profit (Penting: Murni ambil profit tanpa edit)
         if(db.extraProfits) {
             db.extraProfits.forEach(p => {
+                // Di sini letak perbaikannya: Ambil murni nilai profit langsung dari database
                 let calcProfit = p.profit;
-                if(p.name === 'Poco M3' && p.modal === 400000) calcProfit = p.price - 450000;
                 
                 profitEkstra += calcProfit;
                 totalUnitTerjual++; 
