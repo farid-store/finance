@@ -67,8 +67,8 @@
 
         .stat-icon { position: absolute; top: 18px; right: 18px; font-size: 24px; color: var(--primary); opacity: 0.2; }
         .stat-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 6px; }
-        .stat-value { font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 6px; }
-        .stat-sub { font-size: 11px; color: var(--text-muted); }
+        .stat-value { font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 8px; letter-spacing: -0.5px;}
+        .stat-sub { font-size: 11px; color: var(--text-muted); line-height: 1.6; }
 
         /* Chart Area (Horizontal Scroll on Mobile) */
         .panel {
@@ -136,7 +136,10 @@
             <i class="fas fa-wallet stat-icon"></i>
             <div class="stat-title">Aset Saat Ini (Unrealized)</div>
             <div class="stat-value" id="uiTotalAsset">Rp 0</div>
-            <div class="stat-sub">Modal Murni: <span id="uiAssetStart" style="color: #fff">Rp 0</span></div>
+            <div class="stat-sub">
+                Modal Murni: <span id="uiAssetStart" style="color: #fff; font-weight: 600;">Rp 0</span><br>
+                <span id="uiDetailAsset" style="color: var(--primary); font-weight: 600;">Kas: Rp 0 | Stok: Rp 0</span>
+            </div>
         </div>
         
         <div class="stat-card">
@@ -157,7 +160,7 @@
         </div>
     </div>
 
-    <div class="panel" style="padding: 15px 10px; background: transparent; border: none;">
+    <div class="panel" style="padding: 15px 10px; background: transparent; border: none; box-shadow: none;">
         <div class="panel-header" style="padding-left: 5px;"><i class="fas fa-list-check"></i> Progres Detail per Bulan</div>
         <div class="month-list" id="trackerBody">
             </div>
@@ -210,33 +213,51 @@
 
     function processData(db) {
         let monthlyActuals = {};
+        
+        // --- LOGIKA ORISINAL LEDGER UTAMA ---
         let startBalance = Number(db.startBalance) || 0;
-        let globalGrossProfit = 0;
-        let globalUnitTerjual = 0;
+        
+        let belanjaBaru = 0;
+        let uangMasuk = 0;
+        let profit = 0;
+        let floatModal = 0;
+        let floatPrice = 0;
+        let totalUnitTerjual = 0;
 
-        // Proses Item Utama
+        // A. Proses Item Utama
         if(db.items) {
             db.items.forEach(i => {
-                if (i.status === 'sold' && i.soldAt) {
-                    let d = parseDateString(i.soldAt);
-                    let monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-                    if(!monthlyActuals[monthKey]) monthlyActuals[monthKey] = { units: 0, profit: 0 };
+                if (i.status === 'sold') {
+                    totalUnitTerjual++;
+                    if (i.type === 'new') belanjaBaru += i.modal;
+                    uangMasuk += i.price;
+                    const profitItem = i.price - i.modal;
+                    profit += profitItem;
                     
-                    let profitItem = i.price - i.modal;
-                    monthlyActuals[monthKey].units += 1;
-                    monthlyActuals[monthKey].profit += profitItem;
-                    
-                    globalGrossProfit += profitItem;
-                    globalUnitTerjual += 1;
+                    if(i.soldAt) {
+                        let d = parseDateString(i.soldAt);
+                        let monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                        if(!monthlyActuals[monthKey]) monthlyActuals[monthKey] = { units: 0, profit: 0 };
+                        monthlyActuals[monthKey].units += 1;
+                        monthlyActuals[monthKey].profit += profitItem;
+                    }
+                } else if (i.status === 'stok') {
+                    if (i.type === 'new') belanjaBaru += i.modal;
+                    floatModal += i.modal;
+                    floatPrice += i.price;
                 }
             });
         }
 
-        // Proses Extra Profit
+        // B. Proses Extra Profit
+        let extraProfitTotal = 0;
         if(db.extraProfits) {
             db.extraProfits.forEach(p => {
                 let calcProfit = p.profit;
-                if(p.name === 'Poco M3' && p.modal === 400000) calcProfit = p.price - 450000; // Koreksi
+                if(p.name === 'Poco M3' && p.modal === 400000) calcProfit = p.price - 450000;
+                
+                extraProfitTotal += calcProfit;
+                totalUnitTerjual++; 
                 
                 let d = new Date(Math.floor(p.id)); 
                 let monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
@@ -244,23 +265,25 @@
                 
                 monthlyActuals[monthKey].profit += calcProfit;
                 monthlyActuals[monthKey].units += 1;
-                
-                globalGrossProfit += calcProfit;
-                globalUnitTerjual += 1;
             });
         }
 
-        let totalAsetReal = startBalance + globalGrossProfit; 
-        updateUI(monthlyActuals, totalAsetReal, globalGrossProfit, globalUnitTerjual, startBalance);
+        // C. Kalkulasi Final (Berdasarkan Kas dan Stok)
+        const totalProfitBersih = profit + extraProfitTotal;
+        const cashSisa = startBalance - belanjaBaru + uangMasuk;
+        const totalAsetReal = cashSisa + floatPrice; 
+
+        updateUI(monthlyActuals, totalAsetReal, totalProfitBersih, totalUnitTerjual, startBalance, cashSisa, floatPrice);
     }
 
-    function updateUI(actualsData, totalAset, globalGrossProfit, globalUnits, startBalance) {
+    function updateUI(actualsData, totalAset, globalGrossProfit, globalUnits, startBalance, cashSisa, floatPrice) {
         const tbody = document.getElementById('trackerBody');
         tbody.innerHTML = '';
         
-        // Update Header Cards
+        // Update Header Cards dengan Logika Murni
         document.getElementById('uiAssetStart').innerText = formatRpFull(startBalance);
         document.getElementById('uiTotalAsset').innerText = formatRpFull(totalAset);
+        document.getElementById('uiDetailAsset').innerText = `Kas: ${formatRpFull(cashSisa)} | Stok: ${formatRpFull(floatPrice)}`;
         document.getElementById('uiTotalProfit').innerText = '+ ' + formatRpFull(globalGrossProfit);
         
         if(totalAset >= 100000000) document.getElementById('cardAsset').classList.add('success');
@@ -296,7 +319,6 @@
             // Perhitungan Dinamis Kartu Bulanan
             let avgThisMonth = actUnits > 0 ? (actProfit / actUnits) : globalAvgMargin;
             let dynamicTargetUnit = Math.ceil(t.profit / avgThisMonth); 
-            // Jika profit target sudah lewat, samakan target dengan yg terjual
             if (actProfit >= t.profit) dynamicTargetUnit = actUnits; 
             
             let profitPct = Math.min((actProfit / t.profit) * 100, 100);
