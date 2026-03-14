@@ -7,13 +7,17 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
     
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
 
     <script>
         tailwind.config = {
@@ -43,6 +47,16 @@
     </script>
     
     <style>
+        /* Optimasi Anti-Blank (Fade In) saat pertama kali buka Web */
+        body {
+            opacity: 0;
+            animation: fadeInBody 0.4s ease-out forwards;
+        }
+        @keyframes fadeInBody {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         /* Base Setup */
         html, body { 
             background-color: #020202; 
@@ -502,9 +516,11 @@
         let cacheAlloc = { owner: 0, emp: 0, retained: 0 };
         let cacheTrend = { labels: [], profit: [], unit: [] };
 
-        // Konfigurasi Default Chart.js
-        Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
-        Chart.defaults.color = "#64748b";
+        // Konfigurasi Default Chart.js (Aman untuk dideklarasi saat script dipanggil)
+        if (typeof Chart !== 'undefined') {
+            Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+            Chart.defaults.color = "#64748b";
+        }
 
         // ==========================================
         // FUNGSI GANTI TAB & ANIMASI
@@ -523,12 +539,15 @@
             el.classList.add('active');
 
             // Hancurkan dan gambar ulang chart agar animasi berjalan setiap kali tab dibuka
-            if (tabId === 'dashboard') {
-                renderGoalChart(cacheGoal.cur, cacheGoal.rem);
-            } else if (tabId === 'analytics') {
-                renderDoughnutChart(cacheAlloc.owner, cacheAlloc.emp, cacheAlloc.retained);
-            } else if (tabId === 'performance') {
-                renderLineChart(cacheTrend.labels, cacheTrend.profit, cacheTrend.unit);
+            // Pengecekan typeof Chart ditambahkan sebagai pengaman jika library lambat dimuat
+            if (typeof Chart !== 'undefined') {
+                if (tabId === 'dashboard') {
+                    renderGoalChart(cacheGoal.cur, cacheGoal.rem);
+                } else if (tabId === 'analytics') {
+                    renderDoughnutChart(cacheAlloc.owner, cacheAlloc.emp, cacheAlloc.retained);
+                } else if (tabId === 'performance') {
+                    renderLineChart(cacheTrend.labels, cacheTrend.profit, cacheTrend.unit);
+                }
             }
             
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -647,7 +666,7 @@
             if (n.includes('SAMSUNG') || n.includes('GALAXY') || n.startsWith('SAM ')) {
                 return 'Samsung';
             }
-            if (n.includes('XIAOMI') || n.includes('REDMI') || n.includes('POCO') || n.includes('MI ')) {
+            if (n.includes('XIAOMI') || n.includes('NOTE') || n.includes('REDMI') || n.includes('POCO') || n.includes('MI ')) {
                 return 'Xiaomi';
             }
             if (n.includes('OPPO') || n.includes('RENO')) {
@@ -795,6 +814,9 @@
         // FUNGSI RENDER CHART DENGAN ANIMASI
         // ==========================================
         function renderGoalChart(current, remaining) {
+            // Cegah error jika Chart.js belum selesai dimuat oleh browser
+            if (typeof Chart === 'undefined') return;
+
             const ctx = document.getElementById('goalChart').getContext('2d');
             if (goalChartInstance) {
                 goalChartInstance.destroy();
@@ -830,6 +852,8 @@
         }
 
         function renderDoughnutChart(pOwner, pKaryawan, pSisa) {
+            if (typeof Chart === 'undefined') return;
+
             const ctx = document.getElementById('doughnutChart').getContext('2d');
             if (doughnutChartInstance) {
                 doughnutChartInstance.destroy();
@@ -871,6 +895,8 @@
         }
 
         function renderLineChart(labels, profitData, actualData) {
+            if (typeof Chart === 'undefined') return;
+
             const ctx = document.getElementById('salesChart').getContext('2d');
             if (salesChartInstance) {
                 salesChartInstance.destroy(); 
@@ -1227,24 +1253,33 @@
         // ==========================================
         // INISIALISASI DAN EVENT LISTENER
         // ==========================================
+        
+        // Fungsi utama yang dipanggil segera setelah HTML selesai di-parse (Mencegah Layar Blank)
         async function initDashboard() {
-            const cached = localStorage.getItem('fsCacheV10');
+            const cachedDataString = localStorage.getItem('fsCacheV10');
             
-            if (cached) { 
-                globalRawData = JSON.parse(cached); 
+            // Render instan dari cache jika tersedia (Optimasi FOUC & Rendering)
+            if (cachedDataString) { 
+                globalRawData = JSON.parse(cachedDataString); 
                 processData(globalRawData); 
             }
             
-            const db = await fetchDatabase();
+            // Tetap lakukan fetching di latar belakang untuk memastikan data sinkron
+            const databaseResponse = await fetchDatabase();
             
-            if (db) { 
-                localStorage.setItem('fsCacheV10', JSON.stringify(db)); 
-                globalRawData = db; 
-                processData(db); 
+            if (databaseResponse) { 
+                localStorage.setItem('fsCacheV10', JSON.stringify(databaseResponse)); 
+                globalRawData = databaseResponse; 
+                processData(databaseResponse); 
             }
         }
 
-        // Logika Tarik untuk Memperbarui (Pull To Refresh)
+        // Panggil initDashboard SEGERA setelah struktur DOM dimuat (TIDAK menunggu external script/font selesai)
+        document.addEventListener('DOMContentLoaded', initDashboard);
+
+        // ==========================================
+        // LOGIKA TARIK UNTUK MEMPERBARUI (PULL TO REFRESH)
+        // ==========================================
         let startY = 0;
         let isPulling = false; 
         
@@ -1252,23 +1287,23 @@
         const ptrIcon = document.getElementById('ptr-icon');
         const ptrText = document.getElementById('ptr-text');
         
-        document.addEventListener('touchstart', function(e) { 
+        document.addEventListener('touchstart', function(eventTouch) { 
             if (window.scrollY === 0) { 
-                startY = e.touches[0].pageY; 
+                startY = eventTouch.touches[0].pageY; 
                 isPulling = true; 
             } 
         }, { passive: true });
         
-        document.addEventListener('touchmove', function(e) { 
+        document.addEventListener('touchmove', function(eventTouch) { 
             if (!isPulling) return; 
             
-            let diff = e.touches[0].pageY - startY; 
+            let diffY = eventTouch.touches[0].pageY - startY; 
             
-            if (diff > 0 && window.scrollY === 0) { 
-                let height = Math.min(diff * 0.5, 80); 
-                ptrIndicator.style.height = height + 'px'; 
+            if (diffY > 0 && window.scrollY === 0) { 
+                let heightIndicator = Math.min(diffY * 0.5, 80); 
+                ptrIndicator.style.height = heightIndicator + 'px'; 
                 
-                if (height > 60) { 
+                if (heightIndicator > 60) { 
                     ptrIcon.style.transform = 'rotate(180deg)'; 
                     ptrText.innerText = 'Lepaskan untuk Memperbarui'; 
                 } else { 
@@ -1296,8 +1331,6 @@
             }
         });
 
-        // Jalankan saat pertama kali dimuat
-        window.onload = initDashboard;
     </script>
 </body>
 </html>
