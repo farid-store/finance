@@ -803,7 +803,7 @@
             goalChartInstance = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Tercapai', 'Sisa'],
+                    labels: ['Tercapai', 'Sisa Target'],
                     datasets: [{
                         data: [current, remaining],
                         backgroundColor: ['#0ea5e9', 'rgba(255,255,255,0.04)'],
@@ -838,7 +838,7 @@
             doughnutChartInstance = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Gaji Owner', 'Karyawan', 'Laba Ditahan'],
+                    labels: ['Gaji Owner', 'Gaji Karyawan', 'Laba Ditahan'],
                     datasets: [{
                         data: [pOwner, pKaryawan, pSisa],
                         backgroundColor: ['#38bdf8', '#818cf8', '#10b981'],
@@ -882,7 +882,7 @@
                     labels: labels,
                     datasets: [
                         { 
-                            label: isNetProfitMode ? 'Bersih' : 'Kotor', 
+                            label: isNetProfitMode ? 'Laba Bersih' : 'Laba Kotor', 
                             data: profitData, 
                             type: 'line', 
                             backgroundColor: 'rgba(56, 189, 248, 0.1)', 
@@ -1054,6 +1054,10 @@
             const tbUI = document.getElementById('topBrandsUI'); 
             tbUI.innerHTML = '';
             
+            if (bArr.length === 0) {
+                tbUI.innerHTML = '<div class="text-center text-gray-500 text-xs py-4">Belum ada data penjualan.</div>';
+            }
+
             bArr.forEach(function(b, i) {
                 let s = '';
                 if (i === 0) {
@@ -1095,6 +1099,10 @@
             const alUI = document.getElementById('agingListUI'); 
             alUI.innerHTML = '';
             
+            if (aging.length === 0) {
+                alUI.innerHTML = `<div class="text-center text-gray-500 text-xs py-4">Gudang Kosong / Perputaran Lancar</div>`;
+            }
+
             aging.slice(0, 5).forEach(function(item) {
                 let dClass = '';
                 if (item.days > 30) {
@@ -1121,59 +1129,65 @@
             const tb = document.getElementById('trackerBody'); 
             tb.innerHTML = '';
             
-            let avgM = 150000;
+            let globalAverageMargin = 150000;
             if (globalUnits > 0) {
-                avgM = globalGross / globalUnits;
+                globalAverageMargin = globalGross / globalUnits;
             }
             
-            let def = 0;
+            let deficitLaba = 0;
 
             roadmapTargets.forEach(function(t, i) {
                 let y = 2026 + Math.floor((1 + i) / 12);
                 let m = ((1 + i) % 12) + 1;
                 let mk = `${y}-${String(m).padStart(2, '0')}`;
                 
-                let u = 0;
-                let p = 0;
+                let totalUnitBulanIni = 0;
+                let totalLabaBulanIni = 0;
                 
                 if (actuals[mk]) {
-                    u = actuals[mk].units;
-                    p = actuals[mk].profit;
+                    totalUnitBulanIni = actuals[mk].units;
+                    totalLabaBulanIni = actuals[mk].profit;
                 }
 
                 cacheTrend.labels.push(`${monthNamesFull[m-1]} ${y}`);
-                cacheTrend.profit.push(p); 
-                cacheTrend.unit.push(u);
+                cacheTrend.profit.push(totalLabaBulanIni); 
+                cacheTrend.unit.push(totalUnitBulanIni);
 
-                let st = t.profit + def; 
-                if (st < 0) {
-                    st = t.profit; 
+                let targetLabaBulanIni = t.profit + deficitLaba; 
+                if (targetLabaBulanIni < 0) {
+                    targetLabaBulanIni = t.profit; 
+                }
+
+                // Kalkulasi Dinamis Rata-rata Margin per Unit
+                let rataRataMarginBulanIni = globalAverageMargin;
+                if (totalUnitBulanIni > 0) {
+                    rataRataMarginBulanIni = totalLabaBulanIni / totalUnitBulanIni;
                 }
                 
-                let dt = Math.ceil(st / (u > 0 ? (p/u) : avgM)); 
-                if (p >= st) {
-                    dt = u; 
+                let targetUnitBulanIni = Math.ceil(targetLabaBulanIni / rataRataMarginBulanIni); 
+                if (totalLabaBulanIni >= targetLabaBulanIni) {
+                    targetUnitBulanIni = totalUnitBulanIni; 
                 }
                 
                 if (mk <= currMk) {
-                    def += (t.profit - p);
+                    deficitLaba += (t.profit - totalLabaBulanIni);
                 }
 
-                let pPct = Math.min((p / st) * 100, 100) || 0;
-                let uPct = Math.min((u / dt) * 100, 100) || 0;
-                let isC = mk === currMk;
+                let persentaseLaba = Math.min((totalLabaBulanIni / targetLabaBulanIni) * 100, 100) || 0;
+                let persentaseUnit = Math.min((totalUnitBulanIni / targetUnitBulanIni) * 100, 100) || 0;
+                let isBulanBerjalan = mk === currMk;
 
-                let bBadge = '';
-                if (p >= st) {
-                    bBadge = '<span class="bg-green-500/10 text-green-400 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase"><i class="fas fa-check"></i> Tercapai</span>';
-                } else if (p > 0) {
-                    bBadge = '<span class="bg-warning/10 text-warning px-1.5 py-0.5 rounded text-[8px] font-bold uppercase">Proses</span>';
+                let statusBadgeHTML = '';
+                if (totalLabaBulanIni >= targetLabaBulanIni) {
+                    statusBadgeHTML = '<span class="bg-green-500/10 text-green-400 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase"><i class="fas fa-check"></i> Tercapai</span>';
+                } else if (totalLabaBulanIni > 0) {
+                    statusBadgeHTML = '<span class="bg-warning/10 text-warning px-1.5 py-0.5 rounded text-[8px] font-bold uppercase">Proses</span>';
                 } else {
-                    bBadge = '<span class="bg-white/5 text-gray-500 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase">Menunggu</span>';
+                    statusBadgeHTML = '<span class="bg-white/5 text-gray-500 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase">Menunggu</span>';
                 }
 
-                let currentCardClass = isC ? 'border-brand-500/40 bg-brand-500/5' : '';
-                let currentIndicator = isC ? '<span class="w-1.5 h-1.5 rounded-full bg-brand-400 inline-block animate-pulse"></span>' : '';
+                let currentCardClass = isBulanBerjalan ? 'border-brand-500/40 bg-brand-500/5' : '';
+                let currentIndicator = isBulanBerjalan ? '<span class="w-1.5 h-1.5 rounded-full bg-brand-400 inline-block animate-pulse"></span>' : '';
 
                 tb.innerHTML += `
                     <div class="glass-panel rounded-2xl p-4 relative ${currentCardClass}">
@@ -1181,21 +1195,25 @@
                             <h4 class="font-heading text-sm font-bold text-white">
                                 Bulan ${t.month} ${currentIndicator}
                             </h4>
-                            ${bBadge}
+                            ${statusBadgeHTML}
                         </div>
                         <div class="flex justify-between text-[10px] font-bold mb-1">
                             <span class="text-gray-400">Laba Keuntungan</span>
-                            <span class="text-white">${formatRp(p)} <span class="text-gray-500 font-normal">/ ${formatRp(st)}</span></span>
+                            <span class="text-white">${formatRp(totalLabaBulanIni)} <span class="text-gray-500 font-normal">/ ${formatRp(targetLabaBulanIni)}</span></span>
                         </div>
                         <div class="bar-container h-1 rounded-full mb-2.5">
-                            <div class="bar-fill bg-green-500" style="width: ${pPct}%"></div>
+                            <div class="bar-fill bg-green-500" style="width: ${persentaseLaba}%"></div>
                         </div>
                         <div class="flex justify-between text-[10px] font-bold mb-1">
                             <span class="text-gray-400">Volume Penjualan</span>
-                            <span class="text-white">${u} <span class="text-gray-500 font-normal">/ ${dt} Unit</span></span>
+                            <span class="text-white">${totalUnitBulanIni} <span class="text-gray-500 font-normal">/ ${targetUnitBulanIni} Unit</span></span>
                         </div>
-                        <div class="bar-container h-1 rounded-full">
-                            <div class="bar-fill bg-brand-500" style="width: ${uPct}%"></div>
+                        <div class="bar-container h-1 rounded-full mb-3">
+                            <div class="bar-fill bg-brand-500" style="width: ${persentaseUnit}%"></div>
+                        </div>
+                        
+                        <div class="mt-3 pt-2 border-t border-white/5 text-[9px] text-gray-500 text-right italic font-medium">
+                            Rata-rata Margin: <span class="text-gray-400 font-bold">${formatRp(rataRataMarginBulanIni)} / Unit</span>
                         </div>
                     </div>
                 `;
@@ -1226,7 +1244,7 @@
             }
         }
 
-        // Pull To Refresh Logic
+        // Logika Tarik untuk Memperbarui (Pull To Refresh)
         let startY = 0;
         let isPulling = false; 
         
