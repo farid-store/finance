@@ -47,7 +47,7 @@
     </script>
     
     <style>
-        /* Optimasi Anti-Blank (Fade In) saat pertama kali buka Web */
+        /* Fade In Body */
         body {
             opacity: 0;
             animation: fadeInBody 0.4s ease-out forwards;
@@ -516,7 +516,7 @@
         let cacheAlloc = { owner: 0, emp: 0, retained: 0 };
         let cacheTrend = { labels: [], profit: [], unit: [] };
 
-        // Konfigurasi Default Chart.js (Aman untuk dideklarasi saat script dipanggil)
+        // Konfigurasi Default Chart.js
         if (typeof Chart !== 'undefined') {
             Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
             Chart.defaults.color = "#64748b";
@@ -526,7 +526,6 @@
         // FUNGSI GANTI TAB & ANIMASI
         // ==========================================
         function switchTab(tabId, el) {
-            // Hapus kelas active dari semua konten dan tombol
             document.querySelectorAll('.tab-content').forEach(function(t) {
                 t.classList.remove('active');
             });
@@ -534,12 +533,9 @@
                 n.classList.remove('active');
             });
             
-            // Tambahkan kelas active ke tab yang dipilih
             document.getElementById(`tab-${tabId}`).classList.add('active');
             el.classList.add('active');
 
-            // Hancurkan dan gambar ulang chart agar animasi berjalan setiap kali tab dibuka
-            // Pengecekan typeof Chart ditambahkan sebagai pengaman jika library lambat dimuat
             if (typeof Chart !== 'undefined') {
                 if (tabId === 'dashboard') {
                     renderGoalChart(cacheGoal.cur, cacheGoal.rem);
@@ -580,7 +576,6 @@
                 }
                 
                 const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                // Fungsi peredam animasi (Ease out cubic)
                 const easeProgress = 1 - Math.pow(1 - progress, 3); 
                 const currentVal = Math.floor(easeProgress * (end - start) + start);
                 
@@ -626,7 +621,6 @@
                 
                 const data = await response.json();
                 
-                // Indikator berhasil
                 syncIcon.className = 'fas fa-check text-green-400';
                 setTimeout(function() { 
                     syncIcon.className = 'fas fa-cloud-arrow-down text-gray-400'; 
@@ -645,50 +639,27 @@
             if (!dateString || dateString === 'Imported' || dateString === 'Bulan Lalu') {
                 return new Date();
             }
-            
             const parts = dateString.split(' ');
-            
             if (parts[0].includes('-')) {
                 return new Date(parts[0]);
             }
-            
             const d = parts[0].split('/');
-            // Format: DD/MM/YYYY
             return new Date(d[2], d[1] - 1, d[0]); 
         }
 
         function getBrand(name) {
             const n = name.toUpperCase();
             
-            if (n.includes('IPHONE') || n.includes('APPLE') || n.includes('IPAD')) {
-                return 'Apple';
-            }
-            if (n.includes('SAMSUNG') || n.includes('GALAXY') || n.startsWith('SAM ')) {
-                return 'Samsung';
-            }
-            if (n.includes('XIAOMI') || n.includes('NOTE') || n.includes('REDMI') || n.includes('POCO') || n.includes('MI ')) {
-                return 'Xiaomi';
-            }
-            if (n.includes('OPPO') || n.includes('RENO')) {
-                return 'Oppo';
-            }
-            if (n.includes('VIVO') || n.includes('IQOO')) {
-                return 'Vivo';
-            }
-            if (n.includes('REALME') || n.includes('NARZO')) {
-                return 'Realme';
-            }
-            if (n.includes('INFINIX')) {
-                return 'Infinix';
-            }
-            if (n.includes('TECNO')) {
-                return 'Tecno';
-            }
-            if (n.includes('ITEL')) {
-                return 'iTel';
-            }
+            if (n.includes('IPHONE') || n.includes('APPLE') || n.includes('IPAD')) return 'Apple';
+            if (n.includes('SAMSUNG') || n.includes('GALAXY') || n.startsWith('SAM ')) return 'Samsung';
+            if (n.includes('XIAOMI') || n.includes('NOTE') || n.includes('REDMI') || n.includes('POCO') || n.includes('MI ')) return 'Xiaomi';
+            if (n.includes('OPPO') || n.includes('RENO')) return 'Oppo';
+            if (n.includes('VIVO') || n.includes('IQOO')) return 'Vivo';
+            if (n.includes('REALME') || n.includes('NARZO')) return 'Realme';
+            if (n.includes('INFINIX')) return 'Infinix';
+            if (n.includes('TECNO')) return 'Tecno';
+            if (n.includes('ITEL')) return 'iTel';
             
-            // Kembalikan kata pertama jika tidak terdeteksi merk di atas
             return n.split(' ')[0]; 
         }
 
@@ -709,7 +680,6 @@
             let totalUnit = 0;
             let agingStocks = [];
 
-            // Loop melalui setiap item HP
             if (db.items) {
                 db.items.forEach(function(i) {
                     if (i.status === 'sold') {
@@ -720,11 +690,9 @@
                         }
                         
                         uangMasuk += i.price;
-                        
                         let p = i.price - i.modal; 
                         profitMain += p;
 
-                        // Klasifikasi Brand
                         let b = getBrand(i.name);
                         if (!brandStats[b]) {
                             brandStats[b] = { profit: 0, count: 0 };
@@ -732,7 +700,6 @@
                         brandStats[b].profit += p; 
                         brandStats[b].count += 1;
                         
-                        // Menghitung Aktual Bulanan
                         if (i.soldAt) {
                             let d = parseDateString(i.soldAt);
                             let mk = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
@@ -763,7 +730,6 @@
                 });
             }
 
-            // Loop melalui ekstra profit
             if (db.extraProfits) {
                 db.extraProfits.forEach(function(p) {
                     profitEkstra += p.profit; 
@@ -781,7 +747,6 @@
                 });
             }
 
-            // Kalkulasi Netto / Kotor
             let totalGaji = 0; 
             const GAJI = 2500000; 
             
@@ -798,11 +763,9 @@
                 totalBersih -= totalGaji;
             }
 
-            // Logika Aset
             const cashSisa = startBalance - belanjaBaru + uangMasuk;
             const totalAsetReal = cashSisa + floatPrice; 
             
-            // Urutkan stok berdasarkan hari terlama
             agingStocks.sort(function(a, b) {
                 return b.days - a.days;
             });
@@ -814,7 +777,6 @@
         // FUNGSI RENDER CHART DENGAN ANIMASI
         // ==========================================
         function renderGoalChart(current, remaining) {
-            // Cegah error jika Chart.js belum selesai dimuat oleh browser
             if (typeof Chart === 'undefined') return;
 
             const ctx = document.getElementById('goalChart').getContext('2d');
@@ -1021,12 +983,10 @@
                 document.getElementById('uiEtaBadge').innerHTML = `<i class="fas fa-clock"></i> ${etaText}`;
             }
 
-            // Render Goal Chart jika tab sedang aktif
             if (document.getElementById('tab-dashboard').classList.contains('active')) {
                 renderGoalChart(cacheGoal.cur, cacheGoal.rem);
             }
 
-            // Animate Valuasi Aset dan Profit
             const prevAset = parseInt(document.getElementById('uiTotalAsset').innerText.replace(/\D/g,'')) || 0;
             const prevProfit = parseInt(document.getElementById('uiTotalProfit').innerText.replace(/\D/g,'')) || 0;
             
@@ -1034,7 +994,6 @@
             animateValue('uiTotalProfit', prevProfit, globalGross, 1000);
             document.getElementById('uiTotalUnits').innerText = `${globalUnits} Unit`;
 
-            // Milestone
             let nextMil = MILESTONES.find(function(m) {
                 return m > totalAset;
             }) || 100000000;
@@ -1043,7 +1002,6 @@
             document.getElementById('uiNextMilestone').innerText = formatRpFull(nextMil);
             document.getElementById('milestoneBar').style.width = `${milestonePct}%`;
             
-            // Komposisi Aset
             let cashPct = totalAset > 0 ? (cash / totalAset) * 100 : 0;
             let stockPct = totalAset > 0 ? (stock / totalAset) * 100 : 0;
             
@@ -1066,7 +1024,6 @@
                 }
             }
             
-            // Brands Sorting
             let bArr = Object.keys(brands).map(function(k) {
                 return { n: k, p: brands[k].profit, c: brands[k].count };
             });
@@ -1112,7 +1069,6 @@
                 `;
             });
 
-            // Gaji
             cacheAlloc.owner = Math.min(1500000, Math.max(cp, 0));
             cacheAlloc.emp = Math.max(0, Math.min(1000000, cp - 1500000));
             cacheAlloc.retained = Math.max(0, cp - 2500000);
@@ -1121,7 +1077,6 @@
                 renderDoughnutChart(cacheAlloc.owner, cacheAlloc.emp, cacheAlloc.retained);
             }
 
-            // Aging Stock
             const alUI = document.getElementById('agingListUI'); 
             alUI.innerHTML = '';
             
@@ -1184,19 +1139,38 @@
                     targetLabaBulanIni = t.profit; 
                 }
 
-                // Kalkulasi Dinamis Rata-rata Margin per Unit
-                let rataRataMarginBulanIni = globalAverageMargin;
-                if (totalUnitBulanIni > 0) {
-                    rataRataMarginBulanIni = totalLabaBulanIni / totalUnitBulanIni;
-                }
-                
-                let targetUnitBulanIni = Math.ceil(targetLabaBulanIni / rataRataMarginBulanIni); 
+                // Menggunakan globalAverageMargin sebagai baseline patokan unit agar tidak melenceng jauh
+                let targetUnitBulanIni = Math.ceil(targetLabaBulanIni / globalAverageMargin); 
                 if (totalLabaBulanIni >= targetLabaBulanIni) {
                     targetUnitBulanIni = totalUnitBulanIni; 
                 }
                 
                 if (mk <= currMk) {
                     deficitLaba += (t.profit - totalLabaBulanIni);
+                }
+
+                // ==========================================
+                // LOGIKA KEJAR MARGIN SISA
+                // ==========================================
+                let sisaLabaBulanIni = targetLabaBulanIni - totalLabaBulanIni;
+                let sisaUnitBulanIni = targetUnitBulanIni - totalUnitBulanIni;
+                let targetMarginSisa = 0;
+
+                if (sisaLabaBulanIni > 0) {
+                    if (sisaUnitBulanIni > 0) {
+                        targetMarginSisa = sisaLabaBulanIni / sisaUnitBulanIni;
+                    } else {
+                        // Jika unit sudah terpenuhi tapi laba kurang, sisa laba dibebankan ke 1 penjualan ekstra
+                        targetMarginSisa = sisaLabaBulanIni;
+                        targetUnitBulanIni = totalUnitBulanIni + 1;
+                    }
+                }
+
+                let htmlKejarMargin = '';
+                if (sisaLabaBulanIni <= 0) {
+                    htmlKejarMargin = '<span class="text-green-400 font-bold">Target Selesai</span>';
+                } else {
+                    htmlKejarMargin = `<span class="text-brand-400 font-bold">${formatRp(targetMarginSisa)} / Unit</span>`;
                 }
 
                 let persentaseLaba = Math.min((totalLabaBulanIni / targetLabaBulanIni) * 100, 100) || 0;
@@ -1238,8 +1212,8 @@
                             <div class="bar-fill bg-brand-500" style="width: ${persentaseUnit}%"></div>
                         </div>
                         
-                        <div class="mt-3 pt-2 border-t border-white/5 text-[9px] text-gray-500 text-right italic font-medium">
-                            Rata-rata Margin: <span class="text-gray-400 font-bold">${formatRp(rataRataMarginBulanIni)} / Unit</span>
+                        <div class="mt-3 pt-2 border-t border-white/5 flex justify-start text-[9px] text-gray-500 font-medium">
+                            <span class="italic">Kejar Margin: &nbsp;${htmlKejarMargin}</span>
                         </div>
                     </div>
                 `;
@@ -1254,17 +1228,14 @@
         // INISIALISASI DAN EVENT LISTENER
         // ==========================================
         
-        // Fungsi utama yang dipanggil segera setelah HTML selesai di-parse (Mencegah Layar Blank)
         async function initDashboard() {
             const cachedDataString = localStorage.getItem('fsCacheV10');
             
-            // Render instan dari cache jika tersedia (Optimasi FOUC & Rendering)
             if (cachedDataString) { 
                 globalRawData = JSON.parse(cachedDataString); 
                 processData(globalRawData); 
             }
             
-            // Tetap lakukan fetching di latar belakang untuk memastikan data sinkron
             const databaseResponse = await fetchDatabase();
             
             if (databaseResponse) { 
@@ -1274,11 +1245,10 @@
             }
         }
 
-        // Panggil initDashboard SEGERA setelah struktur DOM dimuat (TIDAK menunggu external script/font selesai)
         document.addEventListener('DOMContentLoaded', initDashboard);
 
         // ==========================================
-        // LOGIKA TARIK UNTUK MEMPERBARUI (PULL TO REFRESH)
+        // LOGIKA TARIK UNTUK MEMPERBARUI
         // ==========================================
         let startY = 0;
         let isPulling = false; 
