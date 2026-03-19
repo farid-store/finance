@@ -257,6 +257,12 @@
             opacity: 1; 
             margin-top: 2px;
         }
+        
+        /* Select Styling Override */
+        select option {
+            background-color: #0a0a0a;
+            color: #fff;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -439,9 +445,18 @@
                     <i class="fa-solid fa-money-bill-transfer"></i>
                 </div>
                 
-                <div class="flex items-center gap-1.5 mb-5 relative z-10">
-                    <i class="fa-solid fa-calendar-day text-brand-400 text-sm"></i>
-                    <span class="text-[10px] font-bold text-gray-300 uppercase tracking-widest" id="uiMonthLabel">Bulan Berjalan</span>
+                <div class="flex items-center justify-between mb-5 relative z-10">
+                    <div class="flex items-center gap-1.5">
+                        <i class="fa-solid fa-calendar-day text-brand-400 text-sm"></i>
+                        <span class="text-[10px] font-bold text-gray-300 uppercase tracking-widest">Periode</span>
+                    </div>
+                    <div class="relative">
+                        <select id="monthSelector" onchange="changeCashflowMonth()" class="bg-white/5 border border-white/10 text-brand-300 text-[10px] font-bold uppercase tracking-widest rounded-lg pl-3 pr-8 py-1.5 outline-none appearance-none cursor-pointer backdrop-blur-md">
+                            </select>
+                        <div class="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-brand-400 text-[10px]">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="flex justify-between items-center mb-4 relative z-10">
@@ -610,6 +625,13 @@
                 processData(globalRawData); 
             }
         }
+        
+        // Fungsi pemicu saat Dropdown Bulan Arus Kas diubah
+        function changeCashflowMonth() {
+            if (globalRawData) {
+                processData(globalRawData);
+            }
+        }
 
         function animateValue(id, start, end, duration, isCurrency = true) {
             if (start === end) return;
@@ -728,12 +750,65 @@
             let totalUnit = 0;
             let agingStocks = [];
 
-            // --- LOGIKA LABA RUGI BULAN INI (Sesuai Digital Ledger) ---
-            let currDate = new Date();
-            let currentMonthStr = `${currDate.getFullYear()}-${String(currDate.getMonth() + 1).padStart(2, '0')}`;
+            // --- EKSTRAKSI SEMUA BULAN UNTUK DROPDOWN ---
+            let uniqueMonths = new Set();
+            let currDateObj = new Date();
+            let realCurrentMonth = `${currDateObj.getFullYear()}-${String(currDateObj.getMonth() + 1).padStart(2, '0')}`;
+            uniqueMonths.add(realCurrentMonth); // Pastikan bulan ini selalu ada di pilihan
             
-            let omsetBulanIni = 0; // Pemasukan (Total Harga Jual barang laku)
-            let hppBulanIni = 0;   // Pengeluaran (Total Modal barang laku)
+            if (db.items) {
+                db.items.forEach(i => {
+                    let itemDate = i.id ? new Date(Math.floor(i.id)) : currDateObj;
+                    let m = `${itemDate.getFullYear()}-${String(itemDate.getMonth() + 1).padStart(2, '0')}`;
+                    uniqueMonths.add(m);
+                    if(i.soldAt) {
+                        let d = parseDateString(i.soldAt);
+                        let sm = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                        uniqueMonths.add(sm);
+                    }
+                });
+            }
+            if (db.extraProfits) {
+                db.extraProfits.forEach(p => {
+                    let d = new Date(Math.floor(p.id));
+                    let m = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                    uniqueMonths.add(m);
+                });
+            }
+
+            let sortedMonths = Array.from(uniqueMonths).sort(); // Urutkan bulan dari terlama ke terbaru
+            let selector = document.getElementById('monthSelector');
+            
+            // Build / Rebuild Options Dropdown jika belum ada
+            let currentOptionsString = Array.from(selector.options).map(o => o.value).join(',');
+            let newOptionsString = sortedMonths.join(',');
+            
+            if (currentOptionsString !== newOptionsString) {
+                let prevSelection = selector.value || realCurrentMonth;
+                selector.innerHTML = '';
+                const monthNamesFull = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+                
+                sortedMonths.forEach(m => {
+                    let parts = m.split('-'); // 2026-03
+                    let opt = document.createElement('option');
+                    opt.value = m;
+                    opt.text = `${monthNamesFull[parseInt(parts[1])-1]} ${parts[0]}`;
+                    selector.appendChild(opt);
+                });
+                
+                // Setel ulang value yang ter-select
+                if (sortedMonths.includes(prevSelection)) {
+                    selector.value = prevSelection;
+                } else {
+                    selector.value = realCurrentMonth;
+                }
+            }
+
+            let targetMonthStr = selector.value; // Ini bulan yang dipilih oleh user dari dropdown
+
+            // Variabel Laba/Rugi Khusus untuk Bulan yang Dipilih (Target Month)
+            let omsetBulanIni = 0; 
+            let hppBulanIni = 0;   
 
             if (db.items) {
                 db.items.forEach(function(i) {
@@ -755,14 +830,14 @@
                         brandStats[b].profit += p; 
                         brandStats[b].count += 1;
                         
-                        // Pemasukan & Pengeluaran HANYA dari barang yang LAKU
-                        let soldDateStr = i.soldAt || currentMonthStr;
+                        let soldDateStr = i.soldAt || realCurrentMonth;
                         let dSold = parseDateString(soldDateStr);
                         let soldMk = `${dSold.getFullYear()}-${String(dSold.getMonth() + 1).padStart(2, '0')}`;
                         
-                        if (soldMk === currentMonthStr) {
-                            omsetBulanIni += i.price; // Tambah ke Pemasukan (Omset)
-                            hppBulanIni += i.modal;   // Tambah ke Pengeluaran (Modal)
+                        // Cek apakah laku di bulan target dropdown
+                        if (soldMk === targetMonthStr) {
+                            omsetBulanIni += i.price; // Omset
+                            hppBulanIni += i.modal;   // HPP
                         }
 
                         if (i.soldAt) {
@@ -810,8 +885,8 @@
                     monthlyActuals[mk].profit += p.profit; 
                     monthlyActuals[mk].units += 1;
 
-                    // Tambahkan profit ekstra ke Pemasukan bulan ini
-                    if (mk === currentMonthStr) {
+                    // Cek Extra profit untuk bulan dropdown
+                    if (mk === targetMonthStr) {
                         omsetBulanIni += p.profit;
                     }
                 });
@@ -828,7 +903,7 @@
                 }
             }
 
-            // Jika mode Laba Bersih aktif, otomatis masukkan Gaji bulan ini sebagai pengeluaran
+            // Jika bersih, potong pengeluaran bulan yang difilter dengan gaji
             if (isNetProfitMode) {
                 hppBulanIni += GAJI;
             }
@@ -845,7 +920,6 @@
                 return b.days - a.days;
             });
 
-            // Kirim variabel omset dan hpp ke updateUI
             updateUI(monthlyActuals, totalAsetReal, totalBersih, totalUnit, cashSisa, floatPrice, agingStocks, brandStats, omsetBulanIni, hppBulanIni);
         }
 
@@ -1307,11 +1381,12 @@
                 renderLineChart(cacheTrend.labels, cacheTrend.profit, cacheTrend.unit);
             }
 
-            // 4. UPDATE TAB CASHFLOW
-            document.getElementById('uiMonthLabel').innerText = `Rangkuman ${monthNamesFull[currDate.getMonth()]} ${currDate.getFullYear()}`;
+            // 4. UPDATE TAB CASHFLOW DENGAN ANIMASI
+            const prevIncome = parseInt(document.getElementById('uiTotalIncome').innerText.replace(/\D/g,'')) || 0;
+            const prevExpense = parseInt(document.getElementById('uiTotalExpense').innerText.replace(/\D/g,'')) || 0;
             
-            document.getElementById('uiTotalIncome').innerText = formatRpFull(cashInBulanIni);
-            document.getElementById('uiTotalExpense').innerText = formatRpFull(cashOutBulanIni);
+            animateValue('uiTotalIncome', prevIncome, cashInBulanIni, 800);
+            animateValue('uiTotalExpense', prevExpense, cashOutBulanIni, 800);
             
             let netCash = cashInBulanIni - cashOutBulanIni;
             let netEl = document.getElementById('uiNetCashFlow');
