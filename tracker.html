@@ -450,7 +450,7 @@
                             <i class="fa-solid fa-arrow-down"></i>
                         </div>
                         <div>
-                            <span class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest">Uang Masuk</span>
+                            <span class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest">Pemasukan (Omset)</span>
                             <span class="font-heading text-lg font-bold text-emerald-400" id="uiTotalIncome">Rp 0</span>
                         </div>
                     </div>
@@ -462,7 +462,7 @@
                             <i class="fa-solid fa-arrow-up"></i>
                         </div>
                         <div>
-                            <span class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest">Uang Keluar</span>
+                            <span class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest">Pengeluaran (HPP)</span>
                             <span class="font-heading text-lg font-bold text-rose-400" id="uiTotalExpense">Rp 0</span>
                         </div>
                     </div>
@@ -471,7 +471,7 @@
                 <div class="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-4"></div>
 
                 <div class="flex justify-between items-center relative z-10">
-                    <span class="text-[11px] font-bold text-gray-300 uppercase tracking-widest">Arus Kas Bersih</span>
+                    <span class="text-[11px] font-bold text-gray-300 uppercase tracking-widest">Laba Bulan Ini</span>
                     <span class="font-heading text-2xl font-black text-white" id="uiNetCashFlow">Rp 0</span>
                 </div>
             </div>
@@ -728,21 +728,15 @@
             let totalUnit = 0;
             let agingStocks = [];
 
-            // --- LOGIKA ARUS KAS BULAN INI ---
+            // --- LOGIKA LABA RUGI BULAN INI (Sesuai Digital Ledger) ---
             let currDate = new Date();
             let currentMonthStr = `${currDate.getFullYear()}-${String(currDate.getMonth() + 1).padStart(2, '0')}`;
-            let cashInBulanIni = 0;
-            let cashOutBulanIni = 0;
+            
+            let omsetBulanIni = 0; // Pemasukan (Total Harga Jual barang laku)
+            let hppBulanIni = 0;   // Pengeluaran (Total Modal barang laku)
 
             if (db.items) {
                 db.items.forEach(function(i) {
-                    // Kalkulasi Cash Out (Pembelian barang baru bulan ini berdasarkan id/timestamp)
-                    let itemDate = i.id ? new Date(Math.floor(i.id)) : new Date();
-                    let itemMk = `${itemDate.getFullYear()}-${String(itemDate.getMonth() + 1).padStart(2, '0')}`;
-                    if (itemMk === currentMonthStr && i.type === 'new') {
-                        cashOutBulanIni += i.modal;
-                    }
-
                     if (i.status === 'sold') {
                         totalUnit++;
                         
@@ -761,12 +755,14 @@
                         brandStats[b].profit += p; 
                         brandStats[b].count += 1;
                         
-                        // Kalkulasi Cash In dari penjualan bulan ini
+                        // Pemasukan & Pengeluaran HANYA dari barang yang LAKU
                         let soldDateStr = i.soldAt || currentMonthStr;
                         let dSold = parseDateString(soldDateStr);
                         let soldMk = `${dSold.getFullYear()}-${String(dSold.getMonth() + 1).padStart(2, '0')}`;
+                        
                         if (soldMk === currentMonthStr) {
-                            cashInBulanIni += i.price;
+                            omsetBulanIni += i.price; // Tambah ke Pemasukan (Omset)
+                            hppBulanIni += i.modal;   // Tambah ke Pengeluaran (Modal)
                         }
 
                         if (i.soldAt) {
@@ -814,9 +810,9 @@
                     monthlyActuals[mk].profit += p.profit; 
                     monthlyActuals[mk].units += 1;
 
-                    // Kalkulasi Cash In dari profit ekstra bulan ini
+                    // Tambahkan profit ekstra ke Pemasukan bulan ini
                     if (mk === currentMonthStr) {
-                        cashInBulanIni += p.profit;
+                        omsetBulanIni += p.profit;
                     }
                 });
             }
@@ -832,6 +828,11 @@
                 }
             }
 
+            // Jika mode Laba Bersih aktif, otomatis masukkan Gaji bulan ini sebagai pengeluaran
+            if (isNetProfitMode) {
+                hppBulanIni += GAJI;
+            }
+
             let totalBersih = profitMain + profitEkstra;
             if (isNetProfitMode) {
                 totalBersih -= totalGaji;
@@ -844,7 +845,8 @@
                 return b.days - a.days;
             });
 
-            updateUI(monthlyActuals, totalAsetReal, totalBersih, totalUnit, cashSisa, floatPrice, agingStocks, brandStats, cashInBulanIni, cashOutBulanIni);
+            // Kirim variabel omset dan hpp ke updateUI
+            updateUI(monthlyActuals, totalAsetReal, totalBersih, totalUnit, cashSisa, floatPrice, agingStocks, brandStats, omsetBulanIni, hppBulanIni);
         }
 
         // ==========================================
