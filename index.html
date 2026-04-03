@@ -2624,12 +2624,24 @@ function copyToClipboard(text) {
             rb.className = `badge-rank ${c} mb-1`; rb.innerText = r;
         }
 
-        function setMonthlyTarget() {
-            if(currentUserMode!=='owner') return alert("Hanya Owner yang bisa set target.");
-            const newName = prompt("Nama Target?", targetName);
-            const newAmount = prompt("Nominal Target?", targetGoal);
-            if(newName && newAmount) { targetName = newName; targetGoal = Number(newAmount); calculateAll(); }
-        }
+    function setMonthlyTarget() {
+    // Izinkan jika user adalah 'owner' ATAU 'client_demo' (Sandbox)
+    if(currentUserMode !== 'owner' && currentUserMode !== 'client_demo') {
+        return alert("Hanya Owner yang bisa set target.");
+    }
+    
+    const newName = prompt("Nama Target?", targetName);
+    const newAmount = prompt("Nominal Target?", targetGoal);
+    
+    if(newName && newAmount) { 
+        targetName = newName; 
+        targetGoal = Number(newAmount); 
+        
+        // calculateAll() akan otomatis menyimpan ke Local Storage 'ledger_v2_sandbox' 
+        // karena sistem mendeteksi currentUserMode sedang berada di 'client_demo'
+        calculateAll(); 
+       }
+     }
         
         function saveNote() { localStorage.setItem('ledger_owner_note', document.getElementById('ownerNote').value); }
         
